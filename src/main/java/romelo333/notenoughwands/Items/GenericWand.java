@@ -1,9 +1,10 @@
 package romelo333.notenoughwands.Items;
 
 import net.minecraft.block.Block;
-//import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -34,6 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+//import net.minecraft.client.entity.EntityClientPlayerMP;
 
 @Optional.InterfaceList({
         @Optional.Interface(iface = "cofh.api.energy.IEnergyContainerItem", modid = "CoFHAPI")})
@@ -253,30 +256,30 @@ public class GenericWand extends Item implements cofh.api.energy.IEnergyContaine
         double doubleY = p.lastTickPosY + (p.posY - p.lastTickPosY) * evt.partialTicks;
         double doubleZ = p.lastTickPosZ + (p.posZ - p.lastTickPosZ) * evt.partialTicks;
 
-        GL11.glPushAttrib(GL11.GL_CURRENT_BIT | GL11.GL_DEPTH_BUFFER_BIT | GL11.GL_ENABLE_BIT | GL11.GL_LIGHTING_BIT | GL11.GL_TEXTURE_BIT);
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glDisable(GL11.GL_LIGHTING);
+        GlStateManager.pushAttrib();
+        GlStateManager.disableDepth();
+        GlStateManager.disableTexture2D();
+        GlStateManager.disableLighting();
+        GlStateManager.depthMask(false);
 
-        GL11.glPushMatrix();
-        GL11.glTranslated(-doubleX, -doubleY, -doubleZ);
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(-doubleX, -doubleY, -doubleZ);
 
         renderOutlines(coordinates, r, g, b, 4);
 
-        GL11.glPopMatrix();
-        GL11.glPopAttrib();
+        GlStateManager.popMatrix();
+        GlStateManager.popAttrib();
     }
 
     private static void renderOutlines(Set<BlockPos> coordinates, int r, int g, int b, int thickness) {
+        RenderHelper.enableStandardItemLighting();
+
         Tessellator tessellator = Tessellator.getInstance();
 
         WorldRenderer worldRenderer = tessellator.getWorldRenderer();
         worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
 
-        worldRenderer.color(r, g, b, 255);
-//        tessellator.setBrightness(240);
-
-//        GL11.glColor3ub((byte) r, (byte) g, (byte) b);
+        GlStateManager.color(r / 255.0f, g / 255.0f, b / 255.0f);
         GL11.glLineWidth(thickness);
 
         for (BlockPos coordinate : coordinates) {
@@ -287,36 +290,38 @@ public class GenericWand extends Item implements cofh.api.energy.IEnergyContaine
             renderBlockOutline(worldRenderer, x, y, z, .0f); // .02f
         }
         tessellator.draw();
+
+        RenderHelper.disableStandardItemLighting();
     }
 
     private static void renderBlockOutline(WorldRenderer renderer, float mx, float my, float mz, float o) {
-        renderer.pos(mx - o, my - o, mz - o);
-        renderer.pos(mx + 1 + o, my - o, mz - o);
-        renderer.pos(mx - o, my - o, mz - o);
-        renderer.pos(mx - o, my + 1 + o, mz - o);
-        renderer.pos(mx-o, my - o, mz - o);
-        renderer.pos(mx - o, my - o, mz + 1 + o);
-        renderer.pos(mx + 1 + o, my + 1 + o, mz + 1 + o);
-        renderer.pos(mx - o, my + 1 + o, mz + 1 + o);
-        renderer.pos(mx + 1 + o, my + 1 + o, mz + 1 + o);
-        renderer.pos(mx + 1 + o, my - o, mz + 1 + o);
-        renderer.pos(mx+1+ o, my + 1 + o, mz + 1 + o);
-        renderer.pos(mx + 1 + o, my + 1 + o, mz - o);
+        renderer.pos(mx - o, my - o, mz - o).endVertex();
+        renderer.pos(mx + 1 + o, my - o, mz - o).endVertex();
+        renderer.pos(mx - o, my - o, mz - o).endVertex();
+        renderer.pos(mx - o, my + 1 + o, mz - o).endVertex();
+        renderer.pos(mx - o, my - o, mz - o).endVertex();
+        renderer.pos(mx - o, my - o, mz + 1 + o).endVertex();
+        renderer.pos(mx + 1 + o, my + 1 + o, mz + 1 + o).endVertex();
+        renderer.pos(mx - o, my + 1 + o, mz + 1 + o).endVertex();
+        renderer.pos(mx + 1 + o, my + 1 + o, mz + 1 + o).endVertex();
+        renderer.pos(mx + 1 + o, my - o, mz + 1 + o).endVertex();
+        renderer.pos(mx + 1 + o, my + 1 + o, mz + 1 + o).endVertex();
+        renderer.pos(mx + 1 + o, my + 1 + o, mz - o).endVertex();
 
-        renderer.pos(mx - o, my + 1 + o, mz - o);
-        renderer.pos(mx - o, my + 1 + o, mz + 1 + o);
-        renderer.pos(mx - o, my + 1 + o, mz - o);
-        renderer.pos(mx+1+ o, my + 1 + o, mz - o);
+        renderer.pos(mx - o, my + 1 + o, mz - o).endVertex();
+        renderer.pos(mx - o, my + 1 + o, mz + 1 + o).endVertex();
+        renderer.pos(mx - o, my + 1 + o, mz - o).endVertex();
+        renderer.pos(mx + 1 + o, my + 1 + o, mz - o).endVertex();
 
-        renderer.pos(mx + 1 + o, my - o, mz - o);
-        renderer.pos(mx + 1 + o, my - o, mz + 1 + o);
-        renderer.pos(mx + 1 + o, my - o, mz - o);
-        renderer.pos(mx + 1 + o, my + 1 + o, mz - o);
+        renderer.pos(mx + 1 + o, my - o, mz - o).endVertex();
+        renderer.pos(mx + 1 + o, my - o, mz + 1 + o).endVertex();
+        renderer.pos(mx + 1 + o, my - o, mz - o).endVertex();
+        renderer.pos(mx + 1 + o, my + 1 + o, mz - o).endVertex();
 
-        renderer.pos(mx, my, mz + 1 + o);
-        renderer.pos(mx + 1 + o, my, mz + 1 + o);
-        renderer.pos(mx, my, mz + 1 + o);
-        renderer.pos(mx, my+1+o, mz+1+o);
+        renderer.pos(mx, my, mz + 1 + o).endVertex();
+        renderer.pos(mx + 1 + o, my, mz + 1 + o).endVertex();
+        renderer.pos(mx, my, mz + 1 + o).endVertex();
+        renderer.pos(mx, my + 1 + o, mz + 1 + o).endVertex();
     }
 
 

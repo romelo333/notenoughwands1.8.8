@@ -228,6 +228,9 @@ public class BuildingWand extends GenericWand {
         if (mouseOver != null) {
             World world = player.worldObj;
             BlockPos blockPos = mouseOver.getBlockPos();
+            if (blockPos == null) {
+                return;
+            }
             IBlockState blockState = world.getBlockState(blockPos);
             Block block = blockState.getBlock();
             if (block != null && block.getMaterial() != Material.air) {
