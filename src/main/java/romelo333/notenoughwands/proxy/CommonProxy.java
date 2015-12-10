@@ -22,7 +22,7 @@ public abstract class CommonProxy {
         readMainConfig();
         ModCrafting.init();
         GenericWand.setupChestLoot();
-        PacketHandler.registerMessages("notenoughwands");
+        PacketHandler.registerMessages("assets/notenoughwands");
     }
 
     private void readMainConfig() {

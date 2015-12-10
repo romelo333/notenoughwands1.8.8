@@ -1,0 +1,20 @@
+item.swapping_wand.name=Swapping Wand
+item.teleportation_wand.name=Teleportation Wand
+item.capturing_wand.name=Capturing Wand
+item.building_wand.name=Building Wand
+item.illumination_wand.name=Illumination Wand
+item.moving_wand.name=Moving Wand
+item.protection_wand.name=Protection Wand
+item.masterProtection_wand.name=Master Protection Wand
+item.displacement_wand.name=Displacement Wand
+item.acceleration_wand.name=Acceleration Wand
+item.wandcore.name=Wand Core
+item.advanced_wandcore.name=Advanced Wand Core
+
+tile.blocklight.name=Illuminating Orb
+
+
+key.modifier=Wand Modifier
+key.categories.notenoughwands=Not Enough Wands
+
+itemGroup.NotEnoughWands=Not Enough Wands
