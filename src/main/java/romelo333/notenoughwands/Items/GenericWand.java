@@ -2,10 +2,12 @@ package romelo333.notenoughwands.Items;
 
 import net.minecraft.block.Block;
 //import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -50,6 +52,11 @@ public class GenericWand extends Item implements cofh.api.energy.IEnergyContaine
 
     private static List<GenericWand> wands = new ArrayList<GenericWand>();
 
+    @SideOnly(Side.CLIENT)
+    public void registerModel() {
+        Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(this, 0, new ModelResourceLocation(NotEnoughWands.MODID + ":" + getUnlocalizedName().substring(5), "inventory"));
+    }
+
     // Check if a given block can be picked up.
     public static double checkPickup(EntityPlayer player, World world, BlockPos pos, Block block, float maxHardness, Map<String, Double> blacklisted) {
         float hardness = block.getBlockHardness(world, pos);
@@ -87,13 +94,12 @@ public class GenericWand extends Item implements cofh.api.energy.IEnergyContaine
         }
     }
 
-    protected GenericWand setup(String name, String texture) {
+    protected GenericWand setup(String name) {
         if (availability > 0) {
             setMaxStackSize(1);
             setNoRepair();
             setUnlocalizedName(name);
             setCreativeTab(NotEnoughWands.tabNew);
-//            setTextureName(NotEnoughWands.MODID + ":" + texture);
             GameRegistry.registerItem(this, name);
             wands.add(this);
         }
@@ -179,6 +185,15 @@ public class GenericWand extends Item implements cofh.api.energy.IEnergyContaine
     }
 
     public void toggleMode(EntityPlayer player, ItemStack stack) {
+    }
+
+    //------------------------------------------------------------------------------
+
+    @SideOnly(Side.CLIENT)
+    public static void setupModels() {
+        for (GenericWand wand : wands) {
+            wand.registerModel();
+        }
     }
 
     //------------------------------------------------------------------------------

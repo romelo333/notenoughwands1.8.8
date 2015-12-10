@@ -20,5 +20,6 @@ public class ModItems {
     public static void initModels() {
         wandCore.registerModel();
         advancedWandCore.registerModel();
+        GenericWand.setupModels();
     }
 }
