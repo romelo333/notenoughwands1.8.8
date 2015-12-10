@@ -16,6 +16,8 @@ public class ModItems {
     public static DisplacementWand displacementWand;
     public static MovingWand movingWand;
     public static AccelerationWand accelerationWand;
+    public static ProtectionWand protectionWand;
+    public static ProtectionWand masterProtectionWand;
 
     public static void init() {
         wandCore = new WandCore("wandcore");
@@ -28,6 +30,8 @@ public class ModItems {
         displacementWand = new DisplacementWand();
         movingWand = new MovingWand();
         accelerationWand = new AccelerationWand();
+        protectionWand = new ProtectionWand(false);
+        masterProtectionWand = new ProtectionWand(true);
     }
 
     @SideOnly(Side.CLIENT)

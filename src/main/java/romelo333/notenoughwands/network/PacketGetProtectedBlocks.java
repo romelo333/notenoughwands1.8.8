@@ -1,9 +1,18 @@
 package romelo333.notenoughwands.network;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import romelo333.notenoughwands.Items.ProtectionWand;
+import romelo333.notenoughwands.ProtectedBlocks;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class PacketGetProtectedBlocks implements IMessage,IMessageHandler<PacketGetProtectedBlocks, PacketReturnProtectedBlocks> {
     @Override
@@ -19,27 +28,26 @@ public class PacketGetProtectedBlocks implements IMessage,IMessageHandler<Packet
 
     @Override
     public PacketReturnProtectedBlocks onMessage(PacketGetProtectedBlocks message, MessageContext ctx) {
-//        EntityPlayerMP player = ctx.getServerHandler().playerEntity;
-//        World world = player.worldObj;
-//
-//        ItemStack heldItem = player.getHeldItem();
-//        if (heldItem == null || !(heldItem.getItem() instanceof ProtectionWand)) {
-//            // Cannot happen normally
-//            return null;
-//        }
-//        ProtectionWand protectionWand = (ProtectionWand) heldItem.getItem();
-//        int id = protectionWand.getId(heldItem);
-//
-//        ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
-//        Set<Coordinate> blocks = new HashSet<Coordinate>();
-//        protectedBlocks.fetchProtectedBlocks(blocks, world, (int)player.posX, (int)player.posY, (int)player.posZ, protectionWand.blockShowRadius, id);
-//        Set<Coordinate> childBlocks = new HashSet<Coordinate>();
-//        if (id == -1) {
-//            // Master wand:
-//            protectedBlocks.fetchProtectedBlocks(childBlocks, world, (int)player.posX, (int)player.posY, (int)player.posZ, protectionWand.blockShowRadius, -2);
-//        }
-//        return new PacketReturnProtectedBlocks(blocks, childBlocks);
-        return null;
+        EntityPlayerMP player = ctx.getServerHandler().playerEntity;
+        World world = player.worldObj;
+
+        ItemStack heldItem = player.getHeldItem();
+        if (heldItem == null || !(heldItem.getItem() instanceof ProtectionWand)) {
+            // Cannot happen normally
+            return null;
+        }
+        ProtectionWand protectionWand = (ProtectionWand) heldItem.getItem();
+        int id = protectionWand.getId(heldItem);
+
+        ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
+        Set<BlockPos> blocks = new HashSet<>();
+        protectedBlocks.fetchProtectedBlocks(blocks, world, (int)player.posX, (int)player.posY, (int)player.posZ, protectionWand.blockShowRadius, id);
+        Set<BlockPos> childBlocks = new HashSet<>();
+        if (id == -1) {
+            // Master wand:
+            protectedBlocks.fetchProtectedBlocks(childBlocks, world, (int)player.posX, (int)player.posY, (int)player.posZ, protectionWand.blockShowRadius, -2);
+        }
+        return new PacketReturnProtectedBlocks(blocks, childBlocks);
     }
 
 }

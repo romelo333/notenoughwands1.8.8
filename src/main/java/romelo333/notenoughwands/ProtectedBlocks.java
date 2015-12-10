@@ -70,17 +70,15 @@ public class ProtectedBlocks extends WorldSavedData{
     }
 
     private int getMaxProtectedBlocks(int id) {
-//        if (id == -1) {
-//            return ModItems.masterProtectionWand.maximumProtectedBlocks;
-//        } else {
-//            return ModItems.protectionWand.maximumProtectedBlocks;
-//        }
-        // @todo IMPLEMENT THIS AGAIN
-        return 0;
+        if (id == -1) {
+            return ModItems.masterProtectionWand.maximumProtectedBlocks;
+        } else {
+            return ModItems.protectionWand.maximumProtectedBlocks;
+        }
     }
 
-    public boolean protect(EntityPlayer player, World world, int x, int y, int z, int id) {
-        GlobalCoordinate key = new GlobalCoordinate(x, y, z, world.provider.getDimensionId());
+    public boolean protect(EntityPlayer player, World world, BlockPos pos, int id) {
+        GlobalCoordinate key = new GlobalCoordinate(pos, world.provider.getDimensionId());
         if (id != -1 && blocks.containsKey(key)) {
             Tools.error(player, "This block is already protected!");
             return false;
@@ -103,8 +101,8 @@ public class ProtectedBlocks extends WorldSavedData{
         return true;
     }
 
-    public boolean unprotect(EntityPlayer player, World world, int x, int y, int z, int id) {
-        GlobalCoordinate key = new GlobalCoordinate(x, y, z, world.provider.getDimensionId());
+    public boolean unprotect(EntityPlayer player, World world, BlockPos pos, int id) {
+        GlobalCoordinate key = new GlobalCoordinate(pos, world.provider.getDimensionId());
         if (!blocks.containsKey(key)) {
             Tools.error(player, "This block is not prorected!");
             return false;
