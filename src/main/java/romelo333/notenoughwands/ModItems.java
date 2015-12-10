@@ -11,6 +11,7 @@ public class ModItems {
     public static TeleportationWand teleportationWand;
     public static BuildingWand buildingWand;
     public static SwappingWand swappingWand;
+    public static CapturingWand capturingWand;
 
     public static void init() {
         wandCore = new WandCore("wandcore");
@@ -18,6 +19,7 @@ public class ModItems {
         teleportationWand = new TeleportationWand();
         buildingWand = new BuildingWand();
         swappingWand = new SwappingWand();
+        capturingWand = new CapturingWand();
     }
 
     @SideOnly(Side.CLIENT)
