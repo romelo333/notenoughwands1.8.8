@@ -40,11 +40,11 @@ public class Tools {
         }
     }
 
-    public static void giveItem(World world, EntityPlayer player, Block block, int meta, int cnt, int x, int y, int z) {
+    public static void giveItem(World world, EntityPlayer player, Block block, int meta, int cnt, BlockPos pos) {
         ItemStack oldStack = new ItemStack(block, cnt, meta);
         if (!player.inventory.addItemStackToInventory(oldStack)) {
             // Not enough room. Spawn item in world.
-            EntityItem entityItem = new EntityItem(world, x, y, z, oldStack);
+            EntityItem entityItem = new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), oldStack);
             world.spawnEntityInWorld(entityItem);
         }
     }

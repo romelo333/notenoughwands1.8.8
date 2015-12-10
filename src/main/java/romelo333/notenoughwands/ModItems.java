@@ -9,11 +9,13 @@ public class ModItems {
     public static WandCore wandCore;
     public static AdvancedWandCore advancedWandCore;
     public static TeleportationWand teleportationWand;
+    public static BuildingWand buildingWand;
 
     public static void init() {
         wandCore = new WandCore("wandcore");
         advancedWandCore = new AdvancedWandCore("advanced_wandcore");
         teleportationWand = new TeleportationWand();
+        buildingWand = new BuildingWand();
     }
 
     @SideOnly(Side.CLIENT)
