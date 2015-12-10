@@ -23,6 +23,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import romelo333.notenoughwands.Config;
+import romelo333.notenoughwands.ModItems;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.HashSet;
@@ -125,7 +126,7 @@ public class DisplacementWand extends GenericWand {
             IBlockState otherState = world.getBlockState(otherC);
             Block otherBlock = otherState.getBlock();
             if (otherBlock.isReplaceable(world, otherC)) {
-                double cost = 1.0;//@todo GenericWand.checkPickup(player, world, xx, yy, zz, block, maxHardness, ModItems.movingWand.blacklisted);
+                double cost = GenericWand.checkPickup(player, world, otherC, block, maxHardness, ModItems.movingWand.blacklisted);
                 if (cost >= 0.0) {
                     cnt++;
                     int meta = block.getMetaFromState(state);
