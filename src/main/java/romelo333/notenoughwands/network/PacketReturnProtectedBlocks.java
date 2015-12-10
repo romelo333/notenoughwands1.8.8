@@ -1,40 +1,40 @@
 package romelo333.notenoughwands.network;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import romelo333.notenoughwands.varia.Coordinate;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class PacketReturnProtectedBlocks implements IMessage {
-    private Set<Coordinate> blocks;
-    private Set<Coordinate> childBlocks;
+    private Set<BlockPos> blocks;
+    private Set<BlockPos> childBlocks;
 
     @Override
     public void fromBytes(ByteBuf buf) {
         int size = buf.readInt();
-        blocks = new HashSet<Coordinate>(size);
+        blocks = new HashSet<BlockPos>(size);
         for (int i = 0 ; i < size ; i++) {
-            blocks.add(new Coordinate(buf.readInt(), buf.readInt(), buf.readInt()));
+            blocks.add(new BlockPos(buf.readInt(), buf.readInt(), buf.readInt()));
         }
         size = buf.readInt();
-        childBlocks = new HashSet<Coordinate>(size);
+        childBlocks = new HashSet<BlockPos>(size);
         for (int i = 0 ; i < size ; i++) {
-            childBlocks.add(new Coordinate(buf.readInt(), buf.readInt(), buf.readInt()));
+            childBlocks.add(new BlockPos(buf.readInt(), buf.readInt(), buf.readInt()));
         }
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
         buf.writeInt(blocks.size());
-        for (Coordinate block : blocks) {
+        for (BlockPos block : blocks) {
             buf.writeInt(block.getX());
             buf.writeInt(block.getY());
             buf.writeInt(block.getZ());
         }
         buf.writeInt(childBlocks.size());
-        for (Coordinate block : childBlocks) {
+        for (BlockPos block : childBlocks) {
             buf.writeInt(block.getX());
             buf.writeInt(block.getY());
             buf.writeInt(block.getZ());
@@ -42,18 +42,18 @@ public class PacketReturnProtectedBlocks implements IMessage {
     }
 
 
-    public Set<Coordinate> getBlocks() {
+    public Set<BlockPos> getBlocks() {
         return blocks;
     }
 
-    public Set<Coordinate> getChildBlocks() {
+    public Set<BlockPos> getChildBlocks() {
         return childBlocks;
     }
 
     public PacketReturnProtectedBlocks() {
     }
 
-    public PacketReturnProtectedBlocks(Set<Coordinate> blocks, Set<Coordinate> childBlocks) {
+    public PacketReturnProtectedBlocks(Set<BlockPos> blocks, Set<BlockPos> childBlocks) {
         this.blocks = blocks;
         this.childBlocks = childBlocks;
     }

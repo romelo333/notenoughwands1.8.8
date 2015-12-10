@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import romelo333.notenoughwands.Items.GenericWand;
 
 public class PacketToggleMode implements IMessage, IMessageHandler<PacketToggleMode, IMessage> {
 

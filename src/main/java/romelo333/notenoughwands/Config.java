@@ -2,6 +2,7 @@ package romelo333.notenoughwands;
 
 
 import net.minecraftforge.common.config.Configuration;
+import romelo333.notenoughwands.Items.GenericWand;
 
 public class Config {
     public static String CATEGORY_WANDS = "wands";

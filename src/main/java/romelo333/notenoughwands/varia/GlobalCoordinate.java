@@ -10,6 +10,11 @@ public class GlobalCoordinate extends BlockPos {
         this.dim = dim;
     }
 
+    public GlobalCoordinate(BlockPos pos, int dim) {
+        super(pos);
+        this.dim = dim;
+    }
+
     public int getDim() {
         return dim;
     }

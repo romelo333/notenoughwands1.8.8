@@ -20,7 +20,7 @@ public class ForgeEventHandlers {
         }
         BlockPos pos = event.pos;
         ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
-        if (protectedBlocks.isProtected(world, pos.getX(), pos.getY(), pos.getZ())) {
+        if (protectedBlocks.isProtected(world, pos)) {
             event.setCanceled(true);
         }
     }
@@ -42,7 +42,7 @@ public class ForgeEventHandlers {
         int i = 0;
         while (i < affectedBlocks.size()) {
             BlockPos block = affectedBlocks.get(i);
-            if (protectedBlocks.isProtected(world, block.getX(), block.getY(), block.getZ())) {
+            if (protectedBlocks.isProtected(world, block)) {
                 affectedBlocks.remove(i);
             } else {
                 i++;
@@ -60,7 +60,7 @@ public class ForgeEventHandlers {
             // If the block is protected we prevent sneak-wrenching it.
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(event.world);
             BlockPos pos = event.pos;
-            if (protectedBlocks != null && protectedBlocks.isProtected(event.world, pos.getX(), pos.getY(), pos.getZ())) {
+            if (protectedBlocks != null && protectedBlocks.isProtected(event.world, pos)) {
                 event.setCanceled(true);
             }
         }

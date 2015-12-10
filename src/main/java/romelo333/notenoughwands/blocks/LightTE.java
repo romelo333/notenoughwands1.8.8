@@ -7,9 +7,4 @@ public class LightTE extends TileEntity {
     public boolean shouldRenderInPass(int pass) {
         return pass == 1;
     }
-
-    @Override
-    public boolean canUpdate() {
-        return false;
-    }
 }

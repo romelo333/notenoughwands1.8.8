@@ -3,7 +3,6 @@ package romelo333.notenoughwands.Items;
 import net.minecraft.block.Block;
 //import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -27,7 +26,6 @@ import romelo333.notenoughwands.Config;
 import romelo333.notenoughwands.ModItems;
 import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.ProtectedBlocks;
-import romelo333.notenoughwands.varia.Coordinate;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.ArrayList;
@@ -235,7 +233,7 @@ public class GenericWand extends Item implements cofh.api.energy.IEnergyContaine
 
     }
 
-    protected static void renderOutlines(RenderWorldLastEvent evt, EntityPlayerSP p, Set<Coordinate> coordinates, int r, int g, int b) {
+    protected static void renderOutlines(RenderWorldLastEvent evt, EntityPlayerSP p, Set<BlockPos> coordinates, int r, int g, int b) {
         double doubleX = p.lastTickPosX + (p.posX - p.lastTickPosX) * evt.partialTicks;
         double doubleY = p.lastTickPosY + (p.posY - p.lastTickPosY) * evt.partialTicks;
         double doubleZ = p.lastTickPosZ + (p.posZ - p.lastTickPosZ) * evt.partialTicks;
@@ -254,7 +252,7 @@ public class GenericWand extends Item implements cofh.api.energy.IEnergyContaine
         GL11.glPopAttrib();
     }
 
-    private static void renderOutlines(Set<Coordinate> coordinates, int r, int g, int b, int thickness) {
+    private static void renderOutlines(Set<BlockPos> coordinates, int r, int g, int b, int thickness) {
         Tessellator tessellator = Tessellator.getInstance();
 
         WorldRenderer worldRenderer = tessellator.getWorldRenderer();
@@ -266,7 +264,7 @@ public class GenericWand extends Item implements cofh.api.energy.IEnergyContaine
 //        GL11.glColor3ub((byte) r, (byte) g, (byte) b);
         GL11.glLineWidth(thickness);
 
-        for (Coordinate coordinate : coordinates) {
+        for (BlockPos coordinate : coordinates) {
             float x = coordinate.getX();
             float y = coordinate.getY();
             float z = coordinate.getZ();

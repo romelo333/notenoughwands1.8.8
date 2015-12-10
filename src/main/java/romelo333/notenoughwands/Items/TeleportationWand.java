@@ -6,10 +6,13 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import romelo333.notenoughwands.Config;
 import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.varia.Tools;
@@ -47,7 +50,7 @@ public class TeleportationWand extends GenericWand {
                 return stack;
             }
             Vec3 lookVec = player.getLookVec();
-            Vec3 start = Vec3.createVectorHelper(player.posX, player.posY + player.getEyeHeight(), player.posZ);
+            Vec3 start = new Vec3(player.posX, player.posY + player.getEyeHeight(), player.posZ);
             int distance = this.maxdist;
             if (player.isSneaking()) {
                 distance /= 2;
@@ -57,13 +60,14 @@ public class TeleportationWand extends GenericWand {
             if (position == null) {
                 player.setPositionAndUpdate(end.xCoord, end.yCoord, end.zCoord);
             } else {
-                int x = position.blockX;
-                int y = position.blockY;
-                int z = position.blockZ;
-                if (world.isAirBlock(x, y + 1, z) && world.isAirBlock(x, y + 2, z)) {
+                BlockPos blockPos = position.getBlockPos();
+                int x = blockPos.getX();
+                int y = blockPos.getY();
+                int z = blockPos.getZ();
+                if (world.isAirBlock(blockPos.up()) && world.isAirBlock(blockPos.up(2))) {
                     player.setPositionAndUpdate(x+.5, y + 1, z+.5);
                 } else {
-                    switch (ForgeDirection.getOrientation(position.sideHit)) {
+                    switch (position.sideHit) {
                         case DOWN:
                             player.setPositionAndUpdate(x+.5, y - 2, z+.5);
                             break;
@@ -82,8 +86,6 @@ public class TeleportationWand extends GenericWand {
                         case EAST:
                             player.setPositionAndUpdate(x + 1+.5, y, z+.5);
                             break;
-                        case UNKNOWN:
-                            return stack;
                     }
                 }
             }

@@ -1,17 +1,9 @@
 package romelo333.notenoughwands.network;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import romelo333.notenoughwands.ProtectedBlocks;
-import romelo333.notenoughwands.varia.Coordinate;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class PacketGetProtectedBlocks implements IMessage,IMessageHandler<PacketGetProtectedBlocks, PacketReturnProtectedBlocks> {
     @Override

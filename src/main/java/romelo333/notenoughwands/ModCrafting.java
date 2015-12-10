@@ -5,6 +5,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.RecipeSorter;
+import romelo333.notenoughwands.Items.GenericWand;
 import romelo333.notenoughwands.varia.ContainerToItemRecipe;
 
 public class ModCrafting {

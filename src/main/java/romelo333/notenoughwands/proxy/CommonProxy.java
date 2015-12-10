@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.Level;
 import romelo333.notenoughwands.*;
+import romelo333.notenoughwands.Items.GenericWand;
 import romelo333.notenoughwands.network.PacketHandler;
 import romelo333.notenoughwands.varia.WrenchChecker;
 
