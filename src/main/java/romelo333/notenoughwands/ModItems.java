@@ -10,12 +10,14 @@ public class ModItems {
     public static AdvancedWandCore advancedWandCore;
     public static TeleportationWand teleportationWand;
     public static BuildingWand buildingWand;
+    public static SwappingWand swappingWand;
 
     public static void init() {
         wandCore = new WandCore("wandcore");
         advancedWandCore = new AdvancedWandCore("advanced_wandcore");
         teleportationWand = new TeleportationWand();
         buildingWand = new BuildingWand();
+        swappingWand = new SwappingWand();
     }
 
     @SideOnly(Side.CLIENT)
