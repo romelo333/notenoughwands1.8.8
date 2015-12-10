@@ -15,6 +15,7 @@ public class ModItems {
     public static IlluminationWand illuminationWand;
     public static DisplacementWand displacementWand;
     public static MovingWand movingWand;
+    public static AccelerationWand accelerationWand;
 
     public static void init() {
         wandCore = new WandCore("wandcore");
@@ -26,6 +27,7 @@ public class ModItems {
         illuminationWand = new IlluminationWand();
         displacementWand = new DisplacementWand();
         movingWand = new MovingWand();
+        accelerationWand = new AccelerationWand();
     }
 
     @SideOnly(Side.CLIENT)
