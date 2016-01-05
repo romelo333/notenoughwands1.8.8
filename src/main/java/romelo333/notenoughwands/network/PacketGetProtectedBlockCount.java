@@ -1,13 +1,15 @@
 package romelo333.notenoughwands.network;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import romelo333.notenoughwands.ProtectedBlocks;
 
-public class PacketGetProtectedBlockCount implements IMessage,IMessageHandler<PacketGetProtectedBlockCount, PacketReturnProtectedBlockCount> {
+public class PacketGetProtectedBlockCount implements IMessage {
     private int id;
 
     @Override
@@ -27,12 +29,20 @@ public class PacketGetProtectedBlockCount implements IMessage,IMessageHandler<Pa
         this.id = id;
     }
 
-    @Override
-    public PacketReturnProtectedBlockCount onMessage(PacketGetProtectedBlockCount message, MessageContext ctx) {
-        World world = ctx.getServerHandler().playerEntity.worldObj;
+    public static class Handler implements IMessageHandler<PacketGetProtectedBlockCount, IMessage> {
+        @Override
+        public IMessage onMessage(PacketGetProtectedBlockCount message, MessageContext ctx) {
+            MinecraftServer.getServer().addScheduledTask(() -> handle(message, ctx));
+            return null;
+        }
 
-        ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
-        return new PacketReturnProtectedBlockCount(protectedBlocks.getProtectedBlockCount(message.id));
+        private void handle(PacketGetProtectedBlockCount message, MessageContext ctx) {
+            EntityPlayerMP player = ctx.getServerHandler().playerEntity;
+            World world = player.worldObj;
+
+            ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
+            PacketReturnProtectedBlockCount msg = new PacketReturnProtectedBlockCount(protectedBlocks.getProtectedBlockCount(message.id));
+            PacketHandler.INSTANCE.sendTo(msg, player);
+        }
     }
-
 }

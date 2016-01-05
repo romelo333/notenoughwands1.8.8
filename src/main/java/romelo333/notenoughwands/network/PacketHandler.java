@@ -17,12 +17,12 @@ public class PacketHandler {
         INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(channelName);
 
         // Server side
-        INSTANCE.registerMessage(PacketToggleMode.class, PacketToggleMode.class, nextID(), Side.SERVER);
-        INSTANCE.registerMessage(PacketGetProtectedBlocks.class, PacketGetProtectedBlocks.class, nextID(), Side.SERVER);
-        INSTANCE.registerMessage(PacketGetProtectedBlockCount.class, PacketGetProtectedBlockCount.class, nextID(), Side.SERVER);
+        INSTANCE.registerMessage(PacketToggleMode.Handler.class, PacketToggleMode.class, nextID(), Side.SERVER);
+        INSTANCE.registerMessage(PacketGetProtectedBlocks.Handler.class, PacketGetProtectedBlocks.class, nextID(), Side.SERVER);
+        INSTANCE.registerMessage(PacketGetProtectedBlockCount.Handler.class, PacketGetProtectedBlockCount.class, nextID(), Side.SERVER);
 
         // Client side
-        INSTANCE.registerMessage(PacketReturnProtectedBlocksHandler.class, PacketReturnProtectedBlocks.class, nextID(), Side.CLIENT);
-        INSTANCE.registerMessage(PacketReturnProtectedBlockCountHandler.class, PacketReturnProtectedBlockCount.class, nextID(), Side.CLIENT);
+        INSTANCE.registerMessage(PacketReturnProtectedBlocks.Handler.class, PacketReturnProtectedBlocks.class, nextID(), Side.CLIENT);
+        INSTANCE.registerMessage(PacketReturnProtectedBlockCount.Handler.class, PacketReturnProtectedBlockCount.class, nextID(), Side.CLIENT);
     }
 }

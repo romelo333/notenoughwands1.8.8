@@ -1,8 +1,11 @@
 package romelo333.notenoughwands.network;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -56,5 +59,13 @@ public class PacketReturnProtectedBlocks implements IMessage {
     public PacketReturnProtectedBlocks(Set<BlockPos> blocks, Set<BlockPos> childBlocks) {
         this.blocks = blocks;
         this.childBlocks = childBlocks;
+    }
+
+    public static class Handler implements IMessageHandler<PacketReturnProtectedBlocks, IMessage> {
+        @Override
+        public IMessage onMessage(PacketReturnProtectedBlocks message, MessageContext ctx) {
+            Minecraft.getMinecraft().addScheduledTask(() -> ReturnProtectedBlocksHelper.setProtectedBlocks(message));
+            return null;
+        }
     }
 }
