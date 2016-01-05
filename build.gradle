@@ -13,11 +13,20 @@ buildscript {
     }
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'maven'
 
 repositories {
-      maven {
-          url "http://dvs1.progwml6.com/files/maven"
-      }
+    maven { // The repo from which to get waila
+        name "Mobius Repo"
+        url "http://mobiusstrip.eu/maven"
+    }
+    maven { // JEI
+        url "http://dvs1.progwml6.com/files/maven"
+    }
+    maven {
+        name = "sonatype"
+        url = "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
 }
 
 /*
@@ -26,7 +35,7 @@ plugins {
     id "net.minecraftforge.gradle.forge" version "2.0.2"
 }
 */
-version = "1.2.3"
+version = "1.8.9-1.2.4"
 def ENV = System.getenv()
 if (ENV.DRONE_BUILD_NUMBER) {
     version += ".n" + ENV.DRONE_BUILD_NUMBER
@@ -38,7 +47,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 minecraft {
-    version = "1.8.8-11.15.0.1612-1.8.8"
+    version = "1.8.9-11.15.0.1674"
     runDir = "run"
     
     // the mappings can be changed at any time, and must be in the following format.
@@ -46,7 +55,7 @@ minecraft {
     // stable_#            stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not allways work.
     // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = "snapshot_20151208"
+    mappings = "snapshot_20151216"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
     useDepAts = true
@@ -74,7 +83,8 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
-    deobfCompile "mezz.jei:jei_1.8.8:2.5.0.26"
+    deobfCompile "mcp.mobius.waila:Waila:1.6.0-B3_1.8.8"
+    deobfCompile "mezz.jei:jei_1.8.8:2.8.3.39"
 }
 
 processResources
