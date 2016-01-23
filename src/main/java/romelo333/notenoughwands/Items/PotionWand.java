@@ -76,7 +76,7 @@ public class PotionWand extends GenericWand {
             return;
         }
         NBTTagList effects = (NBTTagList) tagCompound.getTag("effects");
-        if (effects.tagCount()==0){
+        if (effects == null || effects.tagCount()==0){
             list.add(EnumChatFormatting.YELLOW+"No effects.");
             return;
         }
@@ -101,7 +101,7 @@ public class PotionWand extends GenericWand {
             return;
         }
         NBTTagList effects = (NBTTagList) tagCompound.getTag("effects");
-        if (effects.tagCount()==0){
+        if (effects == null || effects.tagCount()==0){
             return;
         }
         if (mode >= effects.tagCount()) {
@@ -125,7 +125,7 @@ public class PotionWand extends GenericWand {
             return;
         }
         NBTTagList effects = (NBTTagList) tagCompound.getTag("effects");
-        if (effects.tagCount()==0){
+        if (effects == null || effects.tagCount()==0){
             Tools.error(player, "There are no effects in this wand!");
             return;
         }
