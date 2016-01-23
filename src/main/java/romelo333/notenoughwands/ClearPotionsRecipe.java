@@ -19,20 +19,15 @@ public class ClearPotionsRecipe extends ShapedRecipes {
         if (tagCompound==null){
             tagCompound=new NBTTagCompound();
         }
-        NBTTagList list = tagCompound.getTagList("effects", Constants.NBT.TAG_COMPOUND);
-        ItemStack potion = inv.getStackInSlot(1);
-        for (PotionEffect effect : ((ItemPotion) potion.getItem()).getEffects(potion)) {
-            NBTTagCompound effecttag = new NBTTagCompound();
-            effect.writeCustomPotionEffectToNBT(effecttag);
-            list.appendTag(effecttag);
-        }
+        tagCompound=(NBTTagCompound)tagCompound.copy();
+        NBTTagList list = new NBTTagList();
         tagCompound.setTag("effects",list);
         result.setTagCompound(tagCompound);
         return result;
     }
 
     public ClearPotionsRecipe(){
-        super(2, 1, new ItemStack[]{new ItemStack(ModItems.potionWand),new ItemStack(Items.potionitem)}, new ItemStack(ModItems.potionWand));
+        super(2, 1, new ItemStack[]{new ItemStack(ModItems.potionWand),new ItemStack(Items.glass_bottle)}, new ItemStack(ModItems.potionWand));
 
     }
 
@@ -49,7 +44,7 @@ public class ClearPotionsRecipe extends ShapedRecipes {
         if (potion==null){
             return false;
         }
-        if (potion.getItem()!=Items.potionitem){
+        if (potion.getItem()!=Items.glass_bottle){
             return false;
         }
         return true;

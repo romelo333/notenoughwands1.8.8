@@ -3,23 +3,33 @@ package romelo333.notenoughwands.Items;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import romelo333.notenoughwands.AddPotionRecipe;
+import romelo333.notenoughwands.ClearPotionsRecipe;
 import romelo333.notenoughwands.Config;
 import romelo333.notenoughwands.varia.Tools;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class PotionWand extends GenericWand {
     private boolean allowPassive = true;
@@ -28,7 +38,7 @@ public class PotionWand extends GenericWand {
     private float diffcultyAdd = 1.0f;
 
     public PotionWand() {
-        setup("freezing_wand").xpUsage(10).availability(AVAILABILITY_ADVANCED).loot(4);
+        setup("potion_wand").xpUsage(10).availability(AVAILABILITY_ADVANCED).loot(3);
     }
 
     @Override
@@ -40,38 +50,88 @@ public class PotionWand extends GenericWand {
         diffcultyAdd = (float) cfg.get(Config.CATEGORY_WANDS, getUnlocalizedName() + "_diffcultyAdd", diffcultyAdd, "Add this to the HP * difficultyMult to get the final difficulty scale that affects XP/RF usage (a final result of 1.0 means that the default XP/RF is used)").getDouble();
     }
 
+    private String getEffectName (PotionEffect potioneffect){
+        String s1 = StatCollector.translateToLocal(potioneffect.getEffectName()).trim();
+        Potion potion = Potion.potionTypes[potioneffect.getPotionID()];
+        Map<IAttribute, AttributeModifier> map = potion.getAttributeModifierMap();
+
+        if (potioneffect.getAmplifier() > 0)
+        {
+            s1 = s1 + " " + StatCollector.translateToLocal("potion.potency." + potioneffect.getAmplifier()).trim();
+        }
+
+        if (potioneffect.getDuration() > 20)
+        {
+            s1 = s1 + " (" + Potion.getDurationString(potioneffect) + ")";
+        }
+        return s1;
+    }
     @Override
     public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean b) {
         super.addInformation(stack, player, list, b);
-        list.add("Right click on creature to freeze creature.");
+        list.add("Left click on creature to add effect on creature.");
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound==null){
+            list.add(EnumChatFormatting.YELLOW+"No effects.");
+            return;
+        }
+        NBTTagList effects = (NBTTagList) tagCompound.getTag("effects");
+        if (effects.tagCount()==0){
+            list.add(EnumChatFormatting.YELLOW+"No effects.");
+            return;
+        }
+        int mode = getMode(stack);
+        for (int i=0;i<effects.tagCount();i++) {
+            NBTTagCompound effecttag = effects.getCompoundTagAt(i);
+            PotionEffect effect = PotionEffect.readCustomPotionEffectFromNBT(effecttag);
+            if (i==mode){
+                list.add(EnumChatFormatting.GREEN+getEffectName(effect));
+            } else {
+                list.add(EnumChatFormatting.GRAY+getEffectName(effect));
+            }
+        }
     }
 
     @Override
-    public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
-        if (!world.isRemote) {
-
+    public void toggleMode(EntityPlayer player, ItemStack stack) {
+        int mode = getMode(stack);
+        mode++;
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound==null){
+            return;
         }
-        return true;
-    }
-
-    private EntityLivingBase createEntity(EntityPlayer player, World world, String type) {
-        EntityLivingBase entityLivingBase;
-        try {
-            entityLivingBase = (EntityLivingBase) Class.forName(type).getConstructor(World.class).newInstance(world);
-        } catch (Exception e) {
-            entityLivingBase = null;
+        NBTTagList effects = (NBTTagList) tagCompound.getTag("effects");
+        if (effects.tagCount()==0){
+            return;
         }
-        return entityLivingBase;
+        if (mode >= effects.tagCount()) {
+            mode = 0;
+        }
+        NBTTagCompound effecttag = effects.getCompoundTagAt(mode);
+        PotionEffect effect = PotionEffect.readCustomPotionEffectFromNBT(effecttag);
+        Tools.notify(player, "Switched to " + getEffectName(effect) + " mode");
+        Tools.getTagCompound(stack).setInteger("mode", mode);
     }
 
-    private void freezePlayer(EntityPlayer player){
-        player.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 200, 4));
+    private int getMode(ItemStack stack) {
+        return Tools.getTagCompound(stack).getInteger("mode");
     }
 
-    public static List<EntityLivingBase> frozen = new ArrayList<>();
-    private void freezeMob(EntityLivingBase mob){
-//        mob.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 200, 4));
-        frozen.add(mob);
+
+    private void addeffect(EntityLivingBase entity, ItemStack wand, EntityPlayer player){
+        NBTTagCompound tagCompound = wand.getTagCompound();
+        if (tagCompound==null){
+            Tools.error(player, "There are no effects in this wand!");
+            return;
+        }
+        NBTTagList effects = (NBTTagList) tagCompound.getTag("effects");
+        if (effects.tagCount()==0){
+            Tools.error(player, "There are no effects in this wand!");
+            return;
+        }
+        NBTTagCompound effecttag = effects.getCompoundTagAt(getMode(wand));
+        PotionEffect effect = PotionEffect.readCustomPotionEffectFromNBT(effecttag);
+        entity.addPotionEffect(effect);
     }
 
     @Override
@@ -79,16 +139,12 @@ public class PotionWand extends GenericWand {
         if (!player.worldObj.isRemote) {
             if (entity instanceof EntityLivingBase) {
                 EntityLivingBase entityLivingBase = (EntityLivingBase) entity;
-                if (entityLivingBase instanceof EntityPlayer) {
-                    freezePlayer((EntityPlayer)entityLivingBase);
-                    return true;
-                }
                 if ((!allowHostile) && entityLivingBase instanceof IMob) {
-                    Tools.error(player, "It is not possible to freeze hostile mobs with this wand!");
+                    Tools.error(player, "It is not possible to add effects to hostile mobs with this wand!");
                     return true;
                 }
                 if ((!allowPassive) && !(entityLivingBase instanceof IMob)) {
-                    Tools.error(player, "It is not possible to freeze passive mobs with this wand!");
+                    Tools.error(player, "It is not possible to add effects to passive mobs with this wand!");
                     return true;
                 }
 
@@ -97,7 +153,7 @@ public class PotionWand extends GenericWand {
                     return true;
                 }
 
-                freezeMob(entityLivingBase);
+                addeffect(entityLivingBase, stack, player);
                 registerUsage(stack, player, difficultyScale);
             } else {
                 Tools.error(player, "Please select a living entity!");
@@ -108,6 +164,8 @@ public class PotionWand extends GenericWand {
 
     @Override
     protected void setupCraftingInt(Item wandcore) {
-        GameRegistry.addRecipe(new ItemStack(this), "is ", "sw ", "  w", 's', Blocks.slime_block, 'i', Blocks.packed_ice, 'w', wandcore);
+        GameRegistry.addRecipe(new ItemStack(this), "fgf", "gw ", "f w", 'f', Items.fermented_spider_eye, 'g', Blocks.glowstone, 'w', wandcore);
+        GameRegistry.addRecipe(new AddPotionRecipe());
+        GameRegistry.addRecipe(new ClearPotionsRecipe());
     }
 }

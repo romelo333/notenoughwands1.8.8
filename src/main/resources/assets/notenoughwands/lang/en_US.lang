@@ -8,6 +8,8 @@ item.protection_wand.name=Protection Wand
 item.masterProtection_wand.name=Master Protection Wand
 item.displacement_wand.name=Displacement Wand
 item.acceleration_wand.name=Acceleration Wand
+item.freezing_wand.name=Freezing Wand
+item.potion_wand.name=Potion Wand
 item.wandcore.name=Wand Core
 item.advanced_wandcore.name=Advanced Wand Core
 

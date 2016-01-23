@@ -18,6 +18,8 @@ public class ModItems {
     public static AccelerationWand accelerationWand;
     public static ProtectionWand protectionWand;
     public static ProtectionWand masterProtectionWand;
+    public static FreezingWand freezingWand;
+    public static PotionWand potionWand;
 
     public static void init() {
         wandCore = new WandCore("wandcore");
@@ -32,6 +34,8 @@ public class ModItems {
         accelerationWand = new AccelerationWand();
         protectionWand = new ProtectionWand(false);
         masterProtectionWand = new ProtectionWand(true);
+        freezingWand = new FreezingWand();
+        potionWand = new PotionWand();
     }
 
     @SideOnly(Side.CLIENT)

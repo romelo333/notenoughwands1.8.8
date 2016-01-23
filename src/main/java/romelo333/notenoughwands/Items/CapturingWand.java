@@ -118,7 +118,6 @@ public class CapturingWand extends GenericWand {
                 }
 
                 float difficultyScale = entityLivingBase.getMaxHealth() * difficultyMult + diffcultyAdd;
-                System.out.println("difficultyScale = " + difficultyScale);
                 if (!checkUsage(stack, player, difficultyScale)) {
                     return true;
                 }

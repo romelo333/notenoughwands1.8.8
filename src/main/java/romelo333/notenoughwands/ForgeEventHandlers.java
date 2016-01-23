@@ -3,10 +3,14 @@ package romelo333.notenoughwands;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import romelo333.notenoughwands.Items.FreezingWand;
 import romelo333.notenoughwands.varia.WrenchChecker;
 
 import java.util.List;
@@ -67,6 +71,17 @@ public class ForgeEventHandlers {
 
     }
 
+    @SubscribeEvent
+    public void onlivingUpdate(LivingEvent.LivingUpdateEvent event){
+        if (FreezingWand.frozen.contains(event.entityLiving)){
+            event.setCanceled(true);
+        }
+    }
 
-
+    @SubscribeEvent
+    public void onlivingHurt(LivingHurtEvent event){
+        if (FreezingWand.frozen.contains(event.entityLiving)){
+            event.setCanceled(true);
+        }
+    }
 }
