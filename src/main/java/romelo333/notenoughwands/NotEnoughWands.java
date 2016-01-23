@@ -1,5 +1,6 @@
 package romelo333.notenoughwands;
 
+import mod.chiselsandbits.api.IChiselAndBitsAPI;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.config.Configuration;
@@ -32,6 +33,8 @@ public class NotEnoughWands {
     public static File mainConfigDir;
     public static File modConfigDir;
     public static Configuration config;
+
+    public static IChiselAndBitsAPI chiselAndBitsAPI;
 
     public static CreativeTabs tabNew = new CreativeTabs("NotEnoughWands") {
         @Override
