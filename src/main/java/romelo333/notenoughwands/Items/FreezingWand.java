@@ -21,6 +21,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import romelo333.notenoughwands.Config;
+import romelo333.notenoughwands.FreezePotion;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.ArrayList;
@@ -59,24 +60,8 @@ public class FreezingWand extends GenericWand {
         return true;
     }
 
-    private EntityLivingBase createEntity(EntityPlayer player, World world, String type) {
-        EntityLivingBase entityLivingBase;
-        try {
-            entityLivingBase = (EntityLivingBase) Class.forName(type).getConstructor(World.class).newInstance(world);
-        } catch (Exception e) {
-            entityLivingBase = null;
-        }
-        return entityLivingBase;
-    }
-
-    private void freezePlayer(EntityPlayer player){
-        player.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 200, 4));
-    }
-
-    public static List<EntityLivingBase> frozen = new ArrayList<>();
     private void freezeMob(EntityLivingBase mob){
-//        mob.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 200, 4));
-        frozen.add(mob);
+        mob.addPotionEffect(new PotionEffect(FreezePotion.freezePotion.getId(), 200, 4));
     }
 
     @Override
@@ -85,7 +70,7 @@ public class FreezingWand extends GenericWand {
             if (entity instanceof EntityLivingBase) {
                 EntityLivingBase entityLivingBase = (EntityLivingBase) entity;
                 if (entityLivingBase instanceof EntityPlayer) {
-                    freezePlayer((EntityPlayer)entityLivingBase);
+                    Tools.error(player, "You cannot use this on players!");
                     return true;
                 }
                 if ((!allowHostile) && entityLivingBase instanceof IMob) {

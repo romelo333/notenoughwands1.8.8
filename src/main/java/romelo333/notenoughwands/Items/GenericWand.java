@@ -90,7 +90,7 @@ public class GenericWand extends Item implements cofh.api.energy.IEnergyContaine
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean b) {
+    public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean b) {
         super.addInformation(stack, player, list, b);
         if (needsrf > 0) {
             list.add(EnumChatFormatting.GREEN+"Energy: " + getEnergyStored(stack) + " / " + getMaxEnergyStored(stack));

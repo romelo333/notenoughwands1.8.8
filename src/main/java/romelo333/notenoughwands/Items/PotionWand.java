@@ -52,42 +52,41 @@ public class PotionWand extends GenericWand {
 
     private String getEffectName (PotionEffect potioneffect){
         String s1 = StatCollector.translateToLocal(potioneffect.getEffectName()).trim();
-        Potion potion = Potion.potionTypes[potioneffect.getPotionID()];
-        Map<IAttribute, AttributeModifier> map = potion.getAttributeModifierMap();
-
-        if (potioneffect.getAmplifier() > 0)
-        {
+        if (potioneffect.getAmplifier() > 0) {
             s1 = s1 + " " + StatCollector.translateToLocal("potion.potency." + potioneffect.getAmplifier()).trim();
         }
-
-        if (potioneffect.getDuration() > 20)
-        {
+        if (potioneffect.getDuration() > 20) {
             s1 = s1 + " (" + Potion.getDurationString(potioneffect) + ")";
         }
         return s1;
     }
+
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean b) {
+    public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean b) {
         super.addInformation(stack, player, list, b);
-        list.add("Left click on creature to add effect on creature.");
+        list.add("Left click on creature to apply effect");
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound==null){
-            list.add(EnumChatFormatting.YELLOW+"No effects.");
+            list.add(EnumChatFormatting.YELLOW+"No effects. Combine with potion");
+            list.add(EnumChatFormatting.YELLOW+"in crafting table to add effect");
             return;
         }
         NBTTagList effects = (NBTTagList) tagCompound.getTag("effects");
         if (effects == null || effects.tagCount()==0){
-            list.add(EnumChatFormatting.YELLOW+"No effects.");
+            list.add(EnumChatFormatting.YELLOW+"No effects. Combine with potion");
+            list.add(EnumChatFormatting.YELLOW+"in crafting table to add effect");
             return;
         }
+        list.add(EnumChatFormatting.YELLOW+"Combine with empty bottle");
+        list.add(EnumChatFormatting.YELLOW+"to clear effects");
         int mode = getMode(stack);
         for (int i=0;i<effects.tagCount();i++) {
             NBTTagCompound effecttag = effects.getCompoundTagAt(i);
             PotionEffect effect = PotionEffect.readCustomPotionEffectFromNBT(effecttag);
             if (i==mode){
-                list.add(EnumChatFormatting.GREEN+getEffectName(effect));
+                list.add("    + " + EnumChatFormatting.GREEN + getEffectName(effect));
             } else {
-                list.add(EnumChatFormatting.GRAY+getEffectName(effect));
+                list.add("    " + EnumChatFormatting.GRAY+getEffectName(effect));
             }
         }
     }
