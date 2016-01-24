@@ -1,21 +1,15 @@
 package romelo333.notenoughwands.Items;
 
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
@@ -24,7 +18,6 @@ import romelo333.notenoughwands.Config;
 import romelo333.notenoughwands.FreezePotion;
 import romelo333.notenoughwands.varia.Tools;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class FreezingWand extends GenericWand {
@@ -98,6 +91,6 @@ public class FreezingWand extends GenericWand {
 
     @Override
     protected void setupCraftingInt(Item wandcore) {
-        GameRegistry.addRecipe(new ItemStack(this), "is ", "sw ", "  w", 's', Blocks.slime_block, 'i', Blocks.packed_ice, 'w', wandcore);
+//        GameRegistry.addRecipe(new ItemStack(this), "is ", "sw ", "  w", 's', Blocks.slime_block, 'i', Blocks.packed_ice, 'w', wandcore);
     }
 }
