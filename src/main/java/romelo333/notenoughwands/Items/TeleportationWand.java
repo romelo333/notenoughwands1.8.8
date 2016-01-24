@@ -31,7 +31,7 @@ public class TeleportationWand extends GenericWand {
     @Override
     public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean b) {
         super.addInformation(stack, player, list, b);
-        list.add("Rigth click to teleport forward until a block");
+        list.add("Right click to teleport forward until a block");
         list.add("is hit or maximum distance is reached. Sneak right");
         list.add("click for half distance");
     }
