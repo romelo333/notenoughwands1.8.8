@@ -1,27 +1,38 @@
 package romelo333.notenoughwands;
 
+import com.google.common.collect.Lists;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.ShapedRecipes;
+import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
-public class AddPotionRecipe extends ShapedRecipes {
+public class AddPotionRecipe extends ShapelessRecipes {
     @Override
     public ItemStack getCraftingResult(InventoryCrafting inv) {
+        ItemStack potion = null;
+        ItemStack wand = null;
+        for (int i = 0 ; i < inv.getSizeInventory() ; i++) {
+            ItemStack stack = inv.getStackInSlot(i);
+            if (stack != null && stack.getItem() == ModItems.potionWand) {
+                wand = stack;
+            } else if (stack != null && stack.getItem() == Items.potionitem) {
+                potion = stack;
+            }
+        }
+
         ItemStack result = super.getCraftingResult(inv);
-        NBTTagCompound tagCompound = inv.getStackInSlot(0).getTagCompound();
+        NBTTagCompound tagCompound = wand.getTagCompound();
         if (tagCompound==null){
             tagCompound=new NBTTagCompound();
         }
         tagCompound=(NBTTagCompound)tagCompound.copy();
         NBTTagList list = tagCompound.getTagList("effects", Constants.NBT.TAG_COMPOUND);
-        ItemStack potion = inv.getStackInSlot(1);
         for (PotionEffect effect : ((ItemPotion) potion.getItem()).getEffects(potion)) {
             NBTTagCompound effecttag = new NBTTagCompound();
             effect.writeCustomPotionEffectToNBT(effecttag);
@@ -33,26 +44,23 @@ public class AddPotionRecipe extends ShapedRecipes {
     }
 
     public AddPotionRecipe(){
-        super(2, 1, new ItemStack[]{new ItemStack(ModItems.potionWand),new ItemStack(Items.potionitem)}, new ItemStack(ModItems.potionWand));
-
+        super(new ItemStack(ModItems.potionWand), Lists.asList(new ItemStack(ModItems.potionWand),new ItemStack(Items.potionitem), new ItemStack[0]));
     }
 
     @Override
     public boolean matches(InventoryCrafting inv, World worldIn) {
-        ItemStack wand = inv.getStackInSlot(0);
-        if (wand==null){
-            return false;
+        int foundWand = 0;
+        int foundPotion = 0;
+        for (int i = 0 ; i < inv.getSizeInventory() ; i++) {
+            ItemStack stack = inv.getStackInSlot(i);
+            if (stack != null && stack.getItem() == ModItems.potionWand) {
+                foundWand++;
+            } else if (stack != null && stack.getItem() == Items.potionitem) {
+                foundPotion++;
+            } else if (stack != null) {
+                return false;
+            }
         }
-        if (wand.getItem()!=ModItems.potionWand){
-            return false;
-        }
-        ItemStack potion = inv.getStackInSlot(1);
-        if (potion==null){
-            return false;
-        }
-        if (potion.getItem()!=Items.potionitem){
-            return false;
-        }
-        return true;
+        return foundWand == 1 && foundPotion == 1;
     }
 }
