@@ -61,13 +61,15 @@ public class ProtectionWand extends GenericWand {
     private static long tooltipLastTime = 0;
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean b) {
+    public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean b) {
         super.addInformation(stack, player, list, b);
         int mode = getMode(stack);
         int id = getId(stack);
-        if ((System.currentTimeMillis() - tooltipLastTime) > 250) {
-            tooltipLastTime = System.currentTimeMillis();
-            PacketHandler.INSTANCE.sendToServer(new PacketGetProtectedBlockCount(id));
+        if (id != 0) {
+            if ((System.currentTimeMillis() - tooltipLastTime) > 250) {
+                tooltipLastTime = System.currentTimeMillis();
+                PacketHandler.INSTANCE.sendToServer(new PacketGetProtectedBlockCount(id));
+            }
         }
         list.add(EnumChatFormatting.GREEN + "Mode: " + descriptions[mode]);
         if (master) {
