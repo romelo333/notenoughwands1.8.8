@@ -7,9 +7,11 @@ import romelo333.notenoughwands.NotEnoughWands;
 
 @ChiselsAndBitsAddon
 public class ChiselAndBitsSupport implements IChiselsAndBitsAddon {
+    public static IChiselAndBitsAPI chiselAndBitsAPI;
+
     @Override
     public void onReadyChiselsAndBits(IChiselAndBitsAPI api) {
         NotEnoughWands.logger.info("Detected Chisel & Bits, enabling support");
-        NotEnoughWands.chiselAndBitsAPI = api;
+        chiselAndBitsAPI = api;
     }
 }
