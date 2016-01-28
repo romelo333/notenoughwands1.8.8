@@ -63,9 +63,10 @@ public class ProtectionWand extends GenericWand {
     @Override
     public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean b) {
         super.addInformation(stack, player, list, b);
+        boolean hasid = stack.getTagCompound() != null && stack.getTagCompound().hasKey("id");
         int mode = getMode(stack);
         int id = getId(stack);
-        if (id != 0) {
+        if (hasid && id != 0) {
             if ((System.currentTimeMillis() - tooltipLastTime) > 250) {
                 tooltipLastTime = System.currentTimeMillis();
                 PacketHandler.INSTANCE.sendToServer(new PacketGetProtectedBlockCount(id));
@@ -79,7 +80,9 @@ public class ProtectionWand extends GenericWand {
                 list.add(EnumChatFormatting.GREEN + "Id: " + id);
             }
         }
-        list.add(EnumChatFormatting.GREEN + "Number of protected blocks: " + ReturnProtectedBlockCountHelper.count);
+        if (hasid) {
+            list.add(EnumChatFormatting.GREEN + "Number of protected blocks: " + ReturnProtectedBlockCountHelper.count);
+        }
         list.add("Rigth click to protect or unprotect a block.");
         list.add("Mode key (default '=') to switch mode.");
     }
