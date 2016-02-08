@@ -23,7 +23,7 @@ public abstract class CommonProxy {
         ModCrafting.init();
         GenericWand.setupChestLoot();
         FreezePotion.freezePotion = new FreezePotion();
-        PacketHandler.registerMessages("assets/notenoughwands");
+        PacketHandler.registerMessages("notenoughwands");
     }
 
     private void readMainConfig() {
