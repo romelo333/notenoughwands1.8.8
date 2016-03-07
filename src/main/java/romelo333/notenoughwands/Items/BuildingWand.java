@@ -225,7 +225,7 @@ public class BuildingWand extends GenericWand {
     @Override
     public void renderOverlay(RenderWorldLastEvent evt, EntityPlayerSP player, ItemStack wand) {
         MovingObjectPosition mouseOver = Minecraft.getMinecraft().objectMouseOver;
-        if (mouseOver != null) {
+        if (mouseOver != null && mouseOver.sideHit != null && mouseOver.getBlockPos() != null) {
             World world = player.worldObj;
             BlockPos blockPos = mouseOver.getBlockPos();
             if (blockPos == null) {

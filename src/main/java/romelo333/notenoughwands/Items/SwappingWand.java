@@ -182,7 +182,7 @@ public class SwappingWand extends GenericWand {
     @Override
     public void renderOverlay(RenderWorldLastEvent evt, EntityPlayerSP player, ItemStack wand) {
         MovingObjectPosition mouseOver = Minecraft.getMinecraft().objectMouseOver;
-        if (mouseOver != null && mouseOver.getBlockPos() != null) {
+        if (mouseOver != null && mouseOver.getBlockPos() != null && mouseOver.sideHit != null) {
             IBlockState state = player.worldObj.getBlockState(mouseOver.getBlockPos());
             Block block = state.getBlock();
             if (block != null && block.getMaterial() != Material.air) {

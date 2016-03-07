@@ -162,7 +162,7 @@ public class DisplacementWand extends GenericWand {
     @Override
     public void renderOverlay(RenderWorldLastEvent evt, EntityPlayerSP player, ItemStack wand) {
         MovingObjectPosition mouseOver = Minecraft.getMinecraft().objectMouseOver;
-        if (mouseOver != null && mouseOver.getBlockPos() != null) {
+        if (mouseOver != null && mouseOver.getBlockPos() != null && mouseOver.sideHit != null) {
             World world = player.worldObj;
             BlockPos blockPos = mouseOver.getBlockPos();
             IBlockState state = world.getBlockState(blockPos);
