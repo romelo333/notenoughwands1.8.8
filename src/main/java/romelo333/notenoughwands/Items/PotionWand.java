@@ -1,26 +1,20 @@
 package romelo333.notenoughwands.Items;
 
 
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.StatCollector;
-import net.minecraft.world.World;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import romelo333.notenoughwands.AddPotionRecipe;
@@ -29,7 +23,6 @@ import romelo333.notenoughwands.Config;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.List;
-import java.util.Map;
 
 public class PotionWand extends GenericWand {
     private boolean allowPassive = true;
@@ -50,13 +43,13 @@ public class PotionWand extends GenericWand {
         diffcultyAdd = (float) cfg.get(Config.CATEGORY_WANDS, getUnlocalizedName() + "_diffcultyAdd", diffcultyAdd, "Add this to the HP * difficultyMult to get the final difficulty scale that affects XP/RF usage (a final result of 1.0 means that the default XP/RF is used)").getDouble();
     }
 
-    private String getEffectName (PotionEffect potioneffect){
-        String s1 = StatCollector.translateToLocal(potioneffect.getEffectName()).trim();
+    private String getEffectName(PotionEffect potioneffect){
+        String s1 = I18n.format(potioneffect.getEffectName()).trim();
         if (potioneffect.getAmplifier() > 0) {
-            s1 = s1 + " " + StatCollector.translateToLocal("potion.potency." + potioneffect.getAmplifier()).trim();
+            s1 = s1 + " " + I18n.format("potion.potency." + potioneffect.getAmplifier()).trim();
         }
         if (potioneffect.getDuration() > 20) {
-            s1 = s1 + " (" + Potion.getDurationString(potioneffect) + ")";
+            s1 = s1 + " (" + Potion.getPotionDurationString(potioneffect, potioneffect.getDuration()) + ")";
         }
         return s1;
     }
@@ -67,26 +60,26 @@ public class PotionWand extends GenericWand {
         list.add("Left click on creature to apply effect");
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound==null){
-            list.add(EnumChatFormatting.YELLOW+"No effects. Combine with potion");
-            list.add(EnumChatFormatting.YELLOW+"in crafting table to add effect");
+            list.add(TextFormatting.YELLOW+"No effects. Combine with potion");
+            list.add(TextFormatting.YELLOW+"in crafting table to add effect");
             return;
         }
         NBTTagList effects = (NBTTagList) tagCompound.getTag("effects");
         if (effects == null || effects.tagCount()==0){
-            list.add(EnumChatFormatting.YELLOW+"No effects. Combine with potion");
-            list.add(EnumChatFormatting.YELLOW+"in crafting table to add effect");
+            list.add(TextFormatting.YELLOW+"No effects. Combine with potion");
+            list.add(TextFormatting.YELLOW+"in crafting table to add effect");
             return;
         }
-        list.add(EnumChatFormatting.YELLOW+"Combine with empty bottle");
-        list.add(EnumChatFormatting.YELLOW+"to clear effects");
+        list.add(TextFormatting.YELLOW+"Combine with empty bottle");
+        list.add(TextFormatting.YELLOW+"to clear effects");
         int mode = getMode(stack);
         for (int i=0;i<effects.tagCount();i++) {
             NBTTagCompound effecttag = effects.getCompoundTagAt(i);
             PotionEffect effect = PotionEffect.readCustomPotionEffectFromNBT(effecttag);
             if (i==mode){
-                list.add("    + " + EnumChatFormatting.GREEN + getEffectName(effect));
+                list.add("    + " + TextFormatting.GREEN + getEffectName(effect));
             } else {
-                list.add("    " + EnumChatFormatting.GRAY+getEffectName(effect));
+                list.add("    " + TextFormatting.GRAY+getEffectName(effect));
             }
         }
     }

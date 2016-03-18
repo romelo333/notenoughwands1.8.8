@@ -9,7 +9,14 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
@@ -69,13 +76,13 @@ public class MovingWand extends GenericWand {
         super.addInformation(stack, player, list, b);
         NBTTagCompound compound = stack.getTagCompound();
         if (!hasBlock(compound)) {
-            list.add(EnumChatFormatting.RED + "Wand is empty.");
+            list.add(TextFormatting.RED + "Wand is empty.");
         } else {
             int id = compound.getInteger("block");
             Block block = (Block) Block.blockRegistry.getObjectById(id);
             int meta = compound.getInteger("meta");
             String name = Tools.getBlockName(block, meta);
-            list.add(EnumChatFormatting.GREEN + "Block: " + name);
+            list.add(TextFormatting.GREEN + "Block: " + name);
         }
         list.add("Right click to take a block.");
         list.add("Right click again on block to place it down.");
@@ -86,26 +93,26 @@ public class MovingWand extends GenericWand {
     }
 
     @Override
-    public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
+    public ActionResult<ItemStack> onItemRightClick(ItemStack stack, World world, EntityPlayer player, EnumHand hand) {
         if (!world.isRemote) {
             NBTTagCompound compound = stack.getTagCompound();
             if (hasBlock(compound)) {
-                Vec3 lookVec = player.getLookVec();
-                Vec3 start = new Vec3(player.posX, player.posY + player.getEyeHeight(), player.posZ);
+                Vec3d lookVec = player.getLookVec();
+                Vec3d start = new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
                 int distance = this.placeDistance;
-                Vec3 end = start.addVector(lookVec.xCoord * distance, lookVec.yCoord * distance, lookVec.zCoord * distance);
-                MovingObjectPosition position = world.rayTraceBlocks(start, end);
+                Vec3d end = start.addVector(lookVec.xCoord * distance, lookVec.yCoord * distance, lookVec.zCoord * distance);
+                RayTraceResult position = world.rayTraceBlocks(start, end);
                 if (position == null) {
                     place(stack, world, new BlockPos(end), null);
                 }
             }
         }
-        return stack;
+        return new ActionResult(EnumActionResult.SUCCESS, stack);
     }
 
 
     @Override
-    public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
         if (!world.isRemote) {
             NBTTagCompound compound = stack.getTagCompound();
             if (hasBlock(compound)) {
@@ -113,14 +120,14 @@ public class MovingWand extends GenericWand {
             } else {
                 pickup(stack, player, world, pos);
             }
-            return true;
+            return EnumActionResult.SUCCESS;
         }
-        return false;
+        return EnumActionResult.PASS;
     }
 
     @Override
-    public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
-        return true;
+    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        return EnumActionResult.SUCCESS;
     }
 
     private void place(ItemStack stack, World world, BlockPos pos, EnumFacing side) {
@@ -130,7 +137,8 @@ public class MovingWand extends GenericWand {
         Block block = Block.blockRegistry.getObjectById(id);
         int meta = tagCompound.getInteger("meta");
 
-        world.setBlockState(pp, block.getStateFromMeta(meta), 3);
+        IBlockState blockState = block.getStateFromMeta(meta);
+        world.setBlockState(pp, blockState, 3);
         if (tagCompound.hasKey("tedata")) {
             NBTTagCompound tc = (NBTTagCompound) tagCompound.getTag("tedata");
             TileEntity tileEntity = world.getTileEntity(pp);
@@ -140,7 +148,7 @@ public class MovingWand extends GenericWand {
                 tc.setInteger("z", pp.getZ());
                 tileEntity.readFromNBT(tc);
                 tileEntity.markDirty();
-                world.markBlockForUpdate(pp);
+                world.notifyBlockUpdate(pp, blockState, blockState, 3);
             }
         }
 

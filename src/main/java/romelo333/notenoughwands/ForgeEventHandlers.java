@@ -2,7 +2,8 @@ package romelo333.notenoughwands;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -55,7 +56,7 @@ public class ForgeEventHandlers {
 
     @SubscribeEvent
     public void onPlayerInteractEvent(PlayerInteractEvent event) {
-        ItemStack heldItem = event.entityPlayer.getHeldItem();
+        ItemStack heldItem = event.entityPlayer.getHeldItem(EnumHand.MAIN_HAND);
         if (heldItem == null || heldItem.getItem() == null) {
             return;
         }

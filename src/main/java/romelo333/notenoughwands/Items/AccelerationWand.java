@@ -8,10 +8,12 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import romelo333.notenoughwands.varia.Tools;
@@ -43,21 +45,21 @@ public class AccelerationWand extends GenericWand {
     @Override
     public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean b) {
         super.addInformation(stack, player, list, b);
-        list.add(EnumChatFormatting.GREEN + "Mode: " + descriptions[getMode(stack)]);
+        list.add(TextFormatting.GREEN + "Mode: " + descriptions[getMode(stack)]);
         list.add("Right click on block to speed up ticks.");
         list.add("Mode key (default '=') to change speed.");
     }
 
 
     @Override
-    public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (!world.isRemote) {
             IBlockState state = world.getBlockState(pos);
             Block block = state.getBlock();
             int mode = getMode(stack);
 
             if (!checkUsage(stack, player, cost[mode])) {
-                return true;
+                return EnumActionResult.FAIL;
             }
             TileEntity tileEntity = world.getTileEntity(pos);
             for (int i = 0; i < amount[mode]/(tileEntity == null ? 5 : 1); i ++){
@@ -71,7 +73,7 @@ public class AccelerationWand extends GenericWand {
 
             registerUsage(stack, player, cost[mode]);
         }
-        return true;
+        return EnumActionResult.SUCCESS;
     }
 
     @Override

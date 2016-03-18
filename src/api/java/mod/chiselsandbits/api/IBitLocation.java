@@ -1,6 +1,6 @@
 package mod.chiselsandbits.api;
 
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * Do not implement, acquire from {@link IChiselAndBitsAPI}

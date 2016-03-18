@@ -3,7 +3,7 @@ package romelo333.notenoughwands;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSavedData;
 import net.minecraftforge.common.util.Constants;
@@ -78,7 +78,7 @@ public class ProtectedBlocks extends WorldSavedData{
     }
 
     public boolean protect(EntityPlayer player, World world, BlockPos pos, int id) {
-        GlobalCoordinate key = new GlobalCoordinate(pos, world.provider.getDimensionId());
+        GlobalCoordinate key = new GlobalCoordinate(pos, world.provider.getDimension());
         if (id != -1 && blocks.containsKey(key)) {
             Tools.error(player, "This block is already protected!");
             return false;
@@ -102,7 +102,7 @@ public class ProtectedBlocks extends WorldSavedData{
     }
 
     public boolean unprotect(EntityPlayer player, World world, BlockPos pos, int id) {
-        GlobalCoordinate key = new GlobalCoordinate(pos, world.provider.getDimensionId());
+        GlobalCoordinate key = new GlobalCoordinate(pos, world.provider.getDimension());
         if (!blocks.containsKey(key)) {
             Tools.error(player, "This block is not prorected!");
             return false;
@@ -137,7 +137,7 @@ public class ProtectedBlocks extends WorldSavedData{
     }
 
     public boolean isProtected(World world, BlockPos pos){
-        return blocks.containsKey(new GlobalCoordinate(pos, world.provider.getDimensionId()));
+        return blocks.containsKey(new GlobalCoordinate(pos, world.provider.getDimension()));
     }
 
     public boolean hasProtections() {
@@ -149,7 +149,7 @@ public class ProtectedBlocks extends WorldSavedData{
         for (Map.Entry<GlobalCoordinate, Integer> entry : blocks.entrySet()) {
             if (entry.getValue() == id || (id == -2 && entry.getValue() != -1)) {
                 GlobalCoordinate block = entry.getKey();
-                if (block.getDim() == world.provider.getDimensionId()) {
+                if (block.getDim() == world.provider.getDimension()) {
                     float sqdist = (x - block.getX()) * (x - block.getX()) + (y - block.getY()) * (y - block.getY()) + (z - block.getZ()) * (z - block.getZ());
                     if (sqdist < radius) {
                         coordinates.add(block);

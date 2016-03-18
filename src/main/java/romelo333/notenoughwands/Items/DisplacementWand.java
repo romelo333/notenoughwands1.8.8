@@ -12,10 +12,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.config.Configuration;
@@ -60,7 +62,7 @@ public class DisplacementWand extends GenericWand {
     @Override
     public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean b) {
         super.addInformation(stack, player, list, b);
-        list.add(EnumChatFormatting.GREEN + "Mode: " + descriptions[getMode(stack)]);
+        list.add(TextFormatting.GREEN + "Mode: " + descriptions[getMode(stack)]);
         list.add("Right click to push blocks forward.");
         list.add("Sneak right click to pull blocks.");
         list.add("Mode key (default '=') to switch mode.");
@@ -83,16 +85,16 @@ public class DisplacementWand extends GenericWand {
 
 
     @Override
-    public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
         if (!world.isRemote) {
             if (player.isSneaking()) {
                 pullBlocks(stack, player, world, pos, side);
             } else {
                 pushBlocks(stack, player, world, pos, side);
             }
-            return true;
+            return EnumActionResult.SUCCESS;
         }
-        return false;
+        return EnumActionResult.PASS;
     }
 
     private void pullBlocks(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side) {
@@ -130,7 +132,8 @@ public class DisplacementWand extends GenericWand {
                 if (cost >= 0.0) {
                     cnt++;
                     int meta = block.getMetaFromState(state);
-                    Tools.playSound(world, block.stepSound.getBreakSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
+                    // @todo
+//                    Tools.playSound(world, block.stepSound.getBreakSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
                     TileEntity tileEntity = world.getTileEntity(coordinate);
                     NBTTagCompound tc = null;
                     if (tileEntity != null) {
@@ -140,7 +143,8 @@ public class DisplacementWand extends GenericWand {
                     }
                     world.setBlockToAir(coordinate);
 
-                    world.setBlockState(otherC, block.getStateFromMeta(meta), 3);
+                    IBlockState blockState = block.getStateFromMeta(meta);
+                    world.setBlockState(otherC, blockState, 3);
                     if (tc != null) {
                         tileEntity = world.getTileEntity(otherC);
                         if (tileEntity != null) {
@@ -149,7 +153,7 @@ public class DisplacementWand extends GenericWand {
                             tc.setInteger("z", otherC.getZ());
                             tileEntity.readFromNBT(tc);
                             tileEntity.markDirty();
-                            world.markBlockForUpdate(otherC);
+                            world.notifyBlockUpdate(otherC, blockState, blockState, 3);
                         }
                     }
                 }
@@ -161,13 +165,13 @@ public class DisplacementWand extends GenericWand {
     @SideOnly(Side.CLIENT)
     @Override
     public void renderOverlay(RenderWorldLastEvent evt, EntityPlayerSP player, ItemStack wand) {
-        MovingObjectPosition mouseOver = Minecraft.getMinecraft().objectMouseOver;
+        RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver;
         if (mouseOver != null && mouseOver.getBlockPos() != null && mouseOver.sideHit != null) {
             World world = player.worldObj;
             BlockPos blockPos = mouseOver.getBlockPos();
             IBlockState state = world.getBlockState(blockPos);
             Block block = state.getBlock();
-            if (block != null && block.getMaterial() != Material.air) {
+            if (block != null && block.getMaterial(state) != Material.air) {
                 Set<BlockPos> coordinates = findSuitableBlocks(wand, world, mouseOver.sideHit, blockPos);
                 renderOutlines(evt, player, coordinates, 200, 230, 180);
             }

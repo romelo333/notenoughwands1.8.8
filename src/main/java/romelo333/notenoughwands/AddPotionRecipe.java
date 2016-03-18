@@ -33,11 +33,12 @@ public class AddPotionRecipe extends ShapelessRecipes {
         }
         tagCompound=(NBTTagCompound)tagCompound.copy();
         NBTTagList list = tagCompound.getTagList("effects", Constants.NBT.TAG_COMPOUND);
-        for (PotionEffect effect : ((ItemPotion) potion.getItem()).getEffects(potion)) {
-            NBTTagCompound effecttag = new NBTTagCompound();
-            effect.writeCustomPotionEffectToNBT(effecttag);
-            list.appendTag(effecttag);
-        }
+//        for (PotionEffect effect : ((ItemPotion) potion.getItem()).getEffects(potion)) {
+//            NBTTagCompound effecttag = new NBTTagCompound();
+//            effect.writeCustomPotionEffectToNBT(effecttag);
+//            list.appendTag(effecttag);
+//        }
+        // @todo
         tagCompound.setTag("effects",list);
         result.setTagCompound(tagCompound);
         return result;

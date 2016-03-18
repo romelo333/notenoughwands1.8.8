@@ -11,10 +11,12 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.config.Configuration;
@@ -70,14 +72,14 @@ public class SwappingWand extends GenericWand {
         super.addInformation(stack, player, list, b);
         NBTTagCompound compound = stack.getTagCompound();
         if (compound == null) {
-            list.add(EnumChatFormatting.RED + "No selected block");
+            list.add(TextFormatting.RED + "No selected block");
         } else {
             int id = compound.getInteger("block");
-            Block block = (Block) Block.blockRegistry.getObjectById(id);
+            Block block = Block.blockRegistry.getObjectById(id);
             int meta = compound.getInteger("meta");
             String name = Tools.getBlockName(block, meta);
-            list.add(EnumChatFormatting.GREEN + "Selected block: " + name);
-            list.add(EnumChatFormatting.GREEN + "Mode: " + descriptions[compound.getInteger("mode")]);
+            list.add(TextFormatting.GREEN + "Selected block: " + name);
+            list.add(TextFormatting.GREEN + "Mode: " + descriptions[compound.getInteger("mode")]);
         }
         list.add("Sneak right click to select a block.");
         list.add("Right click on block to replace.");
@@ -85,7 +87,7 @@ public class SwappingWand extends GenericWand {
     }
 
     @Override
-    public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (!world.isRemote) {
             if (player.isSneaking()) {
                 selectBlock(stack, player, world, pos);
@@ -93,7 +95,7 @@ public class SwappingWand extends GenericWand {
                 placeBlock(stack, player, world, pos, side);
             }
         }
-        return true;
+        return EnumActionResult.SUCCESS;
     }
 
     private void placeBlock(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side) {
@@ -114,7 +116,7 @@ public class SwappingWand extends GenericWand {
         IBlockState oldState = world.getBlockState(pos);
         Block oldblock = oldState.getBlock();
         int oldmeta = oldblock.getMetaFromState(oldState);
-        float blockHardness = oldblock.getBlockHardness(world, pos);
+        float blockHardness = oldblock.getBlockHardness(oldState, world, pos);
 
         if (block == oldblock && meta == oldmeta) {
             // The same, nothing happens.
@@ -147,7 +149,8 @@ public class SwappingWand extends GenericWand {
                 if (!player.capabilities.isCreativeMode) {
                     Tools.giveItem(world, player, oldblock, oldmeta, 1, pos);
                 }
-                Tools.playSound(world, block.stepSound.getBreakSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
+//                Tools.playSound(world, block.stepSound.getBreakSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
+                // @todo
                 world.setBlockState(coordinate, block.getStateFromMeta(meta), 2);
                 player.openContainer.detectAndSendChanges();
                 registerUsage(stack, player, 1.0f);
@@ -172,7 +175,7 @@ public class SwappingWand extends GenericWand {
             int id = Block.blockRegistry.getIDForObject(block);
             tagCompound.setInteger("block", id);
             tagCompound.setInteger("meta", meta);
-            float hardness = block.getBlockHardness(world, pos);
+            float hardness = block.getBlockHardness(state, world, pos);
             tagCompound.setFloat("hardness", hardness);
             Tools.notify(player, "Selected block: " + name);
         }
@@ -181,11 +184,11 @@ public class SwappingWand extends GenericWand {
     @SideOnly(Side.CLIENT)
     @Override
     public void renderOverlay(RenderWorldLastEvent evt, EntityPlayerSP player, ItemStack wand) {
-        MovingObjectPosition mouseOver = Minecraft.getMinecraft().objectMouseOver;
+        RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver;
         if (mouseOver != null && mouseOver.getBlockPos() != null && mouseOver.sideHit != null) {
             IBlockState state = player.worldObj.getBlockState(mouseOver.getBlockPos());
             Block block = state.getBlock();
-            if (block != null && block.getMaterial() != Material.air) {
+            if (block != null && block.getMaterial(state) != Material.air) {
                 int meta = block.getMetaFromState(state);
 
                 int wandId = Tools.getTagCompound(wand).getInteger("block");

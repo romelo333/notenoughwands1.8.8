@@ -1,24 +1,24 @@
 package romelo333.notenoughwands.Items;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.WeightedRandomChestContent;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.common.ChestGenHooks;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -62,12 +62,13 @@ public class GenericWand extends Item implements cofh.api.energy.IEnergyContaine
 
     // Check if a given block can be picked up.
     public static double checkPickup(EntityPlayer player, World world, BlockPos pos, Block block, float maxHardness, Map<String, Double> blacklisted) {
-        float hardness = block.getBlockHardness(world, pos);
+        IBlockState state = world.getBlockState(pos);
+        float hardness = block.getBlockHardness(state, world, pos);
         if (hardness > maxHardness){
             Tools.error(player, "This block is to hard to take!");
             return -1.0f;
         }
-        if (!block.canEntityDestroy(world, pos, player)){
+        if (!block.canEntityDestroy(state, world, pos, player)){
             Tools.error(player, "You are not allowed to take this block!");
             return -1.0f;
         }
@@ -93,7 +94,7 @@ public class GenericWand extends Item implements cofh.api.energy.IEnergyContaine
     public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean b) {
         super.addInformation(stack, player, list, b);
         if (needsrf > 0) {
-            list.add(EnumChatFormatting.GREEN+"Energy: " + getEnergyStored(stack) + " / " + getMaxEnergyStored(stack));
+            list.add(TextFormatting.GREEN+"Energy: " + getEnergyStored(stack) + " / " + getMaxEnergyStored(stack));
         }
     }
 
@@ -230,18 +231,20 @@ public class GenericWand extends Item implements cofh.api.energy.IEnergyContaine
 
     public void setupChestLootInt() {
         if (lootRarity > 0 && availability > 0) {
-            setupChestLootInt(ChestGenHooks.DUNGEON_CHEST);
-            setupChestLootInt(ChestGenHooks.MINESHAFT_CORRIDOR);
-            setupChestLootInt(ChestGenHooks.PYRAMID_DESERT_CHEST);
-            setupChestLootInt(ChestGenHooks.PYRAMID_JUNGLE_CHEST);
-            setupChestLootInt(ChestGenHooks.STRONGHOLD_CORRIDOR);
-            setupChestLootInt(ChestGenHooks.VILLAGE_BLACKSMITH);
+//            setupChestLootInt(ChestGenHooks.DUNGEON_CHEST);
+//            setupChestLootInt(ChestGenHooks.MINESHAFT_CORRIDOR);
+//            setupChestLootInt(ChestGenHooks.PYRAMID_DESERT_CHEST);
+//            setupChestLootInt(ChestGenHooks.PYRAMID_JUNGLE_CHEST);
+//            setupChestLootInt(ChestGenHooks.STRONGHOLD_CORRIDOR);
+//            setupChestLootInt(ChestGenHooks.VILLAGE_BLACKSMITH);
+            // @todo
         }
     }
 
     private void setupChestLootInt(String category) {
-        ChestGenHooks chest = ChestGenHooks.getInfo(category);
-        chest.addItem(new WeightedRandomChestContent(this, 0, 1, 1, lootRarity));
+//        ChestGenHooks chest = ChestGenHooks.getInfo(category);
+//        chest.addItem(new WeightedRandomChestContent(this, 0, 1, 1, lootRarity));
+        // @todo
     }
 
     //------------------------------------------------------------------------------
@@ -276,8 +279,8 @@ public class GenericWand extends Item implements cofh.api.energy.IEnergyContaine
 
         Tessellator tessellator = Tessellator.getInstance();
 
-        WorldRenderer worldRenderer = tessellator.getWorldRenderer();
-        worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
+        VertexBuffer buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
 
         GlStateManager.color(r / 255.0f, g / 255.0f, b / 255.0f);
         GL11.glLineWidth(thickness);
@@ -287,41 +290,41 @@ public class GenericWand extends Item implements cofh.api.energy.IEnergyContaine
             float y = coordinate.getY();
             float z = coordinate.getZ();
 
-            renderBlockOutline(worldRenderer, x, y, z, .0f); // .02f
+            renderBlockOutline(buffer, x, y, z, .0f); // .02f
         }
         tessellator.draw();
 
         RenderHelper.disableStandardItemLighting();
     }
 
-    private static void renderBlockOutline(WorldRenderer renderer, float mx, float my, float mz, float o) {
-        renderer.pos(mx - o, my - o, mz - o).endVertex();
-        renderer.pos(mx + 1 + o, my - o, mz - o).endVertex();
-        renderer.pos(mx - o, my - o, mz - o).endVertex();
-        renderer.pos(mx - o, my + 1 + o, mz - o).endVertex();
-        renderer.pos(mx - o, my - o, mz - o).endVertex();
-        renderer.pos(mx - o, my - o, mz + 1 + o).endVertex();
-        renderer.pos(mx + 1 + o, my + 1 + o, mz + 1 + o).endVertex();
-        renderer.pos(mx - o, my + 1 + o, mz + 1 + o).endVertex();
-        renderer.pos(mx + 1 + o, my + 1 + o, mz + 1 + o).endVertex();
-        renderer.pos(mx + 1 + o, my - o, mz + 1 + o).endVertex();
-        renderer.pos(mx + 1 + o, my + 1 + o, mz + 1 + o).endVertex();
-        renderer.pos(mx + 1 + o, my + 1 + o, mz - o).endVertex();
+    private static void renderBlockOutline(VertexBuffer buffer, float mx, float my, float mz, float o) {
+        buffer.pos(mx - o, my - o, mz - o).endVertex();
+        buffer.pos(mx + 1 + o, my - o, mz - o).endVertex();
+        buffer.pos(mx - o, my - o, mz - o).endVertex();
+        buffer.pos(mx - o, my + 1 + o, mz - o).endVertex();
+        buffer.pos(mx - o, my - o, mz - o).endVertex();
+        buffer.pos(mx - o, my - o, mz + 1 + o).endVertex();
+        buffer.pos(mx + 1 + o, my + 1 + o, mz + 1 + o).endVertex();
+        buffer.pos(mx - o, my + 1 + o, mz + 1 + o).endVertex();
+        buffer.pos(mx + 1 + o, my + 1 + o, mz + 1 + o).endVertex();
+        buffer.pos(mx + 1 + o, my - o, mz + 1 + o).endVertex();
+        buffer.pos(mx + 1 + o, my + 1 + o, mz + 1 + o).endVertex();
+        buffer.pos(mx + 1 + o, my + 1 + o, mz - o).endVertex();
 
-        renderer.pos(mx - o, my + 1 + o, mz - o).endVertex();
-        renderer.pos(mx - o, my + 1 + o, mz + 1 + o).endVertex();
-        renderer.pos(mx - o, my + 1 + o, mz - o).endVertex();
-        renderer.pos(mx + 1 + o, my + 1 + o, mz - o).endVertex();
+        buffer.pos(mx - o, my + 1 + o, mz - o).endVertex();
+        buffer.pos(mx - o, my + 1 + o, mz + 1 + o).endVertex();
+        buffer.pos(mx - o, my + 1 + o, mz - o).endVertex();
+        buffer.pos(mx + 1 + o, my + 1 + o, mz - o).endVertex();
 
-        renderer.pos(mx + 1 + o, my - o, mz - o).endVertex();
-        renderer.pos(mx + 1 + o, my - o, mz + 1 + o).endVertex();
-        renderer.pos(mx + 1 + o, my - o, mz - o).endVertex();
-        renderer.pos(mx + 1 + o, my + 1 + o, mz - o).endVertex();
+        buffer.pos(mx + 1 + o, my - o, mz - o).endVertex();
+        buffer.pos(mx + 1 + o, my - o, mz + 1 + o).endVertex();
+        buffer.pos(mx + 1 + o, my - o, mz - o).endVertex();
+        buffer.pos(mx + 1 + o, my + 1 + o, mz - o).endVertex();
 
-        renderer.pos(mx, my, mz + 1 + o).endVertex();
-        renderer.pos(mx + 1 + o, my, mz + 1 + o).endVertex();
-        renderer.pos(mx, my, mz + 1 + o).endVertex();
-        renderer.pos(mx, my + 1 + o, mz + 1 + o).endVertex();
+        buffer.pos(mx, my, mz + 1 + o).endVertex();
+        buffer.pos(mx + 1 + o, my, mz + 1 + o).endVertex();
+        buffer.pos(mx, my, mz + 1 + o).endVertex();
+        buffer.pos(mx, my + 1 + o, mz + 1 + o).endVertex();
     }
 
 

@@ -2,19 +2,19 @@ package romelo333.notenoughwands.Items;
 
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import romelo333.notenoughwands.Config;
-import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.List;
@@ -44,19 +44,19 @@ public class TeleportationWand extends GenericWand {
     }
 
     @Override
-    public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
+    public ActionResult<ItemStack> onItemRightClick(ItemStack stack, World world, EntityPlayer player, EnumHand hand) {
         if (!world.isRemote) {
             if (!checkUsage(stack, player, 1.0f)) {
-                return stack;
+                return ActionResult.newResult(EnumActionResult.PASS, stack);
             }
-            Vec3 lookVec = player.getLookVec();
-            Vec3 start = new Vec3(player.posX, player.posY + player.getEyeHeight(), player.posZ);
+            Vec3d lookVec = player.getLookVec();
+            Vec3d start = new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
             int distance = this.maxdist;
             if (player.isSneaking()) {
                 distance /= 2;
             }
-            Vec3 end = start.addVector(lookVec.xCoord * distance, lookVec.yCoord * distance, lookVec.zCoord * distance);
-            MovingObjectPosition position = world.rayTraceBlocks(start, end);
+            Vec3d end = start.addVector(lookVec.xCoord * distance, lookVec.yCoord * distance, lookVec.zCoord * distance);
+            RayTraceResult position = world.rayTraceBlocks(start, end);
             if (position == null) {
                 player.setPositionAndUpdate(end.xCoord, end.yCoord, end.zCoord);
             } else {
@@ -73,7 +73,7 @@ public class TeleportationWand extends GenericWand {
                             break;
                         case UP:
                             Tools.error(player, "You will suffocate if you teleport there!");
-                            return stack;
+                            return ActionResult.newResult(EnumActionResult.PASS, stack);
                         case NORTH:
                             player.setPositionAndUpdate(x+.5, y, z - 1 + .5);
                             break;
@@ -91,10 +91,10 @@ public class TeleportationWand extends GenericWand {
             }
             registerUsage(stack, player, 1.0f);
             if (teleportVolume >= 0.01) {
-                ((EntityPlayerMP) player).worldObj.playSoundAtEntity(player, NotEnoughWands.MODID + ":teleport", teleportVolume, 1.0f);
+//                ((EntityPlayerMP) player).worldObj.playSoundAtEntity(player, NotEnoughWands.MODID + ":teleport", teleportVolume, 1.0f);
             }
         }
-        return stack;
+        return ActionResult.newResult(EnumActionResult.PASS, stack);
     }
 
     @Override

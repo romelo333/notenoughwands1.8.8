@@ -10,9 +10,11 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -53,7 +55,7 @@ public class CapturingWand extends GenericWand {
                 } catch (ClassNotFoundException e) {
                     name = "?";
                 }
-                list.add(EnumChatFormatting.GREEN + "Captured mob: " + name);
+                list.add(TextFormatting.GREEN + "Captured mob: " + name);
             }
         }
         list.add("Left click on creature to capture it.");
@@ -61,7 +63,7 @@ public class CapturingWand extends GenericWand {
     }
 
     @Override
-    public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (!world.isRemote) {
             NBTTagCompound tagCompound = Tools.getTagCompound(stack);
             if (tagCompound.hasKey("mob")) {
@@ -70,7 +72,7 @@ public class CapturingWand extends GenericWand {
                 EntityLivingBase entityLivingBase = createEntity(player, world, type);
                 if (entityLivingBase == null) {
                     Tools.error(player, "Something went wrong trying to spawn creature!");
-                    return true;
+                    return EnumActionResult.FAIL;
                 }
                 entityLivingBase.readEntityFromNBT((NBTTagCompound) mobCompound);
                 entityLivingBase.setLocationAndAngles(pos.getX()+.5, pos.getY()+1, pos.getZ()+.5, 0, 0);
@@ -81,7 +83,7 @@ public class CapturingWand extends GenericWand {
                 Tools.error(player, "There is no mob captured in this wand!");
             }
         }
-        return true;
+        return EnumActionResult.SUCCESS;
     }
 
     private EntityLivingBase createEntity(EntityPlayer player, World world, String type) {

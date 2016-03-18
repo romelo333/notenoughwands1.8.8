@@ -11,6 +11,8 @@ public class FreezePotion extends Potion {
     ResourceLocation icon = new ResourceLocation(NotEnoughWands.MODID + ":textures/gui/effects/freeze.png");
 
     public FreezePotion() {
-        super(new ResourceLocation("freeze"), false, Color.BLUE.getRed());
+        super(true, 0);
+//        super(new ResourceLocation("freeze"), false, Color.BLUE.getRed());
+        // @todo
     }
 }

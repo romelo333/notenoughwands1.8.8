@@ -3,9 +3,10 @@ package romelo333.notenoughwands.network;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -30,7 +31,7 @@ public class PacketGetProtectedBlocks implements IMessage {
     public static class Handler implements IMessageHandler<PacketGetProtectedBlocks, IMessage> {
         @Override
         public IMessage onMessage(PacketGetProtectedBlocks message, MessageContext ctx) {
-            MinecraftServer.getServer().addScheduledTask(() -> handle(message, ctx));
+            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
             return null;
         }
 
@@ -38,7 +39,7 @@ public class PacketGetProtectedBlocks implements IMessage {
             EntityPlayerMP player = ctx.getServerHandler().playerEntity;
             World world = player.worldObj;
 
-            ItemStack heldItem = player.getHeldItem();
+            ItemStack heldItem = player.getHeldItem(EnumHand.MAIN_HAND);
             if (heldItem == null || !(heldItem.getItem() instanceof ProtectionWand)) {
                 // Cannot happen normally
                 return;

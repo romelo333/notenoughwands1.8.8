@@ -12,10 +12,12 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -50,8 +52,8 @@ public class BuildingWand extends GenericWand {
         NBTTagCompound compound = stack.getTagCompound();
         if (compound != null) {
             int cnt = (compound.hasKey("undo1") ? 1 : 0) + (compound.hasKey("undo2") ? 1 : 0);
-            list.add(EnumChatFormatting.GREEN + "Has " + cnt + " undo states");
-            list.add(EnumChatFormatting.GREEN + "Mode: " + descriptions[compound.getInteger("mode")]);
+            list.add(TextFormatting.GREEN + "Has " + cnt + " undo states");
+            list.add(TextFormatting.GREEN + "Mode: " + descriptions[compound.getInteger("mode")]);
         }
         list.add("Right click to extend blocks in that direction.");
         list.add("Sneak right click on such a block to undo one of");
@@ -75,7 +77,7 @@ public class BuildingWand extends GenericWand {
     }
 
     @Override
-    public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (!world.isRemote) {
             if (player.isSneaking()) {
                 undoPlaceBlock(stack, player, world, pos);
@@ -83,7 +85,7 @@ public class BuildingWand extends GenericWand {
                 placeBlock(stack, player, world, pos, side);
             }
         }
-        return true;
+        return EnumActionResult.SUCCESS;
     }
 
     private void placeBlock(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side) {
@@ -103,7 +105,8 @@ public class BuildingWand extends GenericWand {
                 break;
             }
             if (Tools.consumeInventoryItem(Item.getItemFromBlock(block), meta, player.inventory, player)) {
-                Tools.playSound(world, block.stepSound.getBreakSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
+//                Tools.playSound(world, block.stepSound.getBreakSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
+                // @todo
                 IBlockState state = block.getStateFromMeta(meta);
                 world.setBlockState(coordinate, state, 2);
                 player.openContainer.detectAndSendChanges();
@@ -124,7 +127,7 @@ public class BuildingWand extends GenericWand {
         NBTTagCompound undoTag = new NBTTagCompound();
         undoTag.setInteger("block", Block.blockRegistry.getIDForObject(block));
         undoTag.setInteger("meta", meta);
-        undoTag.setInteger("dimension", world.provider.getDimensionId());
+        undoTag.setInteger("dimension", world.provider.getDimension());
         int[] undoX = new int[undo.size()];
         int[] undoY = new int[undo.size()];
         int[] undoZ = new int[undo.size()];
@@ -187,7 +190,8 @@ public class BuildingWand extends GenericWand {
             Block testBlock = testState.getBlock();
             int testMeta = testBlock.getMetaFromState(testState);
             if (testBlock == block && testMeta == meta) {
-                Tools.playSound(world, block.stepSound.getBreakSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
+//                Tools.playSound(world, block.stepSound.getBreakSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
+                // @todo
                 world.setBlockToAir(coordinate);
                 cnt++;
             }
@@ -205,7 +209,7 @@ public class BuildingWand extends GenericWand {
             return null;
         }
         int dimension = undoTag.getInteger("dimension");
-        if (dimension != world.provider.getDimensionId()) {
+        if (dimension != world.provider.getDimension()) {
             Tools.error(player, "Select at least one block of the area you want to undo!");
             return null;
         }
@@ -224,7 +228,7 @@ public class BuildingWand extends GenericWand {
     @SideOnly(Side.CLIENT)
     @Override
     public void renderOverlay(RenderWorldLastEvent evt, EntityPlayerSP player, ItemStack wand) {
-        MovingObjectPosition mouseOver = Minecraft.getMinecraft().objectMouseOver;
+        RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver;
         if (mouseOver != null && mouseOver.sideHit != null && mouseOver.getBlockPos() != null) {
             World world = player.worldObj;
             BlockPos blockPos = mouseOver.getBlockPos();
@@ -233,7 +237,7 @@ public class BuildingWand extends GenericWand {
             }
             IBlockState blockState = world.getBlockState(blockPos);
             Block block = blockState.getBlock();
-            if (block != null && block.getMaterial() != Material.air) {
+            if (block != null && block.getMaterial(blockState) != Material.air) {
                 Set<BlockPos> coordinates;
                 int meta = block.getMetaFromState(blockState);
 

@@ -3,24 +3,22 @@ package romelo333.notenoughwands.varia;
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.play.server.S29PacketSoundEffect;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 public class Tools {
     public static void error(EntityPlayer player, String msg) {
-        player.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.RED + msg));
+        player.addChatComponentMessage(new TextComponentString(TextFormatting.RED + msg));
     }
 
     public static void notify(EntityPlayer player, String msg) {
-        player.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.GREEN + msg));
+        player.addChatComponentMessage(new TextComponentString(TextFormatting.GREEN + msg));
     }
 
     public static boolean consumeInventoryItem(Item item, int meta, InventoryPlayer inv, EntityPlayer player) {
@@ -119,19 +117,20 @@ public class Tools {
 
     // Server side: play a sound to all nearby players
     public static void playSound(World worldObj, String soundName, double x, double y, double z, double volume, double pitch) {
-        S29PacketSoundEffect soundEffect = new S29PacketSoundEffect(soundName, x, y, z, (float) volume, (float) pitch);
-
-        for (int j = 0; j < worldObj.playerEntities.size(); ++j) {
-            EntityPlayerMP entityplayermp = (EntityPlayerMP)worldObj.playerEntities.get(j);
-            double d7 = x - entityplayermp.posX;
-            double d8 = y - entityplayermp.posY;
-            double d9 = z - entityplayermp.posZ;
-            double d10 = d7 * d7 + d8 * d8 + d9 * d9;
-
-            if (d10 <= 256.0D) {
-                entityplayermp.playerNetServerHandler.sendPacket(soundEffect);
-            }
-        }
+        // @todo
+//        S29PacketSoundEffect soundEffect = new S29PacketSoundEffect(soundName, x, y, z, (float) volume, (float) pitch);
+//
+//        for (int j = 0; j < worldObj.playerEntities.size(); ++j) {
+//            EntityPlayerMP entityplayermp = (EntityPlayerMP)worldObj.playerEntities.get(j);
+//            double d7 = x - entityplayermp.posX;
+//            double d8 = y - entityplayermp.posY;
+//            double d9 = z - entityplayermp.posZ;
+//            double d10 = d7 * d7 + d8 * d8 + d9 * d9;
+//
+//            if (d10 <= 256.0D) {
+//                entityplayermp.playerNetServerHandler.sendPacket(soundEffect);
+//            }
+//        }
     }
 
 }

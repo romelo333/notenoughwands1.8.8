@@ -5,15 +5,15 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import romelo333.notenoughwands.Config;
 import romelo333.notenoughwands.FreezePotion;
 import romelo333.notenoughwands.varia.Tools;
@@ -46,15 +46,15 @@ public class FreezingWand extends GenericWand {
     }
 
     @Override
-    public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (!world.isRemote) {
 
         }
-        return true;
+        return EnumActionResult.FAIL;
     }
 
     private void freezeMob(EntityLivingBase mob){
-        mob.addPotionEffect(new PotionEffect(FreezePotion.freezePotion.getId(), 200, 4));
+        mob.addPotionEffect(new PotionEffect(FreezePotion.freezePotion, 200, 4));
     }
 
     @Override

@@ -7,9 +7,11 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.config.Configuration;
@@ -72,16 +74,16 @@ public class ProtectionWand extends GenericWand {
                 PacketHandler.INSTANCE.sendToServer(new PacketGetProtectedBlockCount(id));
             }
         }
-        list.add(EnumChatFormatting.GREEN + "Mode: " + descriptions[mode]);
+        list.add(TextFormatting.GREEN + "Mode: " + descriptions[mode]);
         if (master) {
-            list.add(EnumChatFormatting.YELLOW + "Master wand");
+            list.add(TextFormatting.YELLOW + "Master wand");
         } else {
             if (id != 0) {
-                list.add(EnumChatFormatting.GREEN + "Id: " + id);
+                list.add(TextFormatting.GREEN + "Id: " + id);
             }
         }
         if (hasid) {
-            list.add(EnumChatFormatting.GREEN + "Number of protected blocks: " + ReturnProtectedBlockCountHelper.count);
+            list.add(TextFormatting.GREEN + "Number of protected blocks: " + ReturnProtectedBlockCountHelper.count);
         }
         list.add("Rigth click to protect or unprotect a block.");
         list.add("Mode key (default '=') to switch mode.");
@@ -125,29 +127,29 @@ public class ProtectionWand extends GenericWand {
     }
 
     @Override
-    public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (!world.isRemote) {
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
             int id = getOrCreateId(stack, world, protectedBlocks);
             int mode = getMode(stack);
             if (mode == MODE_PROTECT) {
                 if (!checkUsage(stack, player, 1.0f)) {
-                    return true;
+                    return EnumActionResult.FAIL;
                 }
                 if (!protectedBlocks.protect(player, world, pos, id)) {
-                    return true;
+                    return EnumActionResult.FAIL;
                 }
                 registerUsage(stack, player, 1.0f);
             } else if (mode == MODE_UNPROTECT) {
                 if (!protectedBlocks.unprotect(player, world, pos, id)) {
-                    return true;
+                    return EnumActionResult.FAIL;
                 }
             } else {
                 int cnt = protectedBlocks.clearProtections(world, id);
                 Tools.notify(player, "Cleared " + cnt + " protected blocks");
             }
         }
-        return true;
+        return EnumActionResult.SUCCESS;
     }
 
     private int getOrCreateId(ItemStack stack, World world, ProtectedBlocks protectedBlocks) {
