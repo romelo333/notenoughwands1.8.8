@@ -105,8 +105,7 @@ public class BuildingWand extends GenericWand {
                 break;
             }
             if (Tools.consumeInventoryItem(Item.getItemFromBlock(block), meta, player.inventory, player)) {
-//                Tools.playSound(world, block.stepSound.getBreakSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
-                // @todo
+                Tools.playSound(world, block.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
                 IBlockState state = block.getStateFromMeta(meta);
                 world.setBlockState(coordinate, state, 2);
                 player.openContainer.detectAndSendChanges();
@@ -190,8 +189,7 @@ public class BuildingWand extends GenericWand {
             Block testBlock = testState.getBlock();
             int testMeta = testBlock.getMetaFromState(testState);
             if (testBlock == block && testMeta == meta) {
-//                Tools.playSound(world, block.stepSound.getBreakSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
-                // @todo
+                Tools.playSound(world, block.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
                 world.setBlockToAir(coordinate);
                 cnt++;
             }

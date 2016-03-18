@@ -2,12 +2,11 @@ package romelo333.notenoughwands.Items;
 
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -15,6 +14,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import romelo333.notenoughwands.Config;
+import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.List;
@@ -91,7 +91,8 @@ public class TeleportationWand extends GenericWand {
             }
             registerUsage(stack, player, 1.0f);
             if (teleportVolume >= 0.01) {
-//                ((EntityPlayerMP) player).worldObj.playSoundAtEntity(player, NotEnoughWands.MODID + ":teleport", teleportVolume, 1.0f);
+                SoundEvent teleport = SoundEvent.soundEventRegistry.getObject(new ResourceLocation(NotEnoughWands.MODID, "teleport"));
+                ((EntityPlayerMP) player).worldObj.playSound(player, player.getPosition(), teleport, SoundCategory.BLOCKS, teleportVolume, 1.0f);
             }
         }
         return ActionResult.newResult(EnumActionResult.PASS, stack);

@@ -132,8 +132,7 @@ public class DisplacementWand extends GenericWand {
                 if (cost >= 0.0) {
                     cnt++;
                     int meta = block.getMetaFromState(state);
-                    // @todo
-//                    Tools.playSound(world, block.stepSound.getBreakSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
+                    Tools.playSound(world, block.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
                     TileEntity tileEntity = world.getTileEntity(coordinate);
                     NBTTagCompound tc = null;
                     if (tileEntity != null) {

@@ -149,8 +149,7 @@ public class SwappingWand extends GenericWand {
                 if (!player.capabilities.isCreativeMode) {
                     Tools.giveItem(world, player, oldblock, oldmeta, 1, pos);
                 }
-//                Tools.playSound(world, block.stepSound.getBreakSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
-                // @todo
+                Tools.playSound(world, block.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
                 world.setBlockState(coordinate, block.getStateFromMeta(meta), 2);
                 player.openContainer.detectAndSendChanges();
                 registerUsage(stack, player, 1.0f);

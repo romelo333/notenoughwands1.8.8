@@ -1,12 +1,18 @@
 package romelo333.notenoughwands.varia;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.play.server.SPacketSoundEffect;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
@@ -117,20 +123,24 @@ public class Tools {
 
     // Server side: play a sound to all nearby players
     public static void playSound(World worldObj, String soundName, double x, double y, double z, double volume, double pitch) {
-        // @todo
-//        S29PacketSoundEffect soundEffect = new S29PacketSoundEffect(soundName, x, y, z, (float) volume, (float) pitch);
-//
-//        for (int j = 0; j < worldObj.playerEntities.size(); ++j) {
-//            EntityPlayerMP entityplayermp = (EntityPlayerMP)worldObj.playerEntities.get(j);
-//            double d7 = x - entityplayermp.posX;
-//            double d8 = y - entityplayermp.posY;
-//            double d9 = z - entityplayermp.posZ;
-//            double d10 = d7 * d7 + d8 * d8 + d9 * d9;
-//
-//            if (d10 <= 256.0D) {
-//                entityplayermp.playerNetServerHandler.sendPacket(soundEffect);
-//            }
-//        }
+        SoundEvent event = SoundEvent.soundEventRegistry.getObject(new ResourceLocation(soundName));
+        playSound(worldObj, event, x, y, z, volume, pitch);
+    }
+
+    public static void playSound(World worldObj, SoundEvent soundEvent, double x, double y, double z, double volume, double pitch) {
+        SPacketSoundEffect soundEffect = new SPacketSoundEffect(soundEvent, SoundCategory.BLOCKS, x, y, z, (float) volume, (float) pitch);
+
+        for (int j = 0; j < worldObj.playerEntities.size(); ++j) {
+            EntityPlayerMP entityplayermp = (EntityPlayerMP)worldObj.playerEntities.get(j);
+            double d7 = x - entityplayermp.posX;
+            double d8 = y - entityplayermp.posY;
+            double d9 = z - entityplayermp.posZ;
+            double d10 = d7 * d7 + d8 * d8 + d9 * d9;
+
+            if (d10 <= 256.0D) {
+                entityplayermp.playerNetServerHandler.sendPacket(soundEffect);
+            }
+        }
     }
 
 }
