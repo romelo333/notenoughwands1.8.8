@@ -91,8 +91,9 @@ public class TeleportationWand extends GenericWand {
             }
             registerUsage(stack, player, 1.0f);
             if (teleportVolume >= 0.01) {
-                SoundEvent teleport = SoundEvent.soundEventRegistry.getObject(new ResourceLocation(NotEnoughWands.MODID, "teleport"));
-                ((EntityPlayerMP) player).worldObj.playSound(player, player.getPosition(), teleport, SoundCategory.BLOCKS, teleportVolume, 1.0f);
+//                SoundEvent teleport = SoundEvent.soundEventRegistry.getObject(new ResourceLocation(NotEnoughWands.MODID, "teleport"));
+//                ((EntityPlayerMP) player).worldObj.playSound(player, player.getPosition(), teleport, SoundCategory.BLOCKS, teleportVolume, 1.0f);
+                // @todo
             }
         }
         return ActionResult.newResult(EnumActionResult.PASS, stack);
