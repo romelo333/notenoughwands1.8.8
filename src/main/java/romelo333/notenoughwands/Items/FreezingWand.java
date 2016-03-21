@@ -27,7 +27,7 @@ public class FreezingWand extends GenericWand {
     private float diffcultyAdd = 1.0f;
 
     public FreezingWand() {
-        setup("freezing_wand").xpUsage(10).availability(AVAILABILITY_ADVANCED).loot(4);
+        setup("freezing_wand").xpUsage(10).availability(AVAILABILITY_ADVANCED).loot(0);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class FreezingWand extends GenericWand {
     }
 
     private void freezeMob(EntityLivingBase mob){
-        mob.addPotionEffect(new PotionEffect(FreezePotion.freezePotion, 200, 4));
+//        mob.addPotionEffect(new PotionEffect(FreezePotion.freezePotion, 200, 4));
     }
 
     @Override
