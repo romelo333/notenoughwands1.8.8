@@ -1,12 +1,9 @@
 package romelo333.notenoughwands;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
@@ -71,19 +68,19 @@ public class ForgeEventHandlers {
 
     }
 
-    @SubscribeEvent
-    public void onlivingUpdate(LivingEvent.LivingUpdateEvent event){
-        PotionEffect effect = event.entityLiving.getActivePotionEffect(FreezePotion.freezePotion);
-        if (effect != null) {
-            event.setCanceled(true);
-        }
-    }
-
-    @SubscribeEvent
-    public void onlivingHurt(LivingHurtEvent event){
-        PotionEffect effect = event.entityLiving.getActivePotionEffect(FreezePotion.freezePotion);
-        if (effect != null) {
-            event.setCanceled(true);
-        }
-    }
+//    @SubscribeEvent
+//    public void onlivingUpdate(LivingEvent.LivingUpdateEvent event){
+//        PotionEffect effect = event.entityLiving.getActivePotionEffect(FreezePotion.freezePotion);
+//        if (effect != null) {
+//            event.setCanceled(true);
+//        }
+//    }
+//
+//    @SubscribeEvent
+//    public void onlivingHurt(LivingHurtEvent event){
+//        PotionEffect effect = event.entityLiving.getActivePotionEffect(FreezePotion.freezePotion);
+//        if (effect != null) {
+//            event.setCanceled(true);
+//        }
+//    }
 }
