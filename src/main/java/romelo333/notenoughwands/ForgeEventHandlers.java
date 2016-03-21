@@ -70,19 +70,19 @@ public class ForgeEventHandlers {
 
     }
 
-    @SubscribeEvent
-    public void onlivingUpdate(LivingEvent.LivingUpdateEvent event){
-        PotionEffect effect = event.entityLiving.getActivePotionEffect(FreezePotion.freezePotion);
-        if (effect != null) {
-            event.setCanceled(true);
-        }
-    }
-
-    @SubscribeEvent
-    public void onlivingHurt(LivingHurtEvent event){
-        PotionEffect effect = event.entityLiving.getActivePotionEffect(FreezePotion.freezePotion);
-        if (effect != null) {
-            event.setCanceled(true);
-        }
-    }
+//    @SubscribeEvent
+//    public void onlivingUpdate(LivingEvent.LivingUpdateEvent event){
+//        PotionEffect effect = event.entityLiving.getActivePotionEffect(FreezePotion.freezePotion);
+//        if (effect != null) {
+//            event.setCanceled(true);
+//        }
+//    }
+//
+//    @SubscribeEvent
+//    public void onlivingHurt(LivingHurtEvent event){
+//        PotionEffect effect = event.entityLiving.getActivePotionEffect(FreezePotion.freezePotion);
+//        if (effect != null) {
+//            event.setCanceled(true);
+//        }
+//    }
 }
