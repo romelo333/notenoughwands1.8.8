@@ -255,9 +255,9 @@ public class GenericWand extends Item implements cofh.api.energy.IEnergyContaine
     }
 
     protected static void renderOutlines(RenderWorldLastEvent evt, EntityPlayerSP p, Set<BlockPos> coordinates, int r, int g, int b) {
-        double doubleX = p.lastTickPosX + (p.posX - p.lastTickPosX) * evt.partialTicks;
-        double doubleY = p.lastTickPosY + (p.posY - p.lastTickPosY) * evt.partialTicks;
-        double doubleZ = p.lastTickPosZ + (p.posZ - p.lastTickPosZ) * evt.partialTicks;
+        double doubleX = p.lastTickPosX + (p.posX - p.lastTickPosX) * evt.getPartialTicks();
+        double doubleY = p.lastTickPosY + (p.posY - p.lastTickPosY) * evt.getPartialTicks();
+        double doubleZ = p.lastTickPosZ + (p.posZ - p.lastTickPosZ) * evt.getPartialTicks();
 
         GlStateManager.pushAttrib();
         GlStateManager.disableDepth();

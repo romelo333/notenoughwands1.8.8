@@ -15,11 +15,11 @@ import java.util.List;
 public class ForgeEventHandlers {
     @SubscribeEvent
     public void onBlockBreakEvent (BlockEvent.BreakEvent event){
-        World world = event.world;
+        World world = event.getWorld();
         if (world.isRemote) {
             return;
         }
-        BlockPos pos = event.pos;
+        BlockPos pos = event.getPos();
         ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
         if (protectedBlocks.isProtected(world, pos)) {
             event.setCanceled(true);
@@ -28,7 +28,7 @@ public class ForgeEventHandlers {
 
     @SubscribeEvent
     public void onDetonate(ExplosionEvent.Detonate event) {
-        World world = event.world;
+        World world = event.getWorld();
         if (world.isRemote) {
             return;
         }
@@ -53,15 +53,15 @@ public class ForgeEventHandlers {
 
     @SubscribeEvent
     public void onPlayerInteractEvent(PlayerInteractEvent event) {
-        ItemStack heldItem = event.entityPlayer.getHeldItem(EnumHand.MAIN_HAND);
+        ItemStack heldItem = event.getEntityPlayer().getHeldItem(EnumHand.MAIN_HAND);
         if (heldItem == null || heldItem.getItem() == null) {
             return;
         }
-        if (event.entityPlayer.isSneaking() && WrenchChecker.isAWrench(heldItem.getItem())) {
+        if (event.getEntityPlayer().isSneaking() && WrenchChecker.isAWrench(heldItem.getItem())) {
             // If the block is protected we prevent sneak-wrenching it.
-            ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(event.world);
-            BlockPos pos = event.pos;
-            if (protectedBlocks != null && protectedBlocks.isProtected(event.world, pos)) {
+            ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(event.getWorld());
+            BlockPos pos = event.getPos();
+            if (protectedBlocks != null && protectedBlocks.isProtected(event.getWorld(), pos)) {
                 event.setCanceled(true);
             }
         }
