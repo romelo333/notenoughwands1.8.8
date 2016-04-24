@@ -123,7 +123,7 @@ public class Tools {
 
     // Server side: play a sound to all nearby players
     public static void playSound(World worldObj, String soundName, double x, double y, double z, double volume, double pitch) {
-        SoundEvent event = SoundEvent.soundEventRegistry.getObject(new ResourceLocation(soundName));
+        SoundEvent event = SoundEvent.REGISTRY.getObject(new ResourceLocation(soundName));
         playSound(worldObj, event, x, y, z, volume, pitch);
     }
 

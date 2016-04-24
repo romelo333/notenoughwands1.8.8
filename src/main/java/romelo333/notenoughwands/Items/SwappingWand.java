@@ -68,14 +68,14 @@ public class SwappingWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean b) {
+    public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean b) {
         super.addInformation(stack, player, list, b);
         NBTTagCompound compound = stack.getTagCompound();
         if (compound == null) {
             list.add(TextFormatting.RED + "No selected block");
         } else {
             int id = compound.getInteger("block");
-            Block block = Block.blockRegistry.getObjectById(id);
+            Block block = Block.REGISTRY.getObjectById(id);
             int meta = compound.getInteger("meta");
             String name = Tools.getBlockName(block, meta);
             list.add(TextFormatting.GREEN + "Selected block: " + name);
@@ -109,7 +109,7 @@ public class SwappingWand extends GenericWand {
             return;
         }
         int id = tagCompound.getInteger("block");
-        Block block = (Block) Block.blockRegistry.getObjectById(id);
+        Block block = Block.REGISTRY.getObjectById(id);
         int meta = tagCompound.getInteger("meta");
         float hardness = tagCompound.getFloat("hardness");
 
@@ -171,7 +171,7 @@ public class SwappingWand extends GenericWand {
         if (name == null) {
             Tools.error(player, "You cannot select this block!");
         } else {
-            int id = Block.blockRegistry.getIDForObject(block);
+            int id = Block.REGISTRY.getIDForObject(block);
             tagCompound.setInteger("block", id);
             tagCompound.setInteger("meta", meta);
             float hardness = block.getBlockHardness(state, world, pos);
@@ -187,11 +187,11 @@ public class SwappingWand extends GenericWand {
         if (mouseOver != null && mouseOver.getBlockPos() != null && mouseOver.sideHit != null) {
             IBlockState state = player.worldObj.getBlockState(mouseOver.getBlockPos());
             Block block = state.getBlock();
-            if (block != null && block.getMaterial(state) != Material.air) {
+            if (block != null && block.getMaterial(state) != Material.AIR) {
                 int meta = block.getMetaFromState(state);
 
                 int wandId = Tools.getTagCompound(wand).getInteger("block");
-                Block wandBlock = Block.blockRegistry.getObjectById(wandId);
+                Block wandBlock = Block.REGISTRY.getObjectById(wandId);
                 int wandMeta = Tools.getTagCompound(wand).getInteger("meta");
                 if (wandBlock == block && wandMeta == meta) {
                     return;
@@ -268,6 +268,6 @@ public class SwappingWand extends GenericWand {
 
     @Override
     protected void setupCraftingInt(Item wandcore) {
-        GameRegistry.addRecipe(new ItemStack(this), "rg ", "gw ", "  w", 'r', Blocks.redstone_block, 'g', Blocks.glowstone, 'w', wandcore);
+        GameRegistry.addRecipe(new ItemStack(this), "rg ", "gw ", "  w", 'r', Blocks.REDSTONE_BLOCK, 'g', Blocks.GLOWSTONE, 'w', wandcore);
     }
 }

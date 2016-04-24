@@ -170,7 +170,7 @@ public class DisplacementWand extends GenericWand {
             BlockPos blockPos = mouseOver.getBlockPos();
             IBlockState state = world.getBlockState(blockPos);
             Block block = state.getBlock();
-            if (block != null && block.getMaterial(state) != Material.air) {
+            if (block != null && block.getMaterial(state) != Material.AIR) {
                 Set<BlockPos> coordinates = findSuitableBlocks(wand, world, mouseOver.sideHit, blockPos);
                 renderOutlines(evt, player, coordinates, 200, 230, 180);
             }
@@ -237,7 +237,7 @@ public class DisplacementWand extends GenericWand {
 
     @Override
     protected void setupCraftingInt(Item wandcore) {
-        GameRegistry.addRecipe(new ItemStack(this), "eb ", "bw ", "  w", 'e', Items.ender_pearl, 'b', Items.brick, 'w', wandcore);
+        GameRegistry.addRecipe(new ItemStack(this), "eb ", "bw ", "  w", 'e', Items.ENDER_PEARL, 'b', Items.BRICK, 'w', wandcore);
     }
 
 }

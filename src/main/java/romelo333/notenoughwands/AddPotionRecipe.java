@@ -21,7 +21,7 @@ public class AddPotionRecipe extends ShapelessRecipes {
             ItemStack stack = inv.getStackInSlot(i);
             if (stack != null && stack.getItem() == ModItems.potionWand) {
                 wand = stack;
-            } else if (stack != null && stack.getItem() == Items.potionitem) {
+            } else if (stack != null && stack.getItem() == Items.POTIONITEM) {
                 potion = stack;
             }
         }
@@ -45,7 +45,7 @@ public class AddPotionRecipe extends ShapelessRecipes {
     }
 
     public AddPotionRecipe(){
-        super(new ItemStack(ModItems.potionWand), Lists.asList(new ItemStack(ModItems.potionWand),new ItemStack(Items.potionitem), new ItemStack[0]));
+        super(new ItemStack(ModItems.potionWand), Lists.asList(new ItemStack(ModItems.potionWand),new ItemStack(Items.POTIONITEM), new ItemStack[0]));
     }
 
     @Override
@@ -56,7 +56,7 @@ public class AddPotionRecipe extends ShapelessRecipes {
             ItemStack stack = inv.getStackInSlot(i);
             if (stack != null && stack.getItem() == ModItems.potionWand) {
                 foundWand++;
-            } else if (stack != null && stack.getItem() == Items.potionitem) {
+            } else if (stack != null && stack.getItem() == Items.POTIONITEM) {
                 foundPotion++;
             } else if (stack != null) {
                 return false;

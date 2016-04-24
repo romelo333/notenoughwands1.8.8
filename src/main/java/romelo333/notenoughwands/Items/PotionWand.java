@@ -156,7 +156,7 @@ public class PotionWand extends GenericWand {
 
     @Override
     protected void setupCraftingInt(Item wandcore) {
-        GameRegistry.addRecipe(new ItemStack(this), "fgf", "gw ", "f w", 'f', Items.fermented_spider_eye, 'g', Blocks.glowstone, 'w', wandcore);
+        GameRegistry.addRecipe(new ItemStack(this), "fgf", "gw ", "f w", 'f', Items.FERMENTED_SPIDER_EYE, 'g', Blocks.GLOWSTONE, 'w', wandcore);
         GameRegistry.addRecipe(new AddPotionRecipe());
         GameRegistry.addRecipe(new ClearPotionsRecipe());
     }

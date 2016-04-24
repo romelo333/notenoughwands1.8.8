@@ -91,7 +91,7 @@ public class TeleportationWand extends GenericWand {
             }
             registerUsage(stack, player, 1.0f);
             if (teleportVolume >= 0.01) {
-                SoundEvent teleport = SoundEvent.soundEventRegistry.getObject(new ResourceLocation(NotEnoughWands.MODID, "teleport"));
+                SoundEvent teleport = SoundEvent.REGISTRY.getObject(new ResourceLocation(NotEnoughWands.MODID, "teleport"));
                 ModSounds.playSound(player.worldObj, teleport, player.posX, player.posY, player.posZ, teleportVolume, 1.0f);
             }
         }
@@ -104,6 +104,6 @@ public class TeleportationWand extends GenericWand {
                 "ee ",
                 "ew ",
                 "  w",
-                'e', Items.ender_pearl, 'w', wandcore);
+                'e', Items.ENDER_PEARL, 'w', wandcore);
     }
 }

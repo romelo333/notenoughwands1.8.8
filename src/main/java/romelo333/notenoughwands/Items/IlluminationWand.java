@@ -51,7 +51,7 @@ public class IlluminationWand extends GenericWand {
 
     @Override
     protected void setupCraftingInt(Item wandcore) {
-        GameRegistry.addRecipe(new ItemStack(this), "gg ", "gw ", "  w", 'g', Items.glowstone_dust, 'w', wandcore);
+        GameRegistry.addRecipe(new ItemStack(this), "gg ", "gw ", "  w", 'g', Items.GLOWSTONE_DUST, 'w', wandcore);
     }
 
 }

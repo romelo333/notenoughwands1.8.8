@@ -22,7 +22,7 @@ import java.util.Random;
 
 public class LightBlock extends Block implements ITileEntityProvider {
     public LightBlock() {
-        super(Material.portal);
+        super(Material.PORTAL);
         setHardness(0.0f);
         setUnlocalizedName("notenoughwands.blockLight");
 //        setStepSound(Block.soundTypeCloth);

@@ -17,12 +17,12 @@ public class ModCrafting {
 
 
     public static void init() {
-        GameRegistry.addRecipe(new ItemStack(ModItems.wandCore), "bn ", "nbn", " nb", 'b', Items.blaze_rod, 'n', Items.gold_nugget);
+        GameRegistry.addRecipe(new ItemStack(ModItems.wandCore), "bn ", "nbn", " nb", 'b', Items.BLAZE_ROD, 'n', Items.GOLD_NUGGET);
         GameRegistry.addRecipe(new ItemStack(ModItems.advancedWandCore),
                 " x ",
                 "twt",
                 " d ",
-                'w', ModItems.wandCore, 'x', Items.nether_star, 't', Items.ghast_tear, 'd', Items.diamond);
+                'w', ModItems.wandCore, 'x', Items.NETHER_STAR, 't', Items.GHAST_TEAR, 'd', Items.DIAMOND);
 
         GenericWand.setupCrafting();
     }

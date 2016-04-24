@@ -47,9 +47,9 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 minecraft {
-    version = "1.9-12.16.0.1811-1.9"
+    version = "1.9-12.16.0.1865-1.9"
     runDir = "run"
-    mappings = "snapshot_20160326"
+    mappings = "snapshot_20160421"
     useDepAts = true
 }
 
@@ -76,7 +76,7 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
     //deobfCompile "mcp.mobius.waila:Waila:1.6.0-B3_1.8.8"
-    //deobfCompile "mezz.jei:jei_1.8.9:2.22.5.107"
+    deobfCompile "mezz.jei:jei_1.9:3.2.4.177"
 }
 
 processResources

@@ -72,14 +72,14 @@ public class MovingWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean b) {
+    public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean b) {
         super.addInformation(stack, player, list, b);
         NBTTagCompound compound = stack.getTagCompound();
         if (!hasBlock(compound)) {
             list.add(TextFormatting.RED + "Wand is empty.");
         } else {
             int id = compound.getInteger("block");
-            Block block = (Block) Block.blockRegistry.getObjectById(id);
+            Block block = (Block) Block.REGISTRY.getObjectById(id);
             int meta = compound.getInteger("meta");
             String name = Tools.getBlockName(block, meta);
             list.add(TextFormatting.GREEN + "Block: " + name);
@@ -107,7 +107,7 @@ public class MovingWand extends GenericWand {
                 }
             }
         }
-        return new ActionResult(EnumActionResult.SUCCESS, stack);
+        return new ActionResult<>(EnumActionResult.SUCCESS, stack);
     }
 
 
@@ -134,7 +134,7 @@ public class MovingWand extends GenericWand {
         BlockPos pp = pos.offset(side);
         NBTTagCompound tagCompound = stack.getTagCompound();
         int id = tagCompound.getInteger("block");
-        Block block = Block.blockRegistry.getObjectById(id);
+        Block block = Block.REGISTRY.getObjectById(id);
         int meta = tagCompound.getInteger("meta");
 
         IBlockState blockState = block.getStateFromMeta(meta);
@@ -176,7 +176,7 @@ public class MovingWand extends GenericWand {
         if (name == null) {
             Tools.error(player, "You cannot select this block!");
         } else {
-            int id = Block.blockRegistry.getIDForObject(block);
+            int id = Block.REGISTRY.getIDForObject(block);
             tagCompound.setInteger("block", id);
             tagCompound.setInteger("meta", meta);
 
@@ -199,6 +199,6 @@ public class MovingWand extends GenericWand {
 
     @Override
     protected void setupCraftingInt(Item wandcore) {
-        GameRegistry.addRecipe(new ItemStack(this), "re ", "ew ", "  w", 'r', Items.redstone, 'e', Items.ender_pearl, 'w', wandcore);
+        GameRegistry.addRecipe(new ItemStack(this), "re ", "ew ", "  w", 'r', Items.REDSTONE, 'e', Items.ENDER_PEARL, 'w', wandcore);
     }
 }

@@ -140,6 +140,6 @@ public class CapturingWand extends GenericWand {
 
     @Override
     protected void setupCraftingInt(Item wandcore) {
-        GameRegistry.addRecipe(new ItemStack(this), "dr ", "rw ", "  w", 'r', Items.rotten_flesh, 'd', Items.diamond, 'w', wandcore);
+        GameRegistry.addRecipe(new ItemStack(this), "dr ", "rw ", "  w", 'r', Items.ROTTEN_FLESH, 'd', Items.DIAMOND, 'w', wandcore);
     }
 }

@@ -124,7 +124,7 @@ public class BuildingWand extends GenericWand {
 
     private void registerUndo(ItemStack stack, Block block, int meta, World world, Set<BlockPos> undo) {
         NBTTagCompound undoTag = new NBTTagCompound();
-        undoTag.setInteger("block", Block.blockRegistry.getIDForObject(block));
+        undoTag.setInteger("block", Block.REGISTRY.getIDForObject(block));
         undoTag.setInteger("meta", meta);
         undoTag.setInteger("dimension", world.provider.getDimension());
         int[] undoX = new int[undo.size()];
@@ -180,7 +180,7 @@ public class BuildingWand extends GenericWand {
     }
 
     private void performUndo(ItemStack stack, EntityPlayer player, World world, BlockPos pos, NBTTagCompound undoTag, Set<BlockPos> undo) {
-        Block block = Block.blockRegistry.getObjectById(undoTag.getInteger("block"));
+        Block block = Block.REGISTRY.getObjectById(undoTag.getInteger("block"));
         int meta = undoTag.getInteger("meta");
 
         int cnt = 0;
@@ -235,7 +235,7 @@ public class BuildingWand extends GenericWand {
             }
             IBlockState blockState = world.getBlockState(blockPos);
             Block block = blockState.getBlock();
-            if (block != null && block.getMaterial(blockState) != Material.air) {
+            if (block != null && block.getMaterial(blockState) != Material.AIR) {
                 Set<BlockPos> coordinates;
                 int meta = block.getMetaFromState(blockState);
 
@@ -326,7 +326,7 @@ public class BuildingWand extends GenericWand {
         IBlockState destState = world.getBlockState(offset);
         Block destBlock = destState.getBlock();
         if (destBlock == null) {
-            destBlock = Blocks.air;
+            destBlock = Blocks.AIR;
         }
         IBlockState baseState = world.getBlockState(base);
         return baseState.getBlock() == block && baseState.getBlock().getMetaFromState(baseState) == meta &&
@@ -381,7 +381,7 @@ public class BuildingWand extends GenericWand {
 
     @Override
     protected void setupCraftingInt(Item wandcore) {
-        GameRegistry.addRecipe(new ItemStack(this), "bb ", "bw ", "  w", 'b', Items.brick, 'w', wandcore);
+        GameRegistry.addRecipe(new ItemStack(this), "bb ", "bw ", "  w", 'b', Items.BRICK, 'w', wandcore);
     }
 
 }

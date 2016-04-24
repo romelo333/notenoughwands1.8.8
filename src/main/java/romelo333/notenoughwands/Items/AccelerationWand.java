@@ -93,7 +93,7 @@ public class AccelerationWand extends GenericWand {
 
     @Override
     protected void setupCraftingInt(Item wandcore) {
-        GameRegistry.addRecipe(new ItemStack(this), "gg ", "gw ", "  w", 'g', new ItemStack(Items.dye, 1, 15), 'w', wandcore);
+        GameRegistry.addRecipe(new ItemStack(this), "gg ", "gw ", "  w", 'g', new ItemStack(Items.DYE, 1, 15), 'w', wandcore);
     }
 
 }

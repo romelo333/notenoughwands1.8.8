@@ -164,12 +164,12 @@ public class ProtectionWand extends GenericWand {
     @Override
     protected void setupCraftingInt(Item wandcore) {
         if (master) {
-            GameRegistry.addRecipe(new ItemStack(this), "re ", "ew ", "  w", 'r', Items.comparator, 'e', Items.nether_star, 'w', wandcore);
+            GameRegistry.addRecipe(new ItemStack(this), "re ", "ew ", "  w", 'r', Items.COMPARATOR, 'e', Items.NETHER_STAR, 'w', wandcore);
         } else {
-            GameRegistry.addRecipe(new ItemStack(this), "re ", "ew ", "  w", 'r', Items.comparator, 'e', Items.ender_eye, 'w', wandcore);
+            GameRegistry.addRecipe(new ItemStack(this), "re ", "ew ", "  w", 'r', Items.COMPARATOR, 'e', Items.ENDER_EYE, 'w', wandcore);
             GameRegistry.addRecipe(new ContainerToItemRecipe(new ItemStack[] {
-                    new ItemStack(this), new ItemStack(Items.ender_eye), null,
-                    new ItemStack(Items.ender_eye), new ItemStack(wandcore), null,
+                    new ItemStack(this), new ItemStack(Items.ENDER_EYE), null,
+                    new ItemStack(Items.ENDER_EYE), new ItemStack(wandcore), null,
                     null, null, new ItemStack(wandcore)
             }, 0, new ItemStack(this)));
         }
