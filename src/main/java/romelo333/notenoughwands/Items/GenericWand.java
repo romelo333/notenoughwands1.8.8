@@ -57,7 +57,7 @@ public class GenericWand extends Item implements cofh.api.energy.IEnergyContaine
 
     @SideOnly(Side.CLIENT)
     public void registerModel() {
-        Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(this, 0, new ModelResourceLocation(NotEnoughWands.MODID + ":" + getUnlocalizedName().substring(5), "inventory"));
+        Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
     }
 
     // Check if a given block can be picked up.
@@ -102,9 +102,10 @@ public class GenericWand extends Item implements cofh.api.energy.IEnergyContaine
         if (availability > 0) {
             setMaxStackSize(1);
             setNoRepair();
-            setUnlocalizedName(name);
+            setUnlocalizedName(NotEnoughWands.MODID + "." + name);
+            setRegistryName(name);
             setCreativeTab(NotEnoughWands.tabNew);
-            GameRegistry.registerItem(this, name);
+            GameRegistry.register(this);
             wands.add(this);
         }
         return this;
@@ -136,13 +137,17 @@ public class GenericWand extends Item implements cofh.api.energy.IEnergyContaine
         return this;
     }
 
+    protected String getConfigPrefix() {
+        return getRegistryName().getResourcePath();
+    }
+
     public void initConfig(Configuration cfg) {
-        needsxp = cfg.get(Config.CATEGORY_WANDS, getUnlocalizedName() + "_needsxp", needsxp, "How much levels this wand should consume on usage").getInt();
-        needsrf = cfg.get(Config.CATEGORY_WANDS, getUnlocalizedName() + "_needsrf", needsrf, "How much RF this wand should consume on usage").getInt();
-        maxrf = cfg.get(Config.CATEGORY_WANDS, getUnlocalizedName() + "_maxrf", maxrf, "Maximum RF this wand can hold").getInt();
-        setMaxDamage(cfg.get(Config.CATEGORY_WANDS, getUnlocalizedName() + "_maxdurability", getMaxDamage(), "Maximum durability for this wand").getInt());
-        availability = cfg.get(Config.CATEGORY_WANDS, getUnlocalizedName() + "_availability", availability, "Is this wand available? (0=no, 1=not craftable, 2=craftable advanced, 3=craftable normal)").getInt();
-        lootRarity = cfg.get(Config.CATEGORY_WANDS, getUnlocalizedName() + "_lootRarity", lootRarity, "How rare should this wand be in chests? Lower is more rare (0 is not in chests)").getInt();
+        needsxp = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_needsxp", needsxp, "How much levels this wand should consume on usage").getInt();
+        needsrf = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_needsrf", needsrf, "How much RF this wand should consume on usage").getInt();
+        maxrf = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxrf", maxrf, "Maximum RF this wand can hold").getInt();
+        setMaxDamage(cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxdurability", getMaxDamage(), "Maximum durability for this wand").getInt());
+        availability = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_availability", availability, "Is this wand available? (0=no, 1=not craftable, 2=craftable advanced, 3=craftable normal)").getInt();
+        lootRarity = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_lootRarity", lootRarity, "How rare should this wand be in chests? Lower is more rare (0 is not in chests)").getInt();
     }
 
     //------------------------------------------------------------------------------

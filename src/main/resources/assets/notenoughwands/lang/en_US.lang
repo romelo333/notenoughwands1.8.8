@@ -1,19 +1,19 @@
-item.swapping_wand.name=Swapping Wand
-item.teleportation_wand.name=Teleportation Wand
-item.capturing_wand.name=Capturing Wand
-item.building_wand.name=Building Wand
-item.illumination_wand.name=Illumination Wand
-item.moving_wand.name=Moving Wand
-item.protection_wand.name=Protection Wand
-item.master_protection_wand.name=Master Protection Wand
-item.displacement_wand.name=Displacement Wand
-item.acceleration_wand.name=Acceleration Wand
-item.freezing_wand.name=Freezing Wand (WIP)
-item.potion_wand.name=Potion Wand
-item.wandcore.name=Wand Core
-item.advanced_wandcore.name=Advanced Wand Core
+item.notenoughwands.swapping_wand.name=Swapping Wand
+item.notenoughwands.teleportation_wand.name=Teleportation Wand
+item.notenoughwands.capturing_wand.name=Capturing Wand
+item.notenoughwands.building_wand.name=Building Wand
+item.notenoughwands.illumination_wand.name=Illumination Wand
+item.notenoughwands.moving_wand.name=Moving Wand
+item.notenoughwands.protection_wand.name=Protection Wand
+item.notenoughwands.master_protection_wand.name=Master Protection Wand
+item.notenoughwands.displacement_wand.name=Displacement Wand
+item.notenoughwands.acceleration_wand.name=Acceleration Wand
+item.notenoughwands.freezing_wand.name=Freezing Wand (WIP)
+item.notenoughwands.potion_wand.name=Potion Wand
+item.notenoughwands.wandcore.name=Wand Core
+item.notenoughwands.advanced_wandcore.name=Advanced Wand Core
 
-tile.blocklight.name=Illuminating Orb
+tile.notenoughwands.blockLight.name=Illuminating Orb
 
 
 key.modifier=Wand Modifier

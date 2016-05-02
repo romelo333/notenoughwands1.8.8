@@ -56,8 +56,8 @@ public class ProtectionWand extends GenericWand {
     @Override
     public void initConfig(Configuration cfg) {
         super.initConfig(cfg);
-        blockShowRadius = cfg.get(Config.CATEGORY_WANDS, getUnlocalizedName() + "_blockShowRadius", blockShowRadius, "How far around the player protected blocks will be hilighted").getInt();
-        maximumProtectedBlocks = cfg.get(Config.CATEGORY_WANDS, getUnlocalizedName() + "_maximumProtectedBlocks", master ? 0 : maximumProtectedBlocks, "The maximum number of blocks to protect with this wand (set to 0 for no maximum)").getInt();
+        blockShowRadius = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_blockShowRadius", blockShowRadius, "How far around the player protected blocks will be hilighted").getInt();
+        maximumProtectedBlocks = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maximumProtectedBlocks", master ? 0 : maximumProtectedBlocks, "The maximum number of blocks to protect with this wand (set to 0 for no maximum)").getInt();
     }
 
     private static long tooltipLastTime = 0;

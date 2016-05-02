@@ -42,8 +42,8 @@ public class MovingWand extends GenericWand {
     @Override
     public void initConfig(Configuration cfg) {
         super.initConfig(cfg);
-        maxHardness = (float) cfg.get(Config.CATEGORY_WANDS, getUnlocalizedName() + "_maxHardness", maxHardness, "Max hardness this block can move.)").getDouble();
-        placeDistance = cfg.get(Config.CATEGORY_WANDS, getUnlocalizedName() + "_placeDistance", placeDistance, "Distance at which to place blocks in 'in-air' mode").getInt();
+        maxHardness = (float) cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxHardness", maxHardness, "Max hardness this block can move.)").getDouble();
+        placeDistance = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_placeDistance", placeDistance, "Distance at which to place blocks in 'in-air' mode").getInt();
 
         ConfigCategory category = cfg.getCategory(Config.CATEGORY_MOVINGBLACKLIST);
         if (category.isEmpty()) {

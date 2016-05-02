@@ -53,7 +53,7 @@ public class SwappingWand extends GenericWand {
     @Override
     public void initConfig(Configuration cfg) {
         super.initConfig(cfg);
-        hardnessDistance = (float) cfg.get(Config.CATEGORY_WANDS, getUnlocalizedName() + "_hardnessDistance", hardnessDistance, "How far away the hardness can be to allow swapping (100 means basically everything allowed)").getDouble();
+        hardnessDistance = (float) cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_hardnessDistance", hardnessDistance, "How far away the hardness can be to allow swapping (100 means basically everything allowed)").getDouble();
     }
 
     @Override

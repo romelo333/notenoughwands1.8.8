@@ -33,10 +33,10 @@ public class FreezingWand extends GenericWand {
     @Override
     public void initConfig(Configuration cfg) {
         super.initConfig(cfg);
-        allowPassive =  cfg.get(Config.CATEGORY_WANDS, getUnlocalizedName() + "_allowPassive", allowPassive, "Allow freeze passive mobs").getBoolean();
-        allowHostile =  cfg.get(Config.CATEGORY_WANDS, getUnlocalizedName() + "_allowHostile", allowHostile, "Allow freeze hostile mobs").getBoolean();
-        difficultyMult = (float) cfg.get(Config.CATEGORY_WANDS, getUnlocalizedName() + "_difficultyMult", difficultyMult, "Multiply the HP of a mob with this number to get the difficulty scale that affects XP/RF usage (a final result of 1.0 means that the default XP/RF is used)").getDouble();
-        diffcultyAdd = (float) cfg.get(Config.CATEGORY_WANDS, getUnlocalizedName() + "_diffcultyAdd", diffcultyAdd, "Add this to the HP * difficultyMult to get the final difficulty scale that affects XP/RF usage (a final result of 1.0 means that the default XP/RF is used)").getDouble();
+        allowPassive =  cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_allowPassive", allowPassive, "Allow freeze passive mobs").getBoolean();
+        allowHostile =  cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_allowHostile", allowHostile, "Allow freeze hostile mobs").getBoolean();
+        difficultyMult = (float) cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_difficultyMult", difficultyMult, "Multiply the HP of a mob with this number to get the difficulty scale that affects XP/RF usage (a final result of 1.0 means that the default XP/RF is used)").getDouble();
+        diffcultyAdd = (float) cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_diffcultyAdd", diffcultyAdd, "Add this to the HP * difficultyMult to get the final difficulty scale that affects XP/RF usage (a final result of 1.0 means that the default XP/RF is used)").getDouble();
     }
 
     @Override

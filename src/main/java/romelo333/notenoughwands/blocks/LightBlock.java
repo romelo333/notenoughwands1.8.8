@@ -14,6 +14,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -25,6 +26,9 @@ public class LightBlock extends Block implements ITileEntityProvider {
         super(Material.PORTAL);
         setHardness(0.0f);
         setUnlocalizedName("notenoughwands.blockLight");
+        setRegistryName("lightBlock");
+        GameRegistry.register(this);
+        GameRegistry.registerTileEntity(LightTE.class, "LightTileEntity");
 //        setStepSound(Block.soundTypeCloth);
         // @todo
     }
