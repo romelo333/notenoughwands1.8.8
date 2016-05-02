@@ -47,7 +47,7 @@ public class SwappingWand extends GenericWand {
     };
 
     public SwappingWand() {
-        setup("swapping_wand").xpUsage(4).availability(AVAILABILITY_ADVANCED).loot(5);
+        setup("swapping_wand").xpUsage(1).availability(AVAILABILITY_NORMAL).loot(5);
     }
 
     @Override

@@ -50,7 +50,7 @@ public class DisplacementWand extends GenericWand {
     public static final int[] amount = new int[] { 9, 9, 25, 1 };
 
     public DisplacementWand() {
-        setup("displacement_wand").xpUsage(4).availability(AVAILABILITY_NORMAL).loot(3);
+        setup("displacement_wand").xpUsage(1).availability(AVAILABILITY_NORMAL).loot(3);
     }
 
     @Override

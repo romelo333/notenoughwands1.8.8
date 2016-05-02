@@ -43,7 +43,7 @@ public class BuildingWand extends GenericWand {
     public static final int[] amount = new int[] { 9, 9, 25, 1 };
 
     public BuildingWand() {
-        setup("building_wand").xpUsage(4).availability(AVAILABILITY_ADVANCED).loot(3);
+        setup("building_wand").xpUsage(1).availability(AVAILABILITY_NORMAL).loot(3);
     }
 
     @Override
