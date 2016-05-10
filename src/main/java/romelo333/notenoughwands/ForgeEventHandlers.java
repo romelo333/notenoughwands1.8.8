@@ -1,13 +1,21 @@
 package romelo333.notenoughwands;
 
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.storage.loot.LootEntryItem;
+import net.minecraft.world.storage.loot.LootPool;
+import net.minecraft.world.storage.loot.LootTableList;
+import net.minecraft.world.storage.loot.conditions.LootCondition;
+import net.minecraft.world.storage.loot.functions.LootFunction;
+import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import romelo333.notenoughwands.Items.GenericWand;
 import romelo333.notenoughwands.varia.WrenchChecker;
 
 import java.util.List;
@@ -66,6 +74,23 @@ public class ForgeEventHandlers {
             }
         }
 
+    }
+
+    @SubscribeEvent
+    public void onLootLoad(LootTableLoadEvent event) {
+        if (event.getName().equals(LootTableList.CHESTS_ABANDONED_MINESHAFT) ||
+                event.getName().equals(LootTableList.CHESTS_IGLOO_CHEST) ||
+                event.getName().equals(LootTableList.CHESTS_DESERT_PYRAMID) ||
+                event.getName().equals(LootTableList.CHESTS_JUNGLE_TEMPLE) ||
+                event.getName().equals(LootTableList.CHESTS_NETHER_BRIDGE) ||
+                event.getName().equals(LootTableList.CHESTS_SIMPLE_DUNGEON) ||
+                event.getName().equals(LootTableList.CHESTS_VILLAGE_BLACKSMITH)) {
+            LootPool main = event.getTable().getPool("main");
+            // Safety, check if the main lootpool is still present
+            if (main != null) {
+                GenericWand.setupChestLoot(main);
+            }
+        }
     }
 
 //    @SubscribeEvent

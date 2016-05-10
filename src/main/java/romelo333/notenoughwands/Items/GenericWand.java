@@ -14,10 +14,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraft.world.storage.loot.LootEntryItem;
+import net.minecraft.world.storage.loot.LootPool;
+import net.minecraft.world.storage.loot.conditions.LootCondition;
+import net.minecraft.world.storage.loot.functions.LootFunction;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Optional;
@@ -228,28 +231,17 @@ public class GenericWand extends Item implements cofh.api.energy.IEnergyContaine
 
     //------------------------------------------------------------------------------
 
-    public static void setupChestLoot() {
+    public static void setupChestLoot(LootPool main) {
         for (GenericWand wand : wands) {
-            wand.setupChestLootInt();
+            wand.setupChestLootInt(main);
         }
     }
 
-    public void setupChestLootInt() {
+    private void setupChestLootInt(LootPool main) {
         if (lootRarity > 0 && availability > 0) {
-//            setupChestLootInt(ChestGenHooks.DUNGEON_CHEST);
-//            setupChestLootInt(ChestGenHooks.MINESHAFT_CORRIDOR);
-//            setupChestLootInt(ChestGenHooks.PYRAMID_DESERT_CHEST);
-//            setupChestLootInt(ChestGenHooks.PYRAMID_JUNGLE_CHEST);
-//            setupChestLootInt(ChestGenHooks.STRONGHOLD_CORRIDOR);
-//            setupChestLootInt(ChestGenHooks.VILLAGE_BLACKSMITH);
-            // @todo
+            String entryName = NotEnoughWands.MODID + ":" + getRegistryName().getResourcePath();
+            main.addEntry(new LootEntryItem(this, lootRarity, 0, new LootFunction[0], new LootCondition[0], entryName));
         }
-    }
-
-    private void setupChestLootInt(String category) {
-//        ChestGenHooks chest = ChestGenHooks.getInfo(category);
-//        chest.addItem(new WeightedRandomChestContent(this, 0, 1, 1, lootRarity));
-        // @todo
     }
 
     //------------------------------------------------------------------------------
