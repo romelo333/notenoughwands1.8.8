@@ -7,7 +7,9 @@ item.notenoughwands.MovingWand.name=移动魔杖
 item.notenoughwands.ProtectionWand.name=防爆魔杖
 item.notenoughwands.MasterProtectionWand.name=大师防爆魔杖
 item.notenoughwands.DisplacementWand.name=位移魔杖
-item.notenoughwands.AccelerationWand.name=Acceleration Wand
+item.notenoughwands.AccelerationWand.name=时光加速魔杖
+item.notenoughwands.freezing_wand.name=冰冻魔杖(WIP)
+item.notenoughwands.potion_wand.name=药剂魔杖
 item.notenoughwands.WandCore.name=魔杖核心
 item.notenoughwands.AdvancedWandCore.name=闪耀的魔杖核心
 
