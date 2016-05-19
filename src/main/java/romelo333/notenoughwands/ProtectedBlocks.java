@@ -40,7 +40,7 @@ public class ProtectedBlocks extends WorldSavedData{
         if (instance != null){
             return instance;
         }
-        instance = (ProtectedBlocks)world.getMapStorage().loadData(ProtectedBlocks.class, NAME);
+        instance = (ProtectedBlocks)world.getMapStorage().getOrLoadData(ProtectedBlocks.class, NAME);
         if (instance == null){
             instance = new ProtectedBlocks(NAME);
         }
@@ -175,7 +175,7 @@ public class ProtectedBlocks extends WorldSavedData{
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound tagCompound) {
+    public NBTTagCompound writeToNBT(NBTTagCompound tagCompound) {
         tagCompound.setInteger("lastId", lastId);
         NBTTagList list = new NBTTagList();
         for (Map.Entry<GlobalCoordinate, Integer> entry : blocks.entrySet()) {
@@ -189,5 +189,6 @@ public class ProtectedBlocks extends WorldSavedData{
             list.appendTag(tc);
         }
         tagCompound.setTag("blocks",list);
+        return tagCompound;
     }
 }

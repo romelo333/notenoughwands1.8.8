@@ -37,7 +37,7 @@ public class ModSounds {
             double d10 = d7 * d7 + d8 * d8 + d9 * d9;
 
             if (d10 <= 256.0D) {
-                entityplayermp.playerNetServerHandler.sendPacket(soundEffect);
+                entityplayermp.connection.sendPacket(soundEffect);
             }
         }
     }
