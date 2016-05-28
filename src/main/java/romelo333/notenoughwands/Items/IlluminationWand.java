@@ -38,6 +38,10 @@ public class IlluminationWand extends GenericWand {
                 return EnumActionResult.SUCCESS;
             }
 
+            if (!world.isAirBlock(pos.offset(side))) {
+                return EnumActionResult.SUCCESS;
+            }
+
             if (!checkUsage(stack, player, 1.0f)) {
                 return EnumActionResult.SUCCESS;
             }
