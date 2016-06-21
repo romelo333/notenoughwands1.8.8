@@ -2,6 +2,7 @@ package romelo333.notenoughwands.Items;
 
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockRedstoneOre;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -145,7 +146,18 @@ public class SwappingWand extends GenericWand {
             }
             if (Tools.consumeInventoryItem(Item.getItemFromBlock(block), meta, player.inventory, player)) {
                 if (!player.capabilities.isCreativeMode) {
-                    Tools.giveItem(world, player, oldblock, oldmeta, 1, pos);
+                    ItemStack itemStack = null;
+                    if (oldblock instanceof BlockRedstoneOre) {
+                        itemStack = new ItemStack(Blocks.redstone_ore);
+                    } else {
+                        Item item = oldblock.getItem(world, pos);
+                        if (item != null) {
+                            itemStack = new ItemStack(item, 1, oldblock.getDamageValue(world, pos));
+                        }
+                    }
+                    if (itemStack != null) {
+                        Tools.giveItem(world, player, pos, itemStack);
+                    }
                 }
                 Tools.playSound(world, block.stepSound.getBreakSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
                 world.setBlockState(coordinate, block.getStateFromMeta(meta), 2);

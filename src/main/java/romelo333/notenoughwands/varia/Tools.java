@@ -42,6 +42,10 @@ public class Tools {
 
     public static void giveItem(World world, EntityPlayer player, Block block, int meta, int cnt, BlockPos pos) {
         ItemStack oldStack = new ItemStack(block, cnt, meta);
+        giveItem(world, player, pos, oldStack);
+    }
+
+    public static void giveItem(World world, EntityPlayer player, BlockPos pos, ItemStack oldStack) {
         if (!player.inventory.addItemStackToInventory(oldStack)) {
             // Not enough room. Spawn item in world.
             EntityItem entityItem = new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), oldStack);
