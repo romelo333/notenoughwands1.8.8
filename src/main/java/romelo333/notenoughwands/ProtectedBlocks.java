@@ -4,9 +4,11 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSavedData;
 import net.minecraftforge.common.util.Constants;
+import org.apache.commons.lang3.tuple.Pair;
 import romelo333.notenoughwands.varia.GlobalCoordinate;
 import romelo333.notenoughwands.varia.Tools;
 
@@ -20,9 +22,17 @@ public class ProtectedBlocks extends WorldSavedData{
     private static ProtectedBlocks instance;
 
     // Persisted data
-    private Map<GlobalCoordinate, Integer> blocks = new HashMap<GlobalCoordinate, Integer>();       // Map from coordinate -> ID
-    private Map<Integer,Integer> counter = new HashMap<Integer, Integer>(); // Keep track of number of protected blocks per ID
+    private Map<GlobalCoordinate, Integer> blocks = new HashMap<>();       // Map from coordinate -> ID
+
+    // Cache which caches the protected blocks per dimension and per chunk position.
+    private Map<Pair<Integer,ChunkPos>,Set<BlockPos>> perDimPerChunkCache = new HashMap<>();
+
+    private Map<Integer,Integer> counter = new HashMap<>(); // Keep track of number of protected blocks per ID
     private int lastId = 1;
+
+    // Client side protected blocks.
+    public static int clientSideWorld = Integer.MAX_VALUE;
+    public static Map<ChunkPos, Set<BlockPos>> clientSideProtectedBlocks = new HashMap<>();
 
     public ProtectedBlocks(String name) {
         super(name);
@@ -33,7 +43,7 @@ public class ProtectedBlocks extends WorldSavedData{
         markDirty();
     }
 
-    public static ProtectedBlocks getProtectedBlocks (World world){
+    public static ProtectedBlocks getProtectedBlocks(World world){
         if (world.isRemote){
             return null;
         }
@@ -45,6 +55,15 @@ public class ProtectedBlocks extends WorldSavedData{
             instance = new ProtectedBlocks(NAME);
         }
         return instance;
+    }
+
+    public static boolean isProtectedClientSide(World world, BlockPos pos){
+        ChunkPos chunkPos = new ChunkPos(pos);
+        if (!clientSideProtectedBlocks.containsKey(chunkPos)) {
+            return false;
+        }
+        Set<BlockPos> positions = clientSideProtectedBlocks.get(chunkPos);
+        return positions.contains(pos);
     }
 
     public int getNewId(World world) {
@@ -95,6 +114,8 @@ public class ProtectedBlocks extends WorldSavedData{
         }
 
         blocks.put(key, id);
+        clearCache(key);
+
         incrementProtection(id);
 
         save(world);
@@ -113,6 +134,7 @@ public class ProtectedBlocks extends WorldSavedData{
         }
         decrementProtection(blocks.get(key));
         blocks.remove(key);
+        clearCache(key);
         save(world);
         return true;
     }
@@ -129,6 +151,7 @@ public class ProtectedBlocks extends WorldSavedData{
         for (GlobalCoordinate coordinate : toRemove) {
             cnt++;
             blocks.remove(coordinate);
+            clearCache(coordinate);
         }
         counter.put(id, 0);
 
@@ -159,10 +182,55 @@ public class ProtectedBlocks extends WorldSavedData{
         }
     }
 
+    private void clearCache(GlobalCoordinate pos) {
+        ChunkPos chunkpos = new ChunkPos(pos);
+        perDimPerChunkCache.remove(Pair.of(pos.getDim(), chunkpos));
+    }
+
+    public Map<ChunkPos,Set<BlockPos>> fetchProtectedBlocks(World world, BlockPos pos) {
+        Map<ChunkPos,Set<BlockPos>> result = new HashMap<>();
+        ChunkPos chunkpos = new ChunkPos(pos);
+
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.chunkXPos-1, chunkpos.chunkZPos-1));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.chunkXPos  , chunkpos.chunkZPos-1));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.chunkXPos+1, chunkpos.chunkZPos-1));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.chunkXPos-1, chunkpos.chunkZPos  ));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.chunkXPos  , chunkpos.chunkZPos  ));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.chunkXPos+1, chunkpos.chunkZPos  ));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.chunkXPos-1, chunkpos.chunkZPos+1));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.chunkXPos  , chunkpos.chunkZPos+1));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.chunkXPos+1, chunkpos.chunkZPos+1));
+
+        return result;
+    }
+
+    public void fetchProtectedBlocks(Map<ChunkPos,Set<BlockPos>> allresults, World world, ChunkPos chunkpos) {
+        Pair<Integer, ChunkPos> key = Pair.of(world.provider.getDimension(), chunkpos);
+        if (perDimPerChunkCache.containsKey(key)) {
+            allresults.put(chunkpos, perDimPerChunkCache.get(key));
+            return;
+        }
+
+        Set<BlockPos> result = new HashSet<>();
+
+        for (Map.Entry<GlobalCoordinate, Integer> entry : blocks.entrySet()) {
+            GlobalCoordinate block = entry.getKey();
+            if (block.getDim() == world.provider.getDimension()) {
+                ChunkPos bc = new ChunkPos(block);
+                if (bc.equals(chunkpos)) {
+                    result.add(block);
+                }
+            }
+        }
+        allresults.put(chunkpos, result);
+        perDimPerChunkCache.put(key, result);
+    }
+
     @Override
     public void readFromNBT(NBTTagCompound tagCompound) {
         lastId = tagCompound.getInteger("lastId");
         blocks.clear();
+        perDimPerChunkCache.clear();;
         counter.clear();
         NBTTagList list = tagCompound.getTagList("blocks", Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i<list.tagCount();i++){

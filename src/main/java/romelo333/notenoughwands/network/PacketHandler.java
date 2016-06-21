@@ -20,9 +20,11 @@ public class PacketHandler {
         INSTANCE.registerMessage(PacketToggleMode.Handler.class, PacketToggleMode.class, nextID(), Side.SERVER);
         INSTANCE.registerMessage(PacketGetProtectedBlocks.Handler.class, PacketGetProtectedBlocks.class, nextID(), Side.SERVER);
         INSTANCE.registerMessage(PacketGetProtectedBlockCount.Handler.class, PacketGetProtectedBlockCount.class, nextID(), Side.SERVER);
+        INSTANCE.registerMessage(PacketGetProtectedBlocksAroundPlayer.Handler.class, PacketGetProtectedBlocksAroundPlayer.class, nextID(), Side.SERVER);
 
         // Client side
         INSTANCE.registerMessage(PacketReturnProtectedBlocks.Handler.class, PacketReturnProtectedBlocks.class, nextID(), Side.CLIENT);
         INSTANCE.registerMessage(PacketReturnProtectedBlockCount.Handler.class, PacketReturnProtectedBlockCount.class, nextID(), Side.CLIENT);
+        INSTANCE.registerMessage(PacketReturnProtectedBlocksAroundPlayer.Handler.class, PacketReturnProtectedBlocksAroundPlayer.class, nextID(), Side.CLIENT);
     }
 }

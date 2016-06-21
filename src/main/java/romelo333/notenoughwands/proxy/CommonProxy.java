@@ -30,6 +30,7 @@ public abstract class CommonProxy {
         Configuration cfg = mainConfig;
         try {
             cfg.load();
+            cfg.addCustomCategoryComment(Config.CATEGORY_GENERAL, "General configuration");
             cfg.addCustomCategoryComment(Config.CATEGORY_WANDS, "Wand configuration");
             Config.init(cfg);
         } catch (Exception e1) {

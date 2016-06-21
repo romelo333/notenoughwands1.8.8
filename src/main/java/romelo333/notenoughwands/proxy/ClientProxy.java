@@ -10,11 +10,11 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import romelo333.notenoughwands.*;
 import romelo333.notenoughwands.Items.GenericWand;
-import romelo333.notenoughwands.KeyBindings;
-import romelo333.notenoughwands.KeyInputHandler;
-import romelo333.notenoughwands.ModItems;
-import romelo333.notenoughwands.ModRenderers;
+import romelo333.notenoughwands.network.PacketGetProtectedBlocksAroundPlayer;
+import romelo333.notenoughwands.network.PacketHandler;
 
 public class ClientProxy extends CommonProxy {
 
@@ -51,4 +51,21 @@ public class ClientProxy extends CommonProxy {
     public void postInit(FMLPostInitializationEvent e) {
         super.postInit(e);
     }
+
+    public static int timer = 0;
+
+    @SubscribeEvent
+    public void onClientTick(TickEvent.ClientTickEvent event) {
+        if (Config.clientSideProtection < 0) {
+            return;
+        }
+
+        timer--;
+        if (timer > 0) {
+            return;
+        }
+        timer = Config.clientSideProtection;
+        PacketHandler.INSTANCE.sendToServer(new PacketGetProtectedBlocksAroundPlayer());
+    }
+
 }
