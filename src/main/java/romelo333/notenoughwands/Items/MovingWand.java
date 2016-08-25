@@ -131,7 +131,7 @@ public class MovingWand extends GenericWand {
     }
 
     private void place(ItemStack stack, World world, BlockPos pos, EnumFacing side) {
-        BlockPos pp = pos.offset(side);
+        BlockPos pp = side == null ? pos : pos.offset(side);
         NBTTagCompound tagCompound = stack.getTagCompound();
         int id = tagCompound.getInteger("block");
         Block block = Block.REGISTRY.getObjectById(id);
