@@ -54,7 +54,7 @@ public class ForgeEventHandlers {
 
 //    @SubscribeEvent
 //    public void onPlayerLeftClickEvent(PlayerInteractEvent.LeftClickBlock event) {
-//        if (!Config.fullProtection) {
+//        if (!Config.interactionProtection) {
 //            // If full protection is enabled we check in the normal onPlayerInteractEvent
 //            ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(event.getWorld());
 //            BlockPos pos = event.getPos();
@@ -82,7 +82,7 @@ public class ForgeEventHandlers {
             // Server side
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
             if (protectedBlocks != null && protectedBlocks.isProtected(world, pos)) {
-                if (Config.fullProtection) {
+                if (Config.interactionProtection) {
                     event.setCanceled(true);
                 } else {
                     // We still allow right click interaction.
