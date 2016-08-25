@@ -125,7 +125,7 @@ public class ProtectedBlocks extends WorldSavedData{
     public boolean unprotect(EntityPlayer player, World world, BlockPos pos, int id) {
         GlobalCoordinate key = new GlobalCoordinate(pos, world.provider.getDimension());
         if (!blocks.containsKey(key)) {
-            Tools.error(player, "This block is not prorected!");
+            Tools.error(player, "This block is not protected!");
             return false;
         }
         if (id != -1 && blocks.get(key) != id) {
