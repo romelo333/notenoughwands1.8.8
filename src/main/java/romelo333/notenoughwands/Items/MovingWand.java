@@ -141,12 +141,12 @@ public class MovingWand extends GenericWand {
         world.setBlockState(pp, blockState, 3);
         if (tagCompound.hasKey("tedata")) {
             NBTTagCompound tc = (NBTTagCompound) tagCompound.getTag("tedata");
-            TileEntity tileEntity = world.getTileEntity(pp);
+            tc.setInteger("x", pp.getX());
+            tc.setInteger("y", pp.getY());
+            tc.setInteger("z", pp.getZ());
+            TileEntity tileEntity = TileEntity.create(world, tc);
             if (tileEntity != null) {
-                tc.setInteger("x", pp.getX());
-                tc.setInteger("y", pp.getY());
-                tc.setInteger("z", pp.getZ());
-                tileEntity.readFromNBT(tc);
+                world.getChunkFromBlockCoords(pp).addTileEntity(tileEntity);
                 tileEntity.markDirty();
                 world.notifyBlockUpdate(pp, blockState, blockState, 3);
             }
