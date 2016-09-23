@@ -172,7 +172,8 @@ public class MovingWand extends GenericWand {
         }
 
         NBTTagCompound tagCompound = Tools.getTagCompound(stack);
-        String name = Tools.getBlockName(block, meta);
+        ItemStack s = block.getItem(world, pos, state);
+        String name = s.getDisplayName();
         if (name == null) {
             Tools.error(player, "You cannot select this block!");
         } else {
