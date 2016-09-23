@@ -1,0 +1,22 @@
+item.notenoughwands.swapping_wand.name=عصاة تبديل
+item.notenoughwands.teleportation_wand.name=عصاة تحرك تخاطري
+item.notenoughwands.capturing_wand.name=عصاة قبض
+item.notenoughwands.building_wand.name=عصاة بناء
+item.notenoughwands.illumination_wand.name=عصاة إنارة
+item.notenoughwands.moving_wand.name=عصاة تحريك
+item.notenoughwands.protection_wand.name=عصاة حماية
+item.notenoughwands.master_protection_wand.name=عصاة حماية مسيطرة
+item.notenoughwands.displacement_wand.name=عصاة إقتلاع
+item.notenoughwands.acceleration_wand.name=عصاة تسريع
+item.notenoughwands.freezing_wand.name=عصاة تجميد (WIP)
+item.notenoughwands.potion_wand.name=عصاة الجرعات
+item.notenoughwands.wandcore.name=قلب عصاة
+item.notenoughwands.advanced_wandcore.name=قلب عصاة متقدم
+
+tile.notenoughwands.blockLight.name=كرة منيرة
+
+
+key.modifier=معدل عصاة
+key.categories.notenoughwands=Not Enough Wands
+
+itemGroup.NotEnoughWands=Not Enough Wands
