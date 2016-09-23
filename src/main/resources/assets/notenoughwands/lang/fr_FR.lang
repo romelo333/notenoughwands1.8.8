@@ -1,0 +1,22 @@
++item.notenoughwands.swapping_wand.name=Baguette d'Échanges
+ +item.notenoughwands.teleportation_wand.name=Baguette de Téléportation
+ +item.notenoughwands.capturing_wand.name=Baguette de Captation
+ +item.notenoughwands.building_wand.name=Baguette de Construction
+ +item.notenoughwands.illumination_wand.name=Baguette d'Illumination
+ +item.notenoughwands.moving_wand.name=Baguette de Movement
+ +item.notenoughwands.protection_wand.name=Baguette de Protection
+ +item.notenoughwands.master_protection_wand.name=Baguette de Protection Maîtresse
+ +item.notenoughwands.displacement_wand.name=Baguette de Déplacement
+ +item.notenoughwands.acceleration_wand.name=Baguette d'Accélération
+ +item.notenoughwands.freezing_wand.name=Baguette de Congélation (WIP)
+ +item.notenoughwands.potion_wand.name=Baguette de Potion
+ +item.notenoughwands.wandcore.name=Cœur de Baguette
+ +item.notenoughwands.advanced_wandcore.name=Cœur de Baguette Élevé
+ +
+ +tile.notenoughwands.blockLight.name=Orbe d'Illumination
+ +
+ +
+ +key.modifier=Modificateur des Baguette
+ +key.categories.notenoughwands=Not Enough Wands
+ +
+ +itemGroup.NotEnoughWands=Not Enough Wands
