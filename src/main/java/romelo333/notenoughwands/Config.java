@@ -11,11 +11,13 @@ public class Config {
 
     public static boolean interactionProtection = false;
     public static int clientSideProtection = -1;
+    public static boolean showDurabilityBarForRF = true;
 
     public static void init(Configuration cfg) {
         GenericWand.setupConfig(cfg);
 
         interactionProtection = cfg.get(Config.CATEGORY_GENERAL, "interactionProtection", interactionProtection, "If this is true then the protection wand will prevent ALL kind of interaction with protected blocks. If this is false then only block breaking is prevented").getBoolean();
         clientSideProtection = cfg.get(Config.CATEGORY_GENERAL, "clientSideProtection", clientSideProtection, "If this is >= 1 then the protection data will be synced to the client with this frequency (in ticks). This makes protection cleaner at the cost of network traffic").getInt();
+        showDurabilityBarForRF = cfg.get(Config.CATEGORY_GENERAL, "showDurabilityBarForRF", showDurabilityBarForRF, "Set this to false if you don't want the durability bar for wands using RF").getBoolean();
     }
 }

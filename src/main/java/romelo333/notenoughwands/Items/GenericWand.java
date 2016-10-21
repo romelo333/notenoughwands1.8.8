@@ -111,7 +111,7 @@ public class GenericWand extends Item implements cofh.api.energy.IEnergyContaine
 
     @Override
     public boolean showDurabilityBar(ItemStack stack) {
-        if (needsrf > 0) {
+        if (needsrf > 0 && Config.showDurabilityBarForRF) {
             return true;
         }
         return super.showDurabilityBar(stack);
@@ -119,7 +119,7 @@ public class GenericWand extends Item implements cofh.api.energy.IEnergyContaine
 
     @Override
     public double getDurabilityForDisplay(ItemStack stack) {
-        if (needsrf > 0) {
+        if (needsrf > 0 && Config.showDurabilityBarForRF) {
             int max = getMaxEnergyStored(stack);
             return (max - getEnergyStored(stack)) / (double) max;
         }
