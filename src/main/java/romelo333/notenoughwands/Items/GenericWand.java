@@ -109,6 +109,23 @@ public class GenericWand extends Item implements cofh.api.energy.IEnergyContaine
         }
     }
 
+    @Override
+    public boolean showDurabilityBar(ItemStack stack) {
+        if (needsrf > 0) {
+            return true;
+        }
+        return super.showDurabilityBar(stack);
+    }
+
+    @Override
+    public double getDurabilityForDisplay(ItemStack stack) {
+        if (needsrf > 0) {
+            int max = getMaxEnergyStored(stack);
+            return (max - getEnergyStored(stack)) / (double) max;
+        }
+        return super.getDurabilityForDisplay(stack);
+    }
+
     protected GenericWand setup(String name) {
         if (availability > 0) {
             setMaxStackSize(1);
