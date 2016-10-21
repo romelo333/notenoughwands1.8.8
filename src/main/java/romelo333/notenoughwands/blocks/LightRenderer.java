@@ -31,6 +31,7 @@ public class LightRenderer extends TileEntitySpecialRenderer {
         long t = System.currentTimeMillis() % 6;
         ModRenderers.renderBillboardQuad(0.6f, t * (1.0f / 6.0f), (1.0f / 6.0f));
 
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GlStateManager.popMatrix();
     }
 }
