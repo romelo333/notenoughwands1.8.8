@@ -22,6 +22,7 @@ import net.minecraft.world.storage.loot.LootPool;
 import net.minecraft.world.storage.loot.conditions.LootCondition;
 import net.minecraft.world.storage.loot.functions.LootFunction;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -32,6 +33,7 @@ import romelo333.notenoughwands.Config;
 import romelo333.notenoughwands.ModItems;
 import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.ProtectedBlocks;
+import romelo333.notenoughwands.varia.ItemCapabilityProvider;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.ArrayList;
@@ -62,6 +64,12 @@ public class GenericWand extends Item implements cofh.api.energy.IEnergyContaine
     public void registerModel() {
         Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
     }
+
+    @Override
+    public ICapabilityProvider initCapabilities(ItemStack stack, NBTTagCompound nbt) {
+        return new ItemCapabilityProvider(stack, this);
+    }
+
 
     // Check if a given block can be picked up.
     public static double checkPickup(EntityPlayer player, World world, BlockPos pos, Block block, float maxHardness, Map<String, Double> blacklisted) {
