@@ -15,7 +15,10 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import romelo333.notenoughwands.Config;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.List;
@@ -28,6 +31,9 @@ public class AccelerationWand extends GenericWand {
     public static final int MODE_50 = 1;
     public static final int MODE_100 = 2;
     public static final int MODE_LAST = MODE_100;
+
+    private float fakePlayerFactor = 1.0f;
+    private boolean lessEffectiveForFakePlayer = false;
 
     public static final String[] descriptions = new String[] {
             "fast", "faster", "fastest"
@@ -48,8 +54,26 @@ public class AccelerationWand extends GenericWand {
         list.add(TextFormatting.GREEN + "Mode: " + descriptions[getMode(stack)]);
         list.add("Right click on block to speed up ticks.");
         list.add("Mode key (default '=') to change speed.");
+        if (Math.abs(fakePlayerFactor-1.0f) >= 0.01) {
+            if (fakePlayerFactor < 0) {
+                list.add(TextFormatting.RED + "Usage in a machine has been disabled in config!");
+            } else if (fakePlayerFactor > 1) {
+                list.add(TextFormatting.YELLOW + "Usage in a machine will cost more!");
+            }
+        }
+        if (fakePlayerFactor >= 0.0 && lessEffectiveForFakePlayer) {
+            list.add(TextFormatting.YELLOW + "Usage in a machine will be less effective!");
+        }
     }
 
+    @Override
+    public void initConfig(Configuration cfg) {
+        super.initConfig(cfg);
+        fakePlayerFactor = (float) cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_fakePlayerFactor", fakePlayerFactor,
+                "Factor to apply to the cost when this wand is used by a fake player (a machine). Set to -1 to disable its use this way").getDouble();
+        lessEffectiveForFakePlayer =  cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_lessEffectiveForFakePlayer", lessEffectiveForFakePlayer,
+                "If true this wand will be less effective for fake players").getBoolean();
+    }
 
     @Override
     public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
@@ -58,11 +82,26 @@ public class AccelerationWand extends GenericWand {
             Block block = state.getBlock();
             int mode = getMode(stack);
 
-            if (!checkUsage(stack, player, cost[mode])) {
+            float cost = AccelerationWand.cost[mode];
+            int amount = AccelerationWand.amount[mode];
+
+            if (player instanceof FakePlayer) {
+                if (fakePlayerFactor < 0) {
+                    // Blocked by usage in a machine
+                    return EnumActionResult.FAIL;
+                }
+                cost *= fakePlayerFactor;
+
+                if (lessEffectiveForFakePlayer) {
+                    amount /= 2;
+                }
+            }
+
+            if (!checkUsage(stack, player, cost)) {
                 return EnumActionResult.FAIL;
             }
             TileEntity tileEntity = world.getTileEntity(pos);
-            for (int i = 0; i < amount[mode]/(tileEntity == null ? 5 : 1); i ++){
+            for (int i = 0; i < amount /(tileEntity == null ? 5 : 1); i ++){
                 if (tileEntity == null){
                     block.updateTick(world, pos, state, random);
                 } else if (tileEntity instanceof ITickable) {
@@ -71,7 +110,7 @@ public class AccelerationWand extends GenericWand {
 
             }
 
-            registerUsage(stack, player, cost[mode]);
+            registerUsage(stack, player, cost);
         }
         return EnumActionResult.SUCCESS;
     }
