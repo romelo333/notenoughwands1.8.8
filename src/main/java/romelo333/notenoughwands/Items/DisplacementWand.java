@@ -65,7 +65,7 @@ public class DisplacementWand extends GenericWand {
         list.add(TextFormatting.GREEN + "Mode: " + descriptions[getMode(stack)]);
         list.add("Right click to push blocks forward.");
         list.add("Sneak right click to pull blocks.");
-        list.add("Mode key (default '=') to switch mode.");
+        showModeKeyDescription(list, "switch mode");
     }
 
     @Override

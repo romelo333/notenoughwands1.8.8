@@ -53,7 +53,7 @@ public class AccelerationWand extends GenericWand {
         super.addInformation(stack, player, list, b);
         list.add(TextFormatting.GREEN + "Mode: " + descriptions[getMode(stack)]);
         list.add("Right click on block to speed up ticks.");
-        list.add("Mode key (default '=') to change speed.");
+        showModeKeyDescription(list, "change speed");
         if (Math.abs(fakePlayerFactor-1.0f) >= 0.01) {
             if (fakePlayerFactor < 0) {
                 list.add(TextFormatting.RED + "Usage in a machine has been disabled in config!");

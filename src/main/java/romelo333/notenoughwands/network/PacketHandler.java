@@ -18,6 +18,7 @@ public class PacketHandler {
 
         // Server side
         INSTANCE.registerMessage(PacketToggleMode.Handler.class, PacketToggleMode.class, nextID(), Side.SERVER);
+        INSTANCE.registerMessage(PacketToggleSubMode.Handler.class, PacketToggleSubMode.class, nextID(), Side.SERVER);
         INSTANCE.registerMessage(PacketGetProtectedBlocks.Handler.class, PacketGetProtectedBlocks.class, nextID(), Side.SERVER);
         INSTANCE.registerMessage(PacketGetProtectedBlockCount.Handler.class, PacketGetProtectedBlockCount.class, nextID(), Side.SERVER);
         INSTANCE.registerMessage(PacketGetProtectedBlocksAroundPlayer.Handler.class, PacketGetProtectedBlocksAroundPlayer.class, nextID(), Side.SERVER);

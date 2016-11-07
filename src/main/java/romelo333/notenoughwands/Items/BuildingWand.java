@@ -54,12 +54,20 @@ public class BuildingWand extends GenericWand {
         if (compound != null) {
             int cnt = (compound.hasKey("undo1") ? 1 : 0) + (compound.hasKey("undo2") ? 1 : 0);
             list.add(TextFormatting.GREEN + "Has " + cnt + " undo states");
-            list.add(TextFormatting.GREEN + "Mode: " + descriptions[compound.getInteger("mode")]);
+            int mode = compound.getInteger("mode");
+            if (mode == MODE_9ROW || mode == MODE_25ROW) {
+                int submode = getSubMode(stack);
+                list.add(TextFormatting.GREEN + "Mode: " + descriptions[mode] + (submode == 1 ? " [Rotated]" : ""));
+            } else {
+                list.add(TextFormatting.GREEN + "Mode: " + descriptions[mode]);
+            }
         }
         list.add("Right click to extend blocks in that direction.");
         list.add("Sneak right click on such a block to undo one of");
         list.add("the last two operations.");
-        list.add("Mode key (default '=') to switch mode.");
+
+        showModeKeyDescription(list, "switch mode");
+        showSubModeKeyDescription(list, "change orientation");
     }
 
     @Override
@@ -73,8 +81,20 @@ public class BuildingWand extends GenericWand {
         Tools.getTagCompound(stack).setInteger("mode", mode);
     }
 
+    @Override
+    public void toggleSubMode(EntityPlayer player, ItemStack stack) {
+        int submode = getSubMode(stack);
+        submode = submode == 1 ? 0 : 1;
+        Tools.notify(player, "Switched orientation");
+        Tools.getTagCompound(stack).setInteger("submode", submode);
+    }
+
     private int getMode(ItemStack stack) {
         return Tools.getTagCompound(stack).getInteger("mode");
+    }
+
+    private int getSubMode(ItemStack stack) {
+        return Tools.getTagCompound(stack).getInteger("submode");
     }
 
     @Override
@@ -267,33 +287,33 @@ public class BuildingWand extends GenericWand {
     }
 
     private Set<BlockPos> findSuitableBlocks(ItemStack stack, World world, EnumFacing sideHit, BlockPos pos, Block block, int meta) {
-        Set<BlockPos> coordinates = new HashSet<BlockPos>();
-        Set<BlockPos> done = new HashSet<BlockPos>();
-        Deque<BlockPos> todo = new ArrayDeque<BlockPos>();
+        Set<BlockPos> coordinates = new HashSet<>();
+        Set<BlockPos> done = new HashSet<>();
+        Deque<BlockPos> todo = new ArrayDeque<>();
         todo.addLast(pos);
         findSuitableBlocks(world, coordinates, done, todo, sideHit, block, meta, amount[getMode(stack)],
-                getMode(stack) == MODE_9ROW || getMode(stack) == MODE_25ROW);
+                getMode(stack) == MODE_9ROW || getMode(stack) == MODE_25ROW, getSubMode(stack));
 
         return coordinates;
     }
 
     private void findSuitableBlocks(World world, Set<BlockPos> coordinates, Set<BlockPos> done, Deque<BlockPos> todo, EnumFacing direction, Block block, int meta, int maxAmount,
-                                    boolean rowMode) {
+                                    boolean rowMode, int rotated) {
 
         EnumFacing dirA = null;
         EnumFacing dirB = null;
         if (rowMode) {
             BlockPos base = todo.getFirst();
             BlockPos offset = base.offset(direction);
-            dirA = dir1(direction);
+            dirA = rotated == 1 ? dir2(direction) : dir1(direction);
             dirB = dirA.getOpposite();
             if (!isSuitable(world, block, meta, base.offset(dirA), offset.offset(dirA)) ||
                 !isSuitable(world, block, meta, base.offset(dirB), offset.offset(dirB))) {
-                dirA = dir2(direction);
+                dirA = rotated == 1 ? dir3(direction) : dir2(direction);
                 dirB = dirA.getOpposite();
                 if (!isSuitable(world, block, meta, base.offset(dirA), offset.offset(dirA)) ||
                         !isSuitable(world, block, meta, base.offset(dirB), offset.offset(dirB))) {
-                    dirA = dir3(direction);
+                    dirA = rotated == 1 ? dir1(direction) : dir3(direction);
                     dirB = dirA.getOpposite();
                 }
             }

@@ -29,10 +29,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
-import romelo333.notenoughwands.Config;
-import romelo333.notenoughwands.ModItems;
-import romelo333.notenoughwands.NotEnoughWands;
-import romelo333.notenoughwands.ProtectedBlocks;
+import romelo333.notenoughwands.*;
 import romelo333.notenoughwands.varia.ItemCapabilityProvider;
 import romelo333.notenoughwands.varia.Tools;
 
@@ -224,6 +221,9 @@ public class GenericWand extends Item implements cofh.api.energy.IEnergyContaine
     public void toggleMode(EntityPlayer player, ItemStack stack) {
     }
 
+    public void toggleSubMode(EntityPlayer player, ItemStack stack) {
+    }
+
     //------------------------------------------------------------------------------
 
     @SideOnly(Side.CLIENT)
@@ -298,6 +298,16 @@ public class GenericWand extends Item implements cofh.api.energy.IEnergyContaine
 
         Minecraft.getMinecraft().entityRenderer.enableLightmap();
         GlStateManager.enableTexture2D();
+    }
+
+    protected void showModeKeyDescription(List<String> list, String suffix) {
+        String keyDescription = KeyBindings.wandModifier.getDisplayName();
+        list.add("Mode key (" + keyDescription + ") to " + suffix);
+    }
+
+    protected void showSubModeKeyDescription(List<String> list, String suffix) {
+        String keyDescription = KeyBindings.wandSubMode.getDisplayName();
+        list.add("Sub-mode key (" + keyDescription + ") to " + suffix);
     }
 
     private static void renderOutlines(Set<BlockPos> coordinates, int r, int g, int b, int thickness) {

@@ -83,7 +83,7 @@ public class SwappingWand extends GenericWand {
         }
         list.add("Sneak right click to select a block.");
         list.add("Right click on block to replace.");
-        list.add("Mode key (default '=') to switch mode.");
+        showModeKeyDescription(list, "switch mode");
     }
 
     @Override

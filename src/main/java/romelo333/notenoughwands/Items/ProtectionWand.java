@@ -86,7 +86,7 @@ public class ProtectionWand extends GenericWand {
             list.add(TextFormatting.GREEN + "Number of protected blocks: " + ReturnProtectedBlockCountHelper.count);
         }
         list.add("Right click to protect or unprotect a block.");
-        list.add("Mode key (default '=') to switch mode.");
+        showModeKeyDescription(list, "switch mode");
     }
 
     @Override
