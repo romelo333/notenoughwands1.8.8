@@ -33,21 +33,22 @@ public class BuildingWand extends GenericWand {
     public static final int MODE_9 = 0;
     public static final int MODE_9ROW = 1;
     public static final int MODE_25 = 2;
-    public static final int MODE_SINGLE = 3;
+    public static final int MODE_25ROW = 3;
+    public static final int MODE_SINGLE = 4;
     public static final int MODE_LAST = MODE_SINGLE;
 
     public static final String[] descriptions = new String[] {
-            "9 blocks", "9 blocks row", "25 blocks", "single"
+            "9 blocks", "9 blocks row", "25 blocks", "25 blocks row", "single"
     };
 
-    public static final int[] amount = new int[] { 9, 9, 25, 1 };
+    public static final int[] amount = new int[] { 9, 9, 25, 25, 1 };
 
     public BuildingWand() {
         setup("building_wand").xpUsage(1).availability(AVAILABILITY_NORMAL).loot(3);
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean b) {
+    public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean b) {
         super.addInformation(stack, player, list, b);
         NBTTagCompound compound = stack.getTagCompound();
         if (compound != null) {
@@ -270,7 +271,8 @@ public class BuildingWand extends GenericWand {
         Set<BlockPos> done = new HashSet<BlockPos>();
         Deque<BlockPos> todo = new ArrayDeque<BlockPos>();
         todo.addLast(pos);
-        findSuitableBlocks(world, coordinates, done, todo, sideHit, block, meta, amount[getMode(stack)], getMode(stack) == MODE_9ROW);
+        findSuitableBlocks(world, coordinates, done, todo, sideHit, block, meta, amount[getMode(stack)],
+                getMode(stack) == MODE_9ROW || getMode(stack) == MODE_25ROW);
 
         return coordinates;
     }
