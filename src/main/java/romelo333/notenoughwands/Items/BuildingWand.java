@@ -259,7 +259,7 @@ public class BuildingWand extends GenericWand {
                     }
                 } else {
                     coordinates = findSuitableBlocks(wand, world, mouseOver.sideHit, blockPos, block, meta);
-                    renderOutlines(evt, player, coordinates, 200, 230, 180);
+                    renderOutlines(evt, player, coordinates, 50, 250, 180);
                 }
             }
         }
