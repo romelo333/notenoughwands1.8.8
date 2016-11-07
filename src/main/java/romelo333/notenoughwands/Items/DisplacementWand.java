@@ -145,15 +145,25 @@ public class DisplacementWand extends GenericWand {
                     IBlockState blockState = block.getStateFromMeta(meta);
                     world.setBlockState(otherC, blockState, 3);
                     if (tc != null) {
-                        tileEntity = world.getTileEntity(otherC);
+                        tc.setInteger("x", otherC.getX());
+                        tc.setInteger("y", otherC.getY());
+                        tc.setInteger("z", otherC.getZ());
+                        tileEntity = TileEntity.create(world, tc);
                         if (tileEntity != null) {
-                            tc.setInteger("x", otherC.getX());
-                            tc.setInteger("y", otherC.getY());
-                            tc.setInteger("z", otherC.getZ());
-                            tileEntity.readFromNBT(tc);
+                            world.getChunkFromBlockCoords(otherC).addTileEntity(tileEntity);
                             tileEntity.markDirty();
                             world.notifyBlockUpdate(otherC, blockState, blockState, 3);
                         }
+
+//                        tileEntity = world.getTileEntity(otherC);
+//                        if (tileEntity != null) {
+//                            tc.setInteger("x", otherC.getX());
+//                            tc.setInteger("y", otherC.getY());
+//                            tc.setInteger("z", otherC.getZ());
+//                            tileEntity.readFromNBT(tc);
+//                            tileEntity.markDirty();
+//                            world.notifyBlockUpdate(otherC, blockState, blockState, 3);
+//                        }
                     }
                 }
             }
