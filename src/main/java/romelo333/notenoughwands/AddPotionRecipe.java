@@ -3,14 +3,16 @@ package romelo333.notenoughwands;
 import com.google.common.collect.Lists;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.potion.PotionUtils;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
+
+import java.util.List;
 
 public class AddPotionRecipe extends ShapelessRecipes {
     @Override
@@ -31,13 +33,14 @@ public class AddPotionRecipe extends ShapelessRecipes {
         if (tagCompound==null){
             tagCompound=new NBTTagCompound();
         }
-        tagCompound=(NBTTagCompound)tagCompound.copy();
+        tagCompound = tagCompound.copy();
         NBTTagList list = tagCompound.getTagList("effects", Constants.NBT.TAG_COMPOUND);
-//        for (PotionEffect effect : ((ItemPotion) potion.getItem()).getEffects(potion)) {
-//            NBTTagCompound effecttag = new NBTTagCompound();
-//            effect.writeCustomPotionEffectToNBT(effecttag);
-//            list.appendTag(effecttag);
-//        }
+        List<PotionEffect> effectsFromStack = PotionUtils.getEffectsFromStack(potion);
+        for (PotionEffect effect : effectsFromStack) {
+            NBTTagCompound effecttag = new NBTTagCompound();
+            effect.writeCustomPotionEffectToNBT(effecttag);
+            list.appendTag(effecttag);
+        }
         // @todo
         tagCompound.setTag("effects",list);
         result.setTagCompound(tagCompound);
