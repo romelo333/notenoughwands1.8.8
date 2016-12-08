@@ -1,6 +1,6 @@
 {
   "parent": "notenoughwands:item/generic_wand",
   "textures": {
-    "layer0": "notenoughwands:items/capturingWand"
+    "layer0": "notenoughwands:items/capturing_wand"
   }
 }

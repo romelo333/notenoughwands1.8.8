@@ -1,7 +1,7 @@
 {
   "parent": "builtin/generated",
   "textures": {
-    "layer0": "notenoughwands:items/wandCore"
+    "layer0": "notenoughwands:items/wand_core"
   },
   "display": {
     "thirdperson": {

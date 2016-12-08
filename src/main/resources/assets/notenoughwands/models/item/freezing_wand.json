@@ -1,6 +1,6 @@
 {
   "parent": "notenoughwands:item/generic_wand",
   "textures": {
-    "layer0": "notenoughwands:items/freezingWand"
+    "layer0": "notenoughwands:items/freezing_wand"
   }
 }

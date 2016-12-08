@@ -1,6 +1,6 @@
 {
   "parent": "notenoughwands:item/generic_wand",
   "textures": {
-    "layer0": "notenoughwands:items/swappingWand"
+    "layer0": "notenoughwands:items/swapping_wand"
   }
 }

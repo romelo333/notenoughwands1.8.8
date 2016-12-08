@@ -1,6 +1,6 @@
 {
   "parent": "notenoughwands:item/generic_wand",
   "textures": {
-    "layer0": "notenoughwands:items/illuminationWand"
+    "layer0": "notenoughwands:items/illumination_wand"
   }
 }

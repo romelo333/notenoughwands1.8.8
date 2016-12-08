@@ -1,6 +1,6 @@
 {
   "parent": "notenoughwands:item/generic_wand",
   "textures": {
-    "layer0": "notenoughwands:items/masterProtectionWand"
+    "layer0": "notenoughwands:items/master_protection_wand"
   }
 }
