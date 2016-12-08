@@ -1,6 +1,7 @@
 package romelo333.notenoughwands.Items;
 
 
+import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -175,7 +176,7 @@ public class MovingWand extends GenericWand {
         NBTTagCompound tagCompound = Tools.getTagCompound(stack);
         ItemStack s = block.getItem(world, pos, state);
         String name;
-        if (s == null) {
+        if (ItemStackTools.isEmpty(s)) {
             name = Tools.getBlockName(block, meta);
         } else {
             name = s.getDisplayName();

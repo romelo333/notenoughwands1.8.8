@@ -1,6 +1,7 @@
 package romelo333.notenoughwands.network;
 
 import io.netty.buffer.ByteBuf;
+import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
@@ -40,7 +41,7 @@ public class PacketGetProtectedBlocks implements IMessage {
             World world = player.getEntityWorld();
 
             ItemStack heldItem = player.getHeldItem(EnumHand.MAIN_HAND);
-            if (heldItem == null || !(heldItem.getItem() instanceof ProtectionWand)) {
+            if (ItemStackTools.isEmpty(heldItem) || !(heldItem.getItem() instanceof ProtectionWand)) {
                 // Cannot happen normally
                 return;
             }

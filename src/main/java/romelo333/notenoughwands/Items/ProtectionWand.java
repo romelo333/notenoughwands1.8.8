@@ -1,6 +1,7 @@
 package romelo333.notenoughwands.Items;
 
 
+import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -169,9 +170,9 @@ public class ProtectionWand extends GenericWand {
         } else {
             GameRegistry.addRecipe(new ItemStack(this), "re ", "ew ", "  w", 'r', Items.COMPARATOR, 'e', Items.ENDER_EYE, 'w', wandcore);
             GameRegistry.addRecipe(new ContainerToItemRecipe(new ItemStack[] {
-                    new ItemStack(this), new ItemStack(Items.ENDER_EYE), null,
-                    new ItemStack(Items.ENDER_EYE), new ItemStack(wandcore), null,
-                    null, null, new ItemStack(wandcore)
+                    new ItemStack(this), new ItemStack(Items.ENDER_EYE), ItemStackTools.getEmptyStack(),
+                    new ItemStack(Items.ENDER_EYE), new ItemStack(wandcore), ItemStackTools.getEmptyStack(),
+                    ItemStackTools.getEmptyStack(), ItemStackTools.getEmptyStack(), new ItemStack(wandcore)
             }, 0, new ItemStack(this)));
         }
     }
@@ -193,7 +194,7 @@ public class ProtectionWand extends GenericWand {
             container.setTagCompound(stack.getTagCompound().copy());
             return container;
         }
-        return null;
+        return ItemStackTools.getEmptyStack();
     }
 
 }

@@ -1,6 +1,7 @@
 package romelo333.notenoughwands.network;
 
 import io.netty.buffer.ByteBuf;
+import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
@@ -33,7 +34,7 @@ public class PacketToggleSubMode implements IMessage {
         private void handle(PacketToggleSubMode message, MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().playerEntity;
             ItemStack heldItem = playerEntity.getHeldItem(EnumHand.MAIN_HAND);
-            if (heldItem != null && heldItem.getItem() instanceof GenericWand) {
+            if (ItemStackTools.isValid(heldItem) && heldItem.getItem() instanceof GenericWand) {
                 GenericWand genericWand = (GenericWand) (heldItem.getItem());
                 genericWand.toggleSubMode(playerEntity, heldItem);
             }

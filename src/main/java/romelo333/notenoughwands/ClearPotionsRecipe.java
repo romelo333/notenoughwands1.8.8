@@ -1,28 +1,25 @@
 package romelo333.notenoughwands;
 
 import com.google.common.collect.Lists;
+import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants;
 
 public class ClearPotionsRecipe extends ShapelessRecipes {
     @Override
     public ItemStack getCraftingResult(InventoryCrafting inv) {
-        ItemStack potion = null;
-        ItemStack wand = null;
+        ItemStack potion = ItemStackTools.getEmptyStack();
+        ItemStack wand = ItemStackTools.getEmptyStack();
         for (int i = 0 ; i < inv.getSizeInventory() ; i++) {
             ItemStack stack = inv.getStackInSlot(i);
-            if (stack != null && stack.getItem() == ModItems.potionWand) {
+            if (ItemStackTools.isValid(stack) && stack.getItem() == ModItems.potionWand) {
                 wand = stack;
-            } else if (stack != null && stack.getItem() == Items.GLASS_BOTTLE) {
+            } else if (ItemStackTools.isValid(stack) && stack.getItem() == Items.GLASS_BOTTLE) {
                 potion = stack;
             }
         }
@@ -32,7 +29,7 @@ public class ClearPotionsRecipe extends ShapelessRecipes {
         if (tagCompound==null){
             tagCompound=new NBTTagCompound();
         }
-        tagCompound=(NBTTagCompound)tagCompound.copy();
+        tagCompound= tagCompound.copy();
         NBTTagList list = new NBTTagList();
         tagCompound.setTag("effects",list);
         result.setTagCompound(tagCompound);
@@ -49,11 +46,11 @@ public class ClearPotionsRecipe extends ShapelessRecipes {
         int foundPotion = 0;
         for (int i = 0 ; i < inv.getSizeInventory() ; i++) {
             ItemStack stack = inv.getStackInSlot(i);
-            if (stack != null && stack.getItem() == ModItems.potionWand) {
+            if (ItemStackTools.isValid(stack) && stack.getItem() == ModItems.potionWand) {
                 foundWand++;
-            } else if (stack != null && stack.getItem() == Items.GLASS_BOTTLE) {
+            } else if (ItemStackTools.isValid(stack) && stack.getItem() == Items.GLASS_BOTTLE) {
                 foundPotion++;
-            } else if (stack != null) {
+            } else if (ItemStackTools.isValid(stack)) {
                 return false;
             }
         }

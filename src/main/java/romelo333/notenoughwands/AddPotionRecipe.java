@@ -1,6 +1,7 @@
 package romelo333.notenoughwands;
 
 import com.google.common.collect.Lists;
+import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
@@ -17,13 +18,13 @@ import java.util.List;
 public class AddPotionRecipe extends ShapelessRecipes {
     @Override
     public ItemStack getCraftingResult(InventoryCrafting inv) {
-        ItemStack potion = null;
-        ItemStack wand = null;
+        ItemStack potion = ItemStackTools.getEmptyStack();
+        ItemStack wand = ItemStackTools.getEmptyStack();
         for (int i = 0 ; i < inv.getSizeInventory() ; i++) {
             ItemStack stack = inv.getStackInSlot(i);
-            if (stack != null && stack.getItem() == ModItems.potionWand) {
+            if (ItemStackTools.isValid(stack) && stack.getItem() == ModItems.potionWand) {
                 wand = stack;
-            } else if (stack != null && stack.getItem() == Items.POTIONITEM) {
+            } else if (ItemStackTools.isValid(stack) && stack.getItem() == Items.POTIONITEM) {
                 potion = stack;
             }
         }
@@ -57,11 +58,11 @@ public class AddPotionRecipe extends ShapelessRecipes {
         int foundPotion = 0;
         for (int i = 0 ; i < inv.getSizeInventory() ; i++) {
             ItemStack stack = inv.getStackInSlot(i);
-            if (stack != null && stack.getItem() == ModItems.potionWand) {
+            if (ItemStackTools.isValid(stack) && stack.getItem() == ModItems.potionWand) {
                 foundWand++;
-            } else if (stack != null && stack.getItem() == Items.POTIONITEM) {
+            } else if (ItemStackTools.isValid(stack) && stack.getItem() == Items.POTIONITEM) {
                 foundPotion++;
-            } else if (stack != null) {
+            } else if (ItemStackTools.isValid(stack)) {
                 return false;
             }
         }

@@ -1,5 +1,6 @@
 package romelo333.notenoughwands.proxy;
 
+import mcjty.lib.tools.ItemStackTools;
 import mcjty.lib.tools.MinecraftTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -39,7 +40,7 @@ public class ClientProxy extends CommonProxy {
         Minecraft mc = Minecraft.getMinecraft();
         EntityPlayerSP p = MinecraftTools.getPlayer(mc);
         ItemStack heldItem = p.getHeldItem(EnumHand.MAIN_HAND);
-        if (heldItem == null) {
+        if (ItemStackTools.isEmpty(heldItem)) {
             return;
         }
         if (heldItem.getItem() instanceof GenericWand) {
