@@ -1,5 +1,6 @@
 package romelo333.notenoughwands;
 
+import mcjty.lib.compat.CompatCreativeTabs;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.config.Configuration;
@@ -15,13 +16,19 @@ import romelo333.notenoughwands.proxy.CommonProxy;
 
 import java.io.File;
 
-@Mod(modid = NotEnoughWands.MODID, name="Not Enough Wands", dependencies =
-        "required-after:Forge@["+ NotEnoughWands.MIN_FORGE_VER+",)",
+@Mod(modid = NotEnoughWands.MODID, name="Not Enough Wands",
+        dependencies =
+                    "required-after:compatlayer@[" + NotEnoughWands.COMPATLAYER_VER + ",);" +
+                    "after:Forge@[" + NotEnoughWands.MIN_FORGE10_VER + ",);" +
+                    "after:forge@[" + NotEnoughWands.MIN_FORGE11_VER + ",)",
+        acceptedMinecraftVersions = "[1.10,1.12)",
         version = NotEnoughWands.VERSION)
 public class NotEnoughWands {
     public static final String MODID = "notenoughwands";
     public static final String VERSION = "1.4.0";
-    public static final String MIN_FORGE_VER = "12.16.1.1896";
+    public static final String MIN_FORGE10_VER = "12.18.1.2082";
+    public static final String MIN_FORGE11_VER = "13.19.0.2176";
+    public static final String COMPATLAYER_VER = "0.1.3";
 
     @SidedProxy(clientSide="romelo333.notenoughwands.proxy.ClientProxy", serverSide="romelo333.notenoughwands.proxy.ServerProxy")
     public static CommonProxy proxy;
@@ -33,10 +40,9 @@ public class NotEnoughWands {
     public static File modConfigDir;
     public static Configuration config;
 
-    public static CreativeTabs tabNew = new CreativeTabs("NotEnoughWands") {
+    public static CreativeTabs tabNew = new CompatCreativeTabs("NotEnoughWands") {
         @Override
-        @SideOnly(Side.CLIENT)
-        public Item getTabIconItem() {
+        protected Item getItem() {
             return ModItems.teleportationWand;
         }
     };

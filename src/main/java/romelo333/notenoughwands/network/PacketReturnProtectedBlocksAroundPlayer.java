@@ -1,6 +1,7 @@
 package romelo333.notenoughwands.network;
 
 import io.netty.buffer.ByteBuf;
+import mcjty.lib.tools.MinecraftTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -63,7 +64,7 @@ public class PacketReturnProtectedBlocksAroundPlayer implements IMessage {
         @Override
         public IMessage onMessage(PacketReturnProtectedBlocksAroundPlayer message, MessageContext ctx) {
             Minecraft.getMinecraft().addScheduledTask(() -> ReturnProtectedBlocksAroundPlayerHelper.setProtectedBlocks(
-                    Minecraft.getMinecraft().theWorld.provider.getDimension(), message));
+                    MinecraftTools.getWorld(Minecraft.getMinecraft()).provider.getDimension(), message));
             return null;
         }
     }

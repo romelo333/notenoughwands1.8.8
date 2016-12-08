@@ -83,9 +83,9 @@ public class DisplacementWand extends GenericWand {
         return Tools.getTagCompound(stack).getInteger("mode");
     }
 
-
     @Override
-    public EnumActionResult onItemUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
+    protected EnumActionResult clOnItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
+        ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             if (player.isSneaking()) {
                 pullBlocks(stack, player, world, pos, side);
@@ -176,7 +176,7 @@ public class DisplacementWand extends GenericWand {
     public void renderOverlay(RenderWorldLastEvent evt, EntityPlayerSP player, ItemStack wand) {
         RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver;
         if (mouseOver != null && mouseOver.getBlockPos() != null && mouseOver.sideHit != null) {
-            World world = player.worldObj;
+            World world = player.getEntityWorld();
             BlockPos blockPos = mouseOver.getBlockPos();
             IBlockState state = world.getBlockState(blockPos);
             Block block = state.getBlock();

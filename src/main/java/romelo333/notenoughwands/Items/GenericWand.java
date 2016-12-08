@@ -1,5 +1,6 @@
 package romelo333.notenoughwands.Items;
 
+import mcjty.lib.compat.CompatItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -42,7 +43,7 @@ import java.util.Set;
 
 @Optional.InterfaceList({
         @Optional.Interface(iface = "cofh.api.energy.IEnergyContainerItem", modid = "CoFHAPI")})
-public class GenericWand extends Item implements cofh.api.energy.IEnergyContainerItem {
+public class GenericWand extends CompatItem implements cofh.api.energy.IEnergyContainerItem {
     protected int needsxp = 0;
     protected int needsrf = 0;
     protected int maxrf = 0;

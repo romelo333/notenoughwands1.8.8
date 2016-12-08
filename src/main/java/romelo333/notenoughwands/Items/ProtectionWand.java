@@ -127,7 +127,8 @@ public class ProtectionWand extends GenericWand {
     }
 
     @Override
-    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    protected EnumActionResult clOnItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
             int id = getOrCreateId(stack, world, protectedBlocks);
@@ -189,7 +190,7 @@ public class ProtectionWand extends GenericWand {
     public ItemStack getContainerItem(ItemStack stack) {
         if (hasContainerItem(stack) && stack.hasTagCompound()) {
             ItemStack container = new ItemStack(getContainerItem());
-            container.setTagCompound((NBTTagCompound) stack.getTagCompound().copy());
+            container.setTagCompound(stack.getTagCompound().copy());
             return container;
         }
         return null;

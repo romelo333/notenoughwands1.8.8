@@ -128,7 +128,7 @@ public class PotionWand extends GenericWand {
 
     @Override
     public boolean onLeftClickEntity(ItemStack stack, EntityPlayer player, Entity entity) {
-        if (!player.worldObj.isRemote) {
+        if (!player.getEntityWorld().isRemote) {
             if (entity instanceof EntityLivingBase) {
                 EntityLivingBase entityLivingBase = (EntityLivingBase) entity;
                 if ((!allowHostile) && entityLivingBase instanceof IMob) {

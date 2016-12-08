@@ -40,7 +40,7 @@ public class PacketGetProtectedBlocksAroundPlayer implements IMessage {
 
         private void handle(PacketGetProtectedBlocksAroundPlayer message, MessageContext ctx) {
             EntityPlayerMP player = ctx.getServerHandler().playerEntity;
-            World world = player.worldObj;
+            World world = player.getEntityWorld();
 
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
             Map<ChunkPos, Set<BlockPos>> blocks = protectedBlocks.fetchProtectedBlocks(world, player.getPosition());

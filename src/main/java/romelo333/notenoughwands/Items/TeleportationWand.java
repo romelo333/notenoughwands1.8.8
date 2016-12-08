@@ -44,7 +44,8 @@ public class TeleportationWand extends GenericWand {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(ItemStack stack, World world, EntityPlayer player, EnumHand hand) {
+    protected ActionResult<ItemStack> clOnItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+        ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             if (!checkUsage(stack, player, 1.0f)) {
                 return ActionResult.newResult(EnumActionResult.PASS, stack);
@@ -92,7 +93,7 @@ public class TeleportationWand extends GenericWand {
             registerUsage(stack, player, 1.0f);
             if (teleportVolume >= 0.01) {
                 SoundEvent teleport = SoundEvent.REGISTRY.getObject(new ResourceLocation(NotEnoughWands.MODID, "teleport"));
-                ModSounds.playSound(player.worldObj, teleport, player.posX, player.posY, player.posZ, teleportVolume, 1.0f);
+                ModSounds.playSound(player.getEntityWorld(), teleport, player.posX, player.posY, player.posZ, teleportVolume, 1.0f);
             }
         }
         return ActionResult.newResult(EnumActionResult.PASS, stack);

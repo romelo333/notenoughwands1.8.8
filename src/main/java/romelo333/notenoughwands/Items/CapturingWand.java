@@ -1,6 +1,7 @@
 package romelo333.notenoughwands.Items;
 
 
+import mcjty.lib.tools.WorldTools;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.IMob;
@@ -11,9 +12,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
@@ -63,7 +64,8 @@ public class CapturingWand extends GenericWand {
     }
 
     @Override
-    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    protected EnumActionResult clOnItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             NBTTagCompound tagCompound = Tools.getTagCompound(stack);
             if (tagCompound.hasKey("mob")) {
@@ -78,7 +80,7 @@ public class CapturingWand extends GenericWand {
                 entityLivingBase.setLocationAndAngles(pos.getX()+.5, pos.getY()+1, pos.getZ()+.5, 0, 0);
                 tagCompound.removeTag("mob");
                 tagCompound.removeTag("type");
-                world.spawnEntityInWorld(entityLivingBase);
+                WorldTools.spawnEntity(world, entityLivingBase);
             } else {
                 Tools.error(player, "There is no mob captured in this wand!");
             }
@@ -98,7 +100,7 @@ public class CapturingWand extends GenericWand {
 
     @Override
     public boolean onLeftClickEntity(ItemStack stack, EntityPlayer player, Entity entity) {
-        if (!player.worldObj.isRemote) {
+        if (!player.getEntityWorld().isRemote) {
             if (entity instanceof EntityLivingBase) {
                 if (Tools.getTagCompound(stack).hasKey("mob")) {
                     Tools.error(player, "There is already a mob in this wand!");
@@ -128,7 +130,7 @@ public class CapturingWand extends GenericWand {
                 entityLivingBase.writeToNBT(tagCompound);
                 Tools.getTagCompound(stack).setTag("mob", tagCompound);
                 Tools.getTagCompound(stack).setString("type", entity.getClass().getCanonicalName());
-                player.worldObj.removeEntity(entity);
+                player.getEntityWorld().removeEntity(entity);
 
                 registerUsage(stack, player, difficultyScale);
             } else {

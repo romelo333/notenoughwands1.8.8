@@ -28,9 +28,9 @@ public class IlluminationWand extends GenericWand {
         list.add("Right click on light to remove it again.");
     }
 
-
     @Override
-    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+    protected EnumActionResult clOnItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+        ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             Block block = world.getBlockState(pos).getBlock();
             if (block == ModBlocks.lightBlock) {

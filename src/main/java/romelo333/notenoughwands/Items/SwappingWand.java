@@ -87,7 +87,8 @@ public class SwappingWand extends GenericWand {
     }
 
     @Override
-    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+    protected EnumActionResult clOnItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+        ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             if (player.isSneaking()) {
                 selectBlock(stack, player, world, pos);
@@ -186,7 +187,7 @@ public class SwappingWand extends GenericWand {
     public void renderOverlay(RenderWorldLastEvent evt, EntityPlayerSP player, ItemStack wand) {
         RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver;
         if (mouseOver != null && mouseOver.getBlockPos() != null && mouseOver.sideHit != null) {
-            IBlockState state = player.worldObj.getBlockState(mouseOver.getBlockPos());
+            IBlockState state = player.getEntityWorld().getBlockState(mouseOver.getBlockPos());
             Block block = state.getBlock();
             if (block != null && block.getMaterial(state) != Material.AIR) {
                 int meta = block.getMetaFromState(state);
@@ -198,7 +199,7 @@ public class SwappingWand extends GenericWand {
                     return;
                 }
 
-                Set<BlockPos> coordinates = findSuitableBlocks(wand, player.worldObj, mouseOver.sideHit, mouseOver.getBlockPos(), block, meta);
+                Set<BlockPos> coordinates = findSuitableBlocks(wand, player.getEntityWorld(), mouseOver.sideHit, mouseOver.getBlockPos(), block, meta);
                 renderOutlines(evt, player, coordinates, 200, 230, 180);
             }
         }

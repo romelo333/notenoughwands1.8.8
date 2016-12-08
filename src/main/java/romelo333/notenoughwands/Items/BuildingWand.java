@@ -98,7 +98,8 @@ public class BuildingWand extends GenericWand {
     }
 
     @Override
-    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+    protected EnumActionResult clOnItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+        ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             if (player.isSneaking()) {
                 undoPlaceBlock(stack, player, world, pos);
@@ -249,7 +250,7 @@ public class BuildingWand extends GenericWand {
     public void renderOverlay(RenderWorldLastEvent evt, EntityPlayerSP player, ItemStack wand) {
         RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver;
         if (mouseOver != null && mouseOver.sideHit != null && mouseOver.getBlockPos() != null) {
-            World world = player.worldObj;
+            World world = player.getEntityWorld();
             BlockPos blockPos = mouseOver.getBlockPos();
             if (blockPos == null) {
                 return;

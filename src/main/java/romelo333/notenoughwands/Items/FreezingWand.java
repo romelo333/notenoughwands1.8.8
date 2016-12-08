@@ -46,7 +46,7 @@ public class FreezingWand extends GenericWand {
     }
 
     @Override
-    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    protected EnumActionResult clOnItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (!world.isRemote) {
 
         }
@@ -59,7 +59,7 @@ public class FreezingWand extends GenericWand {
 
     @Override
     public boolean onLeftClickEntity(ItemStack stack, EntityPlayer player, Entity entity) {
-        if (!player.worldObj.isRemote) {
+        if (!player.getEntityWorld().isRemote) {
             if (entity instanceof EntityLivingBase) {
                 EntityLivingBase entityLivingBase = (EntityLivingBase) entity;
                 if (entityLivingBase instanceof EntityPlayer) {
