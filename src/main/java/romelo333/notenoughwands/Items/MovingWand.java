@@ -5,6 +5,7 @@ import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -49,13 +50,18 @@ public class MovingWand extends GenericWand {
         ConfigCategory category = cfg.getCategory(Config.CATEGORY_MOVINGBLACKLIST);
         if (category.isEmpty()) {
             // Initialize with defaults
-            blacklist(cfg, "tile.shieldBlock");
-            blacklist(cfg, "tile.shieldBlock2");
-            blacklist(cfg, "tile.shieldBlock3");
-            blacklist(cfg, "tile.solidShieldBlock");
-            blacklist(cfg, "tile.invisibleShieldBlock");
-            setCost(cfg, "tile.mobSpawner", 5.0);
-            setCost(cfg, "tile.blockAiry", 20.0);
+            blacklist(cfg, "rftools:shield_block1");
+            blacklist(cfg, "rftools:shield_block2");
+            blacklist(cfg, "rftools:shield_block3");
+            blacklist(cfg, "rftools:shield_block4");
+            blacklist(cfg, "rftools:notick_invisible_shield_block");
+            blacklist(cfg, "rftools:invisible_shield_block");
+            blacklist(cfg, "rftools:notick_shield_block");
+            blacklist(cfg, "rftools:shield_block");
+            blacklist(cfg, Blocks.BEDROCK.getRegistryName().toString());
+            blacklist(cfg, Blocks.PORTAL.getRegistryName().toString());
+            blacklist(cfg, Blocks.END_PORTAL.getRegistryName().toString());
+            setCost(cfg, Blocks.MOB_SPAWNER.getRegistryName().toString(), 5.0);
         } else {
             for (Map.Entry<String, Property> entry : category.entrySet()) {
                 blacklisted.put(entry.getKey(), entry.getValue().getDouble());

@@ -73,7 +73,7 @@ public class GenericWand extends CompatItem implements cofh.api.energy.IEnergyCo
     public static double checkPickup(EntityPlayer player, World world, BlockPos pos, Block block, float maxHardness, Map<String, Double> blacklisted) {
         IBlockState state = world.getBlockState(pos);
         float hardness = block.getBlockHardness(state, world, pos);
-        if (hardness > maxHardness){
+        if (hardness < 0 || hardness > maxHardness){
             Tools.error(player, "This block is to hard to take!");
             return -1.0f;
         }
@@ -88,9 +88,9 @@ public class GenericWand extends CompatItem implements cofh.api.energy.IEnergyCo
         }
 
         double cost = 1.0f;
-        String unlocName = block.getUnlocalizedName();
-        if (blacklisted.containsKey(unlocName)) {
-            cost = blacklisted.get(unlocName);
+        String regName = block.getRegistryName().toString();
+        if (blacklisted.containsKey(regName)) {
+            cost = blacklisted.get(regName);
         }
         if (cost <= 0.001f) {
             Tools.error(player, "It is illegal to take this block");
