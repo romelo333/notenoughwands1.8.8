@@ -116,6 +116,13 @@ public class SwappingWand extends GenericWand {
 
         IBlockState oldState = world.getBlockState(pos);
         Block oldblock = oldState.getBlock();
+
+        double cost = GenericWand.getBlacklistCost(oldblock);
+        if (cost <= 0.001f) {
+            Tools.error(player, "It is illegal to swap this block");
+            return;
+        }
+
         int oldmeta = oldblock.getMetaFromState(oldState);
         float blockHardness = oldblock.getBlockHardness(oldState, world, pos);
 

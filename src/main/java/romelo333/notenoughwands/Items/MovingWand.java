@@ -170,7 +170,7 @@ public class MovingWand extends GenericWand {
         IBlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
         int meta = block.getMetaFromState(state);
-        double cost = checkPickup(player, world, pos, block, maxHardness, blacklisted);
+        double cost = checkPickup(player, world, pos, block, maxHardness);
         if (cost < 0.0) {
             return;
         }
