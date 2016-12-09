@@ -35,7 +35,7 @@ public class MovingWand extends GenericWand {
     private float maxHardness = 50;
     private int placeDistance = 4;
 
-    public Map<String,Double> blacklisted = new HashMap<String, Double>();
+    public Map<String,Double> blacklisted = new HashMap<>();
 
     public MovingWand() {
         setup("moving_wand").xpUsage(3).availability(AVAILABILITY_NORMAL).loot(5);

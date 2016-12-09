@@ -15,6 +15,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
@@ -88,9 +89,14 @@ public class GenericWand extends CompatItem implements cofh.api.energy.IEnergyCo
         }
 
         double cost = 1.0f;
-        String regName = block.getRegistryName().toString();
-        if (blacklisted.containsKey(regName)) {
-            cost = blacklisted.get(regName);
+        ResourceLocation registryName = block.getRegistryName();
+        if (blacklisted.containsKey(registryName.getResourceDomain() + ":*")) {
+            cost = blacklisted.get(registryName.getResourceDomain() + ":*");
+        } else {
+            String regName = registryName.toString();
+            if (blacklisted.containsKey(regName)) {
+                cost = blacklisted.get(regName);
+            }
         }
         if (cost <= 0.001f) {
             Tools.error(player, "It is illegal to take this block");
