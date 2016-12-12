@@ -5,7 +5,6 @@ import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -20,22 +19,16 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import romelo333.notenoughwands.Config;
 import romelo333.notenoughwands.varia.Tools;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class MovingWand extends GenericWand {
     private float maxHardness = 50;
     private int placeDistance = 4;
-
-    public Map<String,Double> blacklisted = new HashMap<>();
 
     public MovingWand() {
         setup("moving_wand").xpUsage(3).availability(AVAILABILITY_NORMAL).loot(5);
@@ -46,36 +39,6 @@ public class MovingWand extends GenericWand {
         super.initConfig(cfg);
         maxHardness = (float) cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxHardness", maxHardness, "Max hardness this block can move.)").getDouble();
         placeDistance = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_placeDistance", placeDistance, "Distance at which to place blocks in 'in-air' mode").getInt();
-
-        ConfigCategory category = cfg.getCategory(Config.CATEGORY_MOVINGBLACKLIST);
-        if (category.isEmpty()) {
-            // Initialize with defaults
-            blacklist(cfg, "rftools:shield_block1");
-            blacklist(cfg, "rftools:shield_block2");
-            blacklist(cfg, "rftools:shield_block3");
-            blacklist(cfg, "rftools:shield_block4");
-            blacklist(cfg, "rftools:notick_invisible_shield_block");
-            blacklist(cfg, "rftools:invisible_shield_block");
-            blacklist(cfg, "rftools:notick_shield_block");
-            blacklist(cfg, "rftools:shield_block");
-            blacklist(cfg, Blocks.BEDROCK.getRegistryName().toString());
-            blacklist(cfg, Blocks.PORTAL.getRegistryName().toString());
-            blacklist(cfg, Blocks.END_PORTAL.getRegistryName().toString());
-            setCost(cfg, Blocks.MOB_SPAWNER.getRegistryName().toString(), 5.0);
-        } else {
-            for (Map.Entry<String, Property> entry : category.entrySet()) {
-                blacklisted.put(entry.getKey(), entry.getValue().getDouble());
-            }
-        }
-    }
-
-    private void blacklist(Configuration cfg, String name) {
-        setCost(cfg, name, -1.0);
-    }
-
-    private void setCost(Configuration cfg, String name, double cost) {
-        cfg.get(Config.CATEGORY_MOVINGBLACKLIST, name, cost);
-        blacklisted.put(name, cost);
     }
 
     @Override
@@ -86,7 +49,7 @@ public class MovingWand extends GenericWand {
             list.add(TextFormatting.RED + "Wand is empty.");
         } else {
             int id = compound.getInteger("block");
-            Block block = (Block) Block.REGISTRY.getObjectById(id);
+            Block block = Block.REGISTRY.getObjectById(id);
             int meta = compound.getInteger("meta");
             String name = Tools.getBlockName(block, meta);
             list.add(TextFormatting.GREEN + "Block: " + name);

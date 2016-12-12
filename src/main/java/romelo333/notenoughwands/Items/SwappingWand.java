@@ -117,7 +117,7 @@ public class SwappingWand extends GenericWand {
         IBlockState oldState = world.getBlockState(pos);
         Block oldblock = oldState.getBlock();
 
-        double cost = GenericWand.getBlacklistCost(oldblock);
+        double cost = BlackListSettings.getBlacklistCost(oldblock);
         if (cost <= 0.001f) {
             Tools.error(player, "It is illegal to swap this block");
             return;
@@ -180,7 +180,7 @@ public class SwappingWand extends GenericWand {
         if (name == null) {
             Tools.error(player, "You cannot select this block!");
         } else {
-            double cost = GenericWand.getBlacklistCost(block);
+            double cost = BlackListSettings.getBlacklistCost(block);
             if (cost <= 0.001f) {
                 Tools.error(player, "It is illegal to swap this block");
                 return;

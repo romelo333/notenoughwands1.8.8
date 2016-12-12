@@ -43,8 +43,9 @@ public class CapturingWand extends GenericWand {
         diffcultyAdd = (float) cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_diffcultyAdd", diffcultyAdd, "Add this to the HP * difficultyMult to get the final difficulty scale that affects XP/RF usage (a final result of 1.0 means that the default XP/RF is used)").getDouble();
     }
 
+
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean b) {
+    public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean b) {
         super.addInformation(stack, player, list, b);
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound != null) {
@@ -120,8 +121,13 @@ public class CapturingWand extends GenericWand {
                     Tools.error(player, "It is not possible to capture passive mobs with this wand!");
                     return true;
                 }
+                double cost = BlackListSettings.getBlacklistEntity(entity);
+                if (cost <= 0.001f) {
+                    Tools.error(player, "It is illegal to take this entity");
+                    return true;
+                }
 
-                float difficultyScale = entityLivingBase.getMaxHealth() * difficultyMult + diffcultyAdd;
+                float difficultyScale = (float) (entityLivingBase.getMaxHealth() * cost * difficultyMult + diffcultyAdd);
                 if (!checkUsage(stack, player, difficultyScale)) {
                     return true;
                 }
