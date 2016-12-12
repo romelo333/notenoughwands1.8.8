@@ -180,6 +180,12 @@ public class SwappingWand extends GenericWand {
         if (name == null) {
             Tools.error(player, "You cannot select this block!");
         } else {
+            double cost = GenericWand.getBlacklistCost(block);
+            if (cost <= 0.001f) {
+                Tools.error(player, "It is illegal to swap this block");
+                return;
+            }
+
             int id = Block.REGISTRY.getIDForObject(block);
             tagCompound.setInteger("block", id);
             tagCompound.setInteger("meta", meta);
