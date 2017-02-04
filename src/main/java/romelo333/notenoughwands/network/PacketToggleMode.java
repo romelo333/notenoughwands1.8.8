@@ -33,7 +33,8 @@ public class PacketToggleMode implements IMessage {
         }
 
         private void handle(PacketToggleMode message, MessageContext ctx) {
-            EntityPlayerMP playerEntity = ctx.getServerHandler().playerEntity;
+            // @todo
+            EntityPlayerMP playerEntity = ctx.getServerHandler().player;
             ItemStack heldItem = playerEntity.getHeldItem(EnumHand.MAIN_HAND);
             if (ItemStackTools.isValid(heldItem) && heldItem.getItem() instanceof GenericWand) {
                 GenericWand genericWand = (GenericWand) (heldItem.getItem());

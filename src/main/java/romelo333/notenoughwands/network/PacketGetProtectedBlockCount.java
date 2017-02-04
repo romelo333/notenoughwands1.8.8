@@ -37,7 +37,8 @@ public class PacketGetProtectedBlockCount implements IMessage {
         }
 
         private void handle(PacketGetProtectedBlockCount message, MessageContext ctx) {
-            EntityPlayerMP player = ctx.getServerHandler().playerEntity;
+            // @todo
+            EntityPlayerMP player = ctx.getServerHandler().player;
             World world = player.getEntityWorld();
 
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);

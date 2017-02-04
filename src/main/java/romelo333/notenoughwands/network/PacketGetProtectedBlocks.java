@@ -37,7 +37,8 @@ public class PacketGetProtectedBlocks implements IMessage {
         }
 
         private void handle(PacketGetProtectedBlocks message, MessageContext ctx) {
-            EntityPlayerMP player = ctx.getServerHandler().playerEntity;
+            // @todo (compatlayer?)
+            EntityPlayerMP player = ctx.getServerHandler().player;
             World world = player.getEntityWorld();
 
             ItemStack heldItem = player.getHeldItem(EnumHand.MAIN_HAND);

@@ -1,7 +1,7 @@
 {
   "forge_marker": 1,
   "defaults": {
-    "model": "notenoughwands:light_block"
+    "model": "notenoughwands:lightblock"
   },
   "variants": {
     "normal": [{}],

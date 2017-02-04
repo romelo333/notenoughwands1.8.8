@@ -39,7 +39,8 @@ public class PacketGetProtectedBlocksAroundPlayer implements IMessage {
         }
 
         private void handle(PacketGetProtectedBlocksAroundPlayer message, MessageContext ctx) {
-            EntityPlayerMP player = ctx.getServerHandler().playerEntity;
+            // @todo
+            EntityPlayerMP player = ctx.getServerHandler().player;
             World world = player.getEntityWorld();
 
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
