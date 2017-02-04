@@ -34,6 +34,13 @@ public class LightBlock extends CompatBlock implements ITileEntityProvider {
         // @todo
     }
 
+    private static final AxisAlignedBB EMPTY = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
+
+    @Override
+    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
+        return EMPTY;
+    }
+
     @Override
     public int quantityDropped(Random rnd) {
         return 0;
