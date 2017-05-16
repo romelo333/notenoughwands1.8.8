@@ -1,6 +1,7 @@
 package romelo333.notenoughwands.Items;
 
 
+import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -9,8 +10,10 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -74,16 +77,67 @@ public class SwappingWand extends GenericWand {
         if (compound == null) {
             list.add(TextFormatting.RED + "No selected block");
         } else {
-            int id = compound.getInteger("block");
-            Block block = Block.REGISTRY.getObjectById(id);
-            int meta = compound.getInteger("meta");
-            String name = Tools.getBlockName(block, meta);
-            list.add(TextFormatting.GREEN + "Selected block: " + name);
-            list.add(TextFormatting.GREEN + "Mode: " + descriptions[compound.getInteger("mode")]);
+            if (isSwappingWithOffHand(stack)) {
+                list.add(TextFormatting.GREEN + "Will swap with block in offhand");
+            } else {
+                int id = compound.getInteger("block");
+                Block block = Block.REGISTRY.getObjectById(id);
+                if (block != Blocks.AIR) {
+                    int meta = compound.getInteger("meta");
+                    String name = Tools.getBlockName(block, meta);
+                    list.add(TextFormatting.GREEN + "Selected block: " + name);
+                    list.add(TextFormatting.GREEN + "Mode: " + descriptions[compound.getInteger("mode")]);
+                }
+            }
         }
         list.add("Sneak right click to select a block.");
+        list.add("Right click in empty air to select 'offhand' mode.");
         list.add("Right click on block to replace.");
         showModeKeyDescription(list, "switch mode");
+    }
+
+    private static boolean isSwappingWithOffHand(ItemStack stack) {
+        NBTTagCompound compound = stack.getTagCompound();
+        if (compound == null) {
+            return false;
+        }
+        return compound.hasKey("offhand");
+    }
+
+    private static void enableSwappingWithOffHand(ItemStack stack) {
+        NBTTagCompound compound = stack.getTagCompound();
+        if (compound == null) {
+            compound = new NBTTagCompound();
+            stack.setTagCompound(compound);
+        }
+        compound.setBoolean("offhand", true);
+    }
+
+    private static void disableSwappingWithOffHand(ItemStack stack) {
+        NBTTagCompound compound = stack.getTagCompound();
+        if (compound == null) {
+            return;
+        }
+        compound.removeTag("offhand");
+    }
+
+    @Override
+    protected ActionResult<ItemStack> clOnItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+        ItemStack heldItem = playerIn.getHeldItem(hand);
+        if (ItemStackTools.isValid(heldItem)) {
+            if (isSwappingWithOffHand(heldItem)) {
+                disableSwappingWithOffHand(heldItem);
+                if (worldIn.isRemote) {
+                    Tools.notify(playerIn, "Switched to swapping with selected block");
+                }
+            } else {
+                enableSwappingWithOffHand(heldItem);
+                if (worldIn.isRemote) {
+                    Tools.notify(playerIn, "Switched to swapping with block in offhand");
+                }
+            }
+        }
+        return super.clOnItemRightClick(worldIn, playerIn, hand);
     }
 
     @Override
@@ -109,10 +163,32 @@ public class SwappingWand extends GenericWand {
             Tools.error(player, "First select a block by sneaking");
             return;
         }
-        int id = tagCompound.getInteger("block");
-        Block block = Block.REGISTRY.getObjectById(id);
-        int meta = tagCompound.getInteger("meta");
-        float hardness = tagCompound.getFloat("hardness");
+
+        Block block;
+        int meta;
+        float hardness;
+
+        if (isSwappingWithOffHand(stack)) {
+            ItemStack off = player.getHeldItemOffhand();
+            if (ItemStackTools.isEmpty(off)) {
+                Tools.error(player, "You need to hold a block in your offhand!");
+                return;
+            }
+            if (!(off.getItem() instanceof ItemBlock)) {
+                Tools.error(player, "The item in your offhand cannot be placed!");
+                return;
+            }
+            ItemBlock itemBlock = (ItemBlock) off.getItem();
+            block = itemBlock.getBlock();
+            meta = itemBlock.getDamage(off);
+            IBlockState s = block.getStateFromMeta(meta);
+            hardness = s.getBlockHardness(world, pos);
+        } else {
+            int id = tagCompound.getInteger("block");
+            block = Block.REGISTRY.getObjectById(id);
+            meta = tagCompound.getInteger("meta");
+            hardness = tagCompound.getFloat("hardness");
+        }
 
         IBlockState oldState = world.getBlockState(pos);
         Block oldblock = oldState.getBlock();
