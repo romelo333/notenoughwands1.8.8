@@ -23,6 +23,7 @@ public class TeleportationWand extends GenericWand {
 
     private float teleportVolume = 1.0f;
     private int maxdist = 30;
+    private boolean teleportThroughWalls = true;
 
     public TeleportationWand() {
         setup("teleportation_wand").xpUsage(4).availability(AVAILABILITY_NORMAL).loot(6);
@@ -31,9 +32,14 @@ public class TeleportationWand extends GenericWand {
     @Override
     public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean b) {
         super.addInformation(stack, player, list, b);
-        list.add("Right click to teleport forward until a block");
-        list.add("is hit or maximum distance is reached. Sneak right");
-        list.add("click for half distance");
+        list.add("Right click to teleport forward");
+        list.add("until a block is hit or maximum");
+        list.add("distance is reached.");
+        if (teleportThroughWalls) {
+            list.add("Sneak to teleport through walls");
+        } else {
+            list.add("Sneak for half distance");
+        }
     }
 
     @Override
@@ -41,6 +47,7 @@ public class TeleportationWand extends GenericWand {
         super.initConfig(cfg, 500, 100000, 200, 200000, 100, 500000);
         teleportVolume = (float) cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_volume", teleportVolume, "Volume of the teleportation sound (set to 0 to disable)").getDouble();
         maxdist = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxdist", maxdist, "Maximum teleportation distance").getInt();
+        teleportThroughWalls = cfg.getBoolean(getConfigPrefix() + "_teleportThroughWalls", Config.CATEGORY_WANDS, teleportThroughWalls, "If set to true then sneak-right click will teleport through walls. Otherwise sneak-right click will teleport half distance");
     }
 
     @Override
@@ -53,12 +60,25 @@ public class TeleportationWand extends GenericWand {
             Vec3d lookVec = player.getLookVec();
             Vec3d start = new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
             int distance = this.maxdist;
+            boolean gothrough = false;
             if (player.isSneaking()) {
+                if (teleportThroughWalls) {
+                    gothrough = true;
+                }
                 distance /= 2;
             }
+
             Vec3d end = start.addVector(lookVec.xCoord * distance, lookVec.yCoord * distance, lookVec.zCoord * distance);
-            RayTraceResult position = world.rayTraceBlocks(start, end);
+            RayTraceResult position = gothrough ? null : world.rayTraceBlocks(start, end);
             if (position == null) {
+                if (gothrough) {
+                    // First check if the destination is safe
+                    BlockPos blockPos = new BlockPos(end.xCoord, end.yCoord, end.zCoord);
+                    if (!(world.isAirBlock(blockPos) && world.isAirBlock(blockPos.up()))) {
+                        Tools.error(player, "You will suffocate if you teleport there!");
+                        return ActionResult.newResult(EnumActionResult.PASS, stack);
+                    }
+                }
                 player.setPositionAndUpdate(end.xCoord, end.yCoord, end.zCoord);
             } else {
                 BlockPos blockPos = position.getBlockPos();
