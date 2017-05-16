@@ -25,7 +25,6 @@ import net.minecraft.world.storage.loot.functions.LootFunction;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -34,12 +33,12 @@ import romelo333.notenoughwands.*;
 import romelo333.notenoughwands.varia.ItemCapabilityProvider;
 import romelo333.notenoughwands.varia.Tools;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 //import net.minecraft.client.entity.EntityClientPlayerMP;
 
-@Optional.InterfaceList({
-        @Optional.Interface(iface = "cofh.api.energy.IEnergyContainerItem", modid = "CoFHAPI")})
 public class GenericWand extends CompatItem implements cofh.api.energy.IEnergyContainerItem {
     protected int needsxp = 0;
     protected int needsrf = 0;
@@ -389,7 +388,6 @@ public class GenericWand extends CompatItem implements cofh.api.energy.IEnergyCo
     //------------------------------------------------------------------------------
 
     @Override
-    @Optional.Method(modid = "CoFHAPI")
     public int extractEnergy(ItemStack container, int maxExtract, boolean simulate) {
         if (maxrf <= 0) {
             return 0;
@@ -409,7 +407,6 @@ public class GenericWand extends CompatItem implements cofh.api.energy.IEnergyCo
     }
 
     @Override
-    @Optional.Method(modid = "CoFHAPI")
     public int receiveEnergy(ItemStack container, int maxReceive, boolean simulate) {
         if (maxrf <= 0) {
             return 0;
@@ -429,7 +426,6 @@ public class GenericWand extends CompatItem implements cofh.api.energy.IEnergyCo
     }
 
     @Override
-    @Optional.Method(modid = "CoFHAPI")
     public int getEnergyStored(ItemStack container) {
         if (container.getTagCompound() == null || !container.getTagCompound().hasKey("Energy")) {
             return 0;
@@ -438,7 +434,6 @@ public class GenericWand extends CompatItem implements cofh.api.energy.IEnergyCo
     }
 
     @Override
-    @Optional.Method(modid = "CoFHAPI")
     public int getMaxEnergyStored(ItemStack container) {
         return maxrf;
     }
