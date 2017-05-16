@@ -38,7 +38,7 @@ public class TeleportationWand extends GenericWand {
 
     @Override
     public void initConfig(Configuration cfg) {
-        super.initConfig(cfg);
+        super.initConfig(cfg, 500, 100000, 200, 200000, 100, 500000);
         teleportVolume = (float) cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_volume", teleportVolume, "Volume of the teleportation sound (set to 0 to disable)").getDouble();
         maxdist = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxdist", maxdist, "Maximum teleportation distance").getInt();
     }

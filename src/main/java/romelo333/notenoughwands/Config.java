@@ -15,7 +15,24 @@ public class Config {
     public static int clientSideProtection = -1;
     public static boolean showDurabilityBarForRF = true;
 
+    public static String wandSettingPreset = "default";
+    public static WandUsage wandUsage = WandUsage.DEFAULT;
+
+
     public static void init(Configuration cfg) {
+        wandSettingPreset = cfg.getString("wandSettingPreset", CATEGORY_GENERAL, wandSettingPreset, "A global setting to control all wands at once for RF/XP/Durability usage. " +
+                "If set to 'default' then every wand can configure this on its own (i.e. normal mode). You can also use 'easy_rf', 'normal_rf', or 'hard_rf' to set the wands " +
+                "to use RF in various difficulty modes");
+        if ("easy_rf".equals(wandSettingPreset) || "easyrf".equals(wandSettingPreset) || "easy".equals(wandSettingPreset)) {
+            wandUsage = WandUsage.EASY_RF;
+        } else if ("normal_rf".equals(wandSettingPreset) || "normalrf".equals(wandSettingPreset) || "normal".equals(wandSettingPreset) || "rf".equals(wandSettingPreset)) {
+            wandUsage = WandUsage.NORMAL_RF;
+        } else if ("hard_rf".equals(wandSettingPreset) || "hardrf".equals(wandSettingPreset) || "hard".equals(wandSettingPreset)) {
+            wandUsage = WandUsage.HARD_RF;
+        } else {
+            wandUsage = WandUsage.DEFAULT;
+        }
+
         GenericWand.setupConfig(cfg);
         BlackListSettings.setupCapturingWandBlacklist(cfg);
         BlackListSettings.setupMovingWandBlacklist(cfg);

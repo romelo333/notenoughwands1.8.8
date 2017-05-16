@@ -36,7 +36,7 @@ public class CapturingWand extends GenericWand {
 
     @Override
     public void initConfig(Configuration cfg) {
-        super.initConfig(cfg);
+        super.initConfig(cfg, 200, 100000, 100, 200000, 40, 500000);
         allowPassive =  cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_allowPassive", allowPassive, "Allow capturing passive mobs").getBoolean();
         allowHostile =  cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_allowHostile", allowHostile, "Allow capturing hostile mobs").getBoolean();
         difficultyMult = (float) cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_difficultyMult", difficultyMult, "Multiply the HP of a mob with this number to get the difficulty scale that affects XP/RF usage (a final result of 1.0 means that the default XP/RF is used)").getDouble();

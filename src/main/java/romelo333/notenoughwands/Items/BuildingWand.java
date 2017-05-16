@@ -20,6 +20,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -45,6 +46,11 @@ public class BuildingWand extends GenericWand {
 
     public BuildingWand() {
         setup("building_wand").xpUsage(1).availability(AVAILABILITY_NORMAL).loot(3);
+    }
+
+    @Override
+    protected void initConfig(Configuration cfg) {
+        super.initConfig(cfg, 2000, 100000, 500, 200000, 200, 500000);
     }
 
     @Override

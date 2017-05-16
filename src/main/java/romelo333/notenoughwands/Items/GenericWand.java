@@ -39,7 +39,7 @@ import java.util.Set;
 
 //import net.minecraft.client.entity.EntityClientPlayerMP;
 
-public class GenericWand extends CompatItem implements cofh.api.energy.IEnergyContainerItem {
+public abstract class GenericWand extends CompatItem implements cofh.api.energy.IEnergyContainerItem {
     protected int needsxp = 0;
     protected int needsrf = 0;
     protected int maxrf = 0;
@@ -160,11 +160,48 @@ public class GenericWand extends CompatItem implements cofh.api.energy.IEnergyCo
         return getRegistryName().getResourcePath();
     }
 
-    public void initConfig(Configuration cfg) {
-        needsxp = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_needsxp", needsxp, "How much levels this wand should consume on usage").getInt();
-        needsrf = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_needsrf", needsrf, "How much RF this wand should consume on usage").getInt();
-        maxrf = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxrf", maxrf, "Maximum RF this wand can hold").getInt();
-        setMaxDamage(cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxdurability", getMaxDamage(), "Maximum durability for this wand").getInt());
+    protected abstract void initConfig(Configuration cfg);
+
+    public void initConfig(Configuration cfg, int easy_usages, int easy_maxrf, int normal_usages, int normal_maxrf, int hard_usages, int hard_maxrf) {
+        switch (Config.wandUsage) {
+            case DEFAULT:
+                needsxp = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_needsxp", needsxp, "How much levels this wand should consume on usage").getInt();
+                needsrf = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_needsrf", needsrf, "How much RF this wand should consume on usage").getInt();
+                maxrf = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxrf", maxrf, "Maximum RF this wand can hold").getInt();
+                setMaxDamage(cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxdurability", getMaxDamage(), "Maximum durability for this wand").getInt());
+                break;
+            case EASY_RF:
+                needsxp = 0;
+                setMaxDamage(0);
+                needsrf = easy_maxrf / easy_usages;
+                maxrf = easy_maxrf;
+                cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_needsxp", needsxp, "How much levels this wand should consume on usage").getInt();
+                cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_needsrf", needsrf, "How much RF this wand should consume on usage").getInt();
+                cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxrf", maxrf, "Maximum RF this wand can hold").getInt();
+                cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxdurability", getMaxDamage(), "Maximum durability for this wand").getInt();
+                break;
+            case NORMAL_RF:
+                needsxp = 0;
+                setMaxDamage(0);
+                needsrf = normal_maxrf / normal_usages;
+                maxrf = normal_maxrf;
+                cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_needsxp", needsxp, "How much levels this wand should consume on usage").getInt();
+                cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_needsrf", needsrf, "How much RF this wand should consume on usage").getInt();
+                cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxrf", maxrf, "Maximum RF this wand can hold").getInt();
+                cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxdurability", getMaxDamage(), "Maximum durability for this wand").getInt();
+                break;
+            case HARD_RF:
+                needsxp = 0;
+                setMaxDamage(0);
+                needsrf = hard_maxrf / hard_usages;
+                maxrf = hard_maxrf;
+                cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_needsxp", needsxp, "How much levels this wand should consume on usage").getInt();
+                cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_needsrf", needsrf, "How much RF this wand should consume on usage").getInt();
+                cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxrf", maxrf, "Maximum RF this wand can hold").getInt();
+                cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxdurability", getMaxDamage(), "Maximum durability for this wand").getInt();
+                break;
+        }
+
         availability = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_availability", availability, "Is this wand available? (0=no, 1=not craftable, 2=craftable advanced, 3=craftable normal)").getInt();
         lootRarity = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_lootRarity", lootRarity, "How rare should this wand be in chests? Lower is more rare (0 is not in chests)").getInt();
     }

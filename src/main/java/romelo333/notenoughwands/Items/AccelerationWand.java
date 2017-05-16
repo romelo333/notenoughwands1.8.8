@@ -68,7 +68,7 @@ public class AccelerationWand extends GenericWand {
 
     @Override
     public void initConfig(Configuration cfg) {
-        super.initConfig(cfg);
+        super.initConfig(cfg, 500, 100000, 200, 200000, 100, 500000);
         fakePlayerFactor = (float) cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_fakePlayerFactor", fakePlayerFactor,
                 "Factor to apply to the cost when this wand is used by a fake player (a machine). Set to -1 to disable its use this way").getDouble();
         lessEffectiveForFakePlayer =  cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_lessEffectiveForFakePlayer", lessEffectiveForFakePlayer,

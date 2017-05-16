@@ -7,7 +7,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -56,7 +55,7 @@ public class ProtectionWand extends GenericWand {
 
     @Override
     public void initConfig(Configuration cfg) {
-        super.initConfig(cfg);
+        super.initConfig(cfg, 200, 100000, 100, 200000, 50, 500000);
         blockShowRadius = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_blockShowRadius", blockShowRadius, "How far around the player protected blocks will be hilighted").getInt();
         maximumProtectedBlocks = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maximumProtectedBlocks", master ? 0 : maximumProtectedBlocks, "The maximum number of blocks to protect with this wand (set to 0 for no maximum)").getInt();
     }

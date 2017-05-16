@@ -11,6 +11,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import romelo333.notenoughwands.ModBlocks;
 
@@ -19,6 +20,11 @@ import java.util.List;
 public class IlluminationWand extends GenericWand {
     public IlluminationWand() {
         setup("illumination_wand").xpUsage(3).availability(AVAILABILITY_NORMAL).loot(6);
+    }
+
+    @Override
+    protected void initConfig(Configuration cfg) {
+        super.initConfig(cfg, 200, 100000, 100, 200000, 50, 500000);
     }
 
     @Override
