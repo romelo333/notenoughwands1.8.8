@@ -1,0 +1,22 @@
+{
+  "result": {
+    "item": "notenoughwands:swapping_wand"
+  },
+  "pattern": [
+    "rg ",
+    "gw ",
+    "  w"
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "r": {
+      "item": "minecraft:redstone_block"
+    },
+    "g": {
+      "item": "minecraft:glowstone"
+    },
+    "w": {
+      "item": "notenoughwands:wandcore"
+    }
+  }
+}

@@ -1,10 +1,9 @@
 package romelo333.notenoughwands.Items;
 
 
-import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
@@ -15,13 +14,11 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import romelo333.notenoughwands.Config;
 import romelo333.notenoughwands.ProtectedBlocks;
 import romelo333.notenoughwands.network.*;
-import romelo333.notenoughwands.varia.ContainerToItemRecipe;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.List;
@@ -63,7 +60,7 @@ public class ProtectionWand extends GenericWand {
     private static long tooltipLastTime = 0;
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean b) {
+    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
         super.addInformation(stack, player, list, b);
         boolean hasid = stack.getTagCompound() != null && stack.getTagCompound().hasKey("id");
         int mode = getMode(stack);
@@ -127,7 +124,7 @@ public class ProtectionWand extends GenericWand {
     }
 
     @Override
-    protected EnumActionResult clOnItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
@@ -165,14 +162,13 @@ public class ProtectionWand extends GenericWand {
     @Override
     protected void setupCraftingInt(Item wandcore) {
         if (master) {
-            GameRegistry.addRecipe(new ItemStack(this), "re ", "ew ", "  w", 'r', Items.COMPARATOR, 'e', Items.NETHER_STAR, 'w', wandcore);
         } else {
-            GameRegistry.addRecipe(new ItemStack(this), "re ", "ew ", "  w", 'r', Items.COMPARATOR, 'e', Items.ENDER_EYE, 'w', wandcore);
-            GameRegistry.addRecipe(new ContainerToItemRecipe(new ItemStack[] {
-                    new ItemStack(this), new ItemStack(Items.ENDER_EYE), ItemStackTools.getEmptyStack(),
-                    new ItemStack(Items.ENDER_EYE), new ItemStack(wandcore), ItemStackTools.getEmptyStack(),
-                    ItemStackTools.getEmptyStack(), ItemStackTools.getEmptyStack(), new ItemStack(wandcore)
-            }, 0, new ItemStack(this)));
+            // @todo recipes
+//            MyGameReg.addRecipe(new ContainerToItemRecipe(new ItemStack[] {
+//                    new ItemStack(this), new ItemStack(Items.ENDER_EYE), ItemStackTools.getEmptyStack(),
+//                    new ItemStack(Items.ENDER_EYE), new ItemStack(wandcore), ItemStackTools.getEmptyStack(),
+//                    ItemStackTools.getEmptyStack(), ItemStackTools.getEmptyStack(), new ItemStack(wandcore)
+//            }, 0, new ItemStack(this)));
         }
     }
 
@@ -193,7 +189,7 @@ public class ProtectionWand extends GenericWand {
             container.setTagCompound(stack.getTagCompound().copy());
             return container;
         }
-        return ItemStackTools.getEmptyStack();
+        return ItemStack.EMPTY;
     }
 
 }

@@ -1,12 +1,11 @@
 package romelo333.notenoughwands.Items;
 
 
-import mcjty.lib.tools.WorldTools;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
@@ -18,7 +17,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import romelo333.notenoughwands.Config;
 import romelo333.notenoughwands.varia.Tools;
 
@@ -45,7 +43,7 @@ public class CapturingWand extends GenericWand {
 
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean b) {
+    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
         super.addInformation(stack, player, list, b);
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound != null) {
@@ -65,7 +63,7 @@ public class CapturingWand extends GenericWand {
     }
 
     @Override
-    protected EnumActionResult clOnItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             NBTTagCompound tagCompound = Tools.getTagCompound(stack);
@@ -81,7 +79,7 @@ public class CapturingWand extends GenericWand {
                 entityLivingBase.setLocationAndAngles(pos.getX()+.5, pos.getY()+1, pos.getZ()+.5, 0, 0);
                 tagCompound.removeTag("mob");
                 tagCompound.removeTag("type");
-                WorldTools.spawnEntity(world, entityLivingBase);
+                world.spawnEntity(entityLivingBase);
             } else {
                 Tools.error(player, "There is no mob captured in this wand!");
             }
@@ -148,6 +146,5 @@ public class CapturingWand extends GenericWand {
 
     @Override
     protected void setupCraftingInt(Item wandcore) {
-        GameRegistry.addRecipe(new ItemStack(this), "dr ", "rw ", "  w", 'r', Items.ROTTEN_FLESH, 'd', Items.DIAMOND, 'w', wandcore);
     }
 }

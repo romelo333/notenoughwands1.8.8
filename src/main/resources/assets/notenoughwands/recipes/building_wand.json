@@ -1,0 +1,19 @@
+{
+  "result": {
+    "item": "notenoughwands:building_wand"
+  },
+  "pattern": [
+    "bb ",
+    "bw ",
+    "  w"
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "b": {
+      "item": "minecraft:brick"
+    },
+    "w": {
+      "item": "notenoughwands:wandcore"
+    }
+  }
+}

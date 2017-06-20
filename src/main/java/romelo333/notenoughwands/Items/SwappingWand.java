@@ -1,12 +1,12 @@
 package romelo333.notenoughwands.Items;
 
 
-import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -23,7 +23,6 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import romelo333.notenoughwands.Config;
@@ -71,7 +70,7 @@ public class SwappingWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean b) {
+    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
         super.addInformation(stack, player, list, b);
         NBTTagCompound compound = stack.getTagCompound();
         if (compound == null) {
@@ -122,9 +121,9 @@ public class SwappingWand extends GenericWand {
     }
 
     @Override
-    protected ActionResult<ItemStack> clOnItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
         ItemStack heldItem = playerIn.getHeldItem(hand);
-        if (ItemStackTools.isValid(heldItem)) {
+        if (!heldItem.isEmpty()) {
             if (isSwappingWithOffHand(heldItem)) {
                 disableSwappingWithOffHand(heldItem);
                 if (worldIn.isRemote) {
@@ -137,11 +136,11 @@ public class SwappingWand extends GenericWand {
                 }
             }
         }
-        return super.clOnItemRightClick(worldIn, playerIn, hand);
+        return super.onItemRightClick(worldIn, playerIn, hand);
     }
 
     @Override
-    protected EnumActionResult clOnItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             if (player.isSneaking()) {
@@ -170,7 +169,7 @@ public class SwappingWand extends GenericWand {
 
         if (isSwappingWithOffHand(stack)) {
             ItemStack off = player.getHeldItemOffhand();
-            if (ItemStackTools.isEmpty(off)) {
+            if (off.isEmpty()) {
                 Tools.error(player, "You need to hold a block in your offhand!");
                 return;
             }
@@ -359,6 +358,5 @@ public class SwappingWand extends GenericWand {
 
     @Override
     protected void setupCraftingInt(Item wandcore) {
-        GameRegistry.addRecipe(new ItemStack(this), "rg ", "gw ", "  w", 'r', Blocks.REDSTONE_BLOCK, 'g', Blocks.GLOWSTONE, 'w', wandcore);
     }
 }

@@ -6,7 +6,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldSavedData;
+import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.util.Constants;
 import org.apache.commons.lang3.tuple.Pair;
 import romelo333.notenoughwands.varia.GlobalCoordinate;
@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class ProtectedBlocks extends WorldSavedData{
+public class ProtectedBlocks extends WorldSavedData {
     public static final String NAME = "NEWProtectedBlocks";
     private static ProtectedBlocks instance;
 
@@ -191,15 +191,15 @@ public class ProtectedBlocks extends WorldSavedData{
         Map<ChunkPos,Set<BlockPos>> result = new HashMap<>();
         ChunkPos chunkpos = new ChunkPos(pos);
 
-        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.chunkXPos-1, chunkpos.chunkZPos-1));
-        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.chunkXPos  , chunkpos.chunkZPos-1));
-        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.chunkXPos+1, chunkpos.chunkZPos-1));
-        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.chunkXPos-1, chunkpos.chunkZPos  ));
-        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.chunkXPos  , chunkpos.chunkZPos  ));
-        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.chunkXPos+1, chunkpos.chunkZPos  ));
-        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.chunkXPos-1, chunkpos.chunkZPos+1));
-        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.chunkXPos  , chunkpos.chunkZPos+1));
-        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.chunkXPos+1, chunkpos.chunkZPos+1));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x-1, chunkpos.z-1));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x  , chunkpos.z-1));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x+1, chunkpos.z-1));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x-1, chunkpos.z  ));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x  , chunkpos.z  ));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x+1, chunkpos.z  ));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x-1, chunkpos.z+1));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x  , chunkpos.z+1));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x+1, chunkpos.z+1));
 
         return result;
     }

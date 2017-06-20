@@ -16,7 +16,7 @@ public class LightRenderer extends TileEntitySpecialRenderer {
     ResourceLocation texture = new ResourceLocation(NotEnoughWands.MODID.toLowerCase(), "textures/blocks/light.png");
 
     @Override
-    public void renderTileEntityAt(TileEntity tileEntity, double x, double y, double z, float time, int destroyStage) {
+    public void render(TileEntity tileEntity, double x, double y, double z, float time, int destroyStage, float alpha) {
         bindTexture(texture);
 
         GlStateManager.pushMatrix();

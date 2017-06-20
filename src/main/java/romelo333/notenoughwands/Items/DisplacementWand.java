@@ -6,8 +6,8 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -21,7 +21,6 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import romelo333.notenoughwands.Config;
@@ -59,7 +58,7 @@ public class DisplacementWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean b) {
+    public void addInformation(ItemStack stack, World player, List list, ITooltipFlag b) {
         super.addInformation(stack, player, list, b);
         list.add(TextFormatting.GREEN + "Mode: " + descriptions[getMode(stack)]);
         list.add("Right click to push blocks forward.");
@@ -83,7 +82,7 @@ public class DisplacementWand extends GenericWand {
     }
 
     @Override
-    protected EnumActionResult clOnItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
+    public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             if (player.isSneaking()) {
@@ -246,7 +245,6 @@ public class DisplacementWand extends GenericWand {
 
     @Override
     protected void setupCraftingInt(Item wandcore) {
-        GameRegistry.addRecipe(new ItemStack(this), "eb ", "bw ", "  w", 'e', Items.ENDER_PEARL, 'b', Items.BRICK, 'w', wandcore);
     }
 
 }

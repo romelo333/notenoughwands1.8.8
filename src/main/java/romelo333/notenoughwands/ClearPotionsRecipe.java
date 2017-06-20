@@ -1,25 +1,25 @@
 package romelo333.notenoughwands;
 
-import com.google.common.collect.Lists;
-import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 
 public class ClearPotionsRecipe extends ShapelessRecipes {
     @Override
     public ItemStack getCraftingResult(InventoryCrafting inv) {
-        ItemStack potion = ItemStackTools.getEmptyStack();
-        ItemStack wand = ItemStackTools.getEmptyStack();
+        ItemStack potion = ItemStack.EMPTY;
+        ItemStack wand = ItemStack.EMPTY;
         for (int i = 0 ; i < inv.getSizeInventory() ; i++) {
             ItemStack stack = inv.getStackInSlot(i);
-            if (ItemStackTools.isValid(stack) && stack.getItem() == ModItems.potionWand) {
+            if (!stack.isEmpty() && stack.getItem() == ModItems.potionWand) {
                 wand = stack;
-            } else if (ItemStackTools.isValid(stack) && stack.getItem() == Items.GLASS_BOTTLE) {
+            } else if (!stack.isEmpty() && stack.getItem() == Items.GLASS_BOTTLE) {
                 potion = stack;
             }
         }
@@ -36,9 +36,14 @@ public class ClearPotionsRecipe extends ShapelessRecipes {
         return result;
     }
 
-    public ClearPotionsRecipe(){
-        super(new ItemStack(ModItems.potionWand), Lists.asList(new ItemStack(ModItems.potionWand), new ItemStack(Items.GLASS_BOTTLE), new ItemStack[0]));
+    // @todo recipes
+    public ClearPotionsRecipe(String group, ItemStack output, NonNullList<Ingredient> ingredients) {
+        super(group, output, ingredients);
     }
+
+    //    public ClearPotionsRecipe(){
+//        super(new ItemStack(ModItems.potionWand), Lists.asList(new ItemStack(ModItems.potionWand), new ItemStack(Items.GLASS_BOTTLE), new ItemStack[0]));
+//    }
 
     @Override
     public boolean matches(InventoryCrafting inv, World worldIn) {
@@ -46,11 +51,11 @@ public class ClearPotionsRecipe extends ShapelessRecipes {
         int foundPotion = 0;
         for (int i = 0 ; i < inv.getSizeInventory() ; i++) {
             ItemStack stack = inv.getStackInSlot(i);
-            if (ItemStackTools.isValid(stack) && stack.getItem() == ModItems.potionWand) {
+            if (!stack.isEmpty() && stack.getItem() == ModItems.potionWand) {
                 foundWand++;
-            } else if (ItemStackTools.isValid(stack) && stack.getItem() == Items.GLASS_BOTTLE) {
+            } else if (!stack.isEmpty() && stack.getItem() == Items.GLASS_BOTTLE) {
                 foundPotion++;
-            } else if (ItemStackTools.isValid(stack)) {
+            } else if (!stack.isEmpty()) {
                 return false;
             }
         }

@@ -1,6 +1,7 @@
 package romelo333.notenoughwands.Items;
 
 
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.IMob;
@@ -40,13 +41,13 @@ public class FreezingWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean b) {
+    public void addInformation(ItemStack stack, World player, List list, ITooltipFlag b) {
         super.addInformation(stack, player, list, b);
         list.add("Right click on creature to freeze creature.");
     }
 
     @Override
-    protected EnumActionResult clOnItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (!world.isRemote) {
 
         }

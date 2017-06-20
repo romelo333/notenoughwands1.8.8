@@ -1,0 +1,22 @@
+{
+  "result": {
+    "item": "notenoughwands:displacement_wand"
+  },
+  "pattern": [
+    "eb ",
+    "bw ",
+    "  w"
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "b": {
+      "item": "minecraft:brick"
+    },
+    "e": {
+      "item": "minecraft:ender_pearl"
+    },
+    "w": {
+      "item": "notenoughwands:wandcore"
+    }
+  }
+}

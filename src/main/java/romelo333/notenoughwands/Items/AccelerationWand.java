@@ -3,8 +3,8 @@ package romelo333.notenoughwands.Items;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -17,7 +17,6 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import romelo333.notenoughwands.Config;
 import romelo333.notenoughwands.varia.Tools;
 
@@ -49,7 +48,7 @@ public class AccelerationWand extends GenericWand {
     private Random random = new Random();
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean b) {
+    public void addInformation(ItemStack stack, World player, List list, ITooltipFlag b) {
         super.addInformation(stack, player, list, b);
         list.add(TextFormatting.GREEN + "Mode: " + descriptions[getMode(stack)]);
         list.add("Right click on block to speed up ticks.");
@@ -76,7 +75,7 @@ public class AccelerationWand extends GenericWand {
     }
 
     @Override
-    protected EnumActionResult clOnItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             IBlockState state = world.getBlockState(pos);
@@ -133,7 +132,6 @@ public class AccelerationWand extends GenericWand {
 
     @Override
     protected void setupCraftingInt(Item wandcore) {
-        GameRegistry.addRecipe(new ItemStack(this), "gg ", "gw ", "  w", 'g', new ItemStack(Items.DYE, 1, 15), 'w', wandcore);
     }
 
 }

@@ -2,12 +2,11 @@ package romelo333.notenoughwands.Items;
 
 
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -15,10 +14,8 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import romelo333.notenoughwands.AddPotionRecipe;
-import romelo333.notenoughwands.ClearPotionsRecipe;
 import romelo333.notenoughwands.Config;
 import romelo333.notenoughwands.varia.Tools;
 
@@ -55,7 +52,7 @@ public class PotionWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean b) {
+    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
         super.addInformation(stack, player, list, b);
         list.add("Left click on creature to apply effect");
         NBTTagCompound tagCompound = stack.getTagCompound();
@@ -156,8 +153,8 @@ public class PotionWand extends GenericWand {
 
     @Override
     protected void setupCraftingInt(Item wandcore) {
-        GameRegistry.addRecipe(new ItemStack(this), "fgf", "gw ", "f w", 'f', Items.FERMENTED_SPIDER_EYE, 'g', Blocks.GLOWSTONE, 'w', wandcore);
-        GameRegistry.addRecipe(new AddPotionRecipe());
-        GameRegistry.addRecipe(new ClearPotionsRecipe());
+        // @todo recipes
+//        GameRegistry.addRecipe(new AddPotionRecipe());
+//        GameRegistry.addRecipe(new ClearPotionsRecipe());
     }
 }

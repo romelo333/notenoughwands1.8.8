@@ -1,0 +1,25 @@
+{
+  "result": {
+    "item": "notenoughwands:advanced_wandcore"
+  },
+  "pattern": [
+    " x ",
+    "twt",
+    " d "
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "t": {
+      "item": "minecraft:ghast_tear"
+    },
+    "d": {
+      "item": "minecraft:diamond"
+    },
+    "w": {
+      "item": "notenoughwands:wandcore"
+    },
+    "x": {
+      "item": "minecraft:nether_star"
+    }
+  }
+}

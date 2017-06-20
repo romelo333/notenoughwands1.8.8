@@ -1,0 +1,22 @@
+{
+  "result": {
+    "item": "notenoughwands:protection_wand"
+  },
+  "pattern": [
+    "re ",
+    "ew ",
+    "  w"
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "r": {
+      "item": "minecraft:comparator"
+    },
+    "e": {
+      "item": "minecraft:ender_eye"
+    },
+    "w": {
+      "item": "notenoughwands:advanced_wandcore"
+    }
+  }
+}

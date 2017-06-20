@@ -1,7 +1,6 @@
 package romelo333.notenoughwands.blocks;
 
 
-import mcjty.lib.compat.CompatBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -19,10 +18,11 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
 
-public class LightBlock extends CompatBlock implements ITileEntityProvider {
+public class LightBlock extends Block implements ITileEntityProvider {
     public LightBlock() {
         super(Material.PORTAL);
         setHardness(0.0f);
@@ -57,7 +57,7 @@ public class LightBlock extends CompatBlock implements ITileEntityProvider {
     }
 
     @Override
-    public void clAddCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn) {
+    public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean p_185477_7_) {
     }
 
     @Override

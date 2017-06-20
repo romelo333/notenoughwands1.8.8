@@ -1,15 +1,15 @@
 package romelo333.notenoughwands;
 
-import com.google.common.collect.Lists;
-import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.potion.PotionUtils;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
@@ -18,13 +18,13 @@ import java.util.List;
 public class AddPotionRecipe extends ShapelessRecipes {
     @Override
     public ItemStack getCraftingResult(InventoryCrafting inv) {
-        ItemStack potion = ItemStackTools.getEmptyStack();
-        ItemStack wand = ItemStackTools.getEmptyStack();
+        ItemStack potion = ItemStack.EMPTY;
+        ItemStack wand = ItemStack.EMPTY;
         for (int i = 0 ; i < inv.getSizeInventory() ; i++) {
             ItemStack stack = inv.getStackInSlot(i);
-            if (ItemStackTools.isValid(stack) && stack.getItem() == ModItems.potionWand) {
+            if (!stack.isEmpty() && stack.getItem() == ModItems.potionWand) {
                 wand = stack;
-            } else if (ItemStackTools.isValid(stack) && stack.getItem() == Items.POTIONITEM) {
+            } else if (!stack.isEmpty() && stack.getItem() == Items.POTIONITEM) {
                 potion = stack;
             }
         }
@@ -48,9 +48,14 @@ public class AddPotionRecipe extends ShapelessRecipes {
         return result;
     }
 
-    public AddPotionRecipe(){
-        super(new ItemStack(ModItems.potionWand), Lists.asList(new ItemStack(ModItems.potionWand),new ItemStack(Items.POTIONITEM), new ItemStack[0]));
+    // @todo recipes
+    public AddPotionRecipe(String group, ItemStack output, NonNullList<Ingredient> ingredients) {
+        super(group, output, ingredients);
     }
+
+    //    public AddPotionRecipe(){
+//        super(new ItemStack(ModItems.potionWand), Lists.asList(new ItemStack(ModItems.potionWand),new ItemStack(Items.POTIONITEM), new ItemStack[0]));
+//    }
 
     @Override
     public boolean matches(InventoryCrafting inv, World worldIn) {
@@ -58,11 +63,11 @@ public class AddPotionRecipe extends ShapelessRecipes {
         int foundPotion = 0;
         for (int i = 0 ; i < inv.getSizeInventory() ; i++) {
             ItemStack stack = inv.getStackInSlot(i);
-            if (ItemStackTools.isValid(stack) && stack.getItem() == ModItems.potionWand) {
+            if (!stack.isEmpty() && stack.getItem() == ModItems.potionWand) {
                 foundWand++;
-            } else if (ItemStackTools.isValid(stack) && stack.getItem() == Items.POTIONITEM) {
+            } else if (!stack.isEmpty() && stack.getItem() == Items.POTIONITEM) {
                 foundPotion++;
-            } else if (ItemStackTools.isValid(stack)) {
+            } else if (!stack.isEmpty()) {
                 return false;
             }
         }

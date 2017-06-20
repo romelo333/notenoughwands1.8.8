@@ -1,8 +1,5 @@
 package romelo333.notenoughwands.varia;
 
-import mcjty.lib.tools.ChatTools;
-import mcjty.lib.tools.ItemStackTools;
-import mcjty.lib.tools.WorldTools;
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -22,11 +19,11 @@ import net.minecraft.world.World;
 
 public class Tools {
     public static void error(EntityPlayer player, String msg) {
-        ChatTools.addChatMessage(player, new TextComponentString(TextFormatting.RED + msg));
+        player.sendStatusMessage(new TextComponentString(TextFormatting.RED + msg), false);
     }
 
     public static void notify(EntityPlayer player, String msg) {
-        ChatTools.addChatMessage(player, new TextComponentString(TextFormatting.GREEN + msg));
+        player.sendStatusMessage(new TextComponentString(TextFormatting.GREEN + msg), false);
     }
 
     public static boolean consumeInventoryItem(Item item, int meta, InventoryPlayer inv, EntityPlayer player) {
@@ -39,9 +36,11 @@ public class Tools {
             return false;
         } else {
             ItemStack stackInSlot = inv.getStackInSlot(i);
-            stackInSlot = ItemStackTools.incStackSize(stackInSlot, -1);
-            if (ItemStackTools.getStackSize(stackInSlot) == 0) {
-                inv.setInventorySlotContents(i, ItemStackTools.getEmptyStack());
+            int amount = -1;
+            stackInSlot.grow(amount);
+            stackInSlot = stackInSlot;
+            if (stackInSlot.getCount() == 0) {
+                inv.setInventorySlotContents(i, ItemStack.EMPTY);
             }
 
             return true;
@@ -57,14 +56,14 @@ public class Tools {
         if (!player.inventory.addItemStackToInventory(oldStack)) {
             // Not enough room. Spawn item in world.
             EntityItem entityItem = new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), oldStack);
-            WorldTools.spawnEntity(world, entityItem);
+            world.spawnEntity(entityItem);
         }
     }
 
     public static int finditem(Item item, int meta, InventoryPlayer inv) {
         for (int i = 0; i < 36; ++i) {
             ItemStack stack = inv.getStackInSlot(i);
-            if (ItemStackTools.isValid(stack) && stack.getItem() == item && meta == stack.getItemDamage()) {
+            if (!stack.isEmpty() && stack.getItem() == item && meta == stack.getItemDamage()) {
                 return i;
             }
         }

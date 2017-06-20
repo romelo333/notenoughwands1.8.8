@@ -1,7 +1,6 @@
 package romelo333.notenoughwands.network;
 
 import io.netty.buffer.ByteBuf;
-import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
@@ -9,7 +8,6 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.server.FMLServerHandler;
 import romelo333.notenoughwands.Items.GenericWand;
 
 public class PacketToggleMode implements IMessage {
@@ -36,7 +34,7 @@ public class PacketToggleMode implements IMessage {
             // @todo
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
             ItemStack heldItem = playerEntity.getHeldItem(EnumHand.MAIN_HAND);
-            if (ItemStackTools.isValid(heldItem) && heldItem.getItem() instanceof GenericWand) {
+            if (!heldItem.isEmpty() && heldItem.getItem() instanceof GenericWand) {
                 GenericWand genericWand = (GenericWand) (heldItem.getItem());
                 genericWand.toggleMode(playerEntity, heldItem);
             }

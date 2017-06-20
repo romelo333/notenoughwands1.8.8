@@ -1,11 +1,10 @@
 package romelo333.notenoughwands.Items;
 
 
-import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -20,7 +19,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import romelo333.notenoughwands.Config;
 import romelo333.notenoughwands.varia.Tools;
 
@@ -42,7 +40,7 @@ public class MovingWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean b) {
+    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
         super.addInformation(stack, player, list, b);
         NBTTagCompound compound = stack.getTagCompound();
         if (!hasBlock(compound)) {
@@ -62,8 +60,9 @@ public class MovingWand extends GenericWand {
         return compound != null && compound.hasKey("block");
     }
 
+
     @Override
-    protected ActionResult<ItemStack> clOnItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             NBTTagCompound compound = stack.getTagCompound();
@@ -71,7 +70,7 @@ public class MovingWand extends GenericWand {
                 Vec3d lookVec = player.getLookVec();
                 Vec3d start = new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
                 int distance = this.placeDistance;
-                Vec3d end = start.addVector(lookVec.xCoord * distance, lookVec.yCoord * distance, lookVec.zCoord * distance);
+                Vec3d end = start.addVector(lookVec.x * distance, lookVec.y * distance, lookVec.z * distance);
                 RayTraceResult position = world.rayTraceBlocks(start, end);
                 if (position == null) {
                     place(stack, world, new BlockPos(end), null);
@@ -82,7 +81,7 @@ public class MovingWand extends GenericWand {
     }
 
     @Override
-    protected EnumActionResult clOnItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
+    public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             NBTTagCompound compound = stack.getTagCompound();
@@ -97,7 +96,7 @@ public class MovingWand extends GenericWand {
     }
 
     @Override
-    protected EnumActionResult clOnItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         return EnumActionResult.SUCCESS;
     }
 
@@ -145,7 +144,7 @@ public class MovingWand extends GenericWand {
         NBTTagCompound tagCompound = Tools.getTagCompound(stack);
         ItemStack s = block.getItem(world, pos, state);
         String name;
-        if (ItemStackTools.isEmpty(s)) {
+        if (s.isEmpty()) {
             name = Tools.getBlockName(block, meta);
         } else {
             name = s.getDisplayName();
@@ -176,6 +175,5 @@ public class MovingWand extends GenericWand {
 
     @Override
     protected void setupCraftingInt(Item wandcore) {
-        GameRegistry.addRecipe(new ItemStack(this), "re ", "ew ", "  w", 'r', Items.REDSTONE, 'e', Items.ENDER_PEARL, 'w', wandcore);
     }
 }

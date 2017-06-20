@@ -1,16 +1,17 @@
 package romelo333.notenoughwands.Items;
 
-import mcjty.lib.compat.CompatItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -39,7 +40,7 @@ import java.util.Set;
 
 //import net.minecraft.client.entity.EntityClientPlayerMP;
 
-public abstract class GenericWand extends CompatItem implements cofh.api.energy.IEnergyContainerItem {
+public abstract class GenericWand extends Item implements cofh.api.energy.IEnergyContainerItem {
     protected int needsxp = 0;
     protected int needsrf = 0;
     protected int maxrf = 0;
@@ -91,9 +92,8 @@ public abstract class GenericWand extends CompatItem implements cofh.api.energy.
         return cost;
     }
 
-
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean b) {
+    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
         super.addInformation(stack, player, list, b);
         if (needsrf > 0) {
             list.add(TextFormatting.GREEN+"Energy: " + getEnergyStored(stack) + " / " + getMaxEnergyStored(stack));
@@ -332,19 +332,19 @@ public abstract class GenericWand extends CompatItem implements cofh.api.energy.
     }
 
     protected void showModeKeyDescription(List<String> list, String suffix) {
-        String keyDescription = KeyBindings.wandModifier.getDisplayName();
+        String keyDescription = KeyBindings.wandModifier != null ? KeyBindings.wandModifier.getDisplayName() : "unknown";
         list.add("Mode key (" + keyDescription + ") to " + suffix);
     }
 
     protected void showSubModeKeyDescription(List<String> list, String suffix) {
-        String keyDescription = KeyBindings.wandSubMode.getDisplayName();
+        String keyDescription = KeyBindings.wandSubMode != null ? KeyBindings.wandSubMode.getDisplayName() : "unknown";
         list.add("Sub-mode key (" + keyDescription + ") to " + suffix);
     }
 
     private static void renderOutlines(Set<BlockPos> coordinates, int r, int g, int b, int thickness) {
         Tessellator tessellator = Tessellator.getInstance();
 
-        VertexBuffer buffer = tessellator.getBuffer();
+        BufferBuilder buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
 
 //        GlStateManager.color(r / 255.0f, g / 255.0f, b / 255.0f);
@@ -360,7 +360,7 @@ public abstract class GenericWand extends CompatItem implements cofh.api.energy.
         tessellator.draw();
     }
 
-    public static void renderHighLightedBlocksOutline(VertexBuffer buffer, float mx, float my, float mz, float r, float g, float b, float a) {
+    public static void renderHighLightedBlocksOutline(BufferBuilder buffer, float mx, float my, float mz, float r, float g, float b, float a) {
         buffer.pos(mx, my, mz).color(r, g, b, a).endVertex();
         buffer.pos(mx+1, my, mz).color(r, g, b, a).endVertex();
         buffer.pos(mx, my, mz).color(r, g, b, a).endVertex();
@@ -390,7 +390,7 @@ public abstract class GenericWand extends CompatItem implements cofh.api.energy.
         buffer.pos(mx, my+1, mz+1).color(r, g, b, a).endVertex();
     }
 
-    private static void renderBlockOutline(VertexBuffer buffer, float mx, float my, float mz, float o) {
+    private static void renderBlockOutline(BufferBuilder buffer, float mx, float my, float mz, float o) {
         buffer.pos(mx - o, my - o, mz - o).endVertex();
         buffer.pos(mx + 1 + o, my - o, mz - o).endVertex();
         buffer.pos(mx - o, my - o, mz - o).endVertex();

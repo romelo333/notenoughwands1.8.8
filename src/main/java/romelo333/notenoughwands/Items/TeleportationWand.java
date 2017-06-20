@@ -1,8 +1,8 @@
 package romelo333.notenoughwands.Items;
 
 
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
@@ -11,7 +11,6 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import romelo333.notenoughwands.Config;
 import romelo333.notenoughwands.ModSounds;
 import romelo333.notenoughwands.NotEnoughWands;
@@ -30,7 +29,7 @@ public class TeleportationWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean b) {
+    public void addInformation(ItemStack stack, World player, List list, ITooltipFlag b) {
         super.addInformation(stack, player, list, b);
         list.add("Right click to teleport forward");
         list.add("until a block is hit or maximum");
@@ -51,7 +50,7 @@ public class TeleportationWand extends GenericWand {
     }
 
     @Override
-    protected ActionResult<ItemStack> clOnItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             if (!checkUsage(stack, player, 1.0f)) {
@@ -68,18 +67,18 @@ public class TeleportationWand extends GenericWand {
                 distance /= 2;
             }
 
-            Vec3d end = start.addVector(lookVec.xCoord * distance, lookVec.yCoord * distance, lookVec.zCoord * distance);
+            Vec3d end = start.addVector(lookVec.x * distance, lookVec.y * distance, lookVec.z * distance);
             RayTraceResult position = gothrough ? null : world.rayTraceBlocks(start, end);
             if (position == null) {
                 if (gothrough) {
                     // First check if the destination is safe
-                    BlockPos blockPos = new BlockPos(end.xCoord, end.yCoord, end.zCoord);
+                    BlockPos blockPos = new BlockPos(end.x, end.y, end.z);
                     if (!(world.isAirBlock(blockPos) && world.isAirBlock(blockPos.up()))) {
                         Tools.error(player, "You will suffocate if you teleport there!");
                         return ActionResult.newResult(EnumActionResult.PASS, stack);
                     }
                 }
-                player.setPositionAndUpdate(end.xCoord, end.yCoord, end.zCoord);
+                player.setPositionAndUpdate(end.x, end.y, end.z);
             } else {
                 BlockPos blockPos = position.getBlockPos();
                 int x = blockPos.getX();
@@ -121,10 +120,5 @@ public class TeleportationWand extends GenericWand {
 
     @Override
     protected void setupCraftingInt(Item wandcore) {
-        GameRegistry.addRecipe(new ItemStack(this),
-                "ee ",
-                "ew ",
-                "  w",
-                'e', Items.ENDER_PEARL, 'w', wandcore);
     }
 }
