@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -21,17 +22,22 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void preInit(FMLPreInitializationEvent e) {
         super.preInit(e);
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
     @Override
     public void init(FMLInitializationEvent e) {
         super.init(e);
-        ModRenderers.init();
-        ModItems.initModels();
-        MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(new KeyInputHandler());
         KeyBindings.init();
     }
+
+    @SubscribeEvent
+    public void registerModels(ModelRegistryEvent event) {
+        ModRenderers.init();
+        ModItems.initModels();
+    }
+
 
     @SubscribeEvent
     public void renderWorldLastEvent(RenderWorldLastEvent evt) {

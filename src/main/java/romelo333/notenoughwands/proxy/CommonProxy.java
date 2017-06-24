@@ -16,12 +16,10 @@ public abstract class CommonProxy {
     private Configuration mainConfig;
 
     public void preInit(FMLPreInitializationEvent e) {
+        MinecraftForge.EVENT_BUS.register(new ForgeEventHandlers());
+
         mainConfig = NotEnoughWands.config;
-        ModItems.init();
-        ModBlocks.init();
         readMainConfig();
-        ModCrafting.init();
-        ModSounds.init();
         FreezePotion.freezePotion = new FreezePotion();
         PacketHandler.registerMessages("notenoughwands");
     }
@@ -43,7 +41,7 @@ public abstract class CommonProxy {
     }
 
     public void init(FMLInitializationEvent e) {
-        MinecraftForge.EVENT_BUS.register(new ForgeEventHandlers());
+        ModCrafting.init(); // @todo still has to be fixed
     }
 
     public void postInit(FMLPostInitializationEvent e) {

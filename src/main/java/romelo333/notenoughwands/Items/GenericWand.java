@@ -10,7 +10,6 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -24,6 +23,7 @@ import net.minecraft.world.storage.loot.LootPool;
 import net.minecraft.world.storage.loot.conditions.LootCondition;
 import net.minecraft.world.storage.loot.functions.LootFunction;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -53,11 +53,11 @@ public abstract class GenericWand extends Item implements cofh.api.energy.IEnerg
     public static int AVAILABILITY_ADVANCED = 2;
     public static int AVAILABILITY_NORMAL = 3;
 
-    private static List<GenericWand> wands = new ArrayList<GenericWand>();
+    private static List<GenericWand> wands = new ArrayList<>();
 
     @SideOnly(Side.CLIENT)
     public void registerModel() {
-        Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
     }
 
     @Override
@@ -124,7 +124,6 @@ public abstract class GenericWand extends Item implements cofh.api.energy.IEnerg
             setUnlocalizedName(NotEnoughWands.MODID + "." + name);
             setRegistryName(name);
             setCreativeTab(NotEnoughWands.tabNew);
-            GameRegistry.register(this);
             wands.add(this);
         }
         return this;
@@ -256,6 +255,11 @@ public abstract class GenericWand extends Item implements cofh.api.energy.IEnerg
     }
 
     //------------------------------------------------------------------------------
+
+
+    public static List<GenericWand> getWands() {
+        return wands;
+    }
 
     @SideOnly(Side.CLIENT)
     public static void setupModels() {

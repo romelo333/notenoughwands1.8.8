@@ -28,8 +28,6 @@ public class LightBlock extends Block implements ITileEntityProvider {
         setHardness(0.0f);
         setUnlocalizedName("notenoughwands.blockLight");
         setRegistryName("lightBlock");
-        GameRegistry.register(this);
-        GameRegistry.registerTileEntity(LightTE.class, "LightTileEntity");
 //        setStepSound(Block.soundTypeCloth);
         // @todo
     }

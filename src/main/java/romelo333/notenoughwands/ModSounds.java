@@ -2,27 +2,20 @@ package romelo333.notenoughwands;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.play.server.SPacketSoundEffect;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import net.minecraftforge.registries.IForgeRegistry;
 
 public class ModSounds {
 
     public static final String[] REGISTER_SOUND = { "registerSound", "func_187502_a", "a" };
 
-    public static void init() {
-        try {
-            Method m = ReflectionHelper.findMethod(SoundEvent.class, null, REGISTER_SOUND, String.class);
-            m.invoke(null, NotEnoughWands.MODID + ":teleport");
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
+    public static void init(IForgeRegistry<SoundEvent> registry) {
+        SoundEvent teleport = new SoundEvent(new ResourceLocation(NotEnoughWands.MODID, "teleport"));
+        teleport.setRegistryName(new ResourceLocation(NotEnoughWands.MODID, "teleport"));
+        registry.register(teleport);
     }
 
     // Server side: play a sound to all nearby players
