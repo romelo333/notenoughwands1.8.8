@@ -11,7 +11,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import romelo333.notenoughwands.ProtectedBlocks;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 

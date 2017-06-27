@@ -3,8 +3,6 @@ package romelo333.notenoughwands;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.ResourceLocation;
 
-import java.awt.*;
-
 public class FreezePotion extends Potion {
     public static FreezePotion freezePotion;
 

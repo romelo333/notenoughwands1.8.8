@@ -1,5 +1,6 @@
 package romelo333.notenoughwands.Items;
 
+import cofh.redstoneflux.api.IEnergyContainerItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -26,7 +27,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
@@ -40,7 +41,8 @@ import java.util.Set;
 
 //import net.minecraft.client.entity.EntityClientPlayerMP;
 
-public abstract class GenericWand extends Item implements cofh.api.energy.IEnergyContainerItem {
+@Optional.Interface(modid = "redstoneflux", iface = "cofh.redstoneflux.api.IEnergyContainerItem")
+public abstract class GenericWand extends Item implements IEnergyItem, IEnergyContainerItem {
     protected int needsxp = 0;
     protected int needsrf = 0;
     protected int maxrf = 0;
