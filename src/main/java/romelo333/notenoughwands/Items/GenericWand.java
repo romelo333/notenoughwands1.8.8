@@ -42,7 +42,7 @@ import java.util.Set;
 //import net.minecraft.client.entity.EntityClientPlayerMP;
 
 @Optional.Interface(modid = "redstoneflux", iface = "cofh.redstoneflux.api.IEnergyContainerItem")
-public abstract class GenericWand extends Item implements IEnergyItem, IEnergyContainerItem {
+public class GenericWand extends Item implements IEnergyItem, IEnergyContainerItem {
     protected int needsxp = 0;
     protected int needsrf = 0;
     protected int maxrf = 0;
@@ -161,7 +161,9 @@ public abstract class GenericWand extends Item implements IEnergyItem, IEnergyCo
         return getRegistryName().getResourcePath();
     }
 
-    protected abstract void initConfig(Configuration cfg);
+    protected void initConfig(Configuration cfg) {
+
+    }
 
     public void initConfig(Configuration cfg, int easy_usages, int easy_maxrf, int normal_usages, int normal_maxrf, int hard_usages, int hard_maxrf) {
         switch (Config.wandUsage) {

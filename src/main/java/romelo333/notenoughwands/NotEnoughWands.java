@@ -15,12 +15,14 @@ import java.io.File;
 
 @Mod(modid = NotEnoughWands.MODID, name="Not Enough Wands",
         dependencies =
-                    "after:forge@[" + NotEnoughWands.MIN_FORGE11_VER + ",)",
-        version = NotEnoughWands.VERSION)
+                    "after:forge@[" + NotEnoughWands.MIN_FORGE11_VER + ",);" +
+                    "after:redstoneflux@[" + NotEnoughWands.MIN_COFH_VER + ",)",
+                version = NotEnoughWands.VERSION)
 public class NotEnoughWands {
     public static final String MODID = "notenoughwands";
     public static final String VERSION = "1.5.7";
     public static final String MIN_FORGE11_VER = "13.19.0.2176";
+    public static final String MIN_COFH_VER = "2.0.0";
 
     @SidedProxy(clientSide="romelo333.notenoughwands.proxy.ClientProxy", serverSide="romelo333.notenoughwands.proxy.ServerProxy")
     public static CommonProxy proxy;
