@@ -36,8 +36,6 @@ public class ForgeEventHandlers {
 
     @SubscribeEvent
     public void registerItems(RegistryEvent.Register<Item> event) {
-        ModItems.init();
-
         event.getRegistry().register(ModItems.wandCore);
         event.getRegistry().register(ModItems.advancedWandCore);
 

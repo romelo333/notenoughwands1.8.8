@@ -17,6 +17,8 @@ public abstract class CommonProxy {
     public void preInit(FMLPreInitializationEvent e) {
         MinecraftForge.EVENT_BUS.register(new ForgeEventHandlers());
 
+        ModItems.init();
+
         mainConfig = NotEnoughWands.config;
         readMainConfig();
         FreezePotion.freezePotion = new FreezePotion();
