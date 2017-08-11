@@ -17,7 +17,8 @@ import java.io.File;
         dependencies =
                     "after:forge@[" + NotEnoughWands.MIN_FORGE11_VER + ",);" +
                     "after:redstoneflux@[" + NotEnoughWands.MIN_COFH_VER + ",)",
-                version = NotEnoughWands.VERSION)
+        acceptedMinecraftVersions = "[1.12,1.13)",
+        version = NotEnoughWands.VERSION)
 public class NotEnoughWands {
     public static final String MODID = "notenoughwands";
     public static final String VERSION = "1.5.9";
