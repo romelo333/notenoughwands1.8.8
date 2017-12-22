@@ -5,7 +5,7 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
-public class PacketHandler {
+public class NEWPacketHandler {
     public static SimpleNetworkWrapper INSTANCE;
     private static int ID = 0;
 
@@ -13,8 +13,8 @@ public class PacketHandler {
         return ID++;
     }
 
-    public static void registerMessages(String channelName) {
-        INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(channelName);
+    public static void registerMessages(SimpleNetworkWrapper network) {
+        INSTANCE = network;
 
         // Server side
         INSTANCE.registerMessage(PacketToggleMode.Handler.class, PacketToggleMode.class, nextID(), Side.SERVER);

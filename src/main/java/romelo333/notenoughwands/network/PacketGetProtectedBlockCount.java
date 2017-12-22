@@ -43,7 +43,7 @@ public class PacketGetProtectedBlockCount implements IMessage {
 
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
             PacketReturnProtectedBlockCount msg = new PacketReturnProtectedBlockCount(protectedBlocks.getProtectedBlockCount(message.id));
-            PacketHandler.INSTANCE.sendTo(msg, player);
+            NEWPacketHandler.INSTANCE.sendTo(msg, player);
         }
     }
 }

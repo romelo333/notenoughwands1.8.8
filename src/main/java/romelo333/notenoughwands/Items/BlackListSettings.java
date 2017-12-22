@@ -1,5 +1,6 @@
 package romelo333.notenoughwands.Items;
 
+import mcjty.lib.varia.EntityTools;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.EntityDragon;
@@ -10,7 +11,6 @@ import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import romelo333.notenoughwands.Config;
-import romelo333.notenoughwands.varia.EntityTools;
 
 import java.util.HashMap;
 import java.util.Map;

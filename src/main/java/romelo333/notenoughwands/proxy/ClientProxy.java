@@ -1,5 +1,6 @@
 package romelo333.notenoughwands.proxy;
 
+import mcjty.lib.McJtyLibClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.item.ItemStack;
@@ -15,7 +16,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import romelo333.notenoughwands.*;
 import romelo333.notenoughwands.Items.GenericWand;
 import romelo333.notenoughwands.network.PacketGetProtectedBlocksAroundPlayer;
-import romelo333.notenoughwands.network.PacketHandler;
+import romelo333.notenoughwands.network.NEWPacketHandler;
 
 public class ClientProxy extends CommonProxy {
 
@@ -23,6 +24,7 @@ public class ClientProxy extends CommonProxy {
     public void preInit(FMLPreInitializationEvent e) {
         super.preInit(e);
         MinecraftForge.EVENT_BUS.register(this);
+        McJtyLibClient.preInit(e);
     }
 
     @Override
@@ -71,7 +73,7 @@ public class ClientProxy extends CommonProxy {
             return;
         }
         timer = Config.clientSideProtection;
-        PacketHandler.INSTANCE.sendToServer(new PacketGetProtectedBlocksAroundPlayer());
+        NEWPacketHandler.INSTANCE.sendToServer(new PacketGetProtectedBlocksAroundPlayer());
     }
 
 }

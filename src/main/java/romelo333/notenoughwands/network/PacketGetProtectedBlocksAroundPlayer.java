@@ -45,7 +45,7 @@ public class PacketGetProtectedBlocksAroundPlayer implements IMessage {
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
             Map<ChunkPos, Set<BlockPos>> blocks = protectedBlocks.fetchProtectedBlocks(world, player.getPosition());
             PacketReturnProtectedBlocksAroundPlayer msg = new PacketReturnProtectedBlocksAroundPlayer(blocks);
-            PacketHandler.INSTANCE.sendTo(msg, player);
+            NEWPacketHandler.INSTANCE.sendTo(msg, player);
         }
     }
 }

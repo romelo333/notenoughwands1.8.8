@@ -57,7 +57,7 @@ public class PacketGetProtectedBlocks implements IMessage {
                 protectedBlocks.fetchProtectedBlocks(childBlocks, world, (int)player.posX, (int)player.posY, (int)player.posZ, protectionWand.blockShowRadius, -2);
             }
             PacketReturnProtectedBlocks msg = new PacketReturnProtectedBlocks(blocks, childBlocks);
-            PacketHandler.INSTANCE.sendTo(msg, player);
+            NEWPacketHandler.INSTANCE.sendTo(msg, player);
         }
     }
 }
