@@ -1,16 +1,11 @@
 package romelo333.notenoughwands.Items;
 
 import cofh.redstoneflux.api.IEnergyContainerItem;
+import mcjty.lib.gui.BlockOutlineRenderer;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -30,7 +25,6 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
 import romelo333.notenoughwands.*;
 import romelo333.notenoughwands.varia.ItemCapabilityProvider;
 import romelo333.notenoughwands.varia.Tools;
@@ -316,27 +310,7 @@ public class GenericWand extends Item implements IEnergyItem, IEnergyContainerIt
     }
 
     protected static void renderOutlines(RenderWorldLastEvent evt, EntityPlayerSP p, Set<BlockPos> coordinates, int r, int g, int b) {
-        double doubleX = p.lastTickPosX + (p.posX - p.lastTickPosX) * evt.getPartialTicks();
-        double doubleY = p.lastTickPosY + (p.posY - p.lastTickPosY) * evt.getPartialTicks();
-        double doubleZ = p.lastTickPosZ + (p.posZ - p.lastTickPosZ) * evt.getPartialTicks();
-
-        RenderHelper.disableStandardItemLighting();
-        Minecraft.getMinecraft().entityRenderer.disableLightmap();
-        GlStateManager.disableDepth();
-        GlStateManager.disableTexture2D();
-        GlStateManager.disableLighting();
-        GlStateManager.disableAlpha();
-        GlStateManager.depthMask(false);
-
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(-doubleX, -doubleY, -doubleZ);
-
-        renderOutlines(coordinates, r, g, b, 4);
-
-        GlStateManager.popMatrix();
-
-        Minecraft.getMinecraft().entityRenderer.enableLightmap();
-        GlStateManager.enableTexture2D();
+        BlockOutlineRenderer.renderOutlines(p, coordinates, r, g, b, evt.getPartialTicks());
     }
 
     protected void showModeKeyDescription(List<String> list, String suffix) {
@@ -348,87 +322,6 @@ public class GenericWand extends Item implements IEnergyItem, IEnergyContainerIt
         String keyDescription = KeyBindings.wandSubMode != null ? KeyBindings.wandSubMode.getDisplayName() : "unknown";
         list.add("Sub-mode key (" + keyDescription + ") to " + suffix);
     }
-
-    private static void renderOutlines(Set<BlockPos> coordinates, int r, int g, int b, int thickness) {
-        Tessellator tessellator = Tessellator.getInstance();
-
-        BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
-
-//        GlStateManager.color(r / 255.0f, g / 255.0f, b / 255.0f);
-        GL11.glLineWidth(thickness);
-
-        for (BlockPos coordinate : coordinates) {
-            float x = coordinate.getX();
-            float y = coordinate.getY();
-            float z = coordinate.getZ();
-
-            renderHighLightedBlocksOutline(buffer, x, y, z, r / 255.0f, g / 255.0f, b / 255.0f, 1.0f); // .02f
-        }
-        tessellator.draw();
-    }
-
-    public static void renderHighLightedBlocksOutline(BufferBuilder buffer, float mx, float my, float mz, float r, float g, float b, float a) {
-        buffer.pos(mx, my, mz).color(r, g, b, a).endVertex();
-        buffer.pos(mx+1, my, mz).color(r, g, b, a).endVertex();
-        buffer.pos(mx, my, mz).color(r, g, b, a).endVertex();
-        buffer.pos(mx, my+1, mz).color(r, g, b, a).endVertex();
-        buffer.pos(mx, my, mz).color(r, g, b, a).endVertex();
-        buffer.pos(mx, my, mz+1).color(r, g, b, a).endVertex();
-        buffer.pos(mx+1, my+1, mz+1).color(r, g, b, a).endVertex();
-        buffer.pos(mx, my+1, mz+1).color(r, g, b, a).endVertex();
-        buffer.pos(mx+1, my+1, mz+1).color(r, g, b, a).endVertex();
-        buffer.pos(mx+1, my, mz+1).color(r, g, b, a).endVertex();
-        buffer.pos(mx+1, my+1, mz+1).color(r, g, b, a).endVertex();
-        buffer.pos(mx+1, my+1, mz).color(r, g, b, a).endVertex();
-
-        buffer.pos(mx, my+1, mz).color(r, g, b, a).endVertex();
-        buffer.pos(mx, my+1, mz+1).color(r, g, b, a).endVertex();
-        buffer.pos(mx, my+1, mz).color(r, g, b, a).endVertex();
-        buffer.pos(mx+1, my+1, mz).color(r, g, b, a).endVertex();
-
-        buffer.pos(mx+1, my, mz).color(r, g, b, a).endVertex();
-        buffer.pos(mx+1, my, mz+1).color(r, g, b, a).endVertex();
-        buffer.pos(mx+1, my, mz).color(r, g, b, a).endVertex();
-        buffer.pos(mx+1, my+1, mz).color(r, g, b, a).endVertex();
-
-        buffer.pos(mx, my, mz+1).color(r, g, b, a).endVertex();
-        buffer.pos(mx+1, my, mz+1).color(r, g, b, a).endVertex();
-        buffer.pos(mx, my, mz+1).color(r, g, b, a).endVertex();
-        buffer.pos(mx, my+1, mz+1).color(r, g, b, a).endVertex();
-    }
-
-    private static void renderBlockOutline(BufferBuilder buffer, float mx, float my, float mz, float o) {
-        buffer.pos(mx - o, my - o, mz - o).endVertex();
-        buffer.pos(mx + 1 + o, my - o, mz - o).endVertex();
-        buffer.pos(mx - o, my - o, mz - o).endVertex();
-        buffer.pos(mx - o, my + 1 + o, mz - o).endVertex();
-        buffer.pos(mx - o, my - o, mz - o).endVertex();
-        buffer.pos(mx - o, my - o, mz + 1 + o).endVertex();
-        buffer.pos(mx + 1 + o, my + 1 + o, mz + 1 + o).endVertex();
-        buffer.pos(mx - o, my + 1 + o, mz + 1 + o).endVertex();
-        buffer.pos(mx + 1 + o, my + 1 + o, mz + 1 + o).endVertex();
-        buffer.pos(mx + 1 + o, my - o, mz + 1 + o).endVertex();
-        buffer.pos(mx + 1 + o, my + 1 + o, mz + 1 + o).endVertex();
-        buffer.pos(mx + 1 + o, my + 1 + o, mz - o).endVertex();
-
-        buffer.pos(mx - o, my + 1 + o, mz - o).endVertex();
-        buffer.pos(mx - o, my + 1 + o, mz + 1 + o).endVertex();
-        buffer.pos(mx - o, my + 1 + o, mz - o).endVertex();
-        buffer.pos(mx + 1 + o, my + 1 + o, mz - o).endVertex();
-
-        buffer.pos(mx + 1 + o, my - o, mz - o).endVertex();
-        buffer.pos(mx + 1 + o, my - o, mz + 1 + o).endVertex();
-        buffer.pos(mx + 1 + o, my - o, mz - o).endVertex();
-        buffer.pos(mx + 1 + o, my + 1 + o, mz - o).endVertex();
-
-        buffer.pos(mx, my, mz + 1 + o).endVertex();
-        buffer.pos(mx + 1 + o, my, mz + 1 + o).endVertex();
-        buffer.pos(mx, my, mz + 1 + o).endVertex();
-        buffer.pos(mx, my + 1 + o, mz + 1 + o).endVertex();
-    }
-
-
 
     //------------------------------------------------------------------------------
 

@@ -1,5 +1,6 @@
 package romelo333.notenoughwands;
 
+import mcjty.lib.varia.GlobalCoordinate;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -9,7 +10,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.util.Constants;
 import org.apache.commons.lang3.tuple.Pair;
-import romelo333.notenoughwands.varia.GlobalCoordinate;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.HashMap;
@@ -172,7 +172,7 @@ public class ProtectedBlocks extends WorldSavedData {
         for (Map.Entry<GlobalCoordinate, Integer> entry : blocks.entrySet()) {
             if (entry.getValue() == id || (id == -2 && entry.getValue() != -1)) {
                 GlobalCoordinate block = entry.getKey();
-                if (block.getDim() == world.provider.getDimension()) {
+                if (block.getDimension() == world.provider.getDimension()) {
                     float sqdist = (x - block.getX()) * (x - block.getX()) + (y - block.getY()) * (y - block.getY()) + (z - block.getZ()) * (z - block.getZ());
                     if (sqdist < radius) {
                         coordinates.add(block);
@@ -184,7 +184,7 @@ public class ProtectedBlocks extends WorldSavedData {
 
     private void clearCache(GlobalCoordinate pos) {
         ChunkPos chunkpos = new ChunkPos(pos);
-        perDimPerChunkCache.remove(Pair.of(pos.getDim(), chunkpos));
+        perDimPerChunkCache.remove(Pair.of(pos.getDimension(), chunkpos));
     }
 
     public Map<ChunkPos,Set<BlockPos>> fetchProtectedBlocks(World world, BlockPos pos) {
@@ -215,7 +215,7 @@ public class ProtectedBlocks extends WorldSavedData {
 
         for (Map.Entry<GlobalCoordinate, Integer> entry : blocks.entrySet()) {
             GlobalCoordinate block = entry.getKey();
-            if (block.getDim() == world.provider.getDimension()) {
+            if (block.getDimension() == world.provider.getDimension()) {
                 ChunkPos bc = new ChunkPos(block);
                 if (bc.equals(chunkpos)) {
                     result.add(block);
@@ -235,7 +235,7 @@ public class ProtectedBlocks extends WorldSavedData {
         NBTTagList list = tagCompound.getTagList("blocks", Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i<list.tagCount();i++){
             NBTTagCompound tc = list.getCompoundTagAt(i);
-            GlobalCoordinate block = new GlobalCoordinate(tc.getInteger("x"),tc.getInteger("y"),tc.getInteger("z"),tc.getInteger("dim"));
+            GlobalCoordinate block = new GlobalCoordinate(new BlockPos(tc.getInteger("x"),tc.getInteger("y"),tc.getInteger("z")),tc.getInteger("dim"));
             int id = tc.getInteger("id");
             blocks.put(block, id);
             incrementProtection(id);
@@ -252,7 +252,7 @@ public class ProtectedBlocks extends WorldSavedData {
             tc.setInteger("x", block.getX());
             tc.setInteger("y", block.getY());
             tc.setInteger("z", block.getZ());
-            tc.setInteger("dim", block.getDim());
+            tc.setInteger("dim", block.getDimension());
             tc.setInteger("id", entry.getValue());
             list.appendTag(tc);
         }
