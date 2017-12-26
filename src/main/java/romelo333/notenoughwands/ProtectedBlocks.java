@@ -173,9 +173,10 @@ public class ProtectedBlocks extends WorldSavedData {
             if (entry.getValue() == id || (id == -2 && entry.getValue() != -1)) {
                 GlobalCoordinate block = entry.getKey();
                 if (block.getDimension() == world.provider.getDimension()) {
-                    float sqdist = (x - block.getX()) * (x - block.getX()) + (y - block.getY()) * (y - block.getY()) + (z - block.getZ()) * (z - block.getZ());
+                    BlockPos c = block.getCoordinate();
+                    float sqdist = (x - c.getX()) * (x - c.getX()) + (y - c.getY()) * (y - c.getY()) + (z - c.getZ()) * (z - c.getZ());
                     if (sqdist < radius) {
-                        coordinates.add(block);
+                        coordinates.add(c);
                     }
                 }
             }
@@ -183,7 +184,7 @@ public class ProtectedBlocks extends WorldSavedData {
     }
 
     private void clearCache(GlobalCoordinate pos) {
-        ChunkPos chunkpos = new ChunkPos(pos);
+        ChunkPos chunkpos = new ChunkPos(pos.getCoordinate());
         perDimPerChunkCache.remove(Pair.of(pos.getDimension(), chunkpos));
     }
 
@@ -216,9 +217,9 @@ public class ProtectedBlocks extends WorldSavedData {
         for (Map.Entry<GlobalCoordinate, Integer> entry : blocks.entrySet()) {
             GlobalCoordinate block = entry.getKey();
             if (block.getDimension() == world.provider.getDimension()) {
-                ChunkPos bc = new ChunkPos(block);
+                ChunkPos bc = new ChunkPos(block.getCoordinate());
                 if (bc.equals(chunkpos)) {
-                    result.add(block);
+                    result.add(block.getCoordinate());
                 }
             }
         }
@@ -249,9 +250,9 @@ public class ProtectedBlocks extends WorldSavedData {
         for (Map.Entry<GlobalCoordinate, Integer> entry : blocks.entrySet()) {
             GlobalCoordinate block = entry.getKey();
             NBTTagCompound tc = new NBTTagCompound();
-            tc.setInteger("x", block.getX());
-            tc.setInteger("y", block.getY());
-            tc.setInteger("z", block.getZ());
+            tc.setInteger("x", block.getCoordinate().getX());
+            tc.setInteger("y", block.getCoordinate().getY());
+            tc.setInteger("z", block.getCoordinate().getZ());
             tc.setInteger("dim", block.getDimension());
             tc.setInteger("id", entry.getValue());
             list.appendTag(tc);
