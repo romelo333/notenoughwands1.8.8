@@ -249,7 +249,8 @@ public class SwappingWand extends GenericWand {
     private void selectBlock(ItemStack stack, EntityPlayer player, World world, BlockPos pos) {
         IBlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
-        int meta = block.getMetaFromState(state);
+        ItemStack item = block.getItem(world, pos, state);
+        int meta = item.getMetadata();
         NBTTagCompound tagCompound = Tools.getTagCompound(stack);
         String name = Tools.getBlockName(block, meta);
         if (name == null) {
