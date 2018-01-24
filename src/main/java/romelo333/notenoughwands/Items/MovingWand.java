@@ -73,7 +73,7 @@ public class MovingWand extends GenericWand {
                 Vec3d end = start.addVector(lookVec.x * distance, lookVec.y * distance, lookVec.z * distance);
                 RayTraceResult position = world.rayTraceBlocks(start, end);
                 if (position == null) {
-                    place(stack, world, new BlockPos(end), null);
+                    place(stack, world, new BlockPos(end), null, player);
                 }
             }
         }
@@ -86,7 +86,7 @@ public class MovingWand extends GenericWand {
         if (!world.isRemote) {
             NBTTagCompound compound = stack.getTagCompound();
             if (hasBlock(compound)) {
-                place(stack, world, pos, side);
+                place(stack, world, pos, side, player);
             } else {
                 pickup(stack, player, world, pos);
             }
@@ -100,8 +100,16 @@ public class MovingWand extends GenericWand {
         return EnumActionResult.SUCCESS;
     }
 
-    private void place(ItemStack stack, World world, BlockPos pos, EnumFacing side) {
+    private void place(ItemStack stack, World world, BlockPos pos, EnumFacing side, EntityPlayer player) {
         BlockPos pp = side == null ? pos : pos.offset(side);
+
+        // First check what's already there
+        IBlockState old = world.getBlockState(pp);
+        if (!world.isAirBlock(pp) && !old.getBlock().isReplaceable(world, pp)) {
+            Tools.error(player, "Something is in the way!");
+            return;
+        }
+
         NBTTagCompound tagCompound = stack.getTagCompound();
         int id = tagCompound.getInteger("block");
         Block block = Block.REGISTRY.getObjectById(id);
