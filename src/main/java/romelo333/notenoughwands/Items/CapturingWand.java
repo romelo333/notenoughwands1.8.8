@@ -75,7 +75,7 @@ public class CapturingWand extends GenericWand {
                     Tools.error(player, "Something went wrong trying to spawn creature!");
                     return EnumActionResult.FAIL;
                 }
-                entityLivingBase.readEntityFromNBT((NBTTagCompound) mobCompound);
+                entityLivingBase.readFromNBT((NBTTagCompound) mobCompound);
                 entityLivingBase.setLocationAndAngles(pos.getX()+.5, pos.getY()+1, pos.getZ()+.5, 0, 0);
                 tagCompound.removeTag("mob");
                 tagCompound.removeTag("type");
