@@ -74,6 +74,7 @@ public class BlackListSettings {
             blackListBlock(cfg, "rftools:invisible_shield_block");
             blackListBlock(cfg, "rftools:notick_shield_block");
             blackListBlock(cfg, "rftools:shield_block");
+            blackListBlock(cfg, "refinedstorage:*");
             blackListBlock(cfg, Blocks.BEDROCK.getRegistryName().toString());
             blackListBlock(cfg, Blocks.PORTAL.getRegistryName().toString());
             blackListBlock(cfg, Blocks.END_PORTAL.getRegistryName().toString());
