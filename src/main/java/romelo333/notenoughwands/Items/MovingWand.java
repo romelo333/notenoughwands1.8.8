@@ -150,7 +150,8 @@ public class MovingWand extends GenericWand {
         }
 
         NBTTagCompound tagCompound = Tools.getTagCompound(stack);
-        ItemStack s = block.getItem(world, pos, state);
+//        ItemStack s = block.getItem(world, pos, state);
+        ItemStack s = block.getPickBlock(state, null, world, pos, player);
         String name;
         if (s.isEmpty()) {
             name = Tools.getBlockName(block, meta);

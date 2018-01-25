@@ -230,7 +230,7 @@ public class SwappingWand extends GenericWand {
             }
             if (Tools.consumeInventoryItem(Item.getItemFromBlock(block), meta, player.inventory, player)) {
                 if (!player.capabilities.isCreativeMode) {
-                    ItemStack oldblockItem = oldblock.getItem(world, pos, oldState);
+                    ItemStack oldblockItem = oldblock.getPickBlock(oldState, null, world, pos, player);
                     Tools.giveItem(world, player, pos, oldblockItem);
                 }
                 Tools.playSound(world, block.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
@@ -249,7 +249,7 @@ public class SwappingWand extends GenericWand {
     private void selectBlock(ItemStack stack, EntityPlayer player, World world, BlockPos pos) {
         IBlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
-        ItemStack item = block.getItem(world, pos, state);
+        ItemStack item = block.getPickBlock(state, null, world, pos, player);
         int meta = item.getMetadata();
         NBTTagCompound tagCompound = Tools.getTagCompound(stack);
         String name = Tools.getBlockName(block, meta);
