@@ -4,7 +4,6 @@ package romelo333.notenoughwands.Items;
 import net.minecraft.block.Block;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
@@ -18,7 +17,7 @@ import java.util.List;
 
 public class IlluminationWand extends GenericWand {
     public IlluminationWand() {
-        setup("illumination_wand").xpUsage(3).availability(AVAILABILITY_NORMAL).loot(6);
+        setup("illumination_wand").xpUsage(3).loot(6);
     }
 
     @Override
@@ -57,9 +56,4 @@ public class IlluminationWand extends GenericWand {
         }
         return EnumActionResult.SUCCESS;
     }
-
-    @Override
-    protected void setupCraftingInt(Item wandcore) {
-    }
-
 }

@@ -25,7 +25,7 @@ public class TeleportationWand extends GenericWand {
     private boolean teleportThroughWalls = true;
 
     public TeleportationWand() {
-        setup("teleportation_wand").xpUsage(4).availability(AVAILABILITY_NORMAL).loot(6);
+        setup("teleportation_wand").xpUsage(4).loot(6);
     }
 
     @Override
@@ -116,9 +116,5 @@ public class TeleportationWand extends GenericWand {
             }
         }
         return ActionResult.newResult(EnumActionResult.PASS, stack);
-    }
-
-    @Override
-    protected void setupCraftingInt(Item wandcore) {
     }
 }

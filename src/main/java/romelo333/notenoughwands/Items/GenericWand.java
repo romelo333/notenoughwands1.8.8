@@ -25,7 +25,10 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import romelo333.notenoughwands.*;
+import romelo333.notenoughwands.Config;
+import romelo333.notenoughwands.KeyBindings;
+import romelo333.notenoughwands.NotEnoughWands;
+import romelo333.notenoughwands.ProtectedBlocks;
 import romelo333.notenoughwands.varia.ItemCapabilityProvider;
 import romelo333.notenoughwands.varia.Tools;
 
@@ -40,14 +43,8 @@ public class GenericWand extends Item implements IEnergyItem, IEnergyContainerIt
     protected int needsxp = 0;
     protected int needsrf = 0;
     protected int maxrf = 0;
-    protected int availability = AVAILABILITY_NORMAL;
 
     protected int lootRarity = 10;
-
-    public static int AVAILABILITY_NOT = 0;
-    public static int AVAILABILITY_CREATIVE = 1;
-    public static int AVAILABILITY_ADVANCED = 2;
-    public static int AVAILABILITY_NORMAL = 3;
 
     private static List<GenericWand> wands = new ArrayList<>();
 
@@ -114,14 +111,12 @@ public class GenericWand extends Item implements IEnergyItem, IEnergyContainerIt
     }
 
     protected GenericWand setup(String name) {
-        if (availability > 0) {
-            setMaxStackSize(1);
-            setNoRepair();
-            setUnlocalizedName(NotEnoughWands.MODID + "." + name);
-            setRegistryName(name);
-            setCreativeTab(NotEnoughWands.tabNew);
-            wands.add(this);
-        }
+        setMaxStackSize(1);
+        setNoRepair();
+        setUnlocalizedName(NotEnoughWands.MODID + "." + name);
+        setRegistryName(name);
+        setCreativeTab(NotEnoughWands.tabNew);
+        wands.add(this);
         return this;
     }
 
@@ -143,11 +138,6 @@ public class GenericWand extends Item implements IEnergyItem, IEnergyContainerIt
 
     GenericWand loot(int rarity) {
         lootRarity = rarity;
-        return this;
-    }
-
-    GenericWand availability(int availability) {
-        this.availability = availability;
         return this;
     }
 
@@ -199,7 +189,6 @@ public class GenericWand extends Item implements IEnergyItem, IEnergyContainerIt
                 break;
         }
 
-        availability = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_availability", availability, "Is this wand available? (0=no, 1=not craftable, 2=craftable advanced, 3=craftable normal)").getInt();
         lootRarity = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_lootRarity", lootRarity, "How rare should this wand be in chests? Lower is more rare (0 is not in chests)").getInt();
     }
 
@@ -268,23 +257,10 @@ public class GenericWand extends Item implements IEnergyItem, IEnergyContainerIt
 
     //------------------------------------------------------------------------------
 
-    public static void setupCrafting() {
-        for (GenericWand wand : wands) {
-            if (wand.availability == AVAILABILITY_NORMAL) {
-                wand.setupCraftingInt(ModItems.wandCore);
-            } else if (wand.availability == AVAILABILITY_ADVANCED) {
-                wand.setupCraftingInt(ModItems.advancedWandCore);
-            }
-        }
-    }
-
     public static void setupConfig(Configuration cfg) {
         for (GenericWand wand : wands) {
             wand.initConfig(cfg);
         }
-    }
-
-    protected void setupCraftingInt(Item wandcore) {
     }
 
     //------------------------------------------------------------------------------
@@ -296,7 +272,7 @@ public class GenericWand extends Item implements IEnergyItem, IEnergyContainerIt
     }
 
     private void setupChestLootInt(LootPool main) {
-        if (lootRarity > 0 && availability > 0) {
+        if (lootRarity > 0) {
             String entryName = NotEnoughWands.MODID + ":" + getRegistryName().getResourcePath();
             main.addEntry(new LootEntryItem(this, lootRarity, 0, new LootFunction[0], new LootCondition[0], entryName));
         }

@@ -8,7 +8,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -48,7 +47,7 @@ public class DisplacementWand extends GenericWand {
     public static final int[] amount = new int[] { 9, 9, 25, 1 };
 
     public DisplacementWand() {
-        setup("displacement_wand").xpUsage(1).availability(AVAILABILITY_NORMAL).loot(3);
+        setup("displacement_wand").xpUsage(1).loot(3);
     }
 
     @Override
@@ -242,9 +241,4 @@ public class DisplacementWand extends GenericWand {
             coordinates.add(pos);
         }
     }
-
-    @Override
-    protected void setupCraftingInt(Item wandcore) {
-    }
-
 }

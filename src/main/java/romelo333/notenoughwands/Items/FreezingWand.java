@@ -6,7 +6,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
@@ -26,7 +25,7 @@ public class FreezingWand extends GenericWand {
     private float diffcultyAdd = 1.0f;
 
     public FreezingWand() {
-        setup("freezing_wand").xpUsage(10).availability(AVAILABILITY_ADVANCED).loot(0);
+        setup("freezing_wand").xpUsage(10).loot(0);
     }
 
     @Override
@@ -86,10 +85,5 @@ public class FreezingWand extends GenericWand {
             }
         }
         return true;
-    }
-
-    @Override
-    protected void setupCraftingInt(Item wandcore) {
-//        GameRegistry.addRecipe(new ItemStack(this), "is ", "sw ", "  w", 's', Blocks.slime_block, 'i', Blocks.packed_ice, 'w', wandcore);
     }
 }

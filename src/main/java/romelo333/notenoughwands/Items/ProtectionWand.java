@@ -43,9 +43,9 @@ public class ProtectionWand extends GenericWand {
 
     public ProtectionWand(boolean master) {
         if (master) {
-            setup("master_protection_wand").xpUsage(0).availability(AVAILABILITY_CREATIVE).loot(0);
+            setup("master_protection_wand").xpUsage(0).loot(0);
         } else {
-            setup("protection_wand").xpUsage(50).availability(AVAILABILITY_ADVANCED).loot(1);
+            setup("protection_wand").xpUsage(50).loot(1);
         }
         this.master = master;
     }
@@ -157,19 +157,6 @@ public class ProtectionWand extends GenericWand {
             Tools.getTagCompound(stack).setInteger("id", id);
         }
         return id;
-    }
-
-    @Override
-    protected void setupCraftingInt(Item wandcore) {
-        if (master) {
-        } else {
-            // @todo recipes
-//            MyGameReg.addRecipe(new ContainerToItemRecipe(new ItemStack[] {
-//                    new ItemStack(this), new ItemStack(Items.ENDER_EYE), ItemStackTools.getEmptyStack(),
-//                    new ItemStack(Items.ENDER_EYE), new ItemStack(wandcore), ItemStackTools.getEmptyStack(),
-//                    ItemStackTools.getEmptyStack(), ItemStackTools.getEmptyStack(), new ItemStack(wandcore)
-//            }, 0, new ItemStack(this)));
-        }
     }
 
     @Override

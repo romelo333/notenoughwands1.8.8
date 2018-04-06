@@ -5,7 +5,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
@@ -42,7 +41,7 @@ public class AccelerationWand extends GenericWand {
     public static final float[] cost = new float[] { 1.0f, 2.0f, 5.0f};
 
     public AccelerationWand() {
-        setup("acceleration_wand").xpUsage(5).availability(AVAILABILITY_ADVANCED).loot(2);
+        setup("acceleration_wand").xpUsage(5).loot(2);
     }
 
     private Random random = new Random();
@@ -129,9 +128,4 @@ public class AccelerationWand extends GenericWand {
     private int getMode(ItemStack stack) {
         return Tools.getTagCompound(stack).getInteger("mode");
     }
-
-    @Override
-    protected void setupCraftingInt(Item wandcore) {
-    }
-
 }

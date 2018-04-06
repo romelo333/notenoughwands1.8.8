@@ -44,7 +44,7 @@ public class BuildingWand extends GenericWand {
     public static final int[] amount = new int[] { 9, 9, 25, 25, 1 };
 
     public BuildingWand() {
-        setup("building_wand").xpUsage(1).availability(AVAILABILITY_NORMAL).loot(3);
+        setup("building_wand").xpUsage(1).loot(3);
     }
 
     @Override
@@ -404,11 +404,6 @@ public class BuildingWand extends GenericWand {
                 return EnumFacing.SOUTH;
         }
         return null;
-    }
-
-
-    @Override
-    protected void setupCraftingInt(Item wandcore) {
     }
 
 }

@@ -5,7 +5,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -29,7 +28,7 @@ public class MovingWand extends GenericWand {
     private int placeDistance = 4;
 
     public MovingWand() {
-        setup("moving_wand").xpUsage(3).availability(AVAILABILITY_NORMAL).loot(5);
+        setup("moving_wand").xpUsage(3).loot(5);
     }
 
     @Override
@@ -180,9 +179,5 @@ public class MovingWand extends GenericWand {
             Tools.notify(player, "You took: " + name);
             registerUsage(stack, player, (float) cost);
         }
-    }
-
-    @Override
-    protected void setupCraftingInt(Item wandcore) {
     }
 }

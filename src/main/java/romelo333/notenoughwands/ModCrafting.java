@@ -14,7 +14,5 @@ public class ModCrafting {
 
 
     public static void init() {
-
-        GenericWand.setupCrafting();
     }
 }

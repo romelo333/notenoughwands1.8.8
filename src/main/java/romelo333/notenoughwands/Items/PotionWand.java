@@ -28,7 +28,7 @@ public class PotionWand extends GenericWand {
     private float diffcultyAdd = 1.0f;
 
     public PotionWand() {
-        setup("potion_wand").xpUsage(10).availability(AVAILABILITY_ADVANCED).loot(3);
+        setup("potion_wand").xpUsage(10).loot(3);
     }
 
     @Override
@@ -149,12 +149,5 @@ public class PotionWand extends GenericWand {
             }
         }
         return true;
-    }
-
-    @Override
-    protected void setupCraftingInt(Item wandcore) {
-        // @todo recipes
-//        GameRegistry.addRecipe(new AddPotionRecipe());
-//        GameRegistry.addRecipe(new ClearPotionsRecipe());
     }
 }

@@ -49,7 +49,7 @@ public class SwappingWand extends GenericWand {
     };
 
     public SwappingWand() {
-        setup("swapping_wand").xpUsage(1).availability(AVAILABILITY_NORMAL).loot(5);
+        setup("swapping_wand").xpUsage(1).loot(5);
     }
 
     @Override
@@ -355,9 +355,5 @@ public class SwappingWand extends GenericWand {
 
     private int getMode(ItemStack stack) {
         return Tools.getTagCompound(stack).getInteger("mode");
-    }
-
-    @Override
-    protected void setupCraftingInt(Item wandcore) {
     }
 }

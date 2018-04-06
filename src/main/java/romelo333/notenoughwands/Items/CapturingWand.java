@@ -6,7 +6,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -29,7 +28,7 @@ public class CapturingWand extends GenericWand {
     private float diffcultyAdd = 1.0f;
 
     public CapturingWand() {
-        setup("capturing_wand").xpUsage(10).availability(AVAILABILITY_ADVANCED).loot(3);
+        setup("capturing_wand").xpUsage(10).loot(3);
     }
 
     @Override
@@ -142,9 +141,5 @@ public class CapturingWand extends GenericWand {
             }
         }
         return true;
-    }
-
-    @Override
-    protected void setupCraftingInt(Item wandcore) {
     }
 }
