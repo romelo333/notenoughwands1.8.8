@@ -1,7 +1,7 @@
 package romelo333.notenoughwands.Items;
 
 import cofh.redstoneflux.api.IEnergyContainerItem;
-import mcjty.lib.gui.BlockOutlineRenderer;
+import mcjty.lib.client.BlockOutlineRenderer;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
