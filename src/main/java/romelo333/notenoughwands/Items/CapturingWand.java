@@ -120,7 +120,7 @@ public class CapturingWand extends GenericWand {
                 }
                 double cost = BlackListSettings.getBlacklistEntity(entity);
                 if (cost <= 0.001f) {
-                    Tools.error(player, "It is illegal to take this entity");
+                    Tools.error(player, "It is illegal to take this bindings");
                     return true;
                 }
 
@@ -137,7 +137,7 @@ public class CapturingWand extends GenericWand {
 
                 registerUsage(stack, player, difficultyScale);
             } else {
-                Tools.error(player, "Please select a living entity!");
+                Tools.error(player, "Please select a living bindings!");
             }
         }
         return true;

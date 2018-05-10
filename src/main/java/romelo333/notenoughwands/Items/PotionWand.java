@@ -145,7 +145,7 @@ public class PotionWand extends GenericWand {
                 addeffect(entityLivingBase, stack, player);
                 registerUsage(stack, player, difficultyScale);
             } else {
-                Tools.error(player, "Please select a living entity!");
+                Tools.error(player, "Please select a living bindings!");
             }
         }
         return true;

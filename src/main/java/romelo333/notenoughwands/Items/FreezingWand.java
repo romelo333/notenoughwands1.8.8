@@ -81,7 +81,7 @@ public class FreezingWand extends GenericWand {
                 freezeMob(entityLivingBase);
                 registerUsage(stack, player, difficultyScale);
             } else {
-                Tools.error(player, "Please select a living entity!");
+                Tools.error(player, "Please select a living bindings!");
             }
         }
         return true;
