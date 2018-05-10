@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-//import net.minecraft.client.bindings.EntityClientPlayerMP;
+//import net.minecraft.client.entity.EntityClientPlayerMP;
 
 @Optional.Interface(modid = "redstoneflux", iface = "cofh.redstoneflux.api.IEnergyContainerItem")
 public class GenericWand extends Item implements IEnergyItem, IEnergyContainerItem {
