@@ -2,6 +2,7 @@ package romelo333.notenoughwands.proxy;
 
 import mcjty.lib.McJtyLib;
 import mcjty.lib.network.PacketHandler;
+import mcjty.lib.proxy.AbstractCommonProxy;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -13,13 +14,12 @@ import romelo333.notenoughwands.*;
 import romelo333.notenoughwands.network.NEWPacketHandler;
 import romelo333.notenoughwands.varia.WrenchChecker;
 
-public abstract class CommonProxy {
+public abstract class CommonProxy extends AbstractCommonProxy {
 
-    private Configuration mainConfig;
-
+    @Override
     public void preInit(FMLPreInitializationEvent e) {
+        super.preInit(e);
         MinecraftForge.EVENT_BUS.register(new ForgeEventHandlers());
-        McJtyLib.preInit(e);
         ModItems.init();
 
         mainConfig = NotEnoughWands.config;
@@ -46,11 +46,15 @@ public abstract class CommonProxy {
         }
     }
 
+    @Override
     public void init(FMLInitializationEvent e) {
+        super.init(e);
         ModCrafting.init(); // @todo still has to be fixed
     }
 
+    @Override
     public void postInit(FMLPostInitializationEvent e) {
+        super.postInit(e);
         if (mainConfig.hasChanged()) {
             mainConfig.save();
         }

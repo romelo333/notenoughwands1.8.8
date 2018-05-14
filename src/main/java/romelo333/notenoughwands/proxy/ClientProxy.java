@@ -1,10 +1,13 @@
 package romelo333.notenoughwands.proxy;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import mcjty.lib.McJtyLibClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
+import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -17,6 +20,8 @@ import romelo333.notenoughwands.*;
 import romelo333.notenoughwands.Items.GenericWand;
 import romelo333.notenoughwands.network.PacketGetProtectedBlocksAroundPlayer;
 import romelo333.notenoughwands.network.NEWPacketHandler;
+
+import java.util.concurrent.Callable;
 
 public class ClientProxy extends CommonProxy {
 
@@ -74,6 +79,26 @@ public class ClientProxy extends CommonProxy {
         }
         timer = Config.clientSideProtection;
         NEWPacketHandler.INSTANCE.sendToServer(new PacketGetProtectedBlocksAroundPlayer());
+    }
+
+    @Override
+    public World getClientWorld() {
+        return Minecraft.getMinecraft().world;
+    }
+
+    @Override
+    public EntityPlayer getClientPlayer() {
+        return Minecraft.getMinecraft().player;
+    }
+
+    @Override
+    public <V> ListenableFuture<V> addScheduledTaskClient(Callable<V> callableToSchedule) {
+        return Minecraft.getMinecraft().addScheduledTask(callableToSchedule);
+    }
+
+    @Override
+    public ListenableFuture<Object> addScheduledTaskClient(Runnable runnableToSchedule) {
+        return Minecraft.getMinecraft().addScheduledTask(runnableToSchedule);
     }
 
 }
