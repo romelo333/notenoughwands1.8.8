@@ -153,7 +153,7 @@ public class ProtectionWand extends GenericWand {
     private int getOrCreateId(ItemStack stack, World world, ProtectedBlocks protectedBlocks) {
         int id = getId(stack);
         if (id == 0) {
-            id = protectedBlocks.getNewId(world);
+            id = protectedBlocks.getNewId();
             Tools.getTagCompound(stack).setInteger("id", id);
         }
         return id;

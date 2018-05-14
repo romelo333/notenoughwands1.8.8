@@ -1,13 +1,13 @@
 package romelo333.notenoughwands;
 
 import mcjty.lib.varia.GlobalCoordinate;
+import mcjty.lib.worlddata.AbstractWorldData;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.util.Constants;
 import org.apache.commons.lang3.tuple.Pair;
 import romelo333.notenoughwands.varia.Tools;
@@ -17,9 +17,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class ProtectedBlocks extends WorldSavedData {
-    public static final String NAME = "NEWProtectedBlocks";
-    private static ProtectedBlocks instance;
+public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
+
+    private static final String NAME = "NEWProtectedBlocks";
 
     // Persisted data
     private Map<GlobalCoordinate, Integer> blocks = new HashMap<>();       // Map from coordinate -> ID
@@ -38,23 +38,16 @@ public class ProtectedBlocks extends WorldSavedData {
         super(name);
     }
 
-    public void save (World world){
-        world.getMapStorage().setData(NAME, this);
-        markDirty();
+    @Override
+    public void clear() {
+        blocks.clear();
+        perDimPerChunkCache.clear();
+        counter.clear();
+        lastId = -1;
     }
 
     public static ProtectedBlocks getProtectedBlocks(World world){
-        if (world.isRemote){
-            return null;
-        }
-        if (instance != null){
-            return instance;
-        }
-        instance = (ProtectedBlocks)world.getMapStorage().getOrLoadData(ProtectedBlocks.class, NAME);
-        if (instance == null){
-            instance = new ProtectedBlocks(NAME);
-        }
-        return instance;
+        return getData(world, ProtectedBlocks.class, NAME);
     }
 
     public static boolean isProtectedClientSide(World world, BlockPos pos){
@@ -66,9 +59,9 @@ public class ProtectedBlocks extends WorldSavedData {
         return positions.contains(pos);
     }
 
-    public int getNewId(World world) {
+    public int getNewId() {
         lastId++;
-        save(world);
+        save();
         return lastId-1;
     }
 
@@ -118,7 +111,7 @@ public class ProtectedBlocks extends WorldSavedData {
 
         incrementProtection(id);
 
-        save(world);
+        save();
         return true;
     }
 
@@ -135,7 +128,7 @@ public class ProtectedBlocks extends WorldSavedData {
         decrementProtection(blocks.get(key));
         blocks.remove(key);
         clearCache(key);
-        save(world);
+        save();
         return true;
     }
 
@@ -155,7 +148,7 @@ public class ProtectedBlocks extends WorldSavedData {
         }
         counter.put(id, 0);
 
-        save(world);
+        save();
         return cnt;
     }
 
