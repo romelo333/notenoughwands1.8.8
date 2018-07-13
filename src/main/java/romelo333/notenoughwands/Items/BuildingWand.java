@@ -1,6 +1,7 @@
 package romelo333.notenoughwands.Items;
 
 
+import mcjty.lib.varia.BlockTools;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -21,6 +22,8 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import romelo333.notenoughwands.varia.Tools;
@@ -131,10 +134,19 @@ public class BuildingWand extends GenericWand {
             if (!checkUsage(stack, player, 1.0f)) {
                 break;
             }
-            if (Tools.consumeInventoryItem(Item.getItemFromBlock(block), meta, player.inventory, player)) {
+            ItemStack consumed = Tools.consumeInventoryItem(Item.getItemFromBlock(block), meta, player.inventory, player);
+            if (!consumed.isEmpty()) {
                 Tools.playSound(world, block.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
-                IBlockState state = block.getStateFromMeta(meta);
-                world.setBlockState(coordinate, state, 2);
+//                IBlockState state = block.getStateFromMeta(meta);
+//                world.setBlockState(coordinate, state, 2);
+                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, coordinate);
+                BlockTools.placeStackAt(player, consumed, world, coordinate, null);
+                if (ForgeEventFactory.onPlayerBlockPlace(player, blocksnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
+                    blocksnapshot.restore(true, false);
+                    if (!player.capabilities.isCreativeMode) {
+                        Tools.giveItem(world, player, player.getPosition(), consumed);
+                    }
+                }
                 player.openContainer.detectAndSendChanges();
                 registerUsage(stack, player, 1.0f);
                 undo.add(coordinate);
@@ -217,8 +229,14 @@ public class BuildingWand extends GenericWand {
             int testMeta = testBlock.getMetaFromState(testState);
             if (testBlock == block && testMeta == meta) {
                 Tools.playSound(world, block.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
+
+                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, coordinate);
                 world.setBlockToAir(coordinate);
-                cnt++;
+                if (ForgeEventFactory.onPlayerBlockPlace(player, blocksnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
+                    blocksnapshot.restore(true, false);
+                } else {
+                    cnt++;
+                }
             }
         }
         if (cnt > 0) {

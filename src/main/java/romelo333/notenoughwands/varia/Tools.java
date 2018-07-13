@@ -17,6 +17,8 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
+import javax.annotation.Nonnull;
+
 public class Tools {
     public static void error(EntityPlayer player, String msg) {
         player.sendStatusMessage(new TextComponentString(TextFormatting.RED + msg), false);
@@ -26,24 +28,26 @@ public class Tools {
         player.sendStatusMessage(new TextComponentString(TextFormatting.GREEN + msg), false);
     }
 
-    public static boolean consumeInventoryItem(Item item, int meta, InventoryPlayer inv, EntityPlayer player) {
+    @Nonnull
+    public static ItemStack consumeInventoryItem(Item item, int meta, InventoryPlayer inv, EntityPlayer player) {
         if (player.capabilities.isCreativeMode) {
-            return true;
+            return new ItemStack(item, 1, meta);
         }
         int i = finditem(item, meta, inv);
 
         if (i < 0) {
-            return false;
+            return ItemStack.EMPTY;
         } else {
             ItemStack stackInSlot = inv.getStackInSlot(i);
+            ItemStack result = stackInSlot.copy();
+            result.setCount(1);
             int amount = -1;
             stackInSlot.grow(amount);
-            stackInSlot = stackInSlot;
             if (stackInSlot.getCount() == 0) {
                 inv.setInventorySlotContents(i, ItemStack.EMPTY);
             }
 
-            return true;
+            return result;
         }
     }
 
