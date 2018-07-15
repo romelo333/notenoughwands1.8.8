@@ -1,3 +1,7 @@
+1.7.1:
+- WARNING: Do not load any worlds with Not Enough Wands 1.7.0 or earlier if you last saved them with Not Enough Wands 1.7.1 or later!
+- Joseph fixed log warnings due to tile entities being registered with names like "minecraft:lighttileentity" instead of "notenoughwands:lighttileentity".
+
 1.7.0:
 - Made compatible with the latest McJtyLib (3.0.0)
 
