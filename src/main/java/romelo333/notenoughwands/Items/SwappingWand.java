@@ -214,7 +214,7 @@ public class SwappingWand extends GenericWand {
             return;
         }
 
-        if (Math.abs(hardness-blockHardness) >= hardnessDistance) {
+        if ((!player.isCreative()) && Math.abs(hardness-blockHardness) >= hardnessDistance) {
             Tools.error(player, "The hardness of this blocks differs too much to swap!");
             return;
         }
