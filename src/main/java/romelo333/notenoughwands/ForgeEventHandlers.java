@@ -3,22 +3,29 @@ package romelo333.notenoughwands;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.datafix.FixTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.loot.LootPool;
 import net.minecraft.world.storage.loot.LootTableList;
+import net.minecraftforge.common.util.ModFixs;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import romelo333.notenoughwands.Items.GenericWand;
 import romelo333.notenoughwands.blocks.LightBlock;
 import romelo333.notenoughwands.blocks.LightTE;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import mcjty.lib.datafix.fixes.TileEntityNamespace;
 
 public class ForgeEventHandlers {
 
@@ -29,9 +36,19 @@ public class ForgeEventHandlers {
 
     @SubscribeEvent
     public void registerBlocks(RegistryEvent.Register<Block> event) {
+        ModFixs modFixs = FMLCommonHandler.instance().getDataFixer().init(NotEnoughWands.MODID, 1);
+        Map<String, String> oldToNewIdMap = new HashMap<>();
+
         ModBlocks.lightBlock = new LightBlock();
         event.getRegistry().register(ModBlocks.lightBlock);
-        GameRegistry.registerTileEntity(LightTE.class, "LightTileEntity");
+        GameRegistry.registerTileEntity(LightTE.class, NotEnoughWands.MODID + ":lighttileentity");
+
+        // We used to accidentally register TEs with names like "minecraft:lighttileentity" instead of "notenoughwands:lighttileentity".
+        // Set up a DataFixer to map these incorrect names to the correct ones, so that we don't break old saved games.
+        // @todo Remove all this if we ever break saved-game compatibility.
+        oldToNewIdMap.put("LightTileEntity", NotEnoughWands.MODID + ":lighttileentity");
+        oldToNewIdMap.put("minecraft:lighttileentity", NotEnoughWands.MODID + ":lighttileentity");
+        modFixs.registerFix(FixTypes.BLOCK_ENTITY, new TileEntityNamespace(oldToNewIdMap, 1));
     }
 
     @SubscribeEvent
