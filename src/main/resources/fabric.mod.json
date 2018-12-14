@@ -1,0 +1,14 @@
+{
+  "id": "notenoughwands",
+  "name": "Not Enough Wands",
+  "version": "1.7.1.alpha",
+  "side": "universal",
+  "initializers": [
+    "romelo333.notenoughwands.NotEnoughWands",
+    "romelo333.notenoughwands.network.NetworkInit"
+  ],
+  "mixins": {
+    "client": "notenoughwands.client.json",
+    "common": "notenoughwands.common.json"
+  }
+}

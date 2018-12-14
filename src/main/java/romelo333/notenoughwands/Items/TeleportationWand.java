@@ -1,21 +1,25 @@
 package romelo333.notenoughwands.Items;
 
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
+import net.minecraft.client.item.TooltipOptions;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.*;
+import net.minecraft.text.StringTextComponent;
+import net.minecraft.text.TextComponent;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.HitResult;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.common.config.Configuration;
 import romelo333.notenoughwands.Config;
+import romelo333.notenoughwands.Configuration;
 import romelo333.notenoughwands.ModSounds;
 import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.varia.Tools;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class TeleportationWand extends GenericWand {
@@ -29,15 +33,15 @@ public class TeleportationWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List list, ITooltipFlag b) {
+    public void addInformation(ItemStack stack, @Nullable World player, List<TextComponent> list, TooltipOptions b) {
         super.addInformation(stack, player, list, b);
-        list.add("Right click to teleport forward");
-        list.add("until a block is hit or maximum");
-        list.add("distance is reached.");
+        list.add(new StringTextComponent("Right click to teleport forward"));
+        list.add(new StringTextComponent("until a block is hit or maximum"));
+        list.add(new StringTextComponent("distance is reached."));
         if (teleportThroughWalls) {
-            list.add("Sneak to teleport through walls");
+            list.add(new StringTextComponent("Sneak to teleport through walls"));
         } else {
-            list.add("Sneak for half distance");
+            list.add(new StringTextComponent("Sneak for half distance"));
         }
     }
 
@@ -50,14 +54,14 @@ public class TeleportationWand extends GenericWand {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
-        ItemStack stack = player.getHeldItem(hand);
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+        ItemStack stack = player.getStackInHand(hand);
         if (!world.isRemote) {
             if (!checkUsage(stack, player, 1.0f)) {
-                return ActionResult.newResult(EnumActionResult.PASS, stack);
+                return new TypedActionResult<>(ActionResult.PASS, stack)
             }
-            Vec3d lookVec = player.getLookVec();
-            Vec3d start = new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
+            Vec3d lookVec = player.getPosVector();
+            Vec3d start = new Vec3d(player.x, player.y + player.getEyeHeight(), player.z);
             int distance = this.maxdist;
             boolean gothrough = false;
             if (player.isSneaking()) {
@@ -67,8 +71,8 @@ public class TeleportationWand extends GenericWand {
                 distance /= 2;
             }
 
-            Vec3d end = start.addVector(lookVec.x * distance, lookVec.y * distance, lookVec.z * distance);
-            RayTraceResult position = gothrough ? null : world.rayTraceBlocks(start, end);
+            Vec3d end = start.add(lookVec.x * distance, lookVec.y * distance, lookVec.z * distance);
+            HitResult position = gothrough ? null : world.rayTrace(start, end);
             if (position == null) {
                 if (gothrough) {
                     // First check if the destination is safe

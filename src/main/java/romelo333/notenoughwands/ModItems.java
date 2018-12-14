@@ -1,8 +1,6 @@
 package romelo333.notenoughwands;
 
 
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import romelo333.notenoughwands.Items.*;
 
 public class ModItems {
@@ -36,12 +34,5 @@ public class ModItems {
         masterProtectionWand = new ProtectionWand(true);
         freezingWand = new FreezingWand();
         potionWand = new PotionWand();
-    }
-
-    @SideOnly(Side.CLIENT)
-    public static void initModels() {
-        wandCore.registerModel();
-        advancedWandCore.registerModel();
-        GenericWand.setupModels();
     }
 }
