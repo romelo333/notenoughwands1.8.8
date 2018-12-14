@@ -6,9 +6,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.entity.PlayerEntitySP;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -20,7 +20,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TextFormat;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.config.Configuration;
@@ -62,7 +62,7 @@ public class SwappingWand extends GenericWand {
     }
 
     @Override
-    public void toggleMode(EntityPlayer player, ItemStack stack) {
+    public void toggleMode(PlayerEntity player, ItemStack stack) {
         int mode = getMode(stack);
         mode++;
         if (mode > MODE_LAST) {
@@ -77,18 +77,18 @@ public class SwappingWand extends GenericWand {
         super.addInformation(stack, player, list, b);
         NBTTagCompound compound = stack.getTagCompound();
         if (compound == null) {
-            list.add(TextFormatting.RED + "No selected block");
+            list.add(TextFormat.RED + "No selected block");
         } else {
             if (isSwappingWithOffHand(stack)) {
-                list.add(TextFormatting.GREEN + "Will swap with block in offhand");
+                list.add(TextFormat.GREEN + "Will swap with block in offhand");
             } else {
                 int id = compound.getInteger("block");
                 Block block = Block.REGISTRY.getObjectById(id);
                 if (block != Blocks.AIR) {
                     int meta = compound.getInteger("meta");
                     String name = Tools.getBlockName(block, meta);
-                    list.add(TextFormatting.GREEN + "Selected block: " + name);
-                    list.add(TextFormatting.GREEN + "Mode: " + descriptions[compound.getInteger("mode")]);
+                    list.add(TextFormat.GREEN + "Selected block: " + name);
+                    list.add(TextFormat.GREEN + "Mode: " + descriptions[compound.getInteger("mode")]);
                 }
             }
         }
@@ -124,7 +124,7 @@ public class SwappingWand extends GenericWand {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
         ItemStack heldItem = playerIn.getHeldItem(hand);
         if (!heldItem.isEmpty()) {
             if (isSwappingWithOffHand(heldItem)) {
@@ -143,7 +143,7 @@ public class SwappingWand extends GenericWand {
     }
 
     @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(PlayerEntity player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             if (player.isSneaking()) {
@@ -155,7 +155,7 @@ public class SwappingWand extends GenericWand {
         return EnumActionResult.SUCCESS;
     }
 
-    private void placeBlock(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side) {
+    private void placeBlock(ItemStack stack, PlayerEntity player, World world, BlockPos pos, EnumFacing side) {
         if (!checkUsage(stack, player, 1.0f)) {
             return;
         }
@@ -260,7 +260,7 @@ public class SwappingWand extends GenericWand {
         }
     }
 
-    private void selectBlock(ItemStack stack, EntityPlayer player, World world, BlockPos pos) {
+    private void selectBlock(ItemStack stack, PlayerEntity player, World world, BlockPos pos) {
         IBlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
         ItemStack item = block.getPickBlock(state, null, world, pos, player);
@@ -287,7 +287,7 @@ public class SwappingWand extends GenericWand {
 
     @SideOnly(Side.CLIENT)
     @Override
-    public void renderOverlay(RenderWorldLastEvent evt, EntityPlayerSP player, ItemStack wand) {
+    public void renderOverlay(RenderWorldLastEvent evt, PlayerEntitySP player, ItemStack wand) {
         RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver;
         if (mouseOver != null && mouseOver.getBlockPos() != null && mouseOver.sideHit != null) {
             IBlockState state = player.getEntityWorld().getBlockState(mouseOver.getBlockPos());

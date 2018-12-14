@@ -6,9 +6,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.entity.PlayerEntitySP;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -18,7 +18,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TextFormat;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.config.Configuration;
@@ -61,13 +61,13 @@ public class BuildingWand extends GenericWand {
         NBTTagCompound compound = stack.getTagCompound();
         if (compound != null) {
             int cnt = (compound.hasKey("undo1") ? 1 : 0) + (compound.hasKey("undo2") ? 1 : 0);
-            list.add(TextFormatting.GREEN + "Has " + cnt + " undo states");
+            list.add(TextFormat.GREEN + "Has " + cnt + " undo states");
             int mode = compound.getInteger("mode");
             if (mode == MODE_9ROW || mode == MODE_25ROW) {
                 int submode = getSubMode(stack);
-                list.add(TextFormatting.GREEN + "Mode: " + descriptions[mode] + (submode == 1 ? " [Rotated]" : ""));
+                list.add(TextFormat.GREEN + "Mode: " + descriptions[mode] + (submode == 1 ? " [Rotated]" : ""));
             } else {
-                list.add(TextFormatting.GREEN + "Mode: " + descriptions[mode]);
+                list.add(TextFormat.GREEN + "Mode: " + descriptions[mode]);
             }
         }
         list.add("Right click to extend blocks in that direction.");
@@ -79,7 +79,7 @@ public class BuildingWand extends GenericWand {
     }
 
     @Override
-    public void toggleMode(EntityPlayer player, ItemStack stack) {
+    public void toggleMode(PlayerEntity player, ItemStack stack) {
         int mode = getMode(stack);
         mode++;
         if (mode > MODE_LAST) {
@@ -90,7 +90,7 @@ public class BuildingWand extends GenericWand {
     }
 
     @Override
-    public void toggleSubMode(EntityPlayer player, ItemStack stack) {
+    public void toggleSubMode(PlayerEntity player, ItemStack stack) {
         int submode = getSubMode(stack);
         submode = submode == 1 ? 0 : 1;
         Tools.notify(player, "Switched orientation");
@@ -106,7 +106,7 @@ public class BuildingWand extends GenericWand {
     }
 
     @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(PlayerEntity player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             if (player.isSneaking()) {
@@ -118,7 +118,7 @@ public class BuildingWand extends GenericWand {
         return EnumActionResult.SUCCESS;
     }
 
-    private void placeBlock(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side) {
+    private void placeBlock(ItemStack stack, PlayerEntity player, World world, BlockPos pos, EnumFacing side) {
         if (!checkUsage(stack, player, 1.0f)) {
             return;
         }
@@ -187,7 +187,7 @@ public class BuildingWand extends GenericWand {
         wandTag.setTag("undo1", undoTag);
     }
 
-    private void undoPlaceBlock(ItemStack stack, EntityPlayer player, World world, BlockPos pos) {
+    private void undoPlaceBlock(ItemStack stack, PlayerEntity player, World world, BlockPos pos) {
         NBTTagCompound wandTag = Tools.getTagCompound(stack);
         NBTTagCompound undoTag1 = (NBTTagCompound) wandTag.getTag("undo1");
         NBTTagCompound undoTag2 = (NBTTagCompound) wandTag.getTag("undo2");
@@ -218,7 +218,7 @@ public class BuildingWand extends GenericWand {
         Tools.error(player, "Select at least one block of the area you want to undo!");
     }
 
-    private void performUndo(ItemStack stack, EntityPlayer player, World world, BlockPos pos, NBTTagCompound undoTag, Set<BlockPos> undo) {
+    private void performUndo(ItemStack stack, PlayerEntity player, World world, BlockPos pos, NBTTagCompound undoTag, Set<BlockPos> undo) {
         Block block = Block.REGISTRY.getObjectById(undoTag.getInteger("block"));
         int meta = undoTag.getInteger("meta");
 
@@ -247,7 +247,7 @@ public class BuildingWand extends GenericWand {
         }
     }
 
-    private Set<BlockPos> checkUndo(EntityPlayer player, World world, NBTTagCompound undoTag) {
+    private Set<BlockPos> checkUndo(PlayerEntity player, World world, NBTTagCompound undoTag) {
         if (undoTag == null) {
             return null;
         }
@@ -270,7 +270,7 @@ public class BuildingWand extends GenericWand {
 
     @SideOnly(Side.CLIENT)
     @Override
-    public void renderOverlay(RenderWorldLastEvent evt, EntityPlayerSP player, ItemStack wand) {
+    public void renderOverlay(RenderWorldLastEvent evt, PlayerEntitySP player, ItemStack wand) {
         RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver;
         if (mouseOver != null && mouseOver.sideHit != null && mouseOver.getBlockPos() != null) {
             World world = player.getEntityWorld();

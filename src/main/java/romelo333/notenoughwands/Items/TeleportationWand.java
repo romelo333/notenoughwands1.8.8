@@ -4,14 +4,13 @@ package romelo333.notenoughwands.Items;
 import net.minecraft.client.item.TooltipOptions;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.StringTextComponent;
 import net.minecraft.text.TextComponent;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.HitResult;
-import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import romelo333.notenoughwands.Config;
 import romelo333.notenoughwands.Configuration;
@@ -58,7 +57,7 @@ public class TeleportationWand extends GenericWand {
         ItemStack stack = player.getStackInHand(hand);
         if (!world.isRemote) {
             if (!checkUsage(stack, player, 1.0f)) {
-                return new TypedActionResult<>(ActionResult.PASS, stack)
+                return new TypedActionResult<>(ActionResult.PASS, stack);
             }
             Vec3d lookVec = player.getPosVector();
             Vec3d start = new Vec3d(player.x, player.y + player.getEyeHeight(), player.z);
@@ -77,48 +76,48 @@ public class TeleportationWand extends GenericWand {
                 if (gothrough) {
                     // First check if the destination is safe
                     BlockPos blockPos = new BlockPos(end.x, end.y, end.z);
-                    if (!(world.isAirBlock(blockPos) && world.isAirBlock(blockPos.up()))) {
+                    if (!(world.isAir(blockPos) && world.isAir(blockPos.up()))) {
                         Tools.error(player, "You will suffocate if you teleport there!");
-                        return ActionResult.newResult(EnumActionResult.PASS, stack);
+                        return new TypedActionResult<>(ActionResult.PASS, stack);
                     }
                 }
-                player.setPositionAndUpdate(end.x, end.y, end.z);
+                player.method_5859(end.x, end.y, end.z);        // @todo fabric: setPositionAndUpdate
             } else {
                 BlockPos blockPos = position.getBlockPos();
                 int x = blockPos.getX();
                 int y = blockPos.getY();
                 int z = blockPos.getZ();
-                if (world.isAirBlock(blockPos.up()) && world.isAirBlock(blockPos.up(2))) {
-                    player.setPositionAndUpdate(x+.5, y + 1, z+.5);
+                if (world.isAir(blockPos.up()) && world.isAir(blockPos.up(2))) {
+                    player.method_5859(x+.5, y + 1, z+.5);        // @todo fabric: setPositionAndUpdate
                 } else {
-                    switch (position.sideHit) {
+                    switch (position.side) {
                         case DOWN:
-                            player.setPositionAndUpdate(x+.5, y - 2, z+.5);
+                            player.method_5859(x+.5, y - 2, z+.5);  // @todo fabric: setPositionAndUpdate
                             break;
                         case UP:
                             Tools.error(player, "You will suffocate if you teleport there!");
-                            return ActionResult.newResult(EnumActionResult.PASS, stack);
+                            return new TypedActionResult<>(ActionResult.PASS, stack);
                         case NORTH:
-                            player.setPositionAndUpdate(x+.5, y, z - 1 + .5);
+                            player.method_5859(x+.5, y, z - 1 + .5);    // @todo fabric: setPositionAndUpdate
                             break;
                         case SOUTH:
-                            player.setPositionAndUpdate(x+.5, y, z + 1+.5);
+                            player.method_5859(x+.5, y, z + 1+.5);  // @todo fabric: setPositionAndUpdate
                             break;
                         case WEST:
-                            player.setPositionAndUpdate(x - 1+.5, y, z+.5);
+                            player.method_5859(x - 1+.5, y, z+.5);  // @todo fabric: setPositionAndUpdate
                             break;
                         case EAST:
-                            player.setPositionAndUpdate(x + 1+.5, y, z+.5);
+                            player.method_5859(x + 1+.5, y, z+.5);  // @todo fabric: setPositionAndUpdate
                             break;
                     }
                 }
             }
             registerUsage(stack, player, 1.0f);
             if (teleportVolume >= 0.01) {
-                SoundEvent teleport = SoundEvent.REGISTRY.getObject(new ResourceLocation(NotEnoughWands.MODID, "teleport"));
-                ModSounds.playSound(player.getEntityWorld(), teleport, player.posX, player.posY, player.posZ, teleportVolume, 1.0f);
+                SoundEvent teleport = Registry.SOUND_EVENT.get(new Identifier(NotEnoughWands.MODID, "teleport"));
+                ModSounds.playSound(player.getEntityWorld(), teleport, player.x, player.y, player.z, teleportVolume, 1.0f);
             }
         }
-        return ActionResult.newResult(EnumActionResult.PASS, stack);
+        return new TypedActionResult<>(ActionResult.PASS, stack);
     }
 }

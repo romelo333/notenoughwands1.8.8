@@ -1,12 +1,8 @@
 package romelo333.notenoughwands;
 
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.play.server.SPacketSoundEffect;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.world.World;
-import net.minecraftforge.registries.IForgeRegistry;
 
 public class ModSounds {
 
@@ -23,14 +19,14 @@ public class ModSounds {
         SPacketSoundEffect soundEffect = new SPacketSoundEffect(sound, SoundCategory.BLOCKS, x, y, z, (float) volume, (float) pitch);
 
         for (int j = 0; j < worldObj.playerEntities.size(); ++j) {
-            EntityPlayerMP entityplayermp = (EntityPlayerMP)worldObj.playerEntities.get(j);
-            double d7 = x - entityplayermp.posX;
-            double d8 = y - entityplayermp.posY;
-            double d9 = z - entityplayermp.posZ;
+            PlayerEntityMP PlayerEntitymp = (PlayerEntityMP)worldObj.playerEntities.get(j);
+            double d7 = x - PlayerEntitymp.posX;
+            double d8 = y - PlayerEntitymp.posY;
+            double d9 = z - PlayerEntitymp.posZ;
             double d10 = d7 * d7 + d8 * d8 + d9 * d9;
 
             if (d10 <= 256.0D) {
-                entityplayermp.connection.sendPacket(soundEffect);
+                PlayerEntitymp.connection.sendPacket(soundEffect);
             }
         }
     }

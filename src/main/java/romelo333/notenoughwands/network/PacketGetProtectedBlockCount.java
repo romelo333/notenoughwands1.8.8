@@ -1,7 +1,7 @@
 package romelo333.notenoughwands.network;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntityMP;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -38,7 +38,7 @@ public class PacketGetProtectedBlockCount implements IMessage {
 
         private void handle(PacketGetProtectedBlockCount message, MessageContext ctx) {
             // @todo
-            EntityPlayerMP player = ctx.getServerHandler().player;
+            PlayerEntityMP player = ctx.getServerHandler().player;
             World world = player.getEntityWorld();
 
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);

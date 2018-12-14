@@ -1,7 +1,7 @@
 package romelo333.notenoughwands.network;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntityMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
@@ -37,7 +37,7 @@ public class PacketGetProtectedBlocks implements IMessage {
 
         private void handle(PacketGetProtectedBlocks message, MessageContext ctx) {
             // @todo (compatlayer?)
-            EntityPlayerMP player = ctx.getServerHandler().player;
+            PlayerEntityMP player = ctx.getServerHandler().player;
             World world = player.getEntityWorld();
 
             ItemStack heldItem = player.getHeldItem(EnumHand.MAIN_HAND);

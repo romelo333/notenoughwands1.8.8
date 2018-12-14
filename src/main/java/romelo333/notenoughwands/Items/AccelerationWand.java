@@ -4,7 +4,7 @@ package romelo333.notenoughwands.Items;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
@@ -12,7 +12,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TextFormat;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.util.FakePlayer;
@@ -49,18 +49,18 @@ public class AccelerationWand extends GenericWand {
     @Override
     public void addInformation(ItemStack stack, World player, List list, ITooltipFlag b) {
         super.addInformation(stack, player, list, b);
-        list.add(TextFormatting.GREEN + "Mode: " + descriptions[getMode(stack)]);
+        list.add(TextFormat.GREEN + "Mode: " + descriptions[getMode(stack)]);
         list.add("Right click on block to speed up ticks.");
         showModeKeyDescription(list, "change speed");
         if (Math.abs(fakePlayerFactor-1.0f) >= 0.01) {
             if (fakePlayerFactor < 0) {
-                list.add(TextFormatting.RED + "Usage in a machine has been disabled in config!");
+                list.add(TextFormat.RED + "Usage in a machine has been disabled in config!");
             } else if (fakePlayerFactor > 1) {
-                list.add(TextFormatting.YELLOW + "Usage in a machine will cost more!");
+                list.add(TextFormat.YELLOW + "Usage in a machine will cost more!");
             }
         }
         if (fakePlayerFactor >= 0.0 && lessEffectiveForFakePlayer) {
-            list.add(TextFormatting.YELLOW + "Usage in a machine will be less effective!");
+            list.add(TextFormat.YELLOW + "Usage in a machine will be less effective!");
         }
     }
 
@@ -74,7 +74,7 @@ public class AccelerationWand extends GenericWand {
     }
 
     @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(PlayerEntity player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             IBlockState state = world.getBlockState(pos);
@@ -115,7 +115,7 @@ public class AccelerationWand extends GenericWand {
     }
 
     @Override
-    public void toggleMode(EntityPlayer player, ItemStack stack) {
+    public void toggleMode(PlayerEntity player, ItemStack stack) {
         int mode = getMode(stack);
         mode++;
         if (mode > MODE_LAST) {

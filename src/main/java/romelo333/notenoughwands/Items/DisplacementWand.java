@@ -5,9 +5,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.entity.PlayerEntitySP;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -16,7 +16,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TextFormat;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.config.Configuration;
@@ -59,14 +59,14 @@ public class DisplacementWand extends GenericWand {
     @Override
     public void addInformation(ItemStack stack, World player, List list, ITooltipFlag b) {
         super.addInformation(stack, player, list, b);
-        list.add(TextFormatting.GREEN + "Mode: " + descriptions[getMode(stack)]);
+        list.add(TextFormat.GREEN + "Mode: " + descriptions[getMode(stack)]);
         list.add("Right click to push blocks forward.");
         list.add("Sneak right click to pull blocks.");
         showModeKeyDescription(list, "switch mode");
     }
 
     @Override
-    public void toggleMode(EntityPlayer player, ItemStack stack) {
+    public void toggleMode(PlayerEntity player, ItemStack stack) {
         int mode = getMode(stack);
         mode++;
         if (mode > MODE_LAST) {
@@ -81,7 +81,7 @@ public class DisplacementWand extends GenericWand {
     }
 
     @Override
-    public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
+    public EnumActionResult onItemUseFirst(PlayerEntity player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             if (player.isSneaking()) {
@@ -94,7 +94,7 @@ public class DisplacementWand extends GenericWand {
         return EnumActionResult.PASS;
     }
 
-    private void pullBlocks(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side) {
+    private void pullBlocks(ItemStack stack, PlayerEntity player, World world, BlockPos pos, EnumFacing side) {
         if (!checkUsage(stack, player, 1.0f)) {
             return;
         }
@@ -105,7 +105,7 @@ public class DisplacementWand extends GenericWand {
         }
     }
 
-    private void pushBlocks(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side) {
+    private void pushBlocks(ItemStack stack, PlayerEntity player, World world, BlockPos pos, EnumFacing side) {
         if (!checkUsage(stack, player, 1.0f)) {
             return;
         }
@@ -116,7 +116,7 @@ public class DisplacementWand extends GenericWand {
         }
     }
 
-    private int moveBlocks(EntityPlayer player, World world, Set<BlockPos> coordinates, EnumFacing direction) {
+    private int moveBlocks(PlayerEntity player, World world, Set<BlockPos> coordinates, EnumFacing direction) {
         int cnt = 0;
         for (BlockPos coordinate : coordinates) {
             IBlockState state = world.getBlockState(coordinate);
@@ -170,7 +170,7 @@ public class DisplacementWand extends GenericWand {
 
     @SideOnly(Side.CLIENT)
     @Override
-    public void renderOverlay(RenderWorldLastEvent evt, EntityPlayerSP player, ItemStack wand) {
+    public void renderOverlay(RenderWorldLastEvent evt, PlayerEntitySP player, ItemStack wand) {
         RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver;
         if (mouseOver != null && mouseOver.getBlockPos() != null && mouseOver.sideHit != null) {
             World world = player.getEntityWorld();

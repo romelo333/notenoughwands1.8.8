@@ -4,7 +4,7 @@ package romelo333.notenoughwands.Items;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -15,7 +15,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TextFormat;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 import romelo333.notenoughwands.Config;
@@ -43,13 +43,13 @@ public class MovingWand extends GenericWand {
         super.addInformation(stack, player, list, b);
         NBTTagCompound compound = stack.getTagCompound();
         if (!hasBlock(compound)) {
-            list.add(TextFormatting.RED + "Wand is empty.");
+            list.add(TextFormat.RED + "Wand is empty.");
         } else {
             int id = compound.getInteger("block");
             Block block = Block.REGISTRY.getObjectById(id);
             int meta = compound.getInteger("meta");
             String name = Tools.getBlockName(block, meta);
-            list.add(TextFormatting.GREEN + "Block: " + name);
+            list.add(TextFormat.GREEN + "Block: " + name);
         }
         list.add("Right click to take a block.");
         list.add("Right click again on block to place it down.");
@@ -61,7 +61,7 @@ public class MovingWand extends GenericWand {
 
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             NBTTagCompound compound = stack.getTagCompound();
@@ -80,7 +80,7 @@ public class MovingWand extends GenericWand {
     }
 
     @Override
-    public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
+    public EnumActionResult onItemUseFirst(PlayerEntity player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             NBTTagCompound compound = stack.getTagCompound();
@@ -95,11 +95,11 @@ public class MovingWand extends GenericWand {
     }
 
     @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(PlayerEntity player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         return EnumActionResult.SUCCESS;
     }
 
-    private void place(ItemStack stack, World world, BlockPos pos, EnumFacing side, EntityPlayer player) {
+    private void place(ItemStack stack, World world, BlockPos pos, EnumFacing side, PlayerEntity player) {
         BlockPos pp = side == null ? pos : pos.offset(side);
 
         // First check what's already there
@@ -135,7 +135,7 @@ public class MovingWand extends GenericWand {
         stack.setTagCompound(tagCompound);
     }
 
-    private void pickup(ItemStack stack, EntityPlayer player, World world, BlockPos pos) {
+    private void pickup(ItemStack stack, PlayerEntity player, World world, BlockPos pos) {
         IBlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
         int meta = block.getMetaFromState(state);

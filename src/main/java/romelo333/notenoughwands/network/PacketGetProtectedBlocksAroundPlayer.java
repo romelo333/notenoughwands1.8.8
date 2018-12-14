@@ -1,7 +1,7 @@
 package romelo333.notenoughwands.network;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntityMP;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -39,7 +39,7 @@ public class PacketGetProtectedBlocksAroundPlayer implements IMessage {
 
         private void handle(PacketGetProtectedBlocksAroundPlayer message, MessageContext ctx) {
             // @todo
-            EntityPlayerMP player = ctx.getServerHandler().player;
+            PlayerEntityMP player = ctx.getServerHandler().player;
             World world = player.getEntityWorld();
 
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);

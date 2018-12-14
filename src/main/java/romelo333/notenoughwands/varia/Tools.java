@@ -2,9 +2,10 @@ package romelo333.notenoughwands.varia;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerEntityMP;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -14,22 +15,22 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TextFormat;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
 
 public class Tools {
-    public static void error(EntityPlayer player, String msg) {
-        player.sendStatusMessage(new TextComponentString(TextFormatting.RED + msg), false);
+    public static void error(PlayerEntity player, String msg) {
+        player.sendStatusMessage(new TextComponentString(TextFormat.RED + msg), false);
     }
 
-    public static void notify(EntityPlayer player, String msg) {
-        player.sendStatusMessage(new TextComponentString(TextFormatting.GREEN + msg), false);
+    public static void notify(PlayerEntity player, String msg) {
+        player.sendStatusMessage(new TextComponentString(TextFormat.GREEN + msg), false);
     }
 
     @Nonnull
-    public static ItemStack consumeInventoryItem(Item item, int meta, InventoryPlayer inv, EntityPlayer player) {
+    public static ItemStack consumeInventoryItem(Item item, int meta, InventoryPlayer inv, PlayerEntity player) {
         if (player.capabilities.isCreativeMode) {
             return new ItemStack(item, 1, meta);
         }
@@ -51,12 +52,12 @@ public class Tools {
         }
     }
 
-    public static void giveItem(World world, EntityPlayer player, Block block, int meta, int cnt, BlockPos pos) {
+    public static void giveItem(World world, PlayerEntity player, Block block, int meta, int cnt, BlockPos pos) {
         ItemStack oldStack = new ItemStack(block, cnt, meta);
         giveItem(world, player, pos, oldStack);
     }
 
-    public static void giveItem(World world, EntityPlayer player, BlockPos pos, ItemStack oldStack) {
+    public static void giveItem(World world, PlayerEntity player, BlockPos pos, ItemStack oldStack) {
         if (!player.inventory.addItemStackToInventory(oldStack)) {
             // Not enough room. Spawn item in world.
             EntityItem entityItem = new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), oldStack);
@@ -92,11 +93,11 @@ public class Tools {
         return s.getDisplayName();
     }
 
-    public static int getPlayerXP(EntityPlayer player) {
+    public static int getPlayerXP(PlayerEntity player) {
         return (int)(getExperienceForLevel(player.experienceLevel) + (player.experience * player.xpBarCap()));
     }
 
-    public static boolean addPlayerXP(EntityPlayer player, int amount) {
+    public static boolean addPlayerXP(PlayerEntity player, int amount) {
         int experience = getPlayerXP(player) + amount;
         if (experience < 0) {
             return false;
@@ -143,14 +144,14 @@ public class Tools {
         SPacketSoundEffect soundEffect = new SPacketSoundEffect(soundEvent, SoundCategory.BLOCKS, x, y, z, (float) volume, (float) pitch);
 
         for (int j = 0; j < worldObj.playerEntities.size(); ++j) {
-            EntityPlayerMP entityplayermp = (EntityPlayerMP)worldObj.playerEntities.get(j);
-            double d7 = x - entityplayermp.posX;
-            double d8 = y - entityplayermp.posY;
-            double d9 = z - entityplayermp.posZ;
+            PlayerEntityMP PlayerEntitymp = (PlayerEntityMP)worldObj.playerEntities.get(j);
+            double d7 = x - PlayerEntitymp.posX;
+            double d8 = y - PlayerEntitymp.posY;
+            double d9 = z - PlayerEntitymp.posZ;
             double d10 = d7 * d7 + d8 * d8 + d9 * d9;
 
             if (d10 <= 256.0D) {
-                entityplayermp.connection.sendPacket(soundEffect);
+                PlayerEntitymp.connection.sendPacket(soundEffect);
             }
         }
     }

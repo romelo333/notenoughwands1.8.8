@@ -1,35 +1,23 @@
 package romelo333.notenoughwands.Items;
 
-import cofh.redstoneflux.api.IEnergyContainerItem;
-import mcjty.lib.client.BlockOutlineRenderer;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.item.TooltipOptions;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.text.StringTextComponent;
+import net.minecraft.text.TextComponent;
+import net.minecraft.text.TextFormat;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.loot.LootEntryItem;
-import net.minecraft.world.storage.loot.LootPool;
-import net.minecraft.world.storage.loot.conditions.LootCondition;
-import net.minecraft.world.storage.loot.functions.LootFunction;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.common.Optional;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import romelo333.notenoughwands.Config;
-import romelo333.notenoughwands.KeyBindings;
-import romelo333.notenoughwands.NotEnoughWands;
-import romelo333.notenoughwands.ProtectedBlocks;
-import romelo333.notenoughwands.varia.ItemCapabilityProvider;
+import net.minecraft.world.loot.LootPool;
+import net.minecraft.world.loot.condition.LootCondition;
+import net.minecraft.world.loot.function.LootFunction;
+import romelo333.notenoughwands.*;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.ArrayList;
@@ -38,8 +26,9 @@ import java.util.Set;
 
 //import net.minecraft.client.entity.EntityClientPlayerMP;
 
-@Optional.Interface(modid = "redstoneflux", iface = "cofh.redstoneflux.api.IEnergyContainerItem")
-public class GenericWand extends Item implements IEnergyItem, IEnergyContainerItem {
+// @todo fabric
+//@Optional.Interface(modid = "redstoneflux", iface = "cofh.redstoneflux.api.IEnergyContainerItem")
+public class GenericWand extends Item implements IEnergyItem /*, IEnergyContainerItem*/ {
     protected int needsxp = 0;
     protected int needsrf = 0;
     protected int maxrf = 0;
@@ -48,29 +37,33 @@ public class GenericWand extends Item implements IEnergyItem, IEnergyContainerIt
 
     private static List<GenericWand> wands = new ArrayList<>();
 
-    @SideOnly(Side.CLIENT)
-    public void registerModel() {
-        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
-    }
+    // @todo fabric
+//    @Override
+//    public ICapabilityProvider initCapabilities(ItemStack stack, NBTTagCompound nbt) {
+//        return new ItemCapabilityProvider(stack, this);
+//    }
 
-    @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, NBTTagCompound nbt) {
-        return new ItemCapabilityProvider(stack, this);
-    }
 
+    public GenericWand(int maxDurability) {
+        super(new Settings()
+                .stackSize(1)
+                .durability(maxDurability)
+                .itemGroup(ItemGroup.TOOLS));
+    }
 
     // Check if a given block can be picked up.
-    public static double checkPickup(EntityPlayer player, World world, BlockPos pos, Block block, float maxHardness) {
-        IBlockState state = world.getBlockState(pos);
-        float hardness = block.getBlockHardness(state, world, pos);
+    public static double checkPickup(PlayerEntity player, World world, BlockPos pos, Block block, float maxHardness) {
+        BlockState state = world.getBlockState(pos);
+        float hardness = block.getHardness(state, world, pos);
         if (hardness < 0 || hardness > maxHardness){
             Tools.error(player, "This block is to hard to take!");
             return -1.0f;
         }
-        if (!block.canEntityDestroy(state, world, pos, player)){
-            Tools.error(player, "You are not allowed to take this block!");
-            return -1.0f;
-        }
+        // @todo fabric
+//        if (!block.canEntityDestroy(state, world, pos, player)){
+//            Tools.error(player, "You are not allowed to take this block!");
+//            return -1.0f;
+//        }
         ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
         if (protectedBlocks.isProtected(world, pos)) {
             Tools.error(player, "This block is protected. You cannot take it!");
@@ -85,37 +78,35 @@ public class GenericWand extends Item implements IEnergyItem, IEnergyContainerIt
         return cost;
     }
 
+
     @Override
-    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
+    public void addInformation(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
         super.addInformation(stack, player, list, b);
         if (needsrf > 0) {
-            list.add(TextFormatting.GREEN+"Energy: " + getEnergyStored(stack) + " / " + getMaxEnergyStored(stack));
+            list.add(new StringTextComponent(TextFormat.GREEN+"Energy: " + getEnergyStored(stack) + " / " + getMaxEnergyStored(stack)));
         }
     }
 
-    @Override
-    public boolean showDurabilityBar(ItemStack stack) {
-        if (needsrf > 0 && Config.showDurabilityBarForRF) {
-            return true;
-        }
-        return super.showDurabilityBar(stack);
-    }
+    // @todo fabric
+//    @Override
+//    public boolean showDurabilityBar(ItemStack stack) {
+//        if (needsrf > 0 && Config.showDurabilityBarForRF) {
+//            return true;
+//        }
+//        return super.showDurabilityBar(stack);
+//    }
 
-    @Override
-    public double getDurabilityForDisplay(ItemStack stack) {
-        if (needsrf > 0 && Config.showDurabilityBarForRF) {
-            int max = getMaxEnergyStored(stack);
-            return (max - getEnergyStored(stack)) / (double) max;
-        }
-        return super.getDurabilityForDisplay(stack);
-    }
+//    @Override
+//    public double getDurabilityForDisplay(ItemStack stack) {
+//        if (needsrf > 0 && Config.showDurabilityBarForRF) {
+//            int max = getMaxEnergyStored(stack);
+//            return (max - getEnergyStored(stack)) / (double) max;
+//        }
+//        return super.getDurabilityForDisplay(stack);
+//    }
 
     protected GenericWand setup(String name) {
-        setMaxStackSize(1);
-        setNoRepair();
-        setUnlocalizedName(NotEnoughWands.MODID + "." + name);
-        setRegistryName(name);
-        setCreativeTab(NotEnoughWands.tabNew);
+        Registry.ITEM.register(new Identifier(NotEnoughWands.MODID, name), this);
         wands.add(this);
         return this;
     }
@@ -131,18 +122,13 @@ public class GenericWand extends Item implements IEnergyItem, IEnergyContainerIt
         return this;
     }
 
-    GenericWand durabilityUsage(int maxdurability) {
-        setMaxDamage(maxdurability);
-        return this;
-    }
-
     GenericWand loot(int rarity) {
         lootRarity = rarity;
         return this;
     }
 
     protected String getConfigPrefix() {
-        return getRegistryName().getResourcePath();
+        return Registry.ITEM.getId(this).getPath();
     }
 
     protected void initConfig(Configuration cfg) {
@@ -155,37 +141,44 @@ public class GenericWand extends Item implements IEnergyItem, IEnergyContainerIt
                 needsxp = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_needsxp", needsxp, "How much levels this wand should consume on usage").getInt();
                 needsrf = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_needsrf", needsrf, "How much RF this wand should consume on usage").getInt();
                 maxrf = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxrf", maxrf, "Maximum RF this wand can hold").getInt();
-                setMaxDamage(cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxdurability", getMaxDamage(), "Maximum durability for this wand").getInt());
+                // @todo fabric
+//                setMaxDamage(cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxdurability", getMaxDamage(), "Maximum durability for this wand").getInt());
                 break;
             case EASY_RF:
                 needsxp = 0;
-                setMaxDamage(0);
+                // @todo fabric
+//                setMaxDamage(0);
                 needsrf = easy_maxrf / easy_usages;
                 maxrf = easy_maxrf;
                 cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_needsxp", needsxp, "How much levels this wand should consume on usage").getInt();
                 cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_needsrf", needsrf, "How much RF this wand should consume on usage").getInt();
                 cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxrf", maxrf, "Maximum RF this wand can hold").getInt();
-                cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxdurability", getMaxDamage(), "Maximum durability for this wand").getInt();
+                // @todo fabric
+//                cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxdurability", getMaxDamage(), "Maximum durability for this wand").getInt();
                 break;
             case NORMAL_RF:
                 needsxp = 0;
-                setMaxDamage(0);
+                // @todo fabric
+//                setMaxDamage(0);
                 needsrf = normal_maxrf / normal_usages;
                 maxrf = normal_maxrf;
                 cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_needsxp", needsxp, "How much levels this wand should consume on usage").getInt();
                 cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_needsrf", needsrf, "How much RF this wand should consume on usage").getInt();
                 cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxrf", maxrf, "Maximum RF this wand can hold").getInt();
-                cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxdurability", getMaxDamage(), "Maximum durability for this wand").getInt();
+                // @todo fabric
+//                cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxdurability", getMaxDamage(), "Maximum durability for this wand").getInt();
                 break;
             case HARD_RF:
                 needsxp = 0;
-                setMaxDamage(0);
+//                setMaxDamage(0);
+                // @todo fabric
                 needsrf = hard_maxrf / hard_usages;
                 maxrf = hard_maxrf;
                 cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_needsxp", needsxp, "How much levels this wand should consume on usage").getInt();
                 cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_needsrf", needsrf, "How much RF this wand should consume on usage").getInt();
                 cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxrf", maxrf, "Maximum RF this wand can hold").getInt();
-                cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxdurability", getMaxDamage(), "Maximum durability for this wand").getInt();
+                // @todo fabric
+//                cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxdurability", getMaxDamage(), "Maximum durability for this wand").getInt();
                 break;
         }
 
@@ -194,8 +187,8 @@ public class GenericWand extends Item implements IEnergyItem, IEnergyContainerIt
 
     //------------------------------------------------------------------------------
 
-    protected boolean checkUsage(ItemStack stack, EntityPlayer player, float difficultyScale) {
-        if (player.capabilities.isCreativeMode) {
+    protected boolean checkUsage(ItemStack stack, PlayerEntity player, float difficultyScale) {
+        if (player.isCreative()) {
             return true;
         }
         if (needsxp > 0) {
@@ -205,12 +198,13 @@ public class GenericWand extends Item implements IEnergyItem, IEnergyContainerIt
                 return false;
             }
         }
-        if (isDamageable()) {
-            if (stack.getItemDamage() >= stack.getMaxDamage()) {
-                Tools.error(player, "This wand can no longer be used!");
-                return false;
-            }
-        }
+        // @todo fabric
+//        if (isDamageable()) {
+//            if (stack.getItemDamage() >= stack.getMaxDamage()) {
+//                Tools.error(player, "This wand can no longer be used!");
+//                return false;
+//            }
+//        }
         if (needsrf > 0) {
             if (getEnergyStored(stack) < (int)(needsrf * difficultyScale)) {
                 Tools.error(player, "Not enough energy to use this wand!");
@@ -220,25 +214,26 @@ public class GenericWand extends Item implements IEnergyItem, IEnergyContainerIt
         return true;
     }
 
-    protected void registerUsage(ItemStack stack, EntityPlayer player, float difficultyScale) {
-        if (player.capabilities.isCreativeMode) {
+    protected void registerUsage(ItemStack stack, PlayerEntity player, float difficultyScale) {
+        if (player.isCreative()) {
             return;
         }
         if (needsxp > 0) {
             Tools.addPlayerXP(player, -(int) (needsxp * difficultyScale));
         }
-        if (isDamageable()) {
-            stack.damageItem(1, player);
-        }
+        // @todo fabric
+//        if (isDamageable()) {
+//            stack.damageItem(1, player);
+//        }
         if (needsrf > 0) {
             extractEnergy(stack, (int) (needsrf * difficultyScale), false);
         }
     }
 
-    public void toggleMode(EntityPlayer player, ItemStack stack) {
+    public void toggleMode(PlayerEntity player, ItemStack stack) {
     }
 
-    public void toggleSubMode(EntityPlayer player, ItemStack stack) {
+    public void toggleSubMode(PlayerEntity player, ItemStack stack) {
     }
 
     //------------------------------------------------------------------------------
@@ -246,13 +241,6 @@ public class GenericWand extends Item implements IEnergyItem, IEnergyContainerIt
 
     public static List<GenericWand> getWands() {
         return wands;
-    }
-
-    @SideOnly(Side.CLIENT)
-    public static void setupModels() {
-        for (GenericWand wand : wands) {
-            wand.registerModel();
-        }
     }
 
     //------------------------------------------------------------------------------
@@ -273,19 +261,19 @@ public class GenericWand extends Item implements IEnergyItem, IEnergyContainerIt
 
     private void setupChestLootInt(LootPool main) {
         if (lootRarity > 0) {
-            String entryName = NotEnoughWands.MODID + ":" + getRegistryName().getResourcePath();
-            main.addEntry(new LootEntryItem(this, lootRarity, 0, new LootFunction[0], new LootCondition[0], entryName));
+            String entryName = NotEnoughWands.MODID + ":" + Registry.ITEM.getId(this).getPath();
+            // @todo fabric
+//            main.addEntry(new LootEntryItem(this, lootRarity, 0, new LootFunction[0], new LootCondition[0], entryName));
         }
     }
 
     //------------------------------------------------------------------------------
 
-    @SideOnly(Side.CLIENT)
-    public void renderOverlay(RenderWorldLastEvent evt, EntityPlayerSP player, ItemStack wand) {
+    public void renderOverlay(PlayerEntity player, ItemStack wand) {
 
     }
 
-    protected static void renderOutlines(RenderWorldLastEvent evt, EntityPlayerSP p, Set<BlockPos> coordinates, int r, int g, int b) {
+    protected static void renderOutlines(PlayerEntity p, Set<BlockPos> coordinates, int r, int g, int b) {
         BlockOutlineRenderer.renderOutlines(p, coordinates, r, g, b, evt.getPartialTicks());
     }
 

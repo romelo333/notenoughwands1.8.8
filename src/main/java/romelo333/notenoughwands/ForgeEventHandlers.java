@@ -123,11 +123,11 @@ public class ForgeEventHandlers {
                 return;
             }
 //
-//            ItemStack heldItem = event.getEntityPlayer().getHeldItem(EnumHand.MAIN_HAND);
+//            ItemStack heldItem = event.getPlayerEntity().getHeldItem(EnumHand.MAIN_HAND);
 //            if (heldItem == null || heldItem.getItem() == null) {
 //                return;
 //            }
-//            if (event.getEntityPlayer().isSneaking() && WrenchChecker.isAWrench(heldItem.getItem())) {
+//            if (event.getPlayerEntity().isSneaking() && WrenchChecker.isAWrench(heldItem.getItem())) {
 //                // If the block is protected we prevent sneak-wrenching it.
 ////            ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(event.getWorld());
 ////            BlockPos pos = event.getPos();

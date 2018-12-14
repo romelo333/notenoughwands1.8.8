@@ -1,16 +1,16 @@
 package romelo333.notenoughwands.Items;
 
 
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.entity.PlayerEntitySP;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TextFormat;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.config.Configuration;
@@ -71,23 +71,23 @@ public class ProtectionWand extends GenericWand {
                 NEWPacketHandler.INSTANCE.sendToServer(new PacketGetProtectedBlockCount(id));
             }
         }
-        list.add(TextFormatting.GREEN + "Mode: " + descriptions[mode]);
+        list.add(TextFormat.GREEN + "Mode: " + descriptions[mode]);
         if (master) {
-            list.add(TextFormatting.YELLOW + "Master wand");
+            list.add(TextFormat.YELLOW + "Master wand");
         } else {
             if (id != 0) {
-                list.add(TextFormatting.GREEN + "Id: " + id);
+                list.add(TextFormat.GREEN + "Id: " + id);
             }
         }
         if (hasid) {
-            list.add(TextFormatting.GREEN + "Number of protected blocks: " + ReturnProtectedBlockCountHelper.count);
+            list.add(TextFormat.GREEN + "Number of protected blocks: " + ReturnProtectedBlockCountHelper.count);
         }
         list.add("Right click to protect or unprotect a block.");
         showModeKeyDescription(list, "switch mode");
     }
 
     @Override
-    public void toggleMode(EntityPlayer player, ItemStack stack) {
+    public void toggleMode(PlayerEntity player, ItemStack stack) {
         int mode = getMode(stack);
         mode++;
         if (mode > MODE_LAST) {
@@ -112,7 +112,7 @@ public class ProtectionWand extends GenericWand {
 
     @SideOnly(Side.CLIENT)
     @Override
-    public void renderOverlay(RenderWorldLastEvent evt, EntityPlayerSP player, ItemStack wand) {
+    public void renderOverlay(RenderWorldLastEvent evt, PlayerEntitySP player, ItemStack wand) {
         if ((System.currentTimeMillis() - lastTime) > 250) {
             lastTime = System.currentTimeMillis();
             NEWPacketHandler.INSTANCE.sendToServer(new PacketGetProtectedBlocks());
@@ -124,7 +124,7 @@ public class ProtectionWand extends GenericWand {
     }
 
     @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(PlayerEntity player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);

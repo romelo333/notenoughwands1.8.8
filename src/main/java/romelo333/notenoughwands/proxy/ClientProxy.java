@@ -3,8 +3,8 @@ package romelo333.notenoughwands.proxy;
 import com.google.common.util.concurrent.ListenableFuture;
 import mcjty.lib.McJtyLibClient;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.PlayerEntitySP;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
@@ -49,7 +49,7 @@ public class ClientProxy extends CommonProxy {
     @SubscribeEvent
     public void renderWorldLastEvent(RenderWorldLastEvent evt) {
         Minecraft mc = Minecraft.getMinecraft();
-        EntityPlayerSP p = mc.player;
+        PlayerEntitySP p = mc.player;
         ItemStack heldItem = p.getHeldItem(EnumHand.MAIN_HAND);
         if (heldItem.isEmpty()) {
             return;
@@ -87,7 +87,7 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
-    public EntityPlayer getClientPlayer() {
+    public PlayerEntity getClientPlayer() {
         return Minecraft.getMinecraft().player;
     }
 

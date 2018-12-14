@@ -5,7 +5,7 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.IMob;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
@@ -44,7 +44,7 @@ public class FreezingWand extends GenericWand {
     }
 
     @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(PlayerEntity player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (!world.isRemote) {
 
         }
@@ -56,11 +56,11 @@ public class FreezingWand extends GenericWand {
     }
 
     @Override
-    public boolean onLeftClickEntity(ItemStack stack, EntityPlayer player, Entity entity) {
+    public boolean onLeftClickEntity(ItemStack stack, PlayerEntity player, Entity entity) {
         if (!player.getEntityWorld().isRemote) {
             if (entity instanceof EntityLivingBase) {
                 EntityLivingBase entityLivingBase = (EntityLivingBase) entity;
-                if (entityLivingBase instanceof EntityPlayer) {
+                if (entityLivingBase instanceof PlayerEntity) {
                     Tools.error(player, "You cannot use this on players!");
                     return true;
                 }

@@ -5,7 +5,7 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.IMob;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -13,7 +13,7 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TextFormat;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 import romelo333.notenoughwands.Config;
@@ -54,7 +54,7 @@ public class CapturingWand extends GenericWand {
                 } catch (ClassNotFoundException e) {
                     name = "?";
                 }
-                list.add(TextFormatting.GREEN + "Captured mob: " + name);
+                list.add(TextFormat.GREEN + "Captured mob: " + name);
             }
         }
         list.add("Left click on creature to capture it.");
@@ -62,7 +62,7 @@ public class CapturingWand extends GenericWand {
     }
 
     @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(PlayerEntity player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             NBTTagCompound tagCompound = Tools.getTagCompound(stack);
@@ -86,7 +86,7 @@ public class CapturingWand extends GenericWand {
         return EnumActionResult.SUCCESS;
     }
 
-    private EntityLivingBase createEntity(EntityPlayer player, World world, String type) {
+    private EntityLivingBase createEntity(PlayerEntity player, World world, String type) {
         EntityLivingBase entityLivingBase;
         try {
             entityLivingBase = (EntityLivingBase) Class.forName(type).getConstructor(World.class).newInstance(world);
@@ -97,7 +97,7 @@ public class CapturingWand extends GenericWand {
     }
 
     @Override
-    public boolean onLeftClickEntity(ItemStack stack, EntityPlayer player, Entity entity) {
+    public boolean onLeftClickEntity(ItemStack stack, PlayerEntity player, Entity entity) {
         if (!player.getEntityWorld().isRemote) {
             if (entity instanceof EntityLivingBase) {
                 if (Tools.getTagCompound(stack).hasKey("mob")) {
@@ -105,7 +105,7 @@ public class CapturingWand extends GenericWand {
                     return true;
                 }
                 EntityLivingBase entityLivingBase = (EntityLivingBase) entity;
-                if (entityLivingBase instanceof EntityPlayer) {
+                if (entityLivingBase instanceof PlayerEntity) {
                     Tools.error(player, "I don't think that player would appreciate being captured!");
                     return true;
                 }

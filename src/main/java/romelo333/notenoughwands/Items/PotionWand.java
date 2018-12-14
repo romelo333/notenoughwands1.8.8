@@ -6,14 +6,14 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.IMob;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TextFormat;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 import romelo333.notenoughwands.Config;
@@ -57,32 +57,32 @@ public class PotionWand extends GenericWand {
         list.add("Left click on creature to apply effect");
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound==null){
-            list.add(TextFormatting.YELLOW+"No effects. Combine with potion");
-            list.add(TextFormatting.YELLOW+"in crafting table to add effect");
+            list.add(TextFormat.YELLOW+"No effects. Combine with potion");
+            list.add(TextFormat.YELLOW+"in crafting table to add effect");
             return;
         }
         NBTTagList effects = (NBTTagList) tagCompound.getTag("effects");
         if (effects == null || effects.tagCount()==0){
-            list.add(TextFormatting.YELLOW+"No effects. Combine with potion");
-            list.add(TextFormatting.YELLOW+"in crafting table to add effect");
+            list.add(TextFormat.YELLOW+"No effects. Combine with potion");
+            list.add(TextFormat.YELLOW+"in crafting table to add effect");
             return;
         }
-        list.add(TextFormatting.YELLOW+"Combine with empty bottle");
-        list.add(TextFormatting.YELLOW+"to clear effects");
+        list.add(TextFormat.YELLOW+"Combine with empty bottle");
+        list.add(TextFormat.YELLOW+"to clear effects");
         int mode = getMode(stack);
         for (int i=0;i<effects.tagCount();i++) {
             NBTTagCompound effecttag = effects.getCompoundTagAt(i);
             PotionEffect effect = PotionEffect.readCustomPotionEffectFromNBT(effecttag);
             if (i==mode){
-                list.add("    + " + TextFormatting.GREEN + getEffectName(effect));
+                list.add("    + " + TextFormat.GREEN + getEffectName(effect));
             } else {
-                list.add("    " + TextFormatting.GRAY+getEffectName(effect));
+                list.add("    " + TextFormat.GRAY+getEffectName(effect));
             }
         }
     }
 
     @Override
-    public void toggleMode(EntityPlayer player, ItemStack stack) {
+    public void toggleMode(PlayerEntity player, ItemStack stack) {
         int mode = getMode(stack);
         mode++;
         NBTTagCompound tagCompound = stack.getTagCompound();
@@ -107,7 +107,7 @@ public class PotionWand extends GenericWand {
     }
 
 
-    private void addeffect(EntityLivingBase entity, ItemStack wand, EntityPlayer player){
+    private void addeffect(EntityLivingBase entity, ItemStack wand, PlayerEntity player){
         NBTTagCompound tagCompound = wand.getTagCompound();
         if (tagCompound==null){
             Tools.error(player, "There are no effects in this wand!");
@@ -124,7 +124,7 @@ public class PotionWand extends GenericWand {
     }
 
     @Override
-    public boolean onLeftClickEntity(ItemStack stack, EntityPlayer player, Entity entity) {
+    public boolean onLeftClickEntity(ItemStack stack, PlayerEntity player, Entity entity) {
         if (!player.getEntityWorld().isRemote) {
             if (entity instanceof EntityLivingBase) {
                 EntityLivingBase entityLivingBase = (EntityLivingBase) entity;

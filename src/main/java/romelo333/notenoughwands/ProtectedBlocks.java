@@ -2,7 +2,7 @@ package romelo333.notenoughwands;
 
 import mcjty.lib.varia.GlobalCoordinate;
 import mcjty.lib.worlddata.AbstractWorldData;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
@@ -89,7 +89,7 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
         }
     }
 
-    public boolean protect(EntityPlayer player, World world, BlockPos pos, int id) {
+    public boolean protect(PlayerEntity player, World world, BlockPos pos, int id) {
         GlobalCoordinate key = new GlobalCoordinate(pos, world.provider.getDimension());
         if (id != -1 && blocks.containsKey(key)) {
             Tools.error(player, "This block is already protected!");
@@ -115,7 +115,7 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
         return true;
     }
 
-    public boolean unprotect(EntityPlayer player, World world, BlockPos pos, int id) {
+    public boolean unprotect(PlayerEntity player, World world, BlockPos pos, int id) {
         GlobalCoordinate key = new GlobalCoordinate(pos, world.provider.getDimension());
         if (!blocks.containsKey(key)) {
             Tools.error(player, "This block is not protected!");
