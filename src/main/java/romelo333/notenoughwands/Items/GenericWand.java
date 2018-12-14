@@ -7,6 +7,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.text.StringTextComponent;
 import net.minecraft.text.TextComponent;
 import net.minecraft.text.TextFormat;
@@ -15,9 +16,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.loot.LootPool;
-import net.minecraft.world.loot.condition.LootCondition;
-import net.minecraft.world.loot.function.LootFunction;
 import romelo333.notenoughwands.*;
+import romelo333.notenoughwands.mcjtylib.BlockOutlineRenderer;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.ArrayList;
@@ -273,18 +273,18 @@ public class GenericWand extends Item implements IEnergyItem /*, IEnergyContaine
 
     }
 
-    protected static void renderOutlines(PlayerEntity p, Set<BlockPos> coordinates, int r, int g, int b) {
-        BlockOutlineRenderer.renderOutlines(p, coordinates, r, g, b, evt.getPartialTicks());
+    protected static void renderOutlines(PlayerEntity p, Set<BlockPos> coordinates, int r, int g, int b, float partialTicks) {
+        BlockOutlineRenderer.renderOutlines(p, coordinates, r, g, b, partialTicks);
     }
 
-    protected void showModeKeyDescription(List<String> list, String suffix) {
-        String keyDescription = KeyBindings.wandModifier != null ? KeyBindings.wandModifier.getDisplayName() : "unknown";
-        list.add("Mode key (" + keyDescription + ") to " + suffix);
+    protected void showModeKeyDescription(List<TextComponent> list, String suffix) {
+        String keyDescription = KeyBindings.wandModifier != null ? KeyBindings.wandModifier.getName() : "unknown";
+        list.add(new StringTextComponent("Mode key (" + keyDescription + ") to " + suffix));
     }
 
-    protected void showSubModeKeyDescription(List<String> list, String suffix) {
-        String keyDescription = KeyBindings.wandSubMode != null ? KeyBindings.wandSubMode.getDisplayName() : "unknown";
-        list.add("Sub-mode key (" + keyDescription + ") to " + suffix);
+    protected void showSubModeKeyDescription(List<TextComponent> list, String suffix) {
+        String keyDescription = KeyBindings.wandSubMode != null ? KeyBindings.wandSubMode.getName() : "unknown";
+        list.add(new StringTextComponent("Sub-mode key (" + keyDescription + ") to " + suffix));
     }
 
     //------------------------------------------------------------------------------
@@ -295,15 +295,15 @@ public class GenericWand extends Item implements IEnergyItem /*, IEnergyContaine
             return 0;
         }
 
-        if (container.getTagCompound() == null || !container.getTagCompound().hasKey("Energy")) {
+        if (container.getTag() == null || !container.getTag().containsKey("Energy")) {
             return 0;
         }
-        int energy = container.getTagCompound().getInteger("Energy");
+        int energy = container.getTag().getInt("Energy");
         int energyExtracted = Math.min(energy, Math.min(this.needsrf, maxExtract));
 
         if (!simulate) {
             energy -= energyExtracted;
-            container.getTagCompound().setInteger("Energy", energy);
+            container.getTag().putInt("Energy", energy);
         }
         return energyExtracted;
     }
@@ -314,25 +314,25 @@ public class GenericWand extends Item implements IEnergyItem /*, IEnergyContaine
             return 0;
         }
 
-        if (container.getTagCompound() == null) {
-            container.setTagCompound(new NBTTagCompound());
+        if (container.getTag() == null) {
+            container.setTag(new CompoundTag());
         }
-        int energy = container.getTagCompound().getInteger("Energy");
+        int energy = container.getTag().getInt("Energy");
         int energyReceived = Math.min(maxrf - energy, Math.min(this.maxrf, maxReceive));
 
         if (!simulate) {
             energy += energyReceived;
-            container.getTagCompound().setInteger("Energy", energy);
+            container.getTag().putInt("Energy", energy);
         }
         return energyReceived;
     }
 
     @Override
     public int getEnergyStored(ItemStack container) {
-        if (container.getTagCompound() == null || !container.getTagCompound().hasKey("Energy")) {
+        if (container.getTag() == null || !container.getTag().containsKey("Energy")) {
             return 0;
         }
-        return container.getTagCompound().getInteger("Energy");
+        return container.getTag().getInt("Energy");
     }
 
     @Override

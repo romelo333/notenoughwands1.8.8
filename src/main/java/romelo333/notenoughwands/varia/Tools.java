@@ -8,6 +8,7 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.server.SPacketSoundEffect;
 import net.minecraft.util.ResourceLocation;
@@ -76,21 +77,21 @@ public class Tools {
         return -1;
     }
 
-    public static NBTTagCompound getTagCompound(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+    public static CompoundTag getTagCompound(ItemStack stack) {
+        CompoundTag tagCompound = stack.getTag();
         if (tagCompound == null){
-            tagCompound = new NBTTagCompound();
-            stack.setTagCompound(tagCompound);
+            tagCompound = new CompoundTag();
+            stack.setTag(tagCompound);
         }
         return tagCompound;
     }
 
-    public static String getBlockName(Block block, int meta) {
-        ItemStack s = new ItemStack(block,1,meta);
+    public static String getBlockName(Block block) {
+        ItemStack s = new ItemStack(block,1);
         if (s.getItem() == null) {
             return null;
         }
-        return s.getDisplayName();
+        return s.getDisplayName().getFormattedText();
     }
 
     public static int getPlayerXP(PlayerEntity player) {

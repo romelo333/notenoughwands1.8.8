@@ -64,7 +64,7 @@ public class PacketReturnProtectedBlocks implements IMessage {
     public static class Handler implements IMessageHandler<PacketReturnProtectedBlocks, IMessage> {
         @Override
         public IMessage onMessage(PacketReturnProtectedBlocks message, MessageContext ctx) {
-            Minecraft.getMinecraft().addScheduledTask(() -> ReturnProtectedBlocksHelper.setProtectedBlocks(message));
+            MinecraftClient.getInstance().addScheduledTask(() -> ReturnProtectedBlocksHelper.setProtectedBlocks(message));
             return null;
         }
     }

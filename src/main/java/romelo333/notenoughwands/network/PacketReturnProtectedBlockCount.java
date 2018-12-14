@@ -33,7 +33,7 @@ public class PacketReturnProtectedBlockCount implements IMessage {
     public static class Handler implements IMessageHandler<PacketReturnProtectedBlockCount, IMessage> {
         @Override
         public IMessage onMessage(PacketReturnProtectedBlockCount message, MessageContext ctx) {
-            Minecraft.getMinecraft().addScheduledTask(() -> ReturnProtectedBlockCountHelper.setProtectedBlocks(message));
+            MinecraftClient.getInstance().addScheduledTask(() -> ReturnProtectedBlockCountHelper.setProtectedBlocks(message));
             return null;
         }
 

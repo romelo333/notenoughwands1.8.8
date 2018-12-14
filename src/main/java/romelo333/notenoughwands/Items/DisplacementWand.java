@@ -2,27 +2,16 @@ package romelo333.notenoughwands.Items;
 
 
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.PlayerEntitySP;
-import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.client.item.TooltipOptions;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.text.StringTextComponent;
+import net.minecraft.text.TextComponent;
+import net.minecraft.text.TextFormat;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.TextFormat;
 import net.minecraft.world.World;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import romelo333.notenoughwands.Config;
+import romelo333.notenoughwands.Configuration;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.HashSet;
@@ -57,11 +46,11 @@ public class DisplacementWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List list, ITooltipFlag b) {
+    public void addInformation(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
         super.addInformation(stack, player, list, b);
-        list.add(TextFormat.GREEN + "Mode: " + descriptions[getMode(stack)]);
-        list.add("Right click to push blocks forward.");
-        list.add("Sneak right click to pull blocks.");
+        list.add(new StringTextComponent(TextFormat.GREEN + "Mode: " + descriptions[getMode(stack)]));
+        list.add(new StringTextComponent("Right click to push blocks forward."));
+        list.add(new StringTextComponent("Sneak right click to pull blocks."));
         showModeKeyDescription(list, "switch mode");
     }
 
@@ -171,7 +160,7 @@ public class DisplacementWand extends GenericWand {
     @SideOnly(Side.CLIENT)
     @Override
     public void renderOverlay(RenderWorldLastEvent evt, PlayerEntitySP player, ItemStack wand) {
-        RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver;
+        RayTraceResult mouseOver = MinecraftClient.getInstance().objectMouseOver;
         if (mouseOver != null && mouseOver.getBlockPos() != null && mouseOver.sideHit != null) {
             World world = player.getEntityWorld();
             BlockPos blockPos = mouseOver.getBlockPos();

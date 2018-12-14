@@ -1,34 +1,15 @@
 package romelo333.notenoughwands.Items;
 
 
-import mcjty.lib.varia.BlockTools;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.PlayerEntitySP;
-import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.TextFormat;
 import net.minecraft.world.World;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import romelo333.notenoughwands.Config;
+import romelo333.notenoughwands.Configuration;
 import romelo333.notenoughwands.ProtectedBlocks;
 import romelo333.notenoughwands.varia.Tools;
 
@@ -69,7 +50,7 @@ public class SwappingWand extends GenericWand {
             mode = MODE_FIRST;
         }
         Tools.notify(player, "Switched to " + descriptions[mode] + " mode");
-        Tools.getTagCompound(stack).setInteger("mode", mode);
+        Tools.getTagCompound(stack).set("mode", mode);
     }
 
     @Override
@@ -288,7 +269,7 @@ public class SwappingWand extends GenericWand {
     @SideOnly(Side.CLIENT)
     @Override
     public void renderOverlay(RenderWorldLastEvent evt, PlayerEntitySP player, ItemStack wand) {
-        RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver;
+        RayTraceResult mouseOver = MinecraftClient.getInstance().objectMouseOver;
         if (mouseOver != null && mouseOver.getBlockPos() != null && mouseOver.sideHit != null) {
             IBlockState state = player.getEntityWorld().getBlockState(mouseOver.getBlockPos());
             Block block = state.getBlock();

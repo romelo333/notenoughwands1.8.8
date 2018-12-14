@@ -2,21 +2,25 @@ package romelo333.notenoughwands.Items;
 
 
 import net.minecraft.block.Block;
-import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.block.Blocks;
+import net.minecraft.client.item.TooltipOptions;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.item.ItemUsageContext;
+import net.minecraft.text.StringTextComponent;
+import net.minecraft.text.TextComponent;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import net.minecraftforge.common.config.Configuration;
+import romelo333.notenoughwands.Configuration;
 import romelo333.notenoughwands.ModBlocks;
 
 import java.util.List;
 
 public class IlluminationWand extends GenericWand {
     public IlluminationWand() {
+        super(100); // @todo fabric
         setup("illumination_wand").xpUsage(3).loot(6);
     }
 
@@ -26,34 +30,39 @@ public class IlluminationWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List list, ITooltipFlag b) {
+    public void addInformation(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
         super.addInformation(stack, player, list, b);
-        list.add("Right click on block to spawn light.");
-        list.add("Right click on light to remove it again.");
+        list.add(new StringTextComponent("Right click on block to spawn light."));
+        list.add(new StringTextComponent("Right click on light to remove it again."));
     }
 
     @Override
-    public EnumActionResult onItemUse(PlayerEntity player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-        ItemStack stack = player.getHeldItem(hand);
+    public ActionResult useOnBlock(ItemUsageContext context) {
+        PlayerEntity player = context.getPlayer();
+        World world = context.getWorld();
+        BlockPos pos = context.getPos();
+        Direction side = context.getFacing();
+
+        ItemStack stack = player.getMainHandStack();    // @todo fabric, how to handle hand?
         if (!world.isRemote) {
             Block block = world.getBlockState(pos).getBlock();
             if (block == ModBlocks.lightBlock) {
-                world.setBlockToAir(pos);
-                return EnumActionResult.SUCCESS;
+                world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);  // Is this right? @todo fabric: was setBlockToAir
+                return ActionResult.SUCCESS;
             }
 
-            if (!world.isAirBlock(pos.offset(side))) {
-                return EnumActionResult.SUCCESS;
+            if (!world.isAir(pos.offset(side))) {
+                return ActionResult.SUCCESS;
             }
 
             if (!checkUsage(stack, player, 1.0f)) {
-                return EnumActionResult.SUCCESS;
+                return ActionResult.SUCCESS;
             }
 
             world.setBlockState(pos.offset(side), ModBlocks.lightBlock.getDefaultState(), 3);
 
             registerUsage(stack, player, 1.0f);
         }
-        return EnumActionResult.SUCCESS;
+        return ActionResult.SUCCESS;
     }
 }

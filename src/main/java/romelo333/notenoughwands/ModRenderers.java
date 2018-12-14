@@ -34,7 +34,7 @@ public final class ModRenderers {
     }
 
     public static void rotateToPlayer() {
-        RenderManager renderManager = Minecraft.getMinecraft().getRenderManager();
+        RenderManager renderManager = MinecraftClient.getInstance().getRenderManager();
         GlStateManager.rotate(-renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
     }

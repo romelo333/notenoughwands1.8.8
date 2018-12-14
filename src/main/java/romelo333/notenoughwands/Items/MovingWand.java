@@ -2,23 +2,21 @@ package romelo333.notenoughwands.Items;
 
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.client.item.TooltipOptions;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.text.StringTextComponent;
+import net.minecraft.text.TextComponent;
+import net.minecraft.text.TextFormat;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextFormat;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
-import net.minecraftforge.common.config.Configuration;
 import romelo333.notenoughwands.Config;
+import romelo333.notenoughwands.Configuration;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.List;
@@ -39,24 +37,23 @@ public class MovingWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
+    public void addInformation(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
         super.addInformation(stack, player, list, b);
-        NBTTagCompound compound = stack.getTagCompound();
+        CompoundTag compound = stack.getTag();
         if (!hasBlock(compound)) {
-            list.add(TextFormat.RED + "Wand is empty.");
+            list.add(new StringTextComponent(TextFormat.RED + "Wand is empty."));
         } else {
-            int id = compound.getInteger("block");
-            Block block = Block.REGISTRY.getObjectById(id);
-            int meta = compound.getInteger("meta");
+            String id = compound.getString("block");
+            Block block = Registry.BLOCK.get(new Identifier(id));
             String name = Tools.getBlockName(block, meta);
-            list.add(TextFormat.GREEN + "Block: " + name);
+            list.add(new StringTextComponent(TextFormat.GREEN + "Block: " + name));
         }
-        list.add("Right click to take a block.");
-        list.add("Right click again on block to place it down.");
+        list.add(new StringTextComponent("Right click to take a block."));
+        list.add(new StringTextComponent("Right click again on block to place it down."));
     }
 
-    private boolean hasBlock(NBTTagCompound compound) {
-        return compound != null && compound.hasKey("block");
+    private boolean hasBlock(CompoundTag compound) {
+        return compound != null && compound.containsKey("block");
     }
 
 

@@ -9,6 +9,9 @@ public class Configuration {
     public Property get(String category, String name, int def, String description) {
         return new Property(def);
     }
+    public Property get(String category, String name, boolean def, String description) {
+        return new Property(def);
+    }
     public boolean getBoolean(String category, String name, boolean def, String description) {
         return def;
     }
@@ -28,6 +31,10 @@ public class Configuration {
 
         public int getInt() {
             return (Integer) object;
+        }
+
+        public boolean getBoolean() {
+            return (Boolean) object;
         }
     }
 }

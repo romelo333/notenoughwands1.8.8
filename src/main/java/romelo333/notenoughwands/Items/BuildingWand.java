@@ -1,34 +1,23 @@
 package romelo333.notenoughwands.Items;
 
 
-import mcjty.lib.varia.BlockTools;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.PlayerEntitySP;
-import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.client.item.TooltipOptions;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.command.TagCommand;
+import net.minecraft.text.StringTextComponent;
+import net.minecraft.text.TextComponent;
+import net.minecraft.text.TextFormat;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.TextFormat;
 import net.minecraft.world.World;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import romelo333.notenoughwands.Configuration;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.*;
+import java.util.List;
 
 public class BuildingWand extends GenericWand {
 
@@ -55,24 +44,25 @@ public class BuildingWand extends GenericWand {
         super.initConfig(cfg, 2000, 100000, 500, 200000, 200, 500000);
     }
 
+
     @Override
-    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
+    public void addInformation(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
         super.addInformation(stack, player, list, b);
-        NBTTagCompound compound = stack.getTagCompound();
+        CompoundTag compound = stack.getTag();
         if (compound != null) {
-            int cnt = (compound.hasKey("undo1") ? 1 : 0) + (compound.hasKey("undo2") ? 1 : 0);
-            list.add(TextFormat.GREEN + "Has " + cnt + " undo states");
-            int mode = compound.getInteger("mode");
+            int cnt = (compound.containsKey("undo1") ? 1 : 0) + (compound.containsKey("undo2") ? 1 : 0);
+            list.add(new StringTextComponent(TextFormat.GREEN + "Has " + cnt + " undo states"));
+            int mode = compound.getInt("mode");
             if (mode == MODE_9ROW || mode == MODE_25ROW) {
                 int submode = getSubMode(stack);
-                list.add(TextFormat.GREEN + "Mode: " + descriptions[mode] + (submode == 1 ? " [Rotated]" : ""));
+                list.add(new StringTextComponent(TextFormat.GREEN + "Mode: " + descriptions[mode] + (submode == 1 ? " [Rotated]" : "")));
             } else {
-                list.add(TextFormat.GREEN + "Mode: " + descriptions[mode]);
+                list.add(new StringTextComponent(TextFormat.GREEN + "Mode: " + descriptions[mode]));
             }
         }
-        list.add("Right click to extend blocks in that direction.");
-        list.add("Sneak right click on such a block to undo one of");
-        list.add("the last two operations.");
+        list.add(new StringTextComponent("Right click to extend blocks in that direction."));
+        list.add(new StringTextComponent("Sneak right click on such a block to undo one of"));
+        list.add(new StringTextComponent("the last two operations."));
 
         showModeKeyDescription(list, "switch mode");
         showSubModeKeyDescription(list, "change orientation");
@@ -271,7 +261,7 @@ public class BuildingWand extends GenericWand {
     @SideOnly(Side.CLIENT)
     @Override
     public void renderOverlay(RenderWorldLastEvent evt, PlayerEntitySP player, ItemStack wand) {
-        RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver;
+        RayTraceResult mouseOver = MinecraftClient.getInstance().objectMouseOver;
         if (mouseOver != null && mouseOver.sideHit != null && mouseOver.getBlockPos() != null) {
             World world = player.getEntityWorld();
             BlockPos blockPos = mouseOver.getBlockPos();

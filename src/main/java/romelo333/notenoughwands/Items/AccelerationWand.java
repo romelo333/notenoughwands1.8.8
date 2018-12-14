@@ -2,21 +2,22 @@ package romelo333.notenoughwands.Items;
 
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.item.TooltipOptions;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.ITickable;
+import net.minecraft.item.ItemUsageContext;
+import net.minecraft.text.StringTextComponent;
+import net.minecraft.text.TextComponent;
+import net.minecraft.text.TextFormat;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Tickable;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormat;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.util.FakePlayer;
 import romelo333.notenoughwands.Config;
+import romelo333.notenoughwands.Configuration;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.List;
@@ -41,26 +42,27 @@ public class AccelerationWand extends GenericWand {
     public static final float[] cost = new float[] { 1.0f, 2.0f, 5.0f};
 
     public AccelerationWand() {
+        super(100);
         setup("acceleration_wand").xpUsage(5).loot(2);
     }
 
     private Random random = new Random();
 
     @Override
-    public void addInformation(ItemStack stack, World player, List list, ITooltipFlag b) {
+    public void addInformation(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
         super.addInformation(stack, player, list, b);
-        list.add(TextFormat.GREEN + "Mode: " + descriptions[getMode(stack)]);
-        list.add("Right click on block to speed up ticks.");
+        list.add(new StringTextComponent(TextFormat.GREEN + "Mode: " + descriptions[getMode(stack)]));
+        list.add(new StringTextComponent("Right click on block to speed up ticks."));
         showModeKeyDescription(list, "change speed");
         if (Math.abs(fakePlayerFactor-1.0f) >= 0.01) {
             if (fakePlayerFactor < 0) {
-                list.add(TextFormat.RED + "Usage in a machine has been disabled in config!");
+                list.add(new StringTextComponent(TextFormat.RED + "Usage in a machine has been disabled in config!"));
             } else if (fakePlayerFactor > 1) {
-                list.add(TextFormat.YELLOW + "Usage in a machine will cost more!");
+                list.add(new StringTextComponent(TextFormat.YELLOW + "Usage in a machine will cost more!"));
             }
         }
         if (fakePlayerFactor >= 0.0 && lessEffectiveForFakePlayer) {
-            list.add(TextFormat.YELLOW + "Usage in a machine will be less effective!");
+            list.add(new StringTextComponent(TextFormat.YELLOW + "Usage in a machine will be less effective!"));
         }
     }
 
@@ -74,44 +76,50 @@ public class AccelerationWand extends GenericWand {
     }
 
     @Override
-    public EnumActionResult onItemUse(PlayerEntity player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        ItemStack stack = player.getHeldItem(hand);
+    public ActionResult useOnBlock(ItemUsageContext context) {
+        PlayerEntity player = context.getPlayer();
+        World world = context.getWorld();
+        BlockPos pos = context.getPos();
+        Direction side = context.getFacing();
+
+        ItemStack stack = player.getMainHandStack();    // @todo fabric, how to handle hand?
         if (!world.isRemote) {
-            IBlockState state = world.getBlockState(pos);
+            BlockState state = world.getBlockState(pos);
             Block block = state.getBlock();
             int mode = getMode(stack);
 
             float cost = AccelerationWand.cost[mode];
             int amount = AccelerationWand.amount[mode];
 
-            if (player instanceof FakePlayer) {
-                if (fakePlayerFactor < 0) {
-                    // Blocked by usage in a machine
-                    return EnumActionResult.FAIL;
-                }
-                cost *= fakePlayerFactor;
-
-                if (lessEffectiveForFakePlayer) {
-                    amount /= 2;
-                }
-            }
+            // @todo fabric
+//            if (player instanceof FakePlayer) {
+//                if (fakePlayerFactor < 0) {
+//                    // Blocked by usage in a machine
+//                    return EnumActionResult.FAIL;
+//                }
+//                cost *= fakePlayerFactor;
+//
+//                if (lessEffectiveForFakePlayer) {
+//                    amount /= 2;
+//                }
+//            }
 
             if (!checkUsage(stack, player, cost)) {
-                return EnumActionResult.FAIL;
+                return ActionResult.FAILURE;
             }
-            TileEntity tileEntity = world.getTileEntity(pos);
+            BlockEntity tileEntity = world.getBlockEntity(pos);
             for (int i = 0; i < amount /(tileEntity == null ? 5 : 1); i ++){
                 if (tileEntity == null){
                     block.updateTick(world, pos, state, random);
-                } else if (tileEntity instanceof ITickable) {
-                    ((ITickable)tileEntity).update();
+                } else if (tileEntity instanceof Tickable) {
+                    ((Tickable)tileEntity).tick();
                 }
 
             }
 
             registerUsage(stack, player, cost);
         }
-        return EnumActionResult.SUCCESS;
+        return ActionResult.SUCCESS;
     }
 
     @Override

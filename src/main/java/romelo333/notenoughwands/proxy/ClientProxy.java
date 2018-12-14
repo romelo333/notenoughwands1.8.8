@@ -48,7 +48,7 @@ public class ClientProxy extends CommonProxy {
 
     @SubscribeEvent
     public void renderWorldLastEvent(RenderWorldLastEvent evt) {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = MinecraftClient.getInstance();
         PlayerEntitySP p = mc.player;
         ItemStack heldItem = p.getHeldItem(EnumHand.MAIN_HAND);
         if (heldItem.isEmpty()) {
@@ -83,22 +83,22 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public World getClientWorld() {
-        return Minecraft.getMinecraft().world;
+        return MinecraftClient.getInstance().world;
     }
 
     @Override
     public PlayerEntity getClientPlayer() {
-        return Minecraft.getMinecraft().player;
+        return MinecraftClient.getInstance().player;
     }
 
     @Override
     public <V> ListenableFuture<V> addScheduledTaskClient(Callable<V> callableToSchedule) {
-        return Minecraft.getMinecraft().addScheduledTask(callableToSchedule);
+        return MinecraftClient.getInstance().addScheduledTask(callableToSchedule);
     }
 
     @Override
     public ListenableFuture<Object> addScheduledTaskClient(Runnable runnableToSchedule) {
-        return Minecraft.getMinecraft().addScheduledTask(runnableToSchedule);
+        return MinecraftClient.getInstance().addScheduledTask(runnableToSchedule);
     }
 
 }
