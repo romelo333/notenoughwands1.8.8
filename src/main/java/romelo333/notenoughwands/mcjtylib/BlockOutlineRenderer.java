@@ -1,17 +1,20 @@
 package romelo333.notenoughwands.mcjtylib;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.class_308;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexBuffer;
 import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GLXEXTStereoTree;
 
 import java.util.Set;
 
@@ -59,8 +62,12 @@ public class BlockOutlineRenderer {
         double doubleZ = p.prevRenderZ + (p.z - p.prevRenderZ) * partialTicks;
 
         // @todo fabric
-//        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
+        class_308.method_1452(); //        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
+
+        MinecraftClient.getInstance().worldRenderer.method_3187();
 //        MinecraftClient.getInstance().entityRenderer.disableLightmap();
+
+
         GlStateManager.disableDepthTest();
         GlStateManager.disableTexture();
         GlStateManager.disableLighting();
@@ -75,8 +82,11 @@ public class BlockOutlineRenderer {
         GlStateManager.popMatrix();
 
         // @todo fabric
+        MinecraftClient.getInstance().worldRenderer.method_3180();
 //        MinecraftClient.getInstance().entityRenderer.enableLightmap();
+
         GlStateManager.enableTexture();
+        GlStateManager.enableDepthTest();
     }
 
 
