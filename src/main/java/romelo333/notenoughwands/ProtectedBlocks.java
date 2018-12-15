@@ -1,14 +1,11 @@
 package romelo333.notenoughwands;
 
-import mcjty.lib.varia.GlobalCoordinate;
-import mcjty.lib.worlddata.AbstractWorldData;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants;
+import net.minecraft.world.chunk.ChunkPos;
 import org.apache.commons.lang3.tuple.Pair;
 import romelo333.notenoughwands.varia.Tools;
 
@@ -17,7 +14,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
+// @todo fabric
+public class ProtectedBlocks /*extends AbstractWorldData<ProtectedBlocks>*/ {
 
     private static final String NAME = "NEWProtectedBlocks";
 
@@ -25,7 +23,7 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
     private Map<GlobalCoordinate, Integer> blocks = new HashMap<>();       // Map from coordinate -> ID
 
     // Cache which caches the protected blocks per dimension and per chunk position.
-    private Map<Pair<Integer,ChunkPos>,Set<BlockPos>> perDimPerChunkCache = new HashMap<>();
+    private Map<Pair<Integer, ChunkPos>,Set<BlockPos>> perDimPerChunkCache = new HashMap<>();
 
     private Map<Integer,Integer> counter = new HashMap<>(); // Keep track of number of protected blocks per ID
     private int lastId = 1;
@@ -35,10 +33,10 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
     public static Map<ChunkPos, Set<BlockPos>> clientSideProtectedBlocks = new HashMap<>();
 
     public ProtectedBlocks(String name) {
-        super(name);
+//        super(name);
     }
 
-    @Override
+//    @Override
     public void clear() {
         blocks.clear();
         perDimPerChunkCache.clear();
@@ -47,7 +45,8 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
     }
 
     public static ProtectedBlocks getProtectedBlocks(World world){
-        return getData(world, ProtectedBlocks.class, NAME);
+//        return getData(world, ProtectedBlocks.class, NAME);
+        return null;    // @todo fabric
     }
 
     public static boolean isProtectedClientSide(World world, BlockPos pos){
@@ -59,6 +58,10 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
         return positions.contains(pos);
     }
 
+    protected void save() {
+        // @todo fabric: dummy
+    }
+
     public int getNewId() {
         lastId++;
         save();
@@ -66,19 +69,19 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
     }
 
     private void decrementProtection(Integer oldId) {
-        int cnt = counter.containsKey(oldId) ? counter.get(oldId) : 0;
+        int cnt = counter.getOrDefault(oldId, 0);
         cnt--;
         counter.put(oldId, cnt);
     }
 
     private void incrementProtection(Integer newId) {
-        int cnt = counter.containsKey(newId) ? counter.get(newId) : 0;
+        int cnt = counter.getOrDefault(newId, 0);
         cnt++;
         counter.put(newId, cnt);
     }
 
     public int getProtectedBlockCount(int id) {
-        return counter.containsKey(id) ? counter.get(id) : 0;
+        return counter.getOrDefault(id, 0);
     }
 
     private int getMaxProtectedBlocks(int id) {
@@ -90,7 +93,7 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
     }
 
     public boolean protect(PlayerEntity player, World world, BlockPos pos, int id) {
-        GlobalCoordinate key = new GlobalCoordinate(pos, world.provider.getDimension());
+        GlobalCoordinate key = new GlobalCoordinate(pos, world.dimension.getType().getRawId());
         if (id != -1 && blocks.containsKey(key)) {
             Tools.error(player, "This block is already protected!");
             return false;
@@ -116,7 +119,7 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
     }
 
     public boolean unprotect(PlayerEntity player, World world, BlockPos pos, int id) {
-        GlobalCoordinate key = new GlobalCoordinate(pos, world.provider.getDimension());
+        GlobalCoordinate key = new GlobalCoordinate(pos, world.dimension.getType().getRawId());
         if (!blocks.containsKey(key)) {
             Tools.error(player, "This block is not protected!");
             return false;
@@ -153,7 +156,7 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
     }
 
     public boolean isProtected(World world, BlockPos pos){
-        return blocks.containsKey(new GlobalCoordinate(pos, world.provider.getDimension()));
+        return blocks.containsKey(new GlobalCoordinate(pos, world.dimension.getType().getRawId()));
     }
 
     public boolean hasProtections() {
@@ -165,7 +168,7 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
         for (Map.Entry<GlobalCoordinate, Integer> entry : blocks.entrySet()) {
             if (entry.getValue() == id || (id == -2 && entry.getValue() != -1)) {
                 GlobalCoordinate block = entry.getKey();
-                if (block.getDimension() == world.provider.getDimension()) {
+                if (block.getDimension() == world.dimension.getType().getRawId()) {
                     BlockPos c = block.getCoordinate();
                     float sqdist = (x - c.getX()) * (x - c.getX()) + (y - c.getY()) * (y - c.getY()) + (z - c.getZ()) * (z - c.getZ());
                     if (sqdist < radius) {
@@ -199,7 +202,7 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
     }
 
     public void fetchProtectedBlocks(Map<ChunkPos,Set<BlockPos>> allresults, World world, ChunkPos chunkpos) {
-        Pair<Integer, ChunkPos> key = Pair.of(world.provider.getDimension(), chunkpos);
+        Pair<Integer, ChunkPos> key = Pair.of(world.dimension.getType().getRawId(), chunkpos);
         if (perDimPerChunkCache.containsKey(key)) {
             allresults.put(chunkpos, perDimPerChunkCache.get(key));
             return;
@@ -209,7 +212,7 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
 
         for (Map.Entry<GlobalCoordinate, Integer> entry : blocks.entrySet()) {
             GlobalCoordinate block = entry.getKey();
-            if (block.getDimension() == world.provider.getDimension()) {
+            if (block.getDimension() == world.dimension.getType().getRawId()) {
                 ChunkPos bc = new ChunkPos(block.getCoordinate());
                 if (bc.equals(chunkpos)) {
                     result.add(block.getCoordinate());
@@ -220,37 +223,37 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
         perDimPerChunkCache.put(key, result);
     }
 
-    @Override
-    public void readFromNBT(NBTTagCompound tagCompound) {
-        lastId = tagCompound.getInteger("lastId");
+//    @Override
+    public void readFromNBT(CompoundTag tagCompound) {
+        lastId = tagCompound.getInt("lastId");
         blocks.clear();
         perDimPerChunkCache.clear();;
         counter.clear();
-        NBTTagList list = tagCompound.getTagList("blocks", Constants.NBT.TAG_COMPOUND);
-        for (int i = 0; i<list.tagCount();i++){
-            NBTTagCompound tc = list.getCompoundTagAt(i);
-            GlobalCoordinate block = new GlobalCoordinate(new BlockPos(tc.getInteger("x"),tc.getInteger("y"),tc.getInteger("z")),tc.getInteger("dim"));
-            int id = tc.getInteger("id");
+        ListTag list = tagCompound.getList("blocks", 10);
+        for (int i = 0; i<list.size();i++){
+            CompoundTag tc = list.getCompoundTag(i);
+            GlobalCoordinate block = new GlobalCoordinate(new BlockPos(tc.getInt("x"),tc.getInt("y"),tc.getInt("z")),tc.getInt("dim"));
+            int id = tc.getInt("id");
             blocks.put(block, id);
             incrementProtection(id);
         }
     }
 
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound tagCompound) {
-        tagCompound.setInteger("lastId", lastId);
-        NBTTagList list = new NBTTagList();
+//    @Override
+    public CompoundTag writeToNBT(CompoundTag tagCompound) {
+        tagCompound.putInt("lastId", lastId);
+        ListTag list = new ListTag();
         for (Map.Entry<GlobalCoordinate, Integer> entry : blocks.entrySet()) {
             GlobalCoordinate block = entry.getKey();
-            NBTTagCompound tc = new NBTTagCompound();
-            tc.setInteger("x", block.getCoordinate().getX());
-            tc.setInteger("y", block.getCoordinate().getY());
-            tc.setInteger("z", block.getCoordinate().getZ());
-            tc.setInteger("dim", block.getDimension());
-            tc.setInteger("id", entry.getValue());
-            list.appendTag(tc);
+            CompoundTag tc = new CompoundTag();
+            tc.putInt("x", block.getCoordinate().getX());
+            tc.putInt("y", block.getCoordinate().getY());
+            tc.putInt("z", block.getCoordinate().getZ());
+            tc.putInt("dim", block.getDimension());
+            tc.putInt("id", entry.getValue());
+            list.add(tc);
         }
-        tagCompound.setTag("blocks",list);
+        tagCompound.put("blocks",list);
         return tagCompound;
     }
 }

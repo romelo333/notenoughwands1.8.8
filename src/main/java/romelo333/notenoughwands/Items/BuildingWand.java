@@ -2,18 +2,28 @@ package romelo333.notenoughwands.Items;
 
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.Material;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.TooltipOptions;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.command.TagCommand;
 import net.minecraft.text.StringTextComponent;
 import net.minecraft.text.TextComponent;
 import net.minecraft.text.TextFormat;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.HitResult;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import romelo333.notenoughwands.Configuration;
+import romelo333.notenoughwands.mcjtylib.BlockTools;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.*;
@@ -36,6 +46,7 @@ public class BuildingWand extends GenericWand {
     public static final int[] amount = new int[] { 9, 9, 25, 25, 1 };
 
     public BuildingWand() {
+        super(100);
         setup("building_wand").xpUsage(1).loot(3);
     }
 
@@ -76,7 +87,7 @@ public class BuildingWand extends GenericWand {
             mode = MODE_FIRST;
         }
         Tools.notify(player, "Switched to " + descriptions[mode] + " mode");
-        Tools.getTagCompound(stack).setInteger("mode", mode);
+        Tools.getTagCompound(stack).putInt("mode", mode);
     }
 
     @Override
@@ -84,60 +95,62 @@ public class BuildingWand extends GenericWand {
         int submode = getSubMode(stack);
         submode = submode == 1 ? 0 : 1;
         Tools.notify(player, "Switched orientation");
-        Tools.getTagCompound(stack).setInteger("submode", submode);
+        Tools.getTagCompound(stack).putInt("submode", submode);
     }
 
     private int getMode(ItemStack stack) {
-        return Tools.getTagCompound(stack).getInteger("mode");
+        return Tools.getTagCompound(stack).getInt("mode");
     }
 
     private int getSubMode(ItemStack stack) {
-        return Tools.getTagCompound(stack).getInteger("submode");
+        return Tools.getTagCompound(stack).getInt("submode");
     }
 
     @Override
-    public EnumActionResult onItemUse(PlayerEntity player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-        ItemStack stack = player.getHeldItem(hand);
+    public ActionResult useOnBlock(ItemUsageContext context) {
+        PlayerEntity player = context.getPlayer();
+        World world = context.getWorld();
+        BlockPos pos = context.getPos();
+        ItemStack stack = context.getItemStack();
         if (!world.isRemote) {
             if (player.isSneaking()) {
                 undoPlaceBlock(stack, player, world, pos);
             } else {
-                placeBlock(stack, player, world, pos, side);
+                placeBlock(stack, player, world, pos, context.getFacing());
             }
         }
-        return EnumActionResult.SUCCESS;
+        return ActionResult.SUCCESS;
     }
 
-    private void placeBlock(ItemStack stack, PlayerEntity player, World world, BlockPos pos, EnumFacing side) {
+    private void placeBlock(ItemStack stack, PlayerEntity player, World world, BlockPos pos, Direction side) {
         if (!checkUsage(stack, player, 1.0f)) {
             return;
         }
         boolean notenough = false;
-        IBlockState blockState = world.getBlockState(pos);
+        BlockState blockState = world.getBlockState(pos);
         Block block = blockState.getBlock();
-        int meta = block.getMetaFromState(blockState);
 
 
-        Set<BlockPos> coordinates = findSuitableBlocks(stack, world, side, pos, block, meta);
+        Set<BlockPos> coordinates = findSuitableBlocks(stack, world, side, pos, block);
         Set<BlockPos> undo = new HashSet<BlockPos>();
         for (BlockPos coordinate : coordinates) {
             if (!checkUsage(stack, player, 1.0f)) {
                 break;
             }
-            ItemStack consumed = Tools.consumeInventoryItem(Item.getItemFromBlock(block), meta, player.inventory, player);
+            ItemStack consumed = Tools.consumeInventoryItem(Item.getItemFromBlock(block), player.inventory, player);
             if (!consumed.isEmpty()) {
-                Tools.playSound(world, block.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
+                Tools.playSound(world, block.getSoundGroup(blockState).getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
 //                IBlockState state = block.getStateFromMeta(meta);
 //                world.setBlockState(coordinate, state, 2);
-                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, coordinate);
+//                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, coordinate);
                 BlockTools.placeStackAt(player, consumed, world, coordinate, null);
-                if (ForgeEventFactory.onPlayerBlockPlace(player, blocksnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
-                    blocksnapshot.restore(true, false);
-                    if (!player.capabilities.isCreativeMode) {
-                        Tools.giveItem(world, player, player.getPosition(), consumed);
-                    }
-                }
-                player.openContainer.detectAndSendChanges();
+//                if (ForgeEventFactory.onPlayerBlockPlace(player, blocksnapshot, Direction.UP, EnumHand.MAIN_HAND).isCanceled()) {
+//                    blocksnapshot.restore(true, false);
+//                    if (!player.capabilities.isCreativeMode) {
+//                        Tools.giveItem(world, player, player.getPosition(), consumed);
+//                    }
+//                }
+                player.container.sendContentUpdates();
                 registerUsage(stack, player, 1.0f);
                 undo.add(coordinate);
             } else {
@@ -148,14 +161,13 @@ public class BuildingWand extends GenericWand {
             Tools.error(player, "You don't have the right block");
         }
 
-        registerUndo(stack, block, meta, world, undo);
+        registerUndo(stack, block, world, undo);
     }
 
-    private void registerUndo(ItemStack stack, Block block, int meta, World world, Set<BlockPos> undo) {
-        NBTTagCompound undoTag = new NBTTagCompound();
-        undoTag.setInteger("block", Block.REGISTRY.getIDForObject(block));
-        undoTag.setInteger("meta", meta);
-        undoTag.setInteger("dimension", world.provider.getDimension());
+    private void registerUndo(ItemStack stack, Block block, World world, Set<BlockPos> undo) {
+        CompoundTag undoTag = new CompoundTag();
+        undoTag.putString("block", Registry.BLOCK.getId(block).toString());
+        undoTag.putInt("dimension", world.dimension.getType().getRawId());
         int[] undoX = new int[undo.size()];
         int[] undoY = new int[undo.size()];
         int[] undoZ = new int[undo.size()];
@@ -167,20 +179,20 @@ public class BuildingWand extends GenericWand {
             idx++;
         }
 
-        undoTag.setIntArray("x", undoX);
-        undoTag.setIntArray("y", undoY);
-        undoTag.setIntArray("z", undoZ);
-        NBTTagCompound wandTag = Tools.getTagCompound(stack);
-        if (wandTag.hasKey("undo1")) {
-            wandTag.setTag("undo2", wandTag.getTag("undo1"));
+        undoTag.putIntArray("x", undoX);
+        undoTag.putIntArray("y", undoY);
+        undoTag.putIntArray("z", undoZ);
+        CompoundTag wandTag = Tools.getTagCompound(stack);
+        if (wandTag.containsKey("undo1")) {
+            wandTag.put("undo2", wandTag.getTag("undo1"));
         }
-        wandTag.setTag("undo1", undoTag);
+        wandTag.put("undo1", undoTag);
     }
 
     private void undoPlaceBlock(ItemStack stack, PlayerEntity player, World world, BlockPos pos) {
-        NBTTagCompound wandTag = Tools.getTagCompound(stack);
-        NBTTagCompound undoTag1 = (NBTTagCompound) wandTag.getTag("undo1");
-        NBTTagCompound undoTag2 = (NBTTagCompound) wandTag.getTag("undo2");
+        CompoundTag wandTag = Tools.getTagCompound(stack);
+        CompoundTag undoTag1 = (CompoundTag) wandTag.getTag("undo1");
+        CompoundTag undoTag2 = (CompoundTag) wandTag.getTag("undo2");
 
         Set<BlockPos> undo1 = checkUndo(player, world, undoTag1);
         Set<BlockPos> undo2 = checkUndo(player, world, undoTag2);
@@ -191,58 +203,56 @@ public class BuildingWand extends GenericWand {
 
         if (undo1 != null && undo1.contains(pos)) {
             performUndo(stack, player, world, pos, undoTag1, undo1);
-            if (wandTag.hasKey("undo2")) {
-                wandTag.setTag("undo1", wandTag.getTag("undo2"));
-                wandTag.removeTag("undo2");
+            if (wandTag.containsKey("undo2")) {
+                wandTag.put("undo1", wandTag.getTag("undo2"));
+                wandTag.remove("undo2");
             } else {
-                wandTag.removeTag("undo1");
+                wandTag.remove("undo1");
             }
             return;
         }
         if (undo2 != null && undo2.contains(pos)) {
             performUndo(stack, player, world, pos, undoTag2, undo2);
-            wandTag.removeTag("undo2");
+            wandTag.remove("undo2");
             return;
         }
 
         Tools.error(player, "Select at least one block of the area you want to undo!");
     }
 
-    private void performUndo(ItemStack stack, PlayerEntity player, World world, BlockPos pos, NBTTagCompound undoTag, Set<BlockPos> undo) {
-        Block block = Block.REGISTRY.getObjectById(undoTag.getInteger("block"));
-        int meta = undoTag.getInteger("meta");
+    private void performUndo(ItemStack stack, PlayerEntity player, World world, BlockPos pos, CompoundTag undoTag, Set<BlockPos> undo) {
+        Block block = Registry.BLOCK.get(new Identifier(undoTag.getString("block")));
 
         int cnt = 0;
         for (BlockPos coordinate : undo) {
-            IBlockState testState = world.getBlockState(coordinate);
+            BlockState testState = world.getBlockState(coordinate);
             Block testBlock = testState.getBlock();
-            int testMeta = testBlock.getMetaFromState(testState);
-            if (testBlock == block && testMeta == meta) {
-                Tools.playSound(world, block.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
+            if (testBlock == block) {
+                Tools.playSound(world, block.getSoundGroup(testState).getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
 
-                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, coordinate);
-                world.setBlockToAir(coordinate);
-                if (ForgeEventFactory.onPlayerBlockPlace(player, blocksnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
-                    blocksnapshot.restore(true, false);
-                } else {
+//                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, coordinate);
+                world.setBlockState(coordinate, Blocks.AIR.getDefaultState(), 3);   // @todo fabric
+//                if (ForgeEventFactory.onPlayerBlockPlace(player, blocksnapshot, Direction.UP, EnumHand.MAIN_HAND).isCanceled()) {
+//                    blocksnapshot.restore(true, false);
+//                } else {
                     cnt++;
-                }
+//                }
             }
         }
         if (cnt > 0) {
-            if (!player.capabilities.isCreativeMode) {
-                Tools.giveItem(world, player, block, meta, cnt, pos);
-                player.openContainer.detectAndSendChanges();
+            if (!player.isCreative()) {
+                Tools.giveItem(world, player, block, cnt, pos);
+                player.container.sendContentUpdates();
             }
         }
     }
 
-    private Set<BlockPos> checkUndo(PlayerEntity player, World world, NBTTagCompound undoTag) {
+    private Set<BlockPos> checkUndo(PlayerEntity player, World world, CompoundTag undoTag) {
         if (undoTag == null) {
             return null;
         }
-        int dimension = undoTag.getInteger("dimension");
-        if (dimension != world.provider.getDimension()) {
+        int dimension = undoTag.getInt("dimension");
+        if (dimension != world.dimension.getType().getRawId()) {
             Tools.error(player, "Select at least one block of the area you want to undo!");
             return null;
         }
@@ -258,26 +268,24 @@ public class BuildingWand extends GenericWand {
     }
 
 
-    @SideOnly(Side.CLIENT)
     @Override
-    public void renderOverlay(RenderWorldLastEvent evt, PlayerEntitySP player, ItemStack wand) {
-        RayTraceResult mouseOver = MinecraftClient.getInstance().objectMouseOver;
-        if (mouseOver != null && mouseOver.sideHit != null && mouseOver.getBlockPos() != null) {
+    public void renderOverlay(PlayerEntity player, ItemStack wand, float partialTicks) {
+        HitResult mouseOver = MinecraftClient.getInstance().hitResult;
+        if (mouseOver != null && mouseOver.side != null && mouseOver.getBlockPos() != null) {
             World world = player.getEntityWorld();
             BlockPos blockPos = mouseOver.getBlockPos();
             if (blockPos == null) {
                 return;
             }
-            IBlockState blockState = world.getBlockState(blockPos);
+            BlockState blockState = world.getBlockState(blockPos);
             Block block = blockState.getBlock();
             if (block != null && block.getMaterial(blockState) != Material.AIR) {
                 Set<BlockPos> coordinates;
-                int meta = block.getMetaFromState(blockState);
 
                 if (player.isSneaking()) {
-                    NBTTagCompound wandTag = Tools.getTagCompound(wand);
-                    NBTTagCompound undoTag1 = (NBTTagCompound) wandTag.getTag("undo1");
-                    NBTTagCompound undoTag2 = (NBTTagCompound) wandTag.getTag("undo2");
+                    CompoundTag wandTag = Tools.getTagCompound(wand);
+                    CompoundTag undoTag1 = (CompoundTag) wandTag.getTag("undo1");
+                    CompoundTag undoTag2 = (CompoundTag) wandTag.getTag("undo2");
 
                     Set<BlockPos> undo1 = checkUndo(player, world, undoTag1);
                     Set<BlockPos> undo2 = checkUndo(player, world, undoTag2);
@@ -287,46 +295,46 @@ public class BuildingWand extends GenericWand {
 
                     if (undo1 != null && undo1.contains(blockPos)) {
                         coordinates = undo1;
-                        renderOutlines(evt, player, coordinates, 240, 30, 0);
+                        renderOutlines(player, coordinates, 240, 30, 0, partialTicks);
                     } else if (undo2 != null && undo2.contains(blockPos)) {
                         coordinates = undo2;
-                        renderOutlines(evt, player, coordinates, 240, 30, 0);
+                        renderOutlines(player, coordinates, 240, 30, 0, partialTicks);
                     }
                 } else {
-                    coordinates = findSuitableBlocks(wand, world, mouseOver.sideHit, blockPos, block, meta);
-                    renderOutlines(evt, player, coordinates, 50, 250, 180);
+                    coordinates = findSuitableBlocks(wand, world, mouseOver.side, blockPos, block);
+                    renderOutlines(player, coordinates, 50, 250, 180, partialTicks);
                 }
             }
         }
     }
 
-    private Set<BlockPos> findSuitableBlocks(ItemStack stack, World world, EnumFacing sideHit, BlockPos pos, Block block, int meta) {
+    private Set<BlockPos> findSuitableBlocks(ItemStack stack, World world, Direction sideHit, BlockPos pos, Block block) {
         Set<BlockPos> coordinates = new HashSet<>();
         Set<BlockPos> done = new HashSet<>();
         Deque<BlockPos> todo = new ArrayDeque<>();
         todo.addLast(pos);
-        findSuitableBlocks(world, coordinates, done, todo, sideHit, block, meta, amount[getMode(stack)],
+        findSuitableBlocks(world, coordinates, done, todo, sideHit, block, amount[getMode(stack)],
                 getMode(stack) == MODE_9ROW || getMode(stack) == MODE_25ROW, getSubMode(stack));
 
         return coordinates;
     }
 
-    private void findSuitableBlocks(World world, Set<BlockPos> coordinates, Set<BlockPos> done, Deque<BlockPos> todo, EnumFacing direction, Block block, int meta, int maxAmount,
+    private void findSuitableBlocks(World world, Set<BlockPos> coordinates, Set<BlockPos> done, Deque<BlockPos> todo, Direction direction, Block block, int maxAmount,
                                     boolean rowMode, int rotated) {
 
-        EnumFacing dirA = null;
-        EnumFacing dirB = null;
+        Direction dirA = null;
+        Direction dirB = null;
         if (rowMode) {
             BlockPos base = todo.getFirst();
             BlockPos offset = base.offset(direction);
             dirA = rotated == 1 ? dir2(direction) : dir1(direction);
             dirB = dirA.getOpposite();
-            if (!isSuitable(world, block, meta, base.offset(dirA), offset.offset(dirA)) ||
-                !isSuitable(world, block, meta, base.offset(dirB), offset.offset(dirB))) {
+            if (!isSuitable(world, block, base.offset(dirA), offset.offset(dirA)) ||
+                !isSuitable(world, block, base.offset(dirB), offset.offset(dirB))) {
                 dirA = rotated == 1 ? dir3(direction) : dir2(direction);
                 dirB = dirA.getOpposite();
-                if (!isSuitable(world, block, meta, base.offset(dirA), offset.offset(dirA)) ||
-                        !isSuitable(world, block, meta, base.offset(dirB), offset.offset(dirB))) {
+                if (!isSuitable(world, block, base.offset(dirA), offset.offset(dirA)) ||
+                        !isSuitable(world, block, base.offset(dirB), offset.offset(dirB))) {
                     dirA = rotated == 1 ? dir1(direction) : dir3(direction);
                     dirB = dirA.getOpposite();
                 }
@@ -338,7 +346,7 @@ public class BuildingWand extends GenericWand {
             if (!done.contains(base)) {
                 done.add(base);
                 BlockPos offset = base.offset(direction);
-                if (isSuitable(world, block, meta, base, offset)) {
+                if (isSuitable(world, block, base, offset)) {
                     coordinates.add(offset);
                     if (rowMode) {
                         todo.addLast(base.offset(dirA));
@@ -358,58 +366,57 @@ public class BuildingWand extends GenericWand {
         }
     }
 
-    private boolean isSuitable(World world, Block block, int meta, BlockPos base, BlockPos offset) {
-        IBlockState destState = world.getBlockState(offset);
+    private boolean isSuitable(World world, Block block, BlockPos base, BlockPos offset) {
+        BlockState destState = world.getBlockState(offset);
         Block destBlock = destState.getBlock();
         if (destBlock == null) {
             destBlock = Blocks.AIR;
         }
-        IBlockState baseState = world.getBlockState(base);
-        return baseState.getBlock() == block && baseState.getBlock().getMetaFromState(baseState) == meta &&
-                destBlock.isReplaceable(world, offset);
+        BlockState baseState = world.getBlockState(base);
+        return baseState.getBlock() == block && destBlock.isAir(destState);// @todo fabric:  && destBlock.isReplaceable(world, offset);
     }
 
-    private EnumFacing dir1(EnumFacing direction) {
+    private Direction dir1(Direction direction) {
         switch (direction) {
             case DOWN:
             case UP:
-                return EnumFacing.EAST;
+                return Direction.EAST;
             case NORTH:
             case SOUTH:
-                return EnumFacing.EAST;
+                return Direction.EAST;
             case WEST:
             case EAST:
-                return EnumFacing.DOWN;
+                return Direction.DOWN;
         }
         return null;
     }
 
-    private EnumFacing dir2(EnumFacing direction) {
+    private Direction dir2(Direction direction) {
         switch (direction) {
             case DOWN:
             case UP:
-                return EnumFacing.SOUTH;
+                return Direction.SOUTH;
             case NORTH:
             case SOUTH:
-                return EnumFacing.DOWN;
+                return Direction.DOWN;
             case WEST:
             case EAST:
-                return EnumFacing.SOUTH;
+                return Direction.SOUTH;
         }
         return null;
     }
 
-    private EnumFacing dir3(EnumFacing direction) {
+    private Direction dir3(Direction direction) {
         switch (direction) {
             case DOWN:
             case UP:
-                return EnumFacing.SOUTH;
+                return Direction.SOUTH;
             case NORTH:
             case SOUTH:
-                return EnumFacing.WEST;
+                return Direction.WEST;
             case WEST:
             case EAST:
-                return EnumFacing.SOUTH;
+                return Direction.SOUTH;
         }
         return null;
     }

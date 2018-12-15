@@ -1,75 +1,74 @@
 package romelo333.notenoughwands.varia;
 
 import net.minecraft.block.Block;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.client.network.packet.PlaySoundClientPacket;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerEntityMP;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.play.server.SPacketSoundEffect;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.text.StringTextComponent;
+import net.minecraft.text.TextFormat;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormat;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
 
 public class Tools {
     public static void error(PlayerEntity player, String msg) {
-        player.sendStatusMessage(new TextComponentString(TextFormat.RED + msg), false);
+        player.addChatMessage(new StringTextComponent(TextFormat.RED + msg), false);
     }
 
     public static void notify(PlayerEntity player, String msg) {
-        player.sendStatusMessage(new TextComponentString(TextFormat.GREEN + msg), false);
+        player.addChatMessage(new StringTextComponent(TextFormat.GREEN + msg), false);
     }
 
     @Nonnull
-    public static ItemStack consumeInventoryItem(Item item, int meta, InventoryPlayer inv, PlayerEntity player) {
-        if (player.capabilities.isCreativeMode) {
-            return new ItemStack(item, 1, meta);
+    public static ItemStack consumeInventoryItem(Item item, PlayerInventory inv, PlayerEntity player) {
+        if (player.isCreative()) {
+            return new ItemStack(item, 1);
         }
-        int i = finditem(item, meta, inv);
+        int i = finditem(item, inv);
 
         if (i < 0) {
             return ItemStack.EMPTY;
         } else {
-            ItemStack stackInSlot = inv.getStackInSlot(i);
+            ItemStack stackInSlot = inv.getInvStack(i);
             ItemStack result = stackInSlot.copy();
-            result.setCount(1);
+            result.setAmount(1);
             int amount = -1;
-            stackInSlot.grow(amount);
-            if (stackInSlot.getCount() == 0) {
-                inv.setInventorySlotContents(i, ItemStack.EMPTY);
+            stackInSlot.addAmount(amount);
+            if (stackInSlot.getAmount() == 0) {
+                inv.setInvStack(i, ItemStack.EMPTY);
             }
 
             return result;
         }
     }
 
-    public static void giveItem(World world, PlayerEntity player, Block block, int meta, int cnt, BlockPos pos) {
-        ItemStack oldStack = new ItemStack(block, cnt, meta);
+    public static void giveItem(World world, PlayerEntity player, Block block, int cnt, BlockPos pos) {
+        ItemStack oldStack = new ItemStack(block, cnt);
         giveItem(world, player, pos, oldStack);
     }
 
     public static void giveItem(World world, PlayerEntity player, BlockPos pos, ItemStack oldStack) {
-        if (!player.inventory.addItemStackToInventory(oldStack)) {
+        if (!player.inventory.insertStack(oldStack)) {
             // Not enough room. Spawn item in world.
-            EntityItem entityItem = new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), oldStack);
+            ItemEntity entityItem = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), oldStack);
             world.spawnEntity(entityItem);
         }
     }
 
-    public static int finditem(Item item, int meta, InventoryPlayer inv) {
+    public static int finditem(Item item, PlayerInventory inv) {
         for (int i = 0; i < 36; ++i) {
-            ItemStack stack = inv.getStackInSlot(i);
-            if (!stack.isEmpty() && stack.getItem() == item && meta == stack.getItemDamage()) {
+            ItemStack stack = inv.getInvStack(i);
+            if (!stack.isEmpty() && stack.getItem() == item) {
                 return i;
             }
         }
@@ -95,7 +94,7 @@ public class Tools {
     }
 
     public static int getPlayerXP(PlayerEntity player) {
-        return (int)(getExperienceForLevel(player.experienceLevel) + (player.experience * player.xpBarCap()));
+        return (int)(getExperienceForLevel(player.experienceLevel) + (player.experience * player.method_7349()));   // @todo fabric xpBarCap()
     }
 
     public static boolean addPlayerXP(PlayerEntity player, int amount) {
@@ -103,10 +102,10 @@ public class Tools {
         if (experience < 0) {
             return false;
         }
-        player.experienceTotal = experience;
+        player.experience = experience;
         player.experienceLevel = getLevelForExperience(experience);
         int expForLevel = getExperienceForLevel(player.experienceLevel);
-        player.experience = (experience - expForLevel) / (float)player.xpBarCap();
+        player.experienceBarProgress = (experience - expForLevel) / (float)player.method_7349();   // @todo fabric xpBarCap()
         return true;
     }
 
@@ -137,22 +136,22 @@ public class Tools {
 
     // Server side: play a sound to all nearby players
     public static void playSound(World worldObj, String soundName, double x, double y, double z, double volume, double pitch) {
-        SoundEvent event = SoundEvent.REGISTRY.getObject(new ResourceLocation(soundName));
+        SoundEvent event = Registry.SOUND_EVENT.get(new Identifier(soundName));
         playSound(worldObj, event, x, y, z, volume, pitch);
     }
 
     public static void playSound(World worldObj, SoundEvent soundEvent, double x, double y, double z, double volume, double pitch) {
-        SPacketSoundEffect soundEffect = new SPacketSoundEffect(soundEvent, SoundCategory.BLOCKS, x, y, z, (float) volume, (float) pitch);
+        PlaySoundClientPacket soundEffect = new PlaySoundClientPacket(soundEvent, SoundCategory.BLOCK, x, y, z, (float) volume, (float) pitch);
 
-        for (int j = 0; j < worldObj.playerEntities.size(); ++j) {
-            PlayerEntityMP PlayerEntitymp = (PlayerEntityMP)worldObj.playerEntities.get(j);
-            double d7 = x - PlayerEntitymp.posX;
-            double d8 = y - PlayerEntitymp.posY;
-            double d9 = z - PlayerEntitymp.posZ;
+        for (int j = 0; j < worldObj.players.size(); ++j) {
+            ServerPlayerEntity PlayerEntitymp = (ServerPlayerEntity) worldObj.players.get(j);
+            double d7 = x - PlayerEntitymp.x;
+            double d8 = y - PlayerEntitymp.y;
+            double d9 = z - PlayerEntitymp.z;
             double d10 = d7 * d7 + d8 * d8 + d9 * d9;
 
             if (d10 <= 256.0D) {
-                PlayerEntitymp.connection.sendPacket(soundEffect);
+                PlayerEntitymp.networkHandler.sendPacket(soundEffect);
             }
         }
     }

@@ -1,12 +1,12 @@
 package romelo333.notenoughwands;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.fabricmc.fabric.client.render.BlockEntityRendererRegistry;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexBuffer;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import org.lwjgl.opengl.GL11;
 import romelo333.notenoughwands.blocks.LightRenderer;
 import romelo333.notenoughwands.blocks.LightTE;
@@ -14,7 +14,7 @@ import romelo333.notenoughwands.blocks.LightTE;
 public final class ModRenderers {
 
     public static void init() {
-        ClientRegistry.bindTileEntitySpecialRenderer(LightTE.class, new LightRenderer());
+        BlockEntityRendererRegistry.INSTANCE.register(LightTE.class, new LightRenderer());
     }
 
     public static void renderBillboardQuad(double scale, float vAdd1, float vAdd2) {
@@ -23,19 +23,19 @@ public final class ModRenderers {
         rotateToPlayer();
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        buffer.pos(-scale, -scale, 0).tex(0, 0 + vAdd1).endVertex();
-        buffer.pos(-scale, +scale, 0).tex(0, 0 + vAdd1 + vAdd2).endVertex();
-        buffer.pos(+scale, +scale, 0).tex(1, 0 + vAdd1 + vAdd2).endVertex();
-        buffer.pos(+scale, -scale, 0).tex(1, 0 + vAdd1).endVertex();
+        VertexBuffer buffer = tessellator.getVertexBuffer();
+        buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_UV);
+        buffer.vertex(-scale, -scale, 0).texture(0.0, 0.0 + vAdd1).next();
+        buffer.vertex(-scale, +scale, 0).texture(0.0, 0.0 + vAdd1 + vAdd2).next();
+        buffer.vertex(+scale, +scale, 0).texture(1.0, 0.0 + vAdd1 + vAdd2).next();
+        buffer.vertex(+scale, -scale, 0).texture(1.0, 0.0 + vAdd1).next();
         tessellator.draw();
         GlStateManager.popMatrix();
     }
 
     public static void rotateToPlayer() {
-        RenderManager renderManager = MinecraftClient.getInstance().getRenderManager();
-        GlStateManager.rotate(-renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
+        EntityRenderDispatcher manager = MinecraftClient.getInstance().getEntityRenderManager();
+        GlStateManager.rotatef(-manager.field_4679, 0.0F, 1.0F, 0.0F);  // @todo fabric playerViewY
+        GlStateManager.rotatef(manager.field_4677, 1.0F, 0.0F, 0.0F);   // @todo fabric playerViewX
     }
 }

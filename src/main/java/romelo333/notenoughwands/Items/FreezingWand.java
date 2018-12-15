@@ -1,19 +1,20 @@
 package romelo333.notenoughwands.Items;
 
 
-import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.client.item.TooltipOptions;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.IMob;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.item.ItemUsageContext;
+import net.minecraft.text.StringTextComponent;
+import net.minecraft.text.TextComponent;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.world.World;
-import net.minecraftforge.common.config.Configuration;
 import romelo333.notenoughwands.Config;
+import romelo333.notenoughwands.Configuration;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public class FreezingWand extends GenericWand {
     private float diffcultyAdd = 1.0f;
 
     public FreezingWand() {
+        super(100);
         setup("freezing_wand").xpUsage(10).loot(0);
     }
 
@@ -38,47 +40,47 @@ public class FreezingWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List list, ITooltipFlag b) {
+    public void addInformation(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
         super.addInformation(stack, player, list, b);
-        list.add("Right click on creature to freeze creature.");
+        list.add(new StringTextComponent("Right click on creature to freeze creature."));
     }
 
     @Override
-    public EnumActionResult onItemUse(PlayerEntity player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public ActionResult useOnBlock(ItemUsageContext context) {
+        World world = context.getWorld();
         if (!world.isRemote) {
 
         }
-        return EnumActionResult.FAIL;
+        return ActionResult.FAILURE;
     }
 
-    private void freezeMob(EntityLivingBase mob){
+    private void freezeMob(LivingEntity mob){
 //        mob.addPotionEffect(new PotionEffect(FreezePotion.freezePotion, 200, 4));
     }
 
     @Override
-    public boolean onLeftClickEntity(ItemStack stack, PlayerEntity player, Entity entity) {
+    public boolean interactWithEntity(ItemStack stack, PlayerEntity player, LivingEntity entity, Hand hand) {
         if (!player.getEntityWorld().isRemote) {
-            if (entity instanceof EntityLivingBase) {
-                EntityLivingBase entityLivingBase = (EntityLivingBase) entity;
-                if (entityLivingBase instanceof PlayerEntity) {
+            if (entity != null) {
+                if (entity instanceof PlayerEntity) {
                     Tools.error(player, "You cannot use this on players!");
                     return true;
                 }
-                if ((!allowHostile) && entityLivingBase instanceof IMob) {
+                if ((!allowHostile) && entity instanceof Monster) {
                     Tools.error(player, "It is not possible to freeze hostile mobs with this wand!");
                     return true;
                 }
-                if ((!allowPassive) && !(entityLivingBase instanceof IMob)) {
+                if ((!allowPassive) && !(entity instanceof Monster)) {
                     Tools.error(player, "It is not possible to freeze passive mobs with this wand!");
                     return true;
                 }
 
-                float difficultyScale = entityLivingBase.getMaxHealth() * difficultyMult + diffcultyAdd;
+                float difficultyScale = entity.getHealthMaximum() * difficultyMult + diffcultyAdd;
                 if (!checkUsage(stack, player, difficultyScale)) {
                     return true;
                 }
 
-                freezeMob(entityLivingBase);
+                freezeMob(entity);
                 registerUsage(stack, player, difficultyScale);
             } else {
                 Tools.error(player, "Please select a living entity!");

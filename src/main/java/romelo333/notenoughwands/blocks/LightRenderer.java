@@ -1,31 +1,29 @@
 package romelo333.notenoughwands.blocks;
 
 
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.minecraft.util.Identifier;
 import org.lwjgl.opengl.GL11;
 import romelo333.notenoughwands.ModRenderers;
 import romelo333.notenoughwands.NotEnoughWands;
 
-@SideOnly(Side.CLIENT)
-public class LightRenderer extends TileEntitySpecialRenderer {
-    ResourceLocation texture = new ResourceLocation(NotEnoughWands.MODID.toLowerCase(), "textures/blocks/light.png");
+public class LightRenderer extends BlockEntityRenderer {
+    Identifier texture = new Identifier(NotEnoughWands.MODID.toLowerCase(), "textures/blocks/light.png");
+
 
     @Override
-    public void render(TileEntity tileEntity, double x, double y, double z, float time, int destroyStage, float alpha) {
+    public void render(BlockEntity tileEntity, double x, double y, double z, float time, int destroyStage) {
         bindTexture(texture);
 
         GlStateManager.pushMatrix();
         GlStateManager.enableRescaleNormal();
-        GlStateManager.color(1.0f, 1.0f, 1.0f);
+        GlStateManager.color3f(1.0f, 1.0f, 1.0f);
 
         GlStateManager.enableBlend();
 
-        GlStateManager.translate((float) x + 0.5F, (float) y + 0.5F, (float) z + 0.5F);
+        GlStateManager.translatef((float) x + 0.5F, (float) y + 0.5F, (float) z + 0.5F);
         GlStateManager.blendFunc(GL11.GL_ONE, GL11.GL_ONE);
 
         long t = System.currentTimeMillis() % 6;

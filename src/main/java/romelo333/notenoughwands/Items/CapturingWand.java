@@ -1,9 +1,21 @@
 package romelo333.notenoughwands.Items;
 
 
+import net.minecraft.client.item.TooltipOptions;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.text.StringTextComponent;
+import net.minecraft.text.TextComponent;
+import net.minecraft.text.TextFormat;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import romelo333.notenoughwands.Config;
@@ -19,6 +31,7 @@ public class CapturingWand extends GenericWand {
     private float diffcultyAdd = 1.0f;
 
     public CapturingWand() {
+        super(100);
         setup("capturing_wand").xpUsage(10).loot(3);
     }
 
@@ -33,11 +46,11 @@ public class CapturingWand extends GenericWand {
 
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
+    public void addInformation(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
         super.addInformation(stack, player, list, b);
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        CompoundTag tagCompound = stack.getTag();
         if (tagCompound != null) {
-            if (tagCompound.hasKey("mob")) {
+            if (tagCompound.containsKey("mob")) {
                 String type = tagCompound.getString("type");
                 String name = null;
                 try {
@@ -45,42 +58,47 @@ public class CapturingWand extends GenericWand {
                 } catch (ClassNotFoundException e) {
                     name = "?";
                 }
-                list.add(TextFormat.GREEN + "Captured mob: " + name);
+                list.add(new StringTextComponent(TextFormat.GREEN + "Captured mob: " + name));
             }
         }
-        list.add("Left click on creature to capture it.");
-        list.add("Right click on block to respawn creature.");
+        list.add(new StringTextComponent("Left click on creature to capture it."));
+        list.add(new StringTextComponent("Right click on block to respawn creature."));
     }
 
     @Override
-    public EnumActionResult onItemUse(PlayerEntity player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        ItemStack stack = player.getHeldItem(hand);
+    public ActionResult useOnBlock(ItemUsageContext context) {
+        ItemStack stack = context.getItemStack();
+        World world = context.getWorld();
+        BlockPos pos = context.getPos();
+        PlayerEntity player = context.getPlayer();
         if (!world.isRemote) {
-            NBTTagCompound tagCompound = Tools.getTagCompound(stack);
-            if (tagCompound.hasKey("mob")) {
-                NBTBase mobCompound = tagCompound.getTag("mob");
+            CompoundTag tagCompound = Tools.getTagCompound(stack);
+            if (tagCompound.containsKey("mob")) {
+                Tag mobCompound = tagCompound.getTag("mob");
                 String type = tagCompound.getString("type");
-                EntityLivingBase entityLivingBase = createEntity(player, world, type);
+                LivingEntity entityLivingBase = createEntity(player, world, type);
                 if (entityLivingBase == null) {
                     Tools.error(player, "Something went wrong trying to spawn creature!");
-                    return EnumActionResult.FAIL;
+                    return ActionResult.FAILURE;
                 }
-                entityLivingBase.readFromNBT((NBTTagCompound) mobCompound);
-                entityLivingBase.setLocationAndAngles(pos.getX()+.5, pos.getY()+1, pos.getZ()+.5, 0, 0);
-                tagCompound.removeTag("mob");
-                tagCompound.removeTag("type");
+                entityLivingBase.fromTag((CompoundTag) mobCompound);
+                entityLivingBase.setPosition(pos.getX()+.5, pos.getY()+1, pos.getZ()+.5);
+                // @todo fabric
+//                entityLivingBase.setPositionAndRotations(pos.getX()+.5, pos.getY()+1, pos.getZ()+.5, 0, 0);
+                tagCompound.remove("mob");
+                tagCompound.remove("type");
                 world.spawnEntity(entityLivingBase);
             } else {
                 Tools.error(player, "There is no mob captured in this wand!");
             }
         }
-        return EnumActionResult.SUCCESS;
+        return ActionResult.SUCCESS;
     }
 
-    private EntityLivingBase createEntity(PlayerEntity player, World world, String type) {
-        EntityLivingBase entityLivingBase;
+    private LivingEntity createEntity(PlayerEntity player, World world, String type) {
+        LivingEntity entityLivingBase;
         try {
-            entityLivingBase = (EntityLivingBase) Class.forName(type).getConstructor(World.class).newInstance(world);
+            entityLivingBase = (LivingEntity) Class.forName(type).getConstructor(World.class).newInstance(world);
         } catch (Exception e) {
             entityLivingBase = null;
         }
@@ -88,24 +106,23 @@ public class CapturingWand extends GenericWand {
     }
 
     @Override
-    public boolean onLeftClickEntity(ItemStack stack, PlayerEntity player, Entity entity) {
+    public boolean interactWithEntity(ItemStack stack, PlayerEntity player, LivingEntity entity, Hand var4) {
         if (!player.getEntityWorld().isRemote) {
-            if (entity instanceof EntityLivingBase) {
-                if (Tools.getTagCompound(stack).hasKey("mob")) {
+            if (entity != null) {
+                if (Tools.getTagCompound(stack).containsKey("mob")) {
                     Tools.error(player, "There is already a mob in this wand!");
                     return true;
                 }
-                EntityLivingBase entityLivingBase = (EntityLivingBase) entity;
-                if (entityLivingBase instanceof PlayerEntity) {
+                if (entity instanceof PlayerEntity) {
                     Tools.error(player, "I don't think that player would appreciate being captured!");
                     return true;
                 }
 
-                if ((!allowHostile) && entityLivingBase instanceof IMob) {
+                if ((!allowHostile) && entity instanceof Monster) {
                     Tools.error(player, "It is not possible to capture hostile mobs with this wand!");
                     return true;
                 }
-                if ((!allowPassive) && !(entityLivingBase instanceof IMob)) {
+                if ((!allowPassive) && !(entity instanceof Monster)) {
                     Tools.error(player, "It is not possible to capture passive mobs with this wand!");
                     return true;
                 }
@@ -115,16 +132,17 @@ public class CapturingWand extends GenericWand {
                     return true;
                 }
 
-                float difficultyScale = (float) (entityLivingBase.getMaxHealth() * cost * difficultyMult + diffcultyAdd);
+                float difficultyScale = (float) (entity.getHealthMaximum() * cost * difficultyMult + diffcultyAdd);
                 if (!checkUsage(stack, player, difficultyScale)) {
                     return true;
                 }
 
-                NBTTagCompound tagCompound = new NBTTagCompound();
-                entityLivingBase.writeToNBT(tagCompound);
-                Tools.getTagCompound(stack).setTag("mob", tagCompound);
-                Tools.getTagCompound(stack).setString("type", entity.getClass().getCanonicalName());
-                player.getEntityWorld().removeEntity(entity);
+                CompoundTag tagCompound = new CompoundTag();
+                entity.toTag(tagCompound);
+                Tools.getTagCompound(stack).put("mob", tagCompound);
+                Tools.getTagCompound(stack).putString("type", entity.getClass().getCanonicalName());
+                // @todo fabric!!!
+//                player.getEntityWorld().removeEntity(entity);
 
                 registerUsage(stack, player, difficultyScale);
             } else {

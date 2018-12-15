@@ -1,17 +1,8 @@
 package romelo333.notenoughwands.varia;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.IEnergyStorage;
-import romelo333.notenoughwands.Items.IEnergyItem;
-
-import javax.annotation.Nullable;
-
-public class ItemCapabilityProvider implements ICapabilityProvider {
-
+// @todo fabric
+public class ItemCapabilityProvider /*implements ICapabilityProvider*/ {
+/*
     private final ItemStack itemStack;
     private final IEnergyItem item;
 
@@ -65,4 +56,5 @@ public class ItemCapabilityProvider implements ICapabilityProvider {
         }
         return null;
     }
+    */
 }

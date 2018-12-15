@@ -1,24 +1,23 @@
 package romelo333.notenoughwands.Items;
 
 
-import net.minecraft.client.entity.PlayerEntitySP;
-import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.client.item.TooltipOptions;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.item.ItemUsageContext;
+import net.minecraft.text.StringTextComponent;
+import net.minecraft.text.TextComponent;
+import net.minecraft.text.TextFormat;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormat;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import romelo333.notenoughwands.Config;
+import romelo333.notenoughwands.Configuration;
 import romelo333.notenoughwands.ProtectedBlocks;
-import romelo333.notenoughwands.network.*;
+import romelo333.notenoughwands.network.ReturnProtectedBlockCountHelper;
+import romelo333.notenoughwands.network.ReturnProtectedBlocksHelper;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.List;
@@ -42,6 +41,7 @@ public class ProtectionWand extends GenericWand {
     };
 
     public ProtectionWand(boolean master) {
+        super(100);
         if (master) {
             setup("master_protection_wand").xpUsage(0).loot(0);
         } else {
@@ -60,29 +60,30 @@ public class ProtectionWand extends GenericWand {
     private static long tooltipLastTime = 0;
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
+    public void addInformation(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
         super.addInformation(stack, player, list, b);
-        boolean hasid = stack.getTagCompound() != null && stack.getTagCompound().hasKey("id");
+        boolean hasid = stack.getTag() != null && stack.getTag().containsKey("id");
         int mode = getMode(stack);
         int id = getId(stack);
         if (hasid && id != 0) {
             if ((System.currentTimeMillis() - tooltipLastTime) > 250) {
                 tooltipLastTime = System.currentTimeMillis();
-                NEWPacketHandler.INSTANCE.sendToServer(new PacketGetProtectedBlockCount(id));
+                // @todo fabric
+//                NEWPacketHandler.INSTANCE.sendToServer(new PacketGetProtectedBlockCount(id));
             }
         }
-        list.add(TextFormat.GREEN + "Mode: " + descriptions[mode]);
+        list.add(new StringTextComponent(TextFormat.GREEN + "Mode: " + descriptions[mode]));
         if (master) {
-            list.add(TextFormat.YELLOW + "Master wand");
+            list.add(new StringTextComponent(TextFormat.YELLOW + "Master wand"));
         } else {
             if (id != 0) {
-                list.add(TextFormat.GREEN + "Id: " + id);
+                list.add(new StringTextComponent(TextFormat.GREEN + "Id: " + id));
             }
         }
         if (hasid) {
-            list.add(TextFormat.GREEN + "Number of protected blocks: " + ReturnProtectedBlockCountHelper.count);
+            list.add(new StringTextComponent(TextFormat.GREEN + "Number of protected blocks: " + ReturnProtectedBlockCountHelper.count));
         }
-        list.add("Right click to protect or unprotect a block.");
+        list.add(new StringTextComponent("Right click to protect or unprotect a block."));
         showModeKeyDescription(list, "switch mode");
     }
 
@@ -94,89 +95,95 @@ public class ProtectionWand extends GenericWand {
             mode = MODE_FIRST;
         }
         Tools.notify(player, "Switched to " + descriptions[mode] + " mode");
-        Tools.getTagCompound(stack).setInteger("mode", mode);
+        Tools.getTagCompound(stack).putInt("mode", mode);
     }
 
     private int getMode(ItemStack stack) {
-        return Tools.getTagCompound(stack).getInteger("mode");
+        return Tools.getTagCompound(stack).getInt("mode");
     }
 
     public int getId(ItemStack stack) {
         if (master) {
             return -1;
         }
-        return Tools.getTagCompound(stack).getInteger("id");
+        return Tools.getTagCompound(stack).getInt("id");
     }
 
     private static long lastTime = 0;
 
-    @SideOnly(Side.CLIENT)
     @Override
-    public void renderOverlay(RenderWorldLastEvent evt, PlayerEntitySP player, ItemStack wand) {
+    public void renderOverlay(PlayerEntity player, ItemStack wand, float partialTicks) {
         if ((System.currentTimeMillis() - lastTime) > 250) {
             lastTime = System.currentTimeMillis();
-            NEWPacketHandler.INSTANCE.sendToServer(new PacketGetProtectedBlocks());
+            // @todo fabric
+//            NEWPacketHandler.INSTANCE.sendToServer(new PacketGetProtectedBlocks());
         }
         if (master) {
-            renderOutlines(evt, player, ReturnProtectedBlocksHelper.childBlocks, 30, 30, 200);
+            renderOutlines(player, ReturnProtectedBlocksHelper.childBlocks, 30, 30, 200, partialTicks);
         }
-        renderOutlines(evt, player, ReturnProtectedBlocksHelper.blocks, 210, 60, 40);
+        renderOutlines(player, ReturnProtectedBlocksHelper.blocks, 210, 60, 40, partialTicks);
     }
 
     @Override
-    public EnumActionResult onItemUse(PlayerEntity player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        ItemStack stack = player.getHeldItem(hand);
+    public ActionResult useOnBlock(ItemUsageContext context) {
+        PlayerEntity player = context.getPlayer();
+        World world = context.getWorld();
+        BlockPos pos = context.getPos();
+        Direction side = context.getFacing();
+
+        ItemStack stack = player.getMainHandStack();    // @todo fabric, how to handle hand?
         if (!world.isRemote) {
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
             int id = getOrCreateId(stack, world, protectedBlocks);
             int mode = getMode(stack);
             if (mode == MODE_PROTECT) {
                 if (!checkUsage(stack, player, 1.0f)) {
-                    return EnumActionResult.FAIL;
+                    return ActionResult.FAILURE;
                 }
                 if (!protectedBlocks.protect(player, world, pos, id)) {
-                    return EnumActionResult.FAIL;
+                    return ActionResult.FAILURE;
                 }
                 registerUsage(stack, player, 1.0f);
             } else if (mode == MODE_UNPROTECT) {
                 if (!protectedBlocks.unprotect(player, world, pos, id)) {
-                    return EnumActionResult.FAIL;
+                    return ActionResult.FAILURE;
                 }
             } else {
                 int cnt = protectedBlocks.clearProtections(world, id);
                 Tools.notify(player, "Cleared " + cnt + " protected blocks");
             }
         }
-        return EnumActionResult.SUCCESS;
+        return ActionResult.SUCCESS;
     }
 
     private int getOrCreateId(ItemStack stack, World world, ProtectedBlocks protectedBlocks) {
         int id = getId(stack);
         if (id == 0) {
             id = protectedBlocks.getNewId();
-            Tools.getTagCompound(stack).setInteger("id", id);
+            Tools.getTagCompound(stack).putInt("id", id);
         }
         return id;
     }
 
-    @Override
-    public boolean hasContainerItem(ItemStack stack) {
-        return !master;
-    }
+    // @todo fabric
+//    @Override
+//    public boolean hasContainerItem(ItemStack stack) {
+//        return !master;
+//    }
 
-    @Override
-    public Item getContainerItem() {
-        return this;
-    }
+//    @Override
+//    public Item getContainerItem() {
+//        return this;
+//    }
 
-    @Override
-    public ItemStack getContainerItem(ItemStack stack) {
-        if (hasContainerItem(stack) && stack.hasTagCompound()) {
-            ItemStack container = new ItemStack(getContainerItem());
-            container.setTagCompound(stack.getTagCompound().copy());
-            return container;
-        }
-        return ItemStack.EMPTY;
-    }
+//    @Override
+//    public ItemStack getContainerItem(ItemStack stack) {
+//        if (hasContainerItem(stack) && stack.hasTag()) {
+//            ItemStack container = new ItemStack(getContainerItem());
+//            container.setTag(stack.getTag().copy());
+//            return container;
+//        }
+//        return ItemStack.EMPTY;
+//    }
 
 }

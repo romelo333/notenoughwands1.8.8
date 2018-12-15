@@ -1,25 +1,21 @@
 package romelo333.notenoughwands.network;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.world.chunk.ChunkPos;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class PacketReturnProtectedBlocksAroundPlayer implements IMessage {
+public class PacketReturnProtectedBlocksAroundPlayer /*implements IMessage */ {
     private Map<ChunkPos, Set<BlockPos>> blocks;
 
-    @Override
+//    @Override
     public void fromBytes(ByteBuf buf) {
         int size = buf.readInt();
-        blocks = new HashMap<ChunkPos, Set<BlockPos>> (size);
+        blocks = new HashMap<>(size);
         for (int i = 0 ; i < size ; i++) {
             ChunkPos chunkpos = new ChunkPos(buf.readInt(), buf.readInt());
 
@@ -32,7 +28,6 @@ public class PacketReturnProtectedBlocksAroundPlayer implements IMessage {
         }
     }
 
-    @Override
     public void toBytes(ByteBuf buf) {
         buf.writeInt(blocks.size());
         for (Map.Entry<ChunkPos, Set<BlockPos>> entry : blocks.entrySet()) {
@@ -59,12 +54,12 @@ public class PacketReturnProtectedBlocksAroundPlayer implements IMessage {
         this.blocks = blocks;
     }
 
-    public static class Handler implements IMessageHandler<PacketReturnProtectedBlocksAroundPlayer, IMessage> {
-        @Override
-        public IMessage onMessage(PacketReturnProtectedBlocksAroundPlayer message, MessageContext ctx) {
-            MinecraftClient.getInstance().addScheduledTask(() -> ReturnProtectedBlocksAroundPlayerHelper.setProtectedBlocks(
-                    MinecraftClient.getInstance().world.provider.getDimension(), message));
-            return null;
-        }
-    }
+//    public static class Handler implements IMessageHandler<PacketReturnProtectedBlocksAroundPlayer, IMessage> {
+//        @Override
+//        public IMessage onMessage(PacketReturnProtectedBlocksAroundPlayer message, MessageContext ctx) {
+//            MinecraftClient.getInstance().addScheduledTask(() -> ReturnProtectedBlocksAroundPlayerHelper.setProtectedBlocks(
+//                    MinecraftClient.getInstance().world.provider.getDimension(), message));
+//            return null;
+//        }
+//    }
 }

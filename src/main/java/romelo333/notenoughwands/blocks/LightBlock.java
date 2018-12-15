@@ -1,90 +1,87 @@
 package romelo333.notenoughwands.blocks;
 
 
-import net.minecraft.block.Block;
-import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.particle.ParticleManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.fabricmc.fabric.block.FabricBlockSettings;
+import net.minecraft.block.*;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.BoundingBox;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import romelo333.notenoughwands.ModBlocks;
+import romelo333.notenoughwands.NotEnoughWands;
 
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.Random;
 
-public class LightBlock extends Block implements ITileEntityProvider {
+public class LightBlock extends Block implements BlockEntityProvider {
     public LightBlock() {
-        super(Material.PORTAL);
-        setHardness(0.0f);
-        setUnlocalizedName("notenoughwands.blockLight");
-        setRegistryName("lightBlock");
-//        setStepSound(Block.soundTypeCloth);
-        // @todo
+        super(FabricBlockSettings.of(Material.PORTAL).hardness(0.0f).build());
+        Registry.BLOCK.register(new Identifier(NotEnoughWands.MODID, "lightblock"), this);
     }
 
-    private static final AxisAlignedBB EMPTY = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
+    private static final BoundingBox EMPTY = new BoundingBox(0, 0, 0, 0, 0, 0);
 
+
+    // @todo fabric
+//    @Override
+//    public BoundingBox getSelectedBoundingBox(BlockState state, World worldIn, BlockPos pos) {
+//        return EMPTY;
+//    }
+
+//    @Override
+//    public int quantityDropped(Random rnd) {
+//        return 0;
+//    }
+
+    @Nullable
     @Override
-    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
-        return EMPTY;
+    public BlockEntity createBlockEntity(BlockView var1) {
+        return new LightTE(ModBlocks.LIGHT);
     }
 
     @Override
-    public int quantityDropped(Random rnd) {
-        return 0;
-    }
-
-    @Override
-    public TileEntity createNewTileEntity(World world, int i) {
-        return new LightTE();
-    }
-
-    @Override
-    public int getLightValue(IBlockState state) {
+    public int getLuminance(BlockState var1) {
         return 15;
     }
 
     @Override
-    public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean p_185477_7_) {
+    public VoxelShape getBoundingShape(BlockState var1, BlockView var2, BlockPos var3) {
+        return VoxelShapes.empty();
     }
 
-    @Override
-    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
-        return false;
-    }
 
+    // @todo fabric
+//    @Override
+//    public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean p_185477_7_) {
+//    }
+//
 //
 //    @Override
-//    public boolean renderAsNormalBlock() {
+//    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+//        return false;
+//    }
+//
+//    @Override
+//    public boolean isOpaqueCube(IBlockState state) {
 //        return false;
 //    }
 
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state) {
-        return false;
-    }
-
-    @SideOnly(Side.CLIENT)
-    @Override
-    public boolean addHitEffects(IBlockState state, World worldObj, RayTraceResult target, ParticleManager manager) {
-        return true;
-    }
+//    @SideOnly(Side.CLIENT)
+//    @Override
+//    public boolean addHitEffects(IBlockState state, World worldObj, RayTraceResult target, ParticleManager manager) {
+//        return true;
+//    }
 
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public boolean addDestroyEffects(World world, BlockPos pos, ParticleManager effectRenderer) {
-        return true;
-    }
+//    @Override
+//    @SideOnly(Side.CLIENT)
+//    public boolean addDestroyEffects(World world, BlockPos pos, ParticleManager effectRenderer) {
+//        return true;
+//    }
 
 }

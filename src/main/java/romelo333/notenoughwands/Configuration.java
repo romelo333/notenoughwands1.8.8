@@ -6,6 +6,9 @@ public class Configuration {
     public Property get(String category, String name, double def, String description) {
         return new Property(def);
     }
+    public Property get(String category, String name, double def) {
+        return new Property(def);
+    }
     public Property get(String category, String name, int def, String description) {
         return new Property(def);
     }
@@ -13,6 +16,9 @@ public class Configuration {
         return new Property(def);
     }
     public boolean getBoolean(String category, String name, boolean def, String description) {
+        return def;
+    }
+    public String getString(String category, String name, String def, String description) {
         return def;
     }
 

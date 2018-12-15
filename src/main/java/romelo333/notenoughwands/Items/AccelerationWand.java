@@ -81,8 +81,7 @@ public class AccelerationWand extends GenericWand {
         World world = context.getWorld();
         BlockPos pos = context.getPos();
         Direction side = context.getFacing();
-
-        ItemStack stack = player.getMainHandStack();    // @todo fabric, how to handle hand?
+        ItemStack stack = context.getItemStack();
         if (!world.isRemote) {
             BlockState state = world.getBlockState(pos);
             Block block = state.getBlock();
@@ -110,7 +109,7 @@ public class AccelerationWand extends GenericWand {
             BlockEntity tileEntity = world.getBlockEntity(pos);
             for (int i = 0; i < amount /(tileEntity == null ? 5 : 1); i ++){
                 if (tileEntity == null){
-                    block.updateTick(world, pos, state, random);
+                    block.randomTick(state, world, pos, random);
                 } else if (tileEntity instanceof Tickable) {
                     ((Tickable)tileEntity).tick();
                 }
@@ -130,10 +129,10 @@ public class AccelerationWand extends GenericWand {
             mode = MODE_FIRST;
         }
         Tools.notify(player, "Switched to " + descriptions[mode] + " mode");
-        Tools.getTagCompound(stack).setInteger("mode", mode);
+        Tools.getTagCompound(stack).putInt("mode", mode);
     }
 
     private int getMode(ItemStack stack) {
-        return Tools.getTagCompound(stack).getInteger("mode");
+        return Tools.getTagCompound(stack).getInt("mode");
     }
 }

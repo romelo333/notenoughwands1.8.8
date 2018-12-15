@@ -1,22 +1,24 @@
 package romelo333.notenoughwands.Items;
 
 
-import net.minecraft.client.resources.I18n;
-import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.client.item.TooltipOptions;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.IMob;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffectUtil;
+import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.text.TextFormat;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.text.StringTextComponent;
+import net.minecraft.text.TextComponent;
+import net.minecraft.text.TextFormat;
+import net.minecraft.util.Hand;
 import net.minecraft.world.World;
-import net.minecraftforge.common.config.Configuration;
 import romelo333.notenoughwands.Config;
+import romelo333.notenoughwands.Configuration;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.List;
@@ -28,6 +30,7 @@ public class PotionWand extends GenericWand {
     private float diffcultyAdd = 1.0f;
 
     public PotionWand() {
+        super(100);
         setup("potion_wand").xpUsage(10).loot(3);
     }
 
@@ -40,43 +43,43 @@ public class PotionWand extends GenericWand {
         diffcultyAdd = (float) cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_diffcultyAdd", diffcultyAdd, "Add this to the HP * difficultyMult to get the final difficulty scale that affects XP/RF usage (a final result of 1.0 means that the default XP/RF is used)").getDouble();
     }
 
-    private String getEffectName(PotionEffect potioneffect){
-        String s1 = I18n.format(potioneffect.getEffectName()).trim();
+    private String getEffectName(StatusEffectInstance potioneffect){
+        String s1 = I18n.translate(potioneffect.getTranslationKey()).trim();
         if (potioneffect.getAmplifier() > 0) {
-            s1 = s1 + " " + I18n.format("potion.potency." + potioneffect.getAmplifier()).trim();
+            s1 = s1 + " " + I18n.translate("potion.potency." + potioneffect.getAmplifier()).trim();
         }
         if (potioneffect.getDuration() > 20) {
-            s1 = s1 + " (" + Potion.getPotionDurationString(potioneffect, potioneffect.getDuration()) + ")";
+            s1 = s1 + " (" + StatusEffectUtil.durationToString(potioneffect, potioneffect.getDuration()) + ")";
         }
         return s1;
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
+    public void addInformation(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
         super.addInformation(stack, player, list, b);
-        list.add("Left click on creature to apply effect");
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        list.add(new StringTextComponent("Left click on creature to apply effect"));
+        CompoundTag tagCompound = stack.getTag();
         if (tagCompound==null){
-            list.add(TextFormat.YELLOW+"No effects. Combine with potion");
-            list.add(TextFormat.YELLOW+"in crafting table to add effect");
+            list.add(new StringTextComponent(TextFormat.YELLOW+"No effects. Combine with potion"));
+            list.add(new StringTextComponent(TextFormat.YELLOW+"in crafting table to add effect"));
             return;
         }
-        NBTTagList effects = (NBTTagList) tagCompound.getTag("effects");
-        if (effects == null || effects.tagCount()==0){
-            list.add(TextFormat.YELLOW+"No effects. Combine with potion");
-            list.add(TextFormat.YELLOW+"in crafting table to add effect");
+        ListTag effects = (ListTag) tagCompound.getTag("effects");
+        if (effects == null || effects.size()==0){
+            list.add(new StringTextComponent(TextFormat.YELLOW+"No effects. Combine with potion"));
+            list.add(new StringTextComponent(TextFormat.YELLOW+"in crafting table to add effect"));
             return;
         }
-        list.add(TextFormat.YELLOW+"Combine with empty bottle");
-        list.add(TextFormat.YELLOW+"to clear effects");
+        list.add(new StringTextComponent(TextFormat.YELLOW+"Combine with empty bottle"));
+        list.add(new StringTextComponent(TextFormat.YELLOW+"to clear effects"));
         int mode = getMode(stack);
-        for (int i=0;i<effects.tagCount();i++) {
-            NBTTagCompound effecttag = effects.getCompoundTagAt(i);
-            PotionEffect effect = PotionEffect.readCustomPotionEffectFromNBT(effecttag);
+        for (int i=0;i<effects.size();i++) {
+            CompoundTag effecttag = effects.getCompoundTag(i);
+            StatusEffectInstance effect = StatusEffectInstance.deserialize(effecttag);
             if (i==mode){
-                list.add("    + " + TextFormat.GREEN + getEffectName(effect));
+                list.add(new StringTextComponent("    + " + TextFormat.GREEN + getEffectName(effect)));
             } else {
-                list.add("    " + TextFormat.GRAY+getEffectName(effect));
+                list.add(new StringTextComponent("    " + TextFormat.GRAY+getEffectName(effect)));
             }
         }
     }
@@ -85,64 +88,63 @@ public class PotionWand extends GenericWand {
     public void toggleMode(PlayerEntity player, ItemStack stack) {
         int mode = getMode(stack);
         mode++;
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        CompoundTag tagCompound = stack.getTag();
         if (tagCompound==null){
             return;
         }
-        NBTTagList effects = (NBTTagList) tagCompound.getTag("effects");
-        if (effects == null || effects.tagCount()==0){
+        ListTag effects = (ListTag) tagCompound.getTag("effects");
+        if (effects == null || effects.size()==0){
             return;
         }
-        if (mode >= effects.tagCount()) {
+        if (mode >= effects.size()) {
             mode = 0;
         }
-        NBTTagCompound effecttag = effects.getCompoundTagAt(mode);
-        PotionEffect effect = PotionEffect.readCustomPotionEffectFromNBT(effecttag);
+        CompoundTag effecttag = effects.getCompoundTag(mode);
+        StatusEffectInstance effect = StatusEffectInstance.deserialize(effecttag);
         Tools.notify(player, "Switched to " + getEffectName(effect) + " mode");
-        Tools.getTagCompound(stack).setInteger("mode", mode);
+        Tools.getTagCompound(stack).putInt("mode", mode);
     }
 
     private int getMode(ItemStack stack) {
-        return Tools.getTagCompound(stack).getInteger("mode");
+        return Tools.getTagCompound(stack).getInt("mode");
     }
 
 
-    private void addeffect(EntityLivingBase entity, ItemStack wand, PlayerEntity player){
-        NBTTagCompound tagCompound = wand.getTagCompound();
+    private void addeffect(LivingEntity entity, ItemStack wand, PlayerEntity player){
+        CompoundTag tagCompound = wand.getTag();
         if (tagCompound==null){
             Tools.error(player, "There are no effects in this wand!");
             return;
         }
-        NBTTagList effects = (NBTTagList) tagCompound.getTag("effects");
-        if (effects == null || effects.tagCount()==0){
+        ListTag effects = (ListTag) tagCompound.getTag("effects");
+        if (effects == null || effects.size()==0){
             Tools.error(player, "There are no effects in this wand!");
             return;
         }
-        NBTTagCompound effecttag = effects.getCompoundTagAt(getMode(wand));
-        PotionEffect effect = PotionEffect.readCustomPotionEffectFromNBT(effecttag);
+        CompoundTag effecttag = effects.getCompoundTag(getMode(wand));
+        StatusEffectInstance effect = StatusEffectInstance.deserialize(effecttag);
         entity.addPotionEffect(effect);
     }
 
     @Override
-    public boolean onLeftClickEntity(ItemStack stack, PlayerEntity player, Entity entity) {
+    public boolean interactWithEntity(ItemStack stack, PlayerEntity player, LivingEntity entity, Hand hand) {
         if (!player.getEntityWorld().isRemote) {
-            if (entity instanceof EntityLivingBase) {
-                EntityLivingBase entityLivingBase = (EntityLivingBase) entity;
-                if ((!allowHostile) && entityLivingBase instanceof IMob) {
+            if (entity != null) {
+                if ((!allowHostile) && entity instanceof Monster) {
                     Tools.error(player, "It is not possible to add effects to hostile mobs with this wand!");
                     return true;
                 }
-                if ((!allowPassive) && !(entityLivingBase instanceof IMob)) {
+                if ((!allowPassive) && !(entity instanceof Monster)) {
                     Tools.error(player, "It is not possible to add effects to passive mobs with this wand!");
                     return true;
                 }
 
-                float difficultyScale = entityLivingBase.getMaxHealth() * difficultyMult + diffcultyAdd;
+                float difficultyScale = entity.getHealthMaximum() * difficultyMult + diffcultyAdd;
                 if (!checkUsage(stack, player, difficultyScale)) {
                     return true;
                 }
 
-                addeffect(entityLivingBase, stack, player);
+                addeffect(entity, stack, player);
                 registerUsage(stack, player, difficultyScale);
             } else {
                 Tools.error(player, "Please select a living entity!");

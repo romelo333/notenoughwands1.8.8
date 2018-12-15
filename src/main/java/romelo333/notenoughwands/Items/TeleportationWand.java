@@ -28,6 +28,7 @@ public class TeleportationWand extends GenericWand {
     private boolean teleportThroughWalls = true;
 
     public TeleportationWand() {
+        super(100);
         setup("teleportation_wand").xpUsage(4).loot(6);
     }
 

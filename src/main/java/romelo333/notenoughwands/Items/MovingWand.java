@@ -2,16 +2,20 @@ package romelo333.notenoughwands.Items;
 
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.item.TooltipOptions;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.text.StringTextComponent;
 import net.minecraft.text.TextComponent;
 import net.minecraft.text.TextFormat;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Identifier;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
@@ -26,6 +30,7 @@ public class MovingWand extends GenericWand {
     private int placeDistance = 4;
 
     public MovingWand() {
+        super(100);
         setup("moving_wand").xpUsage(3).loot(5);
     }
 
@@ -45,7 +50,7 @@ public class MovingWand extends GenericWand {
         } else {
             String id = compound.getString("block");
             Block block = Registry.BLOCK.get(new Identifier(id));
-            String name = Tools.getBlockName(block, meta);
+            String name = Tools.getBlockName(block);
             list.add(new StringTextComponent(TextFormat.GREEN + "Block: " + name));
         }
         list.add(new StringTextComponent("Right click to take a block."));
@@ -57,85 +62,90 @@ public class MovingWand extends GenericWand {
     }
 
 
+
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, EnumHand hand) {
-        ItemStack stack = player.getHeldItem(hand);
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+        ItemStack stack = player.getStackInHand(hand);
         if (!world.isRemote) {
-            NBTTagCompound compound = stack.getTagCompound();
+            CompoundTag compound = stack.getTag();
             if (hasBlock(compound)) {
-                Vec3d lookVec = player.getLookVec();
-                Vec3d start = new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
+                Vec3d lookVec = player.getRotationVec(0);   // @todo fabric: partialticks?
+                Vec3d start = new Vec3d(player.x, player.y + player.getEyeHeight(), player.z);
                 int distance = this.placeDistance;
-                Vec3d end = start.addVector(lookVec.x * distance, lookVec.y * distance, lookVec.z * distance);
-                RayTraceResult position = world.rayTraceBlocks(start, end);
+                Vec3d end = start.add(lookVec.x * distance, lookVec.y * distance, lookVec.z * distance);
+                HitResult position = world.rayTrace(start, end);
                 if (position == null) {
                     place(stack, world, new BlockPos(end), null, player);
                 }
             }
         }
-        return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+        return new TypedActionResult<>(ActionResult.SUCCESS, stack);
     }
 
     @Override
-    public EnumActionResult onItemUseFirst(PlayerEntity player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
-        ItemStack stack = player.getHeldItem(hand);
+    public ActionResult useOnBlock(ItemUsageContext context) {
+        ItemStack stack = context.getItemStack();
+        World world = context.getWorld();
+        PlayerEntity player = context.getPlayer();
+        BlockPos pos = context.getPos();
+        Direction side = context.getFacing();
         if (!world.isRemote) {
-            NBTTagCompound compound = stack.getTagCompound();
+            CompoundTag compound = stack.getTag();
             if (hasBlock(compound)) {
                 place(stack, world, pos, side, player);
             } else {
                 pickup(stack, player, world, pos);
             }
-            return EnumActionResult.SUCCESS;
+            return ActionResult.SUCCESS;
         }
-        return EnumActionResult.PASS;
+        return ActionResult.PASS;
     }
 
-    @Override
-    public EnumActionResult onItemUse(PlayerEntity player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        return EnumActionResult.SUCCESS;
-    }
 
-    private void place(ItemStack stack, World world, BlockPos pos, EnumFacing side, PlayerEntity player) {
+    // @todo fabric
+//    @Override
+//    public EnumActionResult onItemUse(PlayerEntity player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+//        return EnumActionResult.SUCCESS;
+//    }
+
+    private void place(ItemStack stack, World world, BlockPos pos, Direction side, PlayerEntity player) {
         BlockPos pp = side == null ? pos : pos.offset(side);
 
         // First check what's already there
-        IBlockState old = world.getBlockState(pp);
-        if (!world.isAirBlock(pp) && !old.getBlock().isReplaceable(world, pp)) {
+        BlockState old = world.getBlockState(pp);
+        if (!world.isAir(pp)) {// @todo fabric && !old.getBlock().isReplaceable(world, pp)) {
             Tools.error(player, "Something is in the way!");
             return;
         }
 
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        int id = tagCompound.getInteger("block");
-        Block block = Block.REGISTRY.getObjectById(id);
-        int meta = tagCompound.getInteger("meta");
+        CompoundTag tagCompound = stack.getTag();
+        String id = tagCompound.getString("block");
+        Block block = Registry.BLOCK.get(new Identifier(id));
 
-        IBlockState blockState = block.getStateFromMeta(meta);
+        BlockState blockState = block.getDefaultState();
         world.setBlockState(pp, blockState, 3);
-        if (tagCompound.hasKey("tedata")) {
-            NBTTagCompound tc = (NBTTagCompound) tagCompound.getTag("tedata");
-            tc.setInteger("x", pp.getX());
-            tc.setInteger("y", pp.getY());
-            tc.setInteger("z", pp.getZ());
-            TileEntity tileEntity = TileEntity.create(world, tc);
+        if (tagCompound.containsKey("tedata")) {
+            CompoundTag tc = (CompoundTag) tagCompound.getTag("tedata");
+            tc.putInt("x", pp.getX());
+            tc.putInt("y", pp.getY());
+            tc.putInt("z", pp.getZ());
+            BlockEntity tileEntity = BlockEntity.createFromTag(tc);
             if (tileEntity != null) {
-                world.getChunkFromBlockCoords(pp).addTileEntity(tileEntity);
+                world.getChunk(pp).addBlockEntity(tileEntity);
                 tileEntity.markDirty();
-                world.notifyBlockUpdate(pp, blockState, blockState, 3);
+                world.updateListeners(pp, blockState, blockState, 3);
             }
         }
 
-        tagCompound.removeTag("block");
-        tagCompound.removeTag("tedata");
-        tagCompound.removeTag("meta");
-        stack.setTagCompound(tagCompound);
+        tagCompound.remove("block");
+        tagCompound.remove("tedata");
+        tagCompound.remove("meta");
+        stack.setTag(tagCompound);
     }
 
     private void pickup(ItemStack stack, PlayerEntity player, World world, BlockPos pos) {
-        IBlockState state = world.getBlockState(pos);
+        BlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
-        int meta = block.getMetaFromState(state);
         double cost = checkPickup(player, world, pos, block, maxHardness);
         if (cost < 0.0) {
             return;
@@ -145,33 +155,32 @@ public class MovingWand extends GenericWand {
             return;
         }
 
-        NBTTagCompound tagCompound = Tools.getTagCompound(stack);
+        CompoundTag tagCompound = Tools.getTagCompound(stack);
 //        ItemStack s = block.getItem(world, pos, state);
-        ItemStack s = block.getPickBlock(state, null, world, pos, player);
+        ItemStack s = block.getPickStack(world, pos, state); // @todo fabric getPickStack(state, null, world, pos, player);
         String name;
         if (s.isEmpty()) {
-            name = Tools.getBlockName(block, meta);
+            name = Tools.getBlockName(block);
         } else {
-            name = s.getDisplayName();
+            name = s.getDisplayName().getFormattedText();
         }
         if (name == null) {
             Tools.error(player, "You cannot select this block!");
         } else {
-            int id = Block.REGISTRY.getIDForObject(block);
-            tagCompound.setInteger("block", id);
-            tagCompound.setInteger("meta", meta);
+            String id = Registry.BLOCK.getId(block).toString();
+            tagCompound.putString("block", id);
 
-            TileEntity tileEntity = world.getTileEntity(pos);
+            BlockEntity tileEntity = world.getBlockEntity(pos);
             if (tileEntity != null) {
-                NBTTagCompound tc = new NBTTagCompound();
-                tileEntity.writeToNBT(tc);
-                world.removeTileEntity(pos);
-                tc.removeTag("x");
-                tc.removeTag("y");
-                tc.removeTag("z");
-                tagCompound.setTag("tedata", tc);
+                CompoundTag tc = new CompoundTag();
+                tileEntity.toTag(tc);
+                world.removeBlockEntity(pos);
+                tc.remove("x");
+                tc.remove("y");
+                tc.remove("z");
+                tagCompound.put("tedata", tc);
             }
-            world.setBlockToAir(pos);
+            world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);  // @todo fabric: setBlockToAir
 
             Tools.notify(player, "You took: " + name);
             registerUsage(stack, player, (float) cost);

@@ -269,7 +269,7 @@ public class GenericWand extends Item implements IEnergyItem /*, IEnergyContaine
 
     //------------------------------------------------------------------------------
 
-    public void renderOverlay(PlayerEntity player, ItemStack wand) {
+    public void renderOverlay(PlayerEntity player, ItemStack wand, float partialTicks) {
 
     }
 
