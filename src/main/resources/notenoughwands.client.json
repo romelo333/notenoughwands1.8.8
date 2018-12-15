@@ -3,6 +3,7 @@
   "package": "romelo333.notenoughwands.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "HudMixin"
   ],
   "injectors": {
     "defaultRequire": 1

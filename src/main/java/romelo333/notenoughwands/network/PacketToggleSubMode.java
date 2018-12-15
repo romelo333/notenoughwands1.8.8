@@ -1,6 +1,13 @@
 package romelo333.notenoughwands.network;
 
 import io.netty.buffer.ByteBuf;
+import net.fabricmc.fabric.networking.PacketContext;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.PacketByteBuf;
+import romelo333.notenoughwands.Items.GenericWand;
+
+import java.util.function.BiConsumer;
 
 // @todo fabric
 public class PacketToggleSubMode /*implements IMessage*/ {
@@ -14,22 +21,21 @@ public class PacketToggleSubMode /*implements IMessage*/ {
     public PacketToggleSubMode() {
     }
 
-//    public static class Handler implements IMessageHandler<PacketToggleSubMode, IMessage> {
-//        @Override
-//        public IMessage onMessage(PacketToggleSubMode message, MessageContext ctx) {
-//            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
-//            return null;
-//        }
-//
-//        private void handle(PacketToggleSubMode message, MessageContext ctx) {
-//
-//            // @todo
-//            PlayerEntityMP playerEntity = ctx.getServerHandler().player;
-//            ItemStack heldItem = playerEntity.getHeldItem(EnumHand.MAIN_HAND);
-//            if (!heldItem.isEmpty() && heldItem.getItem() instanceof GenericWand) {
-//                GenericWand genericWand = (GenericWand) (heldItem.getItem());
-//                genericWand.toggleSubMode(playerEntity, heldItem);
-//            }
-//        }
-//    }
+    public static class Handler implements BiConsumer<PacketContext, PacketByteBuf> {
+        @Override
+        public void accept(PacketContext context, PacketByteBuf packetByteBuf) {
+            PacketToggleSubMode packet = new PacketToggleSubMode();
+            packet.fromBytes(packetByteBuf);
+            context.getTaskQueue().execute(() -> handle(context, packet));
+        }
+
+        private void handle(PacketContext context, PacketToggleSubMode message) {
+            PlayerEntity player = context.getPlayer();
+            ItemStack heldItem = player.getMainHandStack();
+            if (!heldItem.isEmpty() && heldItem.getItem() instanceof GenericWand) {
+                GenericWand genericWand = (GenericWand) (heldItem.getItem());
+                genericWand.toggleSubMode(player, heldItem);
+            }
+        }
+    }
 }

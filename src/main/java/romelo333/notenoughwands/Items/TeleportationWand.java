@@ -60,7 +60,7 @@ public class TeleportationWand extends GenericWand {
             if (!checkUsage(stack, player, 1.0f)) {
                 return new TypedActionResult<>(ActionResult.PASS, stack);
             }
-            Vec3d lookVec = player.getPosVector();
+            Vec3d lookVec = player.getRotationVec(0);
             Vec3d start = new Vec3d(player.x, player.y + player.getEyeHeight(), player.z);
             int distance = this.maxdist;
             boolean gothrough = false;

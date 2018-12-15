@@ -1,5 +1,9 @@
 package romelo333.notenoughwands.proxy;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.item.ItemStack;
+import romelo333.notenoughwands.Items.GenericWand;
+
 public class ClientProxy extends CommonProxy {
 
     @Override
@@ -19,18 +23,17 @@ public class ClientProxy extends CommonProxy {
 
 // @todo fabric
 //    @SubscribeEvent
-//    public void renderWorldLastEvent(RenderWorldLastEvent evt) {
-//        Minecraft mc = MinecraftClient.getInstance();
-//        PlayerEntitySP p = mc.player;
-//        ItemStack heldItem = p.getHeldItem(EnumHand.MAIN_HAND);
-//        if (heldItem.isEmpty()) {
-//            return;
-//        }
-//        if (heldItem.getItem() instanceof GenericWand) {
-//            GenericWand genericWand = (GenericWand) heldItem.getItem();
-//            genericWand.renderOverlay(evt, p, heldItem);
-//        }
-//    }
+    public static void renderWorldLastEvent() {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        ItemStack heldItem = mc.player.getMainHandStack();
+        if (heldItem.isEmpty()) {
+            return;
+        }
+        if (heldItem.getItem() instanceof GenericWand) {
+            GenericWand genericWand = (GenericWand) heldItem.getItem();
+            genericWand.renderOverlay(mc.player, heldItem, mc.getTickDelta());
+        }
+    }
 
     @Override
     public void postInit() {

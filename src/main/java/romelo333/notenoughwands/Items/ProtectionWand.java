@@ -3,7 +3,6 @@ package romelo333.notenoughwands.Items;
 
 import net.minecraft.client.item.TooltipOptions;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.text.StringTextComponent;
@@ -16,8 +15,7 @@ import net.minecraft.world.World;
 import romelo333.notenoughwands.Config;
 import romelo333.notenoughwands.Configuration;
 import romelo333.notenoughwands.ProtectedBlocks;
-import romelo333.notenoughwands.network.ReturnProtectedBlockCountHelper;
-import romelo333.notenoughwands.network.ReturnProtectedBlocksHelper;
+import romelo333.notenoughwands.network.*;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.List;
@@ -68,8 +66,7 @@ public class ProtectionWand extends GenericWand {
         if (hasid && id != 0) {
             if ((System.currentTimeMillis() - tooltipLastTime) > 250) {
                 tooltipLastTime = System.currentTimeMillis();
-                // @todo fabric
-//                NEWPacketHandler.INSTANCE.sendToServer(new PacketGetProtectedBlockCount(id));
+                NetworkInit.getProtectedBlockCount(new PacketGetProtectedBlockCount(id));
             }
         }
         list.add(new StringTextComponent(TextFormat.GREEN + "Mode: " + descriptions[mode]));
@@ -115,8 +112,7 @@ public class ProtectionWand extends GenericWand {
     public void renderOverlay(PlayerEntity player, ItemStack wand, float partialTicks) {
         if ((System.currentTimeMillis() - lastTime) > 250) {
             lastTime = System.currentTimeMillis();
-            // @todo fabric
-//            NEWPacketHandler.INSTANCE.sendToServer(new PacketGetProtectedBlocks());
+            NetworkInit.getProtectedBlocks(new PacketGetProtectedBlocks());
         }
         if (master) {
             renderOutlines(player, ReturnProtectedBlocksHelper.childBlocks, 30, 30, 200, partialTicks);

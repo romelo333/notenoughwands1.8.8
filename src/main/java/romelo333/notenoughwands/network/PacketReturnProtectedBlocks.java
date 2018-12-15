@@ -1,10 +1,13 @@
 package romelo333.notenoughwands.network;
 
 import io.netty.buffer.ByteBuf;
+import net.fabricmc.fabric.networking.PacketContext;
+import net.minecraft.util.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 public class PacketReturnProtectedBlocks /*implements IMessage*/ {
     private Set<BlockPos> blocks;
@@ -55,11 +58,17 @@ public class PacketReturnProtectedBlocks /*implements IMessage*/ {
         this.childBlocks = childBlocks;
     }
 
-//    public static class Handler implements IMessageHandler<PacketReturnProtectedBlocks, IMessage> {
-//        @Override
-//        public IMessage onMessage(PacketReturnProtectedBlocks message, MessageContext ctx) {
-//            MinecraftClient.getInstance().addScheduledTask(() -> ReturnProtectedBlocksHelper.setProtectedBlocks(message));
-//            return null;
-//        }
-//    }
+    public static class Handler implements BiConsumer<PacketContext, PacketByteBuf> {
+
+        @Override
+        public void accept(PacketContext context, PacketByteBuf packetByteBuf) {
+            PacketReturnProtectedBlocks packet = new PacketReturnProtectedBlocks();
+            packet.fromBytes(packetByteBuf);
+            context.getTaskQueue().execute(() -> handle(context, packet));
+        }
+
+        private void handle(PacketContext context, PacketReturnProtectedBlocks message) {
+            ReturnProtectedBlocksHelper.setProtectedBlocks(message);
+        }
+    }
 }

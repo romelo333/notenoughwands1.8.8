@@ -1,9 +1,5 @@
 package romelo333.notenoughwands;
 
-import romelo333.notenoughwands.network.NEWPacketHandler;
-import romelo333.notenoughwands.network.PacketToggleMode;
-import romelo333.notenoughwands.network.PacketToggleSubMode;
-
 public class KeyInputHandler {
 
     // @todo fabric

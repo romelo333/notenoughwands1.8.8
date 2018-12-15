@@ -18,7 +18,8 @@ public class NotEnoughWands implements ModInitializer {
 
     @Override
     public void onInitialize() {
-
+        ModItems.init();
+        ModBlocks.init();
     }
 
     // @todo fabric

@@ -2,7 +2,10 @@ package romelo333.notenoughwands.blocks;
 
 
 import net.fabricmc.fabric.block.FabricBlockSettings;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -11,12 +14,10 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
 import romelo333.notenoughwands.ModBlocks;
 import romelo333.notenoughwands.NotEnoughWands;
 
 import javax.annotation.Nullable;
-import java.util.Random;
 
 public class LightBlock extends Block implements BlockEntityProvider {
     public LightBlock() {
