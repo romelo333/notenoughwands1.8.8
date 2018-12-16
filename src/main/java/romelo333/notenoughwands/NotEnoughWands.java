@@ -20,6 +20,7 @@ public class NotEnoughWands implements ModInitializer {
     public void onInitialize() {
         ModItems.init();
         ModBlocks.init();
+        ModSounds.init();
     }
 
     // @todo fabric

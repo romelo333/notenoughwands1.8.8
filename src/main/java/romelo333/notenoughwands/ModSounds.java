@@ -14,7 +14,6 @@ public class ModSounds {
 
     public static final String[] REGISTER_SOUND = { "registerSound", "func_187502_a", "a" };
 
-    // @todo fabric, call from somewhere
     public static void init() {
         Registry.register(Registry.SOUND_EVENT, new Identifier(NotEnoughWands.MODID, "teleport"), teleport);
     }
