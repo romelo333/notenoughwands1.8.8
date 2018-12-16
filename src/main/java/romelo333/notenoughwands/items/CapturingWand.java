@@ -63,6 +63,8 @@ public class CapturingWand extends GenericWand {
         list.add(new StringTextComponent("Right click on block to respawn creature."));
     }
 
+
+
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
         ItemStack stack = context.getItemStack();
@@ -103,8 +105,8 @@ public class CapturingWand extends GenericWand {
         return entityLivingBase;
     }
 
-    @Override
-    public boolean interactWithEntity(ItemStack stack, PlayerEntity player, LivingEntity entity, Hand var4) {
+
+    public boolean captureMob(ItemStack stack, PlayerEntity player, LivingEntity entity, Hand hand) {
         if (!player.getEntityWorld().isRemote) {
             if (entity != null) {
                 if (Tools.getTagCompound(stack).containsKey("mob")) {
@@ -139,8 +141,7 @@ public class CapturingWand extends GenericWand {
                 entity.toTag(tagCompound);
                 Tools.getTagCompound(stack).put("mob", tagCompound);
                 Tools.getTagCompound(stack).putString("type", entity.getClass().getCanonicalName());
-                // @todo fabric!!!
-//                player.getEntityWorld().removeEntity(entity);
+                player.getEntityWorld().method_8463(entity);
 
                 registerUsage(stack, player, difficultyScale);
             } else {

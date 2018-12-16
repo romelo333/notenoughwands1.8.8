@@ -1,7 +1,15 @@
 package romelo333.notenoughwands;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.events.PlayerInteractionEvent;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.world.World;
 import org.apache.logging.log4j.Logger;
+import romelo333.notenoughwands.items.CapturingWand;
 
 import java.io.File;
 
@@ -21,6 +29,13 @@ public class NotEnoughWands implements ModInitializer {
         ModItems.init();
         ModBlocks.init();
         ModSounds.init();
+        PlayerInteractionEvent.ATTACK_ENTITY.register((player, world, hand, entity) -> {
+            if (player.getStackInHand(hand).getItem() == ModItems.capturingWand && entity instanceof LivingEntity && !world.isRemote()) {
+                ModItems.capturingWand.captureMob(player.getStackInHand(hand), player, (LivingEntity) entity, hand);
+                return ActionResult.SUCCESS;
+            }
+            return ActionResult.PASS;
+        });
     }
 
     // @todo fabric

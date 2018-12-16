@@ -1,7 +1,11 @@
 package romelo333.notenoughwands;
 
 // @todo fabric
-public class ForgeEventHandlers {
+public class FabricEventHandlers {
+
+
+
+
 //
 //    @SubscribeEvent
 //    public void registerSounds(RegistryEvent.Register<SoundEvent> event) {
