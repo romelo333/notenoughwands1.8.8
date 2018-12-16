@@ -7,7 +7,7 @@
     "gw ",
     "f w"
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "crafting_shaped",
   "key": {
     "f": {
       "item": "minecraft:fermented_spider_eye"

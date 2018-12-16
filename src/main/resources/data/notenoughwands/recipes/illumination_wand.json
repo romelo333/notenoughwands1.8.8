@@ -7,7 +7,7 @@
     "gw ",
     "  w"
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "crafting_shaped",
   "key": {
     "g": {
       "item": "minecraft:glowstone_dust"

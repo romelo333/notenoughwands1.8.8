@@ -7,7 +7,7 @@
     "ew ",
     "  w"
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "crafting_shaped",
   "key": {
     "r": {
       "item": "minecraft:comparator"

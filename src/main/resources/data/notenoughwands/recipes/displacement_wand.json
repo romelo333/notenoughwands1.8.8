@@ -7,7 +7,7 @@
     "bw ",
     "  w"
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "crafting_shaped",
   "key": {
     "b": {
       "item": "minecraft:brick"

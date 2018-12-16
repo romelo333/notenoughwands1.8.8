@@ -1,14 +1,17 @@
 {
   "result": {
-    "item": "notenoughwands:teleportation_wand"
+    "item": "notenoughwands:moving_wand"
   },
   "pattern": [
-    "ee ",
+    "re ",
     "ew ",
     "  w"
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "crafting_shaped",
   "key": {
+    "r": {
+      "item": "minecraft:redstone"
+    },
     "e": {
       "item": "minecraft:ender_pearl"
     },

@@ -7,7 +7,7 @@
     "twt",
     " d "
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "crafting_shaped",
   "key": {
     "t": {
       "item": "minecraft:ghast_tear"
