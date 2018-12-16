@@ -2,7 +2,7 @@ package romelo333.notenoughwands.proxy;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
-import romelo333.notenoughwands.Items.GenericWand;
+import romelo333.notenoughwands.items.GenericWand;
 
 public class ClientProxy extends CommonProxy {
 

@@ -1,9 +1,8 @@
-package romelo333.notenoughwands.Items;
+package romelo333.notenoughwands.items;
 
 
 import net.minecraft.client.item.TooltipOptions;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffectUtil;

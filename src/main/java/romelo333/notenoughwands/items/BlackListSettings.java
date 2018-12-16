@@ -1,9 +1,7 @@
-package romelo333.notenoughwands.Items;
+package romelo333.notenoughwands.items;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.boss.EntityWither;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import romelo333.notenoughwands.Config;

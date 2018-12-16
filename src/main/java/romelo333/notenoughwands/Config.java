@@ -1,8 +1,8 @@
 package romelo333.notenoughwands;
 
 
-import romelo333.notenoughwands.Items.BlackListSettings;
-import romelo333.notenoughwands.Items.GenericWand;
+import romelo333.notenoughwands.items.BlackListSettings;
+import romelo333.notenoughwands.items.GenericWand;
 
 public class Config {
     public static String CATEGORY_GENERAL = "general";

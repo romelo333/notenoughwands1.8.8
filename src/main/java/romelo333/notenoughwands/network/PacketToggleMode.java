@@ -5,7 +5,7 @@ import net.fabricmc.fabric.networking.PacketContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.PacketByteBuf;
-import romelo333.notenoughwands.Items.GenericWand;
+import romelo333.notenoughwands.items.GenericWand;
 
 import java.util.function.BiConsumer;
 

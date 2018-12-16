@@ -1,4 +1,4 @@
-package romelo333.notenoughwands.Items;
+package romelo333.notenoughwands.items;
 
 import net.minecraft.item.ItemStack;
 

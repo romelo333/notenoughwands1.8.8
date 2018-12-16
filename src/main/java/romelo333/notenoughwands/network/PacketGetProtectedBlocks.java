@@ -8,7 +8,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import romelo333.notenoughwands.Items.ProtectionWand;
+import romelo333.notenoughwands.items.ProtectionWand;
 import romelo333.notenoughwands.ProtectedBlocks;
 
 import java.util.HashSet;

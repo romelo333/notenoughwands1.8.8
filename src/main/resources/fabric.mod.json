@@ -5,7 +5,8 @@
   "side": "universal",
   "initializers": [
     "romelo333.notenoughwands.NotEnoughWands",
-    "romelo333.notenoughwands.network.NetworkInit"
+    "romelo333.notenoughwands.network.NetworkInit",
+    "romelo333.notenoughwands.ClientInit"
   ],
   "mixins": {
     "client": "notenoughwands.client.json",

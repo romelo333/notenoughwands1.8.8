@@ -1,4 +1,4 @@
-package romelo333.notenoughwands.Items;
+package romelo333.notenoughwands.items;
 
 
 import net.minecraft.block.Block;
@@ -43,7 +43,7 @@ public class IlluminationWand extends GenericWand {
         BlockPos pos = context.getPos();
         Direction side = context.getFacing();
 
-        ItemStack stack = player.getMainHandStack();    // @todo fabric, how to handle hand?
+        ItemStack stack = context.getItemStack();
         if (!world.isRemote) {
             Block block = world.getBlockState(pos).getBlock();
             if (block == ModBlocks.lightBlock) {

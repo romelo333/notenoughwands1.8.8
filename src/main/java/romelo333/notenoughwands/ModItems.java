@@ -1,7 +1,7 @@
 package romelo333.notenoughwands;
 
 
-import romelo333.notenoughwands.Items.*;
+import romelo333.notenoughwands.items.*;
 
 public class ModItems {
     public static WandCore wandCore;

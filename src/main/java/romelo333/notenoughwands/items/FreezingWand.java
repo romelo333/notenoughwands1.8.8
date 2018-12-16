@@ -1,8 +1,7 @@
-package romelo333.notenoughwands.Items;
+package romelo333.notenoughwands.items;
 
 
 import net.minecraft.client.item.TooltipOptions;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.player.PlayerEntity;
