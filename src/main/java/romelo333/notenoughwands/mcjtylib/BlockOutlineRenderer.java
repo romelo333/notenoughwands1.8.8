@@ -7,14 +7,12 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexBuffer;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GLXEXTStereoTree;
 
 import java.util.Set;
 
@@ -62,7 +60,7 @@ public class BlockOutlineRenderer {
         double doubleZ = p.prevRenderZ + (p.z - p.prevRenderZ) * partialTicks;
 
         // @todo fabric
-        class_308.method_1452(); //        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
+        class_308.method_1450(); //        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
 
         MinecraftClient.getInstance().worldRenderer.method_3187();
 //        MinecraftClient.getInstance().entityRenderer.disableLightmap();
@@ -151,7 +149,7 @@ public class BlockOutlineRenderer {
      */
     public static void renderBoxOutline(BlockPos pos) {
         // @todo fabric
-//        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
+        class_308.method_1450(); //        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
 //        MinecraftClient.getInstance().entityRenderer.disableLightmap();
         GlStateManager.disableTexture();
         GlStateManager.disableBlend();

@@ -2,6 +2,7 @@ package romelo333.notenoughwands.mcjtylib;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.block.Block;
+import net.minecraft.class_308;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -9,6 +10,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexBuffer;
 import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.entity.Entity;
@@ -38,7 +40,7 @@ public class RenderHelper {
         GlStateManager.rotatef(180F, 0.0F, 0.0F, 1.0F);
         GlStateManager.rotatef(135F, 0.0F, 1.0F, 0.0F);
         // @todo fabric
-//        net.minecraft.client.render.Renderer.enableStandardItemLighting();
+        class_308.method_1452(); //        net.minecraft.client.render.Renderer.enableStandardItemLighting();
         GlStateManager.rotatef(-135F, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotatef(rot, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotatef(0.0F, 1.0F, 0.0F, 0.0F);
@@ -48,7 +50,7 @@ public class RenderHelper {
         MinecraftClient.getInstance().getEntityRenderManager().method_3954(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, false);    // render @todo fabric
         GlStateManager.popMatrix();
         // @todo fabric
-//        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
+        class_308.method_1450(); //        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
 
         GlStateManager.disableRescaleNormal();
         GlStateManager.translatef(0F, 0F, 0.0F);
@@ -61,7 +63,7 @@ public class RenderHelper {
         GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.disableRescaleNormal();
         // @todo fabric
-//        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
+        class_308.method_1450(); //        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
         GlStateManager.disableLighting();
         GlStateManager.disableDepthTest();
         GlStateManager.popMatrix();
