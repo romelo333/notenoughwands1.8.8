@@ -7,5 +7,6 @@ public class ClientInit implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ModRenderers.init();
+        KeyBindings.init();
     }
 }
