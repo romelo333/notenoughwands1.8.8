@@ -112,7 +112,7 @@ public class GenericWand extends Item implements IEnergyItem /*, IEnergyContaine
     }
 
     GenericWand xpUsage(int xp) {
-        this.needsxp = xp;
+        this.needsxp = 0; // @todo fabric until we get config: xp;
         return this;
     }
 
