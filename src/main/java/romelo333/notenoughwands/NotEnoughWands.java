@@ -31,21 +31,4 @@ public class NotEnoughWands implements ModInitializer {
 //            return new ItemStack(ModItems.teleportationWand);
 //        }
 //    };
-
-    /**
-     * Run before anything else. Read your config, create blocks, items, etc, and
-     * register them with the GameRegistry.
-     */
-//    @Mod.EventHandler
-//    public void preInit(FMLPreInitializationEvent e) {
-//        logger = e.getModLog();
-//        mainConfigDir = e.getModConfigurationDirectory();
-//        modConfigDir = new File(mainConfigDir.getPath());
-//        config = new Configuration(new File(modConfigDir, "notenoughwands.cfg"));
-//        proxy.preInit(e);
-//    }
-
-    public String getModId() {
-        return NotEnoughWands.MODID;
-    }
 }

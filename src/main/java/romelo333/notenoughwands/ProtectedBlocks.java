@@ -44,9 +44,15 @@ public class ProtectedBlocks /*extends AbstractWorldData<ProtectedBlocks>*/ {
         lastId = -1;
     }
 
+    private static ProtectedBlocks instance;
+
     public static ProtectedBlocks getProtectedBlocks(World world){
+        // @todo fabric!
+        if (instance == null) {
+            instance = new ProtectedBlocks(NAME);
+        }
 //        return getData(world, ProtectedBlocks.class, NAME);
-        return null;    // @todo fabric
+        return instance;
     }
 
     public static boolean isProtectedClientSide(World world, BlockPos pos){
