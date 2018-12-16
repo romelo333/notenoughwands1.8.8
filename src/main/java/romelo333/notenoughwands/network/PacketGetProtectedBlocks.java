@@ -5,36 +5,46 @@ import net.fabricmc.fabric.networking.PacketContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.PacketByteBuf;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import romelo333.notenoughwands.items.ProtectionWand;
+import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.ProtectedBlocks;
+import romelo333.notenoughwands.items.ProtectionWand;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.BiConsumer;
 
-public class PacketGetProtectedBlocks /*implements IMessage */ {
+public class PacketGetProtectedBlocks implements IPacket {
+
+
+    public static final Identifier GET_PROTECTED_BLOCKS = new Identifier(NotEnoughWands.MODID, "get_protected_blocks");
+
+    @Override
+    public Identifier getId() {
+        return GET_PROTECTED_BLOCKS;
+    }
+
+    @Override
     public void fromBytes(ByteBuf buf) {
     }
 
+    @Override
     public void toBytes(ByteBuf buf) {
     }
 
     public PacketGetProtectedBlocks() {
     }
 
-    public static class Handler implements BiConsumer<PacketContext, PacketByteBuf> {
+    public static class Handler extends MessageHandler<PacketGetProtectedBlocks> {
 
         @Override
-        public void accept(PacketContext context, PacketByteBuf packetByteBuf) {
-            PacketGetProtectedBlocks packet = new PacketGetProtectedBlocks();
-            packet.fromBytes(packetByteBuf);
-            context.getTaskQueue().execute(() -> handle(context, packet));
+        protected PacketGetProtectedBlocks createPacket() {
+            return new PacketGetProtectedBlocks();
         }
 
-        private void handle(PacketContext context, PacketGetProtectedBlocks message) {
+        @Override
+        public void handle(PacketContext context, PacketGetProtectedBlocks message) {
             PlayerEntity player = context.getPlayer();
             World world = player.getEntityWorld();
 
@@ -55,7 +65,7 @@ public class PacketGetProtectedBlocks /*implements IMessage */ {
                 protectedBlocks.fetchProtectedBlocks(childBlocks, world, (int)player.x, (int)player.y, (int)player.z, protectionWand.blockShowRadius, -2);
             }
             PacketReturnProtectedBlocks msg = new PacketReturnProtectedBlocks(blocks, childBlocks);
-            NetworkInit.returnProtectedBlocks(msg, (ServerPlayerEntity) player);
+            NetworkInit.sendToClient(msg, (ServerPlayerEntity) player);
         }
     }
 }

@@ -4,19 +4,28 @@ import io.netty.buffer.ByteBuf;
 import net.fabricmc.fabric.networking.PacketContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.PacketByteBuf;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
+import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.ProtectedBlocks;
 
-import java.util.function.BiConsumer;
+public class PacketGetProtectedBlockCount implements IPacket {
 
-public class PacketGetProtectedBlockCount /*implements IMessage*/ {
+    public static final Identifier GET_PROTECTED_BLOCK_COUNT = new Identifier(NotEnoughWands.MODID, "get_protected_block_count");
+
     private int id;
 
+    @Override
+    public Identifier getId() {
+        return GET_PROTECTED_BLOCK_COUNT;
+    }
+
+    @Override
     public void fromBytes(ByteBuf buf) {
         id = buf.readInt();
     }
 
+    @Override
     public void toBytes(ByteBuf buf) {
         buf.writeInt(id);
     }
@@ -28,22 +37,21 @@ public class PacketGetProtectedBlockCount /*implements IMessage*/ {
         this.id = id;
     }
 
-    public static class Handler implements BiConsumer<PacketContext, PacketByteBuf> {
+    public static class Handler extends MessageHandler<PacketGetProtectedBlockCount> {
 
         @Override
-        public void accept(PacketContext context, PacketByteBuf packetByteBuf) {
-            PacketGetProtectedBlockCount packet = new PacketGetProtectedBlockCount();
-            packet.fromBytes(packetByteBuf);
-            context.getTaskQueue().execute(() -> handle(context, packet));
+        protected PacketGetProtectedBlockCount createPacket() {
+            return new PacketGetProtectedBlockCount();
         }
 
-        private void handle(PacketContext context, PacketGetProtectedBlockCount message) {
+        @Override
+        public void handle(PacketContext context, PacketGetProtectedBlockCount message) {
             PlayerEntity player = context.getPlayer();
             World world = player.getEntityWorld();
 
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
             PacketReturnProtectedBlockCount msg = new PacketReturnProtectedBlockCount(protectedBlocks.getProtectedBlockCount(message.id));
-            NetworkInit.returnProtectedBlockCount(msg, (ServerPlayerEntity) player);
+            NetworkInit.sendToClient(msg, (ServerPlayerEntity) player);
         }
     }
 }

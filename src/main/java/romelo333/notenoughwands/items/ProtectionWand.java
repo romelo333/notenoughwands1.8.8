@@ -66,7 +66,7 @@ public class ProtectionWand extends GenericWand {
         if (hasid && id != 0) {
             if ((System.currentTimeMillis() - tooltipLastTime) > 250) {
                 tooltipLastTime = System.currentTimeMillis();
-                NetworkInit.getProtectedBlockCount(new PacketGetProtectedBlockCount(id));
+                NetworkInit.sendToServer(new PacketGetProtectedBlockCount(id));
             }
         }
         list.add(new StringTextComponent(TextFormat.GREEN + "Mode: " + descriptions[mode]));
@@ -112,7 +112,7 @@ public class ProtectionWand extends GenericWand {
     public void renderOverlay(PlayerEntity player, ItemStack wand, float partialTicks) {
         if ((System.currentTimeMillis() - lastTime) > 250) {
             lastTime = System.currentTimeMillis();
-            NetworkInit.getProtectedBlocks(new PacketGetProtectedBlocks());
+            NetworkInit.sendToServer(new PacketGetProtectedBlocks());
         }
         if (master) {
             renderOutlines(player, ReturnProtectedBlocksHelper.childBlocks, 30, 30, 200, partialTicks);

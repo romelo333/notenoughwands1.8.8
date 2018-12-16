@@ -39,9 +39,9 @@ public class ClientProxy extends CommonProxy {
 
     public static void checkKeys() {
         if (KeyBindings.wandModifier.method_1434()) {
-            NetworkInit.toggleMode(new PacketToggleMode());
+            NetworkInit.sendToServer(new PacketToggleMode());
         } else if (KeyBindings.wandSubMode.method_1434()) {
-            NetworkInit.toggleSubMode(new PacketToggleSubMode());
+            NetworkInit.sendToServer(new PacketToggleSubMode());
         }
     }
 

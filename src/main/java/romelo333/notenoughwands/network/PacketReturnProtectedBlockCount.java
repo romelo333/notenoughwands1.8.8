@@ -2,19 +2,26 @@ package romelo333.notenoughwands.network;
 
 import io.netty.buffer.ByteBuf;
 import net.fabricmc.fabric.networking.PacketContext;
-import net.minecraft.util.PacketByteBuf;
+import net.minecraft.util.Identifier;
+import romelo333.notenoughwands.NotEnoughWands;
 
-import java.util.function.BiConsumer;
+public class PacketReturnProtectedBlockCount implements IPacket {
 
-public class PacketReturnProtectedBlockCount /*implements IMessage*/ {
+    public static final Identifier RETURN_PROTECTED_BLOCK_COUNT = new Identifier(NotEnoughWands.MODID, "return_protected_block_count");
+
     private int count;
 
-//    @Override
+    @Override
+    public Identifier getId() {
+        return RETURN_PROTECTED_BLOCK_COUNT;
+    }
+
+    @Override
     public void fromBytes(ByteBuf buf) {
         count = buf.readInt();
     }
 
-//    @Override
+    @Override
     public void toBytes(ByteBuf buf) {
         buf.writeInt(count);
     }
@@ -30,16 +37,15 @@ public class PacketReturnProtectedBlockCount /*implements IMessage*/ {
         this.count = count;
     }
 
-    public static class Handler implements BiConsumer<PacketContext, PacketByteBuf> {
+    public static class Handler extends MessageHandler<PacketReturnProtectedBlockCount> {
 
         @Override
-        public void accept(PacketContext context, PacketByteBuf packetByteBuf) {
-            PacketReturnProtectedBlockCount packet = new PacketReturnProtectedBlockCount();
-            packet.fromBytes(packetByteBuf);
-            context.getTaskQueue().execute(() -> handle(context, packet));
+        protected PacketReturnProtectedBlockCount createPacket() {
+            return new PacketReturnProtectedBlockCount();
         }
 
-        private void handle(PacketContext context, PacketReturnProtectedBlockCount message) {
+        @Override
+        public void handle(PacketContext context, PacketReturnProtectedBlockCount message) {
             ReturnProtectedBlockCountHelper.setProtectedBlocks(message);
         }
 

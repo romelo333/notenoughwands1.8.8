@@ -2,30 +2,40 @@ package romelo333.notenoughwands.network;
 
 import io.netty.buffer.ByteBuf;
 import net.fabricmc.fabric.networking.PacketContext;
-import net.minecraft.util.PacketByteBuf;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import romelo333.notenoughwands.NotEnoughWands;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.BiConsumer;
 
-public class PacketReturnProtectedBlocks /*implements IMessage*/ {
+public class PacketReturnProtectedBlocks implements IPacket {
+
+    public static final Identifier RETURN_PROTECTED_BLOCKS = new Identifier(NotEnoughWands.MODID, "return_protected_blocks");
+
     private Set<BlockPos> blocks;
     private Set<BlockPos> childBlocks;
 
+    @Override
+    public Identifier getId() {
+        return RETURN_PROTECTED_BLOCKS;
+    }
+
+    @Override
     public void fromBytes(ByteBuf buf) {
         int size = buf.readInt();
-        blocks = new HashSet<BlockPos>(size);
+        blocks = new HashSet<>(size);
         for (int i = 0 ; i < size ; i++) {
             blocks.add(new BlockPos(buf.readInt(), buf.readInt(), buf.readInt()));
         }
         size = buf.readInt();
-        childBlocks = new HashSet<BlockPos>(size);
+        childBlocks = new HashSet<>(size);
         for (int i = 0 ; i < size ; i++) {
             childBlocks.add(new BlockPos(buf.readInt(), buf.readInt(), buf.readInt()));
         }
     }
 
+    @Override
     public void toBytes(ByteBuf buf) {
         buf.writeInt(blocks.size());
         for (BlockPos block : blocks) {
@@ -58,16 +68,15 @@ public class PacketReturnProtectedBlocks /*implements IMessage*/ {
         this.childBlocks = childBlocks;
     }
 
-    public static class Handler implements BiConsumer<PacketContext, PacketByteBuf> {
+    public static class Handler extends MessageHandler<PacketReturnProtectedBlocks> {
 
         @Override
-        public void accept(PacketContext context, PacketByteBuf packetByteBuf) {
-            PacketReturnProtectedBlocks packet = new PacketReturnProtectedBlocks();
-            packet.fromBytes(packetByteBuf);
-            context.getTaskQueue().execute(() -> handle(context, packet));
+        protected PacketReturnProtectedBlocks createPacket() {
+            return new PacketReturnProtectedBlocks();
         }
 
-        private void handle(PacketContext context, PacketReturnProtectedBlocks message) {
+        @Override
+        public void handle(PacketContext context, PacketReturnProtectedBlocks message) {
             ReturnProtectedBlocksHelper.setProtectedBlocks(message);
         }
     }

@@ -4,33 +4,39 @@ import io.netty.buffer.ByteBuf;
 import net.fabricmc.fabric.networking.PacketContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.PacketByteBuf;
+import net.minecraft.util.Identifier;
+import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.items.GenericWand;
 
-import java.util.function.BiConsumer;
+public class PacketToggleMode implements IPacket {
 
-public class PacketToggleMode /*implements IMessage*/ {
+    public static final Identifier TOGGLE_MODE = new Identifier(NotEnoughWands.MODID, "toggle_mode");
 
-//    @Override
+    @Override
+    public Identifier getId() {
+        return TOGGLE_MODE;
+    }
+
+    @Override
     public void fromBytes(ByteBuf buf) {
     }
 
-//    @Override
+    @Override
     public void toBytes(ByteBuf buf) {
     }
 
     public PacketToggleMode() {
     }
 
-    public static class Handler implements BiConsumer<PacketContext, PacketByteBuf> {
+    public static class Handler extends MessageHandler<PacketToggleMode> {
+
         @Override
-        public void accept(PacketContext context, PacketByteBuf packetByteBuf) {
-            PacketToggleMode packet = new PacketToggleMode();
-            packet.fromBytes(packetByteBuf);
-            context.getTaskQueue().execute(() -> handle(context, packet));
+        protected PacketToggleMode createPacket() {
+            return new PacketToggleMode();
         }
 
-        private void handle(PacketContext context, PacketToggleMode message) {
+        @Override
+        public void handle(PacketContext context, PacketToggleMode message) {
             PlayerEntity player = context.getPlayer();
             ItemStack heldItem = player.getMainHandStack();
             if (!heldItem.isEmpty() && heldItem.getItem() instanceof GenericWand) {
