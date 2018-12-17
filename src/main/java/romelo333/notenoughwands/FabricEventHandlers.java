@@ -32,7 +32,7 @@ public class FabricEventHandlers {
 //    @SubscribeEvent
 //    public void onBlockBreakEvent (BlockEvent.BreakEvent event){
 //        World world = event.getWorld();
-//        if (world.isRemote) {
+//        if (world.isClient) {
 //            return;
 //        }
 //        BlockPos pos = event.getPos();
@@ -45,7 +45,7 @@ public class FabricEventHandlers {
 //    @SubscribeEvent
 //    public void onDetonate(ExplosionEvent.Detonate event) {
 //        World world = event.getWorld();
-//        if (world.isRemote) {
+//        if (world.isClient) {
 //            return;
 //        }
 //        ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
@@ -76,7 +76,7 @@ public class FabricEventHandlers {
 //        World world = event.getWorld();
 //        BlockPos pos = event.getPos();
 //
-//        if (world.isRemote) {
+//        if (world.isClient) {
 //            // Client side.
 //            if (ProtectedBlocks.isProtectedClientSide(world, pos)) {
 //                event.setCanceled(true);

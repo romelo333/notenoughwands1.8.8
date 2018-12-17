@@ -39,15 +39,15 @@ public class FreezingWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
-        super.addInformation(stack, player, list, b);
+    public void buildTooltip(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
+        super.buildTooltip(stack, player, list, b);
         list.add(new StringTextComponent("Right click on creature to freeze creature."));
     }
 
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
         World world = context.getWorld();
-        if (!world.isRemote) {
+        if (!world.isClient) {
 
         }
         return ActionResult.FAILURE;
@@ -59,7 +59,7 @@ public class FreezingWand extends GenericWand {
 
     @Override
     public boolean interactWithEntity(ItemStack stack, PlayerEntity player, LivingEntity entity, Hand hand) {
-        if (!player.getEntityWorld().isRemote) {
+        if (!player.getEntityWorld().isClient) {
             if (entity != null) {
                 if (entity instanceof PlayerEntity) {
                     Tools.error(player, "You cannot use this on players!");

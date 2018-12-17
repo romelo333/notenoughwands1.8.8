@@ -58,8 +58,8 @@ public class ProtectionWand extends GenericWand {
     private static long tooltipLastTime = 0;
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
-        super.addInformation(stack, player, list, b);
+    public void buildTooltip(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
+        super.buildTooltip(stack, player, list, b);
         boolean hasid = stack.getTag() != null && stack.getTag().containsKey("id");
         int mode = getMode(stack);
         int id = getId(stack);
@@ -127,8 +127,8 @@ public class ProtectionWand extends GenericWand {
         BlockPos pos = context.getPos();
         Direction side = context.getFacing();
 
-        ItemStack stack = player.getMainHandStack();    // @todo fabric, how to handle hand?
-        if (!world.isRemote) {
+        ItemStack stack = context.getItemStack();
+        if (!world.isClient) {
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
             int id = getOrCreateId(stack, world, protectedBlocks);
             int mode = getMode(stack);

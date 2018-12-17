@@ -1,11 +1,11 @@
 package romelo333.notenoughwands.mcjtylib;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.class_308;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.GuiLighting;
 import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexBuffer;
+import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
@@ -38,7 +38,7 @@ public class BlockOutlineRenderer {
         GlStateManager.disableTexture();
 
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer buffer = tessellator.getVertexBuffer();
+        BufferBuilder buffer = tessellator.getBufferBuilder();
         float mx = c.getX();
         float my = c.getY();
         float mz = c.getZ();
@@ -60,7 +60,7 @@ public class BlockOutlineRenderer {
         double doubleZ = p.prevRenderZ + (p.z - p.prevRenderZ) * partialTicks;
 
         // @todo fabric
-        class_308.method_1450(); //        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
+        GuiLighting.disable(); //        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
 
         MinecraftClient.getInstance().worldRenderer.method_3187();//        MinecraftClient.getInstance().entityRenderer.disableLightmap();
 
@@ -94,7 +94,7 @@ public class BlockOutlineRenderer {
     public static void renderOutlines(Set<BlockPos> coordinates, int r, int g, int b, int thickness) {
         Tessellator tessellator = Tessellator.getInstance();
 
-        VertexBuffer buffer = tessellator.getVertexBuffer();
+        BufferBuilder buffer = tessellator.getBufferBuilder();
         buffer.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
 
 //        GlStateManager.color(r / 255.0f, g / 255.0f, b / 255.0f);
@@ -110,7 +110,7 @@ public class BlockOutlineRenderer {
         tessellator.draw();
     }
 
-    public static void renderHighLightedBlocksOutline(VertexBuffer buffer, float mx, float my, float mz, float r, float g, float b, float a) {
+    public static void renderHighLightedBlocksOutline(BufferBuilder buffer, float mx, float my, float mz, float r, float g, float b, float a) {
         buffer.vertex(mx, my, mz).color(r, g, b, a).next();
         buffer.vertex(mx+1, my, mz).color(r, g, b, a).next();
         buffer.vertex(mx, my, mz).color(r, g, b, a).next();
@@ -148,7 +148,7 @@ public class BlockOutlineRenderer {
      */
     public static void renderBoxOutline(BlockPos pos) {
         // @todo fabric
-        class_308.method_1450(); //        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
+        GuiLighting.disable(); //        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
         MinecraftClient.getInstance().worldRenderer.method_3187();//        MinecraftClient.getInstance().entityRenderer.disableLightmap();
 
         GlStateManager.disableTexture();
@@ -159,7 +159,7 @@ public class BlockOutlineRenderer {
         GlStateManager.color3f(1, 1, 1);
 
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer buffer = tessellator.getVertexBuffer();
+        BufferBuilder buffer = tessellator.getBufferBuilder();
         float mx = pos.getX();
         float my = pos.getY();
         float mz = pos.getZ();
@@ -188,7 +188,7 @@ public class BlockOutlineRenderer {
         GlStateManager.enableTexture();
 
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer buffer = tessellator.getVertexBuffer();
+        BufferBuilder buffer = tessellator.getBufferBuilder();
 
         MinecraftClient.getInstance().getTextureManager().bindTexture(texture);
 

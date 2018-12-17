@@ -2,15 +2,14 @@ package romelo333.notenoughwands.mcjtylib;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.block.Block;
-import net.minecraft.class_308;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.GuiLighting;
 import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexBuffer;
+import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.entity.Entity;
@@ -40,7 +39,7 @@ public class RenderHelper {
         GlStateManager.rotatef(180F, 0.0F, 0.0F, 1.0F);
         GlStateManager.rotatef(135F, 0.0F, 1.0F, 0.0F);
         // @todo fabric
-        class_308.method_1452(); //        net.minecraft.client.render.Renderer.enableStandardItemLighting();
+        GuiLighting.enable(); //        net.minecraft.client.render.Renderer.enableStandardItemLighting();
         GlStateManager.rotatef(-135F, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotatef(rot, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotatef(0.0F, 1.0F, 0.0F, 0.0F);
@@ -50,7 +49,7 @@ public class RenderHelper {
         MinecraftClient.getInstance().getEntityRenderManager().method_3954(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, false);    // render @todo fabric
         GlStateManager.popMatrix();
         // @todo fabric
-        class_308.method_1450(); //        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
+        GuiLighting.disable(); //        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
 
         GlStateManager.disableRescaleNormal();
         GlStateManager.translatef(0F, 0F, 0.0F);
@@ -63,7 +62,7 @@ public class RenderHelper {
         GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.disableRescaleNormal();
         // @todo fabric
-        class_308.method_1450(); //        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
+        GuiLighting.disable(); //        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
         GlStateManager.disableLighting();
         GlStateManager.disableDepthTest();
         GlStateManager.popMatrix();
@@ -140,12 +139,12 @@ public class RenderHelper {
         double vMax = textureSprite.getMaxV();
 
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer vertexBuffer = tessellator.getVertexBuffer();
-        vertexBuffer.begin(7, VertexFormats.POSITION_UV);
-        vertexBuffer.vertex(xCoord, yCoord + 16, zLevel).texture(uMin, vMax).next();
-        vertexBuffer.vertex(xCoord + 16, yCoord + 16, zLevel).texture(uMax, vMax).next();
-        vertexBuffer.vertex(xCoord + 16, yCoord, zLevel).texture(uMax, vMin).next();
-        vertexBuffer.vertex(xCoord, yCoord, zLevel).texture(uMin, vMin).next();
+        BufferBuilder BufferBuilder = tessellator.getBufferBuilder();
+        BufferBuilder.begin(7, VertexFormats.POSITION_UV);
+        BufferBuilder.vertex(xCoord, yCoord + 16, zLevel).texture(uMin, vMax).next();
+        BufferBuilder.vertex(xCoord + 16, yCoord + 16, zLevel).texture(uMax, vMax).next();
+        BufferBuilder.vertex(xCoord + 16, yCoord, zLevel).texture(uMax, vMin).next();
+        BufferBuilder.vertex(xCoord, yCoord, zLevel).texture(uMin, vMin).next();
         tessellator.draw();
     }
 
@@ -261,10 +260,10 @@ public class RenderHelper {
 //                GlStateManager.disableAlpha();
 //                GlStateManager.disableBlend();
 //                Tessellator tessellator = Tessellator.getInstance();
-//                BufferBuilder vertexbuffer = tessellator.getBuffer();
-//                draw(vertexbuffer, xPosition + 2, yPosition + 13, 13, 2, 0, 0, 0, 255);
-//                draw(vertexbuffer, xPosition + 2, yPosition + 13, 12, 1, (255 - i) / 4, 64, 0, 255);
-//                draw(vertexbuffer, xPosition + 2, yPosition + 13, j, 1, 255 - i, i, 0, 255);
+//                BufferBuilder BufferBuilder = tessellator.getBuffer();
+//                draw(BufferBuilder, xPosition + 2, yPosition + 13, 13, 2, 0, 0, 0, 255);
+//                draw(BufferBuilder, xPosition + 2, yPosition + 13, 12, 1, (255 - i) / 4, 64, 0, 255);
+//                draw(BufferBuilder, xPosition + 2, yPosition + 13, j, 1, 255 - i, i, 0, 255);
 //                GlStateManager.enableBlend();
 //                GlStateManager.enableAlpha();
 //                GlStateManager.enableTexture2D();
@@ -280,8 +279,8 @@ public class RenderHelper {
                 GlStateManager.disableDepthTest();
                 GlStateManager.disableTexture();
                 Tessellator tessellator1 = Tessellator.getInstance();
-                VertexBuffer vertexbuffer1 = tessellator1.getVertexBuffer();
-                draw(vertexbuffer1, xPosition, yPosition + MathTools.floor(16.0F * (1.0F - f)), 16, MathTools.ceiling(16.0F * f), 255, 255, 255, 127);
+                BufferBuilder BufferBuilder1 = tessellator1.getBufferBuilder();
+                draw(BufferBuilder1, xPosition, yPosition + MathTools.floor(16.0F * (1.0F - f)), 16, MathTools.ceiling(16.0F * f), 255, 255, 255, 127);
                 GlStateManager.enableTexture();
                 GlStateManager.enableLighting();
                 GlStateManager.enableDepthTest();
@@ -292,7 +291,7 @@ public class RenderHelper {
     /**
      * Draw with the WorldRenderer
      */
-    private static void draw(VertexBuffer renderer, int x, int y, int width, int height, int red, int green, int blue, int alpha) {
+    private static void draw(BufferBuilder renderer, int x, int y, int width, int height, int red, int green, int blue, int alpha) {
         renderer.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
         renderer.vertex((x + 0), (y + 0), 0.0D).color(red, green, blue, alpha).next();
         renderer.vertex((x + 0), (y + height), 0.0D).color(red, green, blue, alpha).next();
@@ -327,7 +326,7 @@ public class RenderHelper {
 
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer buffer = tessellator.getVertexBuffer();
+        BufferBuilder buffer = tessellator.getBufferBuilder();
         buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
         buffer.vertex(x2, y1, zLevel).color(f1, f2, f3, f).next();
         buffer.vertex(x1, y1, zLevel).color(f1, f2, f3, f).next();
@@ -364,7 +363,7 @@ public class RenderHelper {
         GlStateManager.blendFuncSeparate(770, 771, 1, 0);
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer buffer = tessellator.getVertexBuffer();
+        BufferBuilder buffer = tessellator.getBufferBuilder();
         buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
         buffer.vertex(x1, y1, zLevel).color(f1, f2, f3, f).next();
         buffer.vertex(x1, y2, zLevel).color(f1, f2, f3, f).next();
@@ -533,7 +532,7 @@ public class RenderHelper {
         float f = (1/256.0f);
         float f1 = (1/256.0f);
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer buffer = tessellator.getVertexBuffer();
+        BufferBuilder buffer = tessellator.getBufferBuilder();
         buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_UV);
         buffer.vertex((x + 0), (y + height), zLevel).texture(((u + 0.0) * f), ((v + height) * f1)).next();
         buffer.vertex((x + width), (y + height), zLevel).texture(((u + width) * f), ((v + height) * f1)).next();
@@ -547,12 +546,12 @@ public class RenderHelper {
         float f1 = 1.0f/toth;
         double zLevel = 50;
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer vertexbuffer = tessellator.getVertexBuffer();
-        vertexbuffer.begin(7, VertexFormats.POSITION_UV);
-        vertexbuffer.vertex((x + 0), (y + height), zLevel).texture(((textureX + 0.0) *  f), ((textureY + height) * f1)).next();
-        vertexbuffer.vertex((x + width), (y + height), zLevel).texture(((textureX + width) * f), ((textureY + height) * f1)).next();
-        vertexbuffer.vertex((x + width), (y + 0), zLevel).texture(((textureX + width) * f), ((textureY + 0.0) * f1)).next();
-        vertexbuffer.vertex((x + 0), (y + 0), zLevel).texture(((textureX + 0.0) * f), ((textureY + 0.0) * f1)).next();
+        BufferBuilder BufferBuilder = tessellator.getBufferBuilder();
+        BufferBuilder.begin(7, VertexFormats.POSITION_UV);
+        BufferBuilder.vertex((x + 0), (y + height), zLevel).texture(((textureX + 0.0) *  f), ((textureY + height) * f1)).next();
+        BufferBuilder.vertex((x + width), (y + height), zLevel).texture(((textureX + width) * f), ((textureY + height) * f1)).next();
+        BufferBuilder.vertex((x + width), (y + 0), zLevel).texture(((textureX + width) * f), ((textureY + 0.0) * f1)).next();
+        BufferBuilder.vertex((x + 0), (y + 0), zLevel).texture(((textureX + 0.0) * f), ((textureY + 0.0) * f1)).next();
         tessellator.draw();
     }
 
@@ -563,7 +562,7 @@ public class RenderHelper {
         GlStateManager.pushMatrix();
         RenderHelper.rotateToPlayer();
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer buffer = tessellator.getVertexBuffer();
+        BufferBuilder buffer = tessellator.getBufferBuilder();
         buffer.begin(7, VertexFormats.field_1586); // @todo fabric: POSITION_TEX_LMAP_COLOR);
         buffer.vertex(-scale, -scale, 0.0D).texture(0.0D, 0.0D).texture(b1, b2).color(255, 255, 255, 128).next();
         buffer.vertex(-scale, scale, 0.0D).texture(0.0D, 1.0D).texture(b1, b2).color(255, 255, 255, 128).next();
@@ -579,7 +578,7 @@ public class RenderHelper {
         rotateToPlayer();
 
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer buffer = tessellator.getVertexBuffer();
+        BufferBuilder buffer = tessellator.getBufferBuilder();
         buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_UV);
         buffer.vertex(-scale, -scale, 0).texture(0.0, 0.0).next();
         buffer.vertex(-scale, +scale, 0).texture(0.0, 1.0).next();
@@ -597,7 +596,7 @@ public class RenderHelper {
         GlStateManager.rotatef(rot, 0, 0, 1);
 
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer buffer = tessellator.getVertexBuffer();
+        BufferBuilder buffer = tessellator.getBufferBuilder();
         buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_UV);
         buffer.vertex(-scale, -scale, 0).texture(0.0, 0.0).next();
         buffer.vertex(-scale, +scale, 0).texture(0.0, 1.0).next();
@@ -701,7 +700,7 @@ public class RenderHelper {
         int b1 = brightness >> 16 & 65535;
         int b2 = brightness & 65535;
 
-        VertexBuffer buffer = tessellator.getVertexBuffer();
+        BufferBuilder buffer = tessellator.getBufferBuilder();
         buffer.vertex(p1.getX(), p1.getY(), p1.getZ()).texture(0.0D, 0.0D).texture(b1, b2).color(255, 255, 255, 128).next();
         buffer.vertex(p2.getX(), p2.getY(), p2.getZ()).texture(1.0D, 0.0D).texture(b1, b2).color(255, 255, 255, 128).next();
         buffer.vertex(p3.getX(), p3.getY(), p3.getZ()).texture(1.0D, 1.0D).texture(b1, b2).color(255, 255, 255, 128).next();
@@ -758,7 +757,7 @@ public class RenderHelper {
         return new Vector(a.x * f, a.y * f, a.z * f);
     }
 
-    public static void renderHighLightedBlocksOutline(VertexBuffer buffer, float mx, float my, float mz, float r, float g, float b, float a) {
+    public static void renderHighLightedBlocksOutline(BufferBuilder buffer, float mx, float my, float mz, float r, float g, float b, float a) {
         buffer.vertex(mx, my, mz).color(r, g, b, a).next();
         buffer.vertex(mx+1, my, mz).color(r, g, b, a).next();
         buffer.vertex(mx, my, mz).color(r, g, b, a).next();

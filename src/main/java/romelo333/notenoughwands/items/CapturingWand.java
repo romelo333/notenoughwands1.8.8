@@ -44,8 +44,8 @@ public class CapturingWand extends GenericWand {
 
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
-        super.addInformation(stack, player, list, b);
+    public void buildTooltip(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
+        super.buildTooltip(stack, player, list, b);
         CompoundTag tagCompound = stack.getTag();
         if (tagCompound != null) {
             if (tagCompound.containsKey("mob")) {
@@ -71,7 +71,7 @@ public class CapturingWand extends GenericWand {
         World world = context.getWorld();
         BlockPos pos = context.getPos();
         PlayerEntity player = context.getPlayer();
-        if (!world.isRemote) {
+        if (!world.isClient) {
             CompoundTag tagCompound = Tools.getTagCompound(stack);
             if (tagCompound.containsKey("mob")) {
                 Tag mobCompound = tagCompound.getTag("mob");
@@ -107,7 +107,7 @@ public class CapturingWand extends GenericWand {
 
 
     public boolean captureMob(ItemStack stack, PlayerEntity player, LivingEntity entity, Hand hand) {
-        if (!player.getEntityWorld().isRemote) {
+        if (!player.getEntityWorld().isClient) {
             if (entity != null) {
                 if (Tools.getTagCompound(stack).containsKey("mob")) {
                     Tools.error(player, "There is already a mob in this wand!");

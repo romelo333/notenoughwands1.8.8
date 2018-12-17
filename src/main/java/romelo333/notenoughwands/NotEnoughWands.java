@@ -30,7 +30,7 @@ public class NotEnoughWands implements ModInitializer {
         ModBlocks.init();
         ModSounds.init();
         PlayerInteractionEvent.ATTACK_ENTITY.register((player, world, hand, entity) -> {
-            if (player.getStackInHand(hand).getItem() == ModItems.capturingWand && entity instanceof LivingEntity && !world.isRemote()) {
+            if (player.getStackInHand(hand).getItem() == ModItems.capturingWand && entity instanceof LivingEntity && !world.isClient()) {
                 ModItems.capturingWand.captureMob(player.getStackInHand(hand), player, (LivingEntity) entity, hand);
                 return ActionResult.SUCCESS;
             }

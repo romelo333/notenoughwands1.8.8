@@ -69,8 +69,8 @@ public class SwappingWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
-        super.addInformation(stack, player, list, b);
+    public void buildTooltip(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
+        super.buildTooltip(stack, player, list, b);
         CompoundTag compound = stack.getTag();
         if (compound == null) {
             list.add(new StringTextComponent(TextFormat.RED + "No selected block"));
@@ -124,12 +124,12 @@ public class SwappingWand extends GenericWand {
         if (!heldItem.isEmpty()) {
             if (isSwappingWithOffHand(heldItem)) {
                 disableSwappingWithOffHand(heldItem);
-                if (worldIn.isRemote) {
+                if (worldIn.isClient) {
                     Tools.notify(playerIn, "Switched to swapping with selected block");
                 }
             } else {
                 enableSwappingWithOffHand(heldItem);
-                if (worldIn.isRemote) {
+                if (worldIn.isClient) {
                     Tools.notify(playerIn, "Switched to swapping with block in offhand");
                 }
             }
@@ -144,7 +144,7 @@ public class SwappingWand extends GenericWand {
         PlayerEntity player = context.getPlayer();
         BlockPos pos = context.getPos();
         Direction side = context.getFacing();
-        if (!world.isRemote) {
+        if (!world.isClient) {
             if (player.isSneaking()) {
                 selectBlock(stack, player, world, pos);
             } else {

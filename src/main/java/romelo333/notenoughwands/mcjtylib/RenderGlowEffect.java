@@ -2,7 +2,7 @@ package romelo333.notenoughwands.mcjtylib;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexBuffer;
+import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -15,7 +15,7 @@ public class RenderGlowEffect {
      * for glowing should be bound before calling this.
      */
     public static void renderGlow(Tessellator tessellator, double x, double y, double z) {
-        VertexBuffer buffer = tessellator.getVertexBuffer();
+        BufferBuilder buffer = tessellator.getBufferBuilder();
         GlStateManager.pushMatrix();
         GlStateManager.translated(x, y, z);
 
@@ -45,7 +45,7 @@ public class RenderGlowEffect {
             new Quad(new Vt(1, 0, 0), new Vt(1, 1, 0), new Vt(1, 1, 1), new Vt(1, 0, 1)),       // EAST
     };
 
-    public static void addSideFullTexture(VertexBuffer buffer, int side, float mult, float offset, Vec3d offs) {
+    public static void addSideFullTexture(BufferBuilder buffer, int side, float mult, float offset, Vec3d offs) {
         int brightness = 240;
         int b1 = brightness >> 16 & 65535;
         int b2 = brightness & 65535;
@@ -56,7 +56,7 @@ public class RenderGlowEffect {
         buffer.vertex(offs.x + quad.v4.x * mult + offset, offs.y + quad.v4.y * mult + offset, offs.z + quad.v4.z * mult + offset).texture(1.0, 0.0).texture(b1, b2).color(255, 255, 255, 128).next();
     }
 
-    public static void addSideFullTexture(VertexBuffer buffer, int side, float mult, float offset) {
+    public static void addSideFullTexture(BufferBuilder buffer, int side, float mult, float offset) {
         int brightness = 240;
         int b1 = brightness >> 16 & 65535;
         int b2 = brightness & 65535;

@@ -80,8 +80,8 @@ public class GenericWand extends Item implements IEnergyItem /*, IEnergyContaine
 
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
-        super.addInformation(stack, player, list, b);
+    public void buildTooltip(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
+        super.buildTooltip(stack, player, list, b);
         if (needsrf > 0) {
             list.add(new StringTextComponent(TextFormat.GREEN+"Energy: " + getEnergyStored(stack) + " / " + getMaxEnergyStored(stack)));
         }

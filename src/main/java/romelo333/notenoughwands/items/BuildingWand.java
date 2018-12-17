@@ -57,8 +57,8 @@ public class BuildingWand extends GenericWand {
 
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
-        super.addInformation(stack, player, list, b);
+    public void buildTooltip(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
+        super.buildTooltip(stack, player, list, b);
         CompoundTag compound = stack.getTag();
         if (compound != null) {
             int cnt = (compound.containsKey("undo1") ? 1 : 0) + (compound.containsKey("undo2") ? 1 : 0);
@@ -112,7 +112,7 @@ public class BuildingWand extends GenericWand {
         World world = context.getWorld();
         BlockPos pos = context.getPos();
         ItemStack stack = context.getItemStack();
-        if (!world.isRemote) {
+        if (!world.isClient) {
             if (player.isSneaking()) {
                 undoPlaceBlock(stack, player, world, pos);
             } else {

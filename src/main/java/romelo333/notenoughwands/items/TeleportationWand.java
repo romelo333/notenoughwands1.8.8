@@ -33,8 +33,8 @@ public class TeleportationWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World player, List<TextComponent> list, TooltipOptions b) {
-        super.addInformation(stack, player, list, b);
+    public void buildTooltip(ItemStack stack, @Nullable World player, List<TextComponent> list, TooltipOptions b) {
+        super.buildTooltip(stack, player, list, b);
         list.add(new StringTextComponent("Right click to teleport forward"));
         list.add(new StringTextComponent("until a block is hit or maximum"));
         list.add(new StringTextComponent("distance is reached."));
@@ -56,7 +56,7 @@ public class TeleportationWand extends GenericWand {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
-        if (!world.isRemote) {
+        if (!world.isClient) {
             if (!checkUsage(stack, player, 1.0f)) {
                 return new TypedActionResult<>(ActionResult.PASS, stack);
             }

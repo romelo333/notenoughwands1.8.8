@@ -57,8 +57,8 @@ public class DisplacementWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
-        super.addInformation(stack, player, list, b);
+    public void buildTooltip(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
+        super.buildTooltip(stack, player, list, b);
         list.add(new StringTextComponent(TextFormat.GREEN + "Mode: " + descriptions[getMode(stack)]));
         list.add(new StringTextComponent("Right click to push blocks forward."));
         list.add(new StringTextComponent("Sneak right click to pull blocks."));
@@ -87,7 +87,7 @@ public class DisplacementWand extends GenericWand {
         BlockPos pos = context.getPos();
         Direction side = context.getFacing();
         ItemStack stack = context.getItemStack();
-        if (!world.isRemote) {
+        if (!world.isClient) {
             if (player.isSneaking()) {
                 pullBlocks(stack, player, world, pos, side);
             } else {

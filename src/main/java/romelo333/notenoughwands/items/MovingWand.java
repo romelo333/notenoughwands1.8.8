@@ -42,8 +42,8 @@ public class MovingWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
-        super.addInformation(stack, player, list, b);
+    public void buildTooltip(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
+        super.buildTooltip(stack, player, list, b);
         CompoundTag compound = stack.getTag();
         if (!hasBlock(compound)) {
             list.add(new StringTextComponent(TextFormat.RED + "Wand is empty."));
@@ -66,7 +66,7 @@ public class MovingWand extends GenericWand {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
-        if (!world.isRemote) {
+        if (!world.isClient) {
             CompoundTag compound = stack.getTag();
             if (hasBlock(compound)) {
                 Vec3d lookVec = player.getRotationVec(0);   // @todo fabric: partialticks?
@@ -89,7 +89,7 @@ public class MovingWand extends GenericWand {
         PlayerEntity player = context.getPlayer();
         BlockPos pos = context.getPos();
         Direction side = context.getFacing();
-        if (!world.isRemote) {
+        if (!world.isClient) {
             CompoundTag compound = stack.getTag();
             if (hasBlock(compound)) {
                 place(stack, world, pos, side, player);

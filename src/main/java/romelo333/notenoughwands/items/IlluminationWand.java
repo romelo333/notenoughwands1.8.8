@@ -30,8 +30,8 @@ public class IlluminationWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
-        super.addInformation(stack, player, list, b);
+    public void buildTooltip(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
+        super.buildTooltip(stack, player, list, b);
         list.add(new StringTextComponent("Right click on block to spawn light."));
         list.add(new StringTextComponent("Right click on light to remove it again."));
     }
@@ -44,7 +44,7 @@ public class IlluminationWand extends GenericWand {
         Direction side = context.getFacing();
 
         ItemStack stack = context.getItemStack();
-        if (!world.isRemote) {
+        if (!world.isClient) {
             Block block = world.getBlockState(pos).getBlock();
             if (block == ModBlocks.lightBlock) {
                 world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);  // Is this right? @todo fabric: was setBlockToAir

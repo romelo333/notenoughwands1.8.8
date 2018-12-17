@@ -49,8 +49,8 @@ public class AccelerationWand extends GenericWand {
     private Random random = new Random();
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
-        super.addInformation(stack, player, list, b);
+    public void buildTooltip(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
+        super.buildTooltip(stack, player, list, b);
         list.add(new StringTextComponent(TextFormat.GREEN + "Mode: " + descriptions[getMode(stack)]));
         list.add(new StringTextComponent("Right click on block to speed up ticks."));
         showModeKeyDescription(list, "change speed");
@@ -82,7 +82,7 @@ public class AccelerationWand extends GenericWand {
         BlockPos pos = context.getPos();
         Direction side = context.getFacing();
         ItemStack stack = context.getItemStack();
-        if (!world.isRemote) {
+        if (!world.isClient) {
             BlockState state = world.getBlockState(pos);
             Block block = state.getBlock();
             int mode = getMode(stack);

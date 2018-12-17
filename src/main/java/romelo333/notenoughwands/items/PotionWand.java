@@ -54,8 +54,8 @@ public class PotionWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
-        super.addInformation(stack, player, list, b);
+    public void buildTooltip(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
+        super.buildTooltip(stack, player, list, b);
         list.add(new StringTextComponent("Left click on creature to apply effect"));
         CompoundTag tagCompound = stack.getTag();
         if (tagCompound==null){
@@ -127,7 +127,7 @@ public class PotionWand extends GenericWand {
 
     @Override
     public boolean interactWithEntity(ItemStack stack, PlayerEntity player, LivingEntity entity, Hand hand) {
-        if (!player.getEntityWorld().isRemote) {
+        if (!player.getEntityWorld().isClient) {
             if (entity != null) {
                 if ((!allowHostile) && entity instanceof Monster) {
                     Tools.error(player, "It is not possible to add effects to hostile mobs with this wand!");
