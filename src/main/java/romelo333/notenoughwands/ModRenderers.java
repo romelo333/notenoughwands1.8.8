@@ -6,15 +6,13 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import org.lwjgl.opengl.GL11;
 import romelo333.notenoughwands.blocks.LightRenderer;
-import romelo333.notenoughwands.blocks.LightTE;
 
 public final class ModRenderers {
 
     public static void init() {
-        ClientRegistry.bindTileEntitySpecialRenderer(LightTE.class, new LightRenderer());
+        LightRenderer.register();
     }
 
     public static void renderBillboardQuad(double scale, float vAdd1, float vAdd2) {
