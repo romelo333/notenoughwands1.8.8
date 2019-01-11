@@ -1,8 +1,8 @@
 package romelo333.notenoughwands.mcjtylib;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -19,7 +19,7 @@ public class RenderGlowEffect {
         GlStateManager.pushMatrix();
         GlStateManager.translated(x, y, z);
 
-        buffer.begin(GL11.GL_QUADS, VertexFormats.field_1586);
+        buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_UV_LMAP_COLOR);
 
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);

@@ -2,12 +2,8 @@ package romelo333.notenoughwands.blocks;
 
 
 import net.fabricmc.fabric.block.FabricBlockSettings;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Material;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.render.block.BlockRenderLayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -50,7 +46,7 @@ public class LightBlock extends Block implements BlockEntityProvider {
         return Collections.emptyList();
     }
 
-
+    @Override
     public BlockRenderLayer getRenderLayer() {
         return BlockRenderLayer.TRANSLUCENT;
     }

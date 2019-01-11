@@ -141,7 +141,7 @@ public class CapturingWand extends GenericWand {
                 entity.toTag(tagCompound);
                 Tools.getTagCompound(stack).put("mob", tagCompound);
                 Tools.getTagCompound(stack).putString("type", entity.getClass().getCanonicalName());
-                player.getEntityWorld().method_8463(entity);
+                player.getEntityWorld().removeEntity(entity);
 
                 registerUsage(stack, player, difficultyScale);
             } else {

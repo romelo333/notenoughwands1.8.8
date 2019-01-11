@@ -4,8 +4,7 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "HudMixin",
-    "ClientTickMixin",
-    "KeyBindingsMixin"
+    "ClientTickMixin"
   ],
   "injectors": {
     "defaultRequire": 1

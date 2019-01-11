@@ -20,6 +20,8 @@ import net.minecraft.util.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.WorldChunk;
 import romelo333.notenoughwands.Config;
 import romelo333.notenoughwands.Configuration;
 import romelo333.notenoughwands.varia.Tools;
@@ -150,7 +152,8 @@ public class DisplacementWand extends GenericWand {
                         tc.putInt("z", otherC.getZ());
                         tileEntity = BlockEntity.createFromTag(tc);
                         if (tileEntity != null) {
-                            world.getChunk(otherC).addBlockEntity(tileEntity);
+                            Chunk chunk = world.getChunk(otherC);
+                            ((WorldChunk) chunk).addBlockEntity(tileEntity);
                             tileEntity.markDirty();
                             world.updateListeners(otherC, blockState, blockState, 3);
                         }

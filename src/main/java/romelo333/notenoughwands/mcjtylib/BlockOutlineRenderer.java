@@ -3,9 +3,9 @@ package romelo333.notenoughwands.mcjtylib;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GuiLighting;
 import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
@@ -62,7 +62,7 @@ public class BlockOutlineRenderer {
         // @todo fabric
         GuiLighting.disable(); //        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
 
-        MinecraftClient.getInstance().worldRenderer.method_3187();//        MinecraftClient.getInstance().entityRenderer.disableLightmap();
+        MinecraftClient.getInstance().worldRenderer.disableLightmap();
 
 
         GlStateManager.disableDepthTest();
@@ -78,9 +78,7 @@ public class BlockOutlineRenderer {
 
         GlStateManager.popMatrix();
 
-        // @todo fabric
-        MinecraftClient.getInstance().worldRenderer.method_3180();
-//        MinecraftClient.getInstance().entityRenderer.enableLightmap();
+        MinecraftClient.getInstance().worldRenderer.enableLightmap();
 
         GlStateManager.enableTexture();
         GlStateManager.enableDepthTest();
@@ -149,7 +147,7 @@ public class BlockOutlineRenderer {
     public static void renderBoxOutline(BlockPos pos) {
         // @todo fabric
         GuiLighting.disable(); //        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
-        MinecraftClient.getInstance().worldRenderer.method_3187();//        MinecraftClient.getInstance().entityRenderer.disableLightmap();
+        MinecraftClient.getInstance().worldRenderer.disableLightmap();
 
         GlStateManager.disableTexture();
         GlStateManager.disableBlend();
@@ -169,7 +167,7 @@ public class BlockOutlineRenderer {
         tessellator.draw();
 
         // @todo fabric
-        MinecraftClient.getInstance().worldRenderer.method_3180(); //        MinecraftClient.getInstance().entityRenderer.enableLightmap();
+        MinecraftClient.getInstance().worldRenderer.enableLightmap();
         GlStateManager.enableTexture();
     }
 
@@ -192,7 +190,7 @@ public class BlockOutlineRenderer {
 
         MinecraftClient.getInstance().getTextureManager().bindTexture(texture);
 
-        buffer.begin(GL11.GL_QUADS, VertexFormats.field_1586);
+        buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_UV_LMAP_COLOR);
 //        tessellator.setColorRGBA(255, 255, 255, 64);
 //        tessellator.setBrightness(240);
 

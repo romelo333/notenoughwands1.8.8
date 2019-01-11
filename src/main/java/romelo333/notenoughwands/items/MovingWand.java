@@ -19,6 +19,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.WorldChunk;
 import romelo333.notenoughwands.Config;
 import romelo333.notenoughwands.Configuration;
 import romelo333.notenoughwands.varia.Tools;
@@ -131,7 +133,8 @@ public class MovingWand extends GenericWand {
             tc.putInt("z", pp.getZ());
             BlockEntity tileEntity = BlockEntity.createFromTag(tc);
             if (tileEntity != null) {
-                world.getChunk(pp).addBlockEntity(tileEntity);
+                Chunk chunk = world.getChunk(pp);
+                ((WorldChunk) chunk).addBlockEntity(tileEntity);
                 tileEntity.markDirty();
                 world.updateListeners(pp, blockState, blockState, 3);
             }

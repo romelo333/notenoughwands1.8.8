@@ -6,9 +6,9 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GuiLighting;
 import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.texture.Sprite;
@@ -46,7 +46,7 @@ public class RenderHelper {
         entity.pitch = 0.0F;
         GlStateManager.translatef(0.0F, (float) entity.getHeightOffset(), 0.0F);
         MinecraftClient.getInstance().getEntityRenderManager().field_4679 = 180F;   // playerViewY @todo fabric
-        MinecraftClient.getInstance().getEntityRenderManager().method_3954(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, false);    // render @todo fabric
+        MinecraftClient.getInstance().getEntityRenderManager().render(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, false);
         GlStateManager.popMatrix();
         // @todo fabric
         GuiLighting.disable(); //        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
@@ -563,7 +563,7 @@ public class RenderHelper {
         RenderHelper.rotateToPlayer();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBufferBuilder();
-        buffer.begin(7, VertexFormats.field_1586); // @todo fabric: POSITION_TEX_LMAP_COLOR);
+        buffer.begin(7, VertexFormats.POSITION_UV_LMAP_COLOR);
         buffer.vertex(-scale, -scale, 0.0D).texture(0.0D, 0.0D).texture(b1, b2).color(255, 255, 255, 128).next();
         buffer.vertex(-scale, scale, 0.0D).texture(0.0D, 1.0D).texture(b1, b2).color(255, 255, 255, 128).next();
         buffer.vertex(scale, scale, 0.0D).texture(1.0D, 1.0D).texture(b1, b2).color(255, 255, 255, 128).next();
