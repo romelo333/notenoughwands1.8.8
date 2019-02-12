@@ -11,6 +11,8 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.event.ForgeEventFactory;
 import romelo333.notenoughwands.ModBlocks;
 
 import java.util.List;
@@ -38,11 +40,16 @@ public class IlluminationWand extends GenericWand {
         if (!world.isRemote) {
             Block block = world.getBlockState(pos).getBlock();
             if (block == ModBlocks.lightBlock) {
+                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, pos);
                 world.setBlockToAir(pos);
+                if (ForgeEventFactory.onPlayerBlockPlace(player, blocksnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
+                    blocksnapshot.restore(true, false);
+                }
                 return EnumActionResult.SUCCESS;
             }
 
-            if (!world.isAirBlock(pos.offset(side))) {
+            BlockPos offset = pos.offset(side);
+            if (!world.isAirBlock(offset)) {
                 return EnumActionResult.SUCCESS;
             }
 
@@ -50,9 +57,13 @@ public class IlluminationWand extends GenericWand {
                 return EnumActionResult.SUCCESS;
             }
 
-            world.setBlockState(pos.offset(side), ModBlocks.lightBlock.getDefaultState(), 3);
-
-            registerUsage(stack, player, 1.0f);
+            BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, offset);
+            world.setBlockState(offset, ModBlocks.lightBlock.getDefaultState(), 3);
+            if (ForgeEventFactory.onPlayerBlockPlace(player, blocksnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
+                blocksnapshot.restore(true, false);
+            } else {
+                registerUsage(stack, player, 1.0f);
+            }
         }
         return EnumActionResult.SUCCESS;
     }

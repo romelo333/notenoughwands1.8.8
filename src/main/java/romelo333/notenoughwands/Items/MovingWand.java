@@ -18,6 +18,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.event.ForgeEventFactory;
 import romelo333.notenoughwands.Config;
 import romelo333.notenoughwands.varia.Tools;
 
@@ -100,6 +102,7 @@ public class MovingWand extends GenericWand {
     }
 
     private void place(ItemStack stack, World world, BlockPos pos, EnumFacing side, EntityPlayer player) {
+
         BlockPos pp = side == null ? pos : pos.offset(side);
 
         // First check what's already there
@@ -114,8 +117,15 @@ public class MovingWand extends GenericWand {
         Block block = Block.REGISTRY.getObjectById(id);
         int meta = tagCompound.getInteger("meta");
 
+        BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, pp);
+
         IBlockState blockState = block.getStateFromMeta(meta);
         world.setBlockState(pp, blockState, 3);
+        if (ForgeEventFactory.onPlayerBlockPlace(player, blocksnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
+            blocksnapshot.restore(true, false);
+            return;
+        }
+
         if (tagCompound.hasKey("tedata")) {
             NBTTagCompound tc = (NBTTagCompound) tagCompound.getTag("tedata");
             tc.setInteger("x", pp.getX());

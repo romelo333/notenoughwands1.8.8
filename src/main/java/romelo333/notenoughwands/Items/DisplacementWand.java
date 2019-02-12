@@ -20,6 +20,8 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import romelo333.notenoughwands.Config;
@@ -137,10 +139,19 @@ public class DisplacementWand extends GenericWand {
                         tileEntity.writeToNBT(tc);
                         world.removeTileEntity(coordinate);
                     }
+
                     world.setBlockToAir(coordinate);
 
+                    BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, otherC);
                     IBlockState blockState = block.getStateFromMeta(meta);
                     world.setBlockState(otherC, blockState, 3);
+                    if (ForgeEventFactory.onPlayerBlockPlace(player, blocksnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
+                        blocksnapshot.restore(true, false);
+                        world.setBlockState(coordinate, blockState, 3);
+                        // Make sure we restore the tileentity at the original spot
+                        otherC = coordinate;
+                    }
+
                     if (tc != null) {
                         tc.setInteger("x", otherC.getX());
                         tc.setInteger("y", otherC.getY());
