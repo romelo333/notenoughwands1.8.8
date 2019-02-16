@@ -1,7 +1,7 @@
 package romelo333.notenoughwands.network;
 
 import io.netty.buffer.ByteBuf;
-import net.fabricmc.fabric.networking.PacketContext;
+import net.fabricmc.fabric.api.network.PacketContext;
 import net.minecraft.util.Identifier;
 import romelo333.notenoughwands.NotEnoughWands;
 

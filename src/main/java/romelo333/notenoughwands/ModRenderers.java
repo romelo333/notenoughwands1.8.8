@@ -1,7 +1,7 @@
 package romelo333.notenoughwands;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.fabricmc.fabric.client.render.BlockEntityRendererRegistry;
+import net.fabricmc.fabric.api.client.render.BlockEntityRendererRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.BufferBuilder;

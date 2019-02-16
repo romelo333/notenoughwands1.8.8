@@ -1,6 +1,6 @@
 package romelo333.notenoughwands.mixin;
 
-import net.minecraft.class_856;
+import net.minecraft.client.render.VisibleRegion;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,7 +22,7 @@ public class HudMixin {
             ),
             method = "renderEntities(Lnet/minecraft/entity/Entity;Lnet/minecraft/class_856;F)V"
     )
-    public void renderEntities(Entity var1, class_856 var2, float var3, CallbackInfo info) {
+    public void renderEntities(Entity var1, VisibleRegion var2, float var3, CallbackInfo info) {
         ClientProxy.renderWorldLastEvent();
     }
 }

@@ -4,7 +4,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.FontRenderer;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GuiLighting;
@@ -201,7 +201,8 @@ public class RenderHelper {
             // @todo fabric
 //            net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
 //            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, short1 / 1.0F, short2 / 1.0F);
-            itemRender.renderItemAndGlowInGui(itm, x, y);
+//            itemRender.renderItemAndGlowInGui(itm, x, y);
+            itemRender.renderGuiItemIcon(itm, x, y);
             renderItemOverlayIntoGUI(mc.fontRenderer, itm, x, y, txt, txt.length() - 2);
 //            itemRender.renderItemOverlayIntoGUI(mc.fontRenderer, itm, x, y, txt);
             GlStateManager.popMatrix();
@@ -272,7 +273,7 @@ public class RenderHelper {
 //            }
 
             ClientPlayerEntity entityplayersp = MinecraftClient.getInstance().player;
-            float f = entityplayersp == null ? 0.0F : entityplayersp.getItemCooldownManager().method_7905(stack.getItem(), MinecraftClient.getInstance().getTickDelta());
+            float f = entityplayersp == null ? 0.0F : entityplayersp.getItemCooldownManager().getCooldownProgress(stack.getItem(), MinecraftClient.getInstance().getTickDelta());
 
             if (f > 0.0F) {
                 GlStateManager.disableLighting();
@@ -377,11 +378,11 @@ public class RenderHelper {
     }
 
     public static void drawHorizontalLine(int x1, int y1, int x2, int color) {
-        Gui.drawRect(x1, y1, x2, y1+1, color);
+        Screen.drawRect(x1, y1, x2, y1+1, color);
     }
 
     public static void drawVerticalLine(int x1, int y1, int y2, int color) {
-        Gui.drawRect(x1, y1, x1+1, y2, color);
+        Screen.drawRect(x1, y1, x1+1, y2, color);
     }
 
     // Draw a small triangle. x,y is the coordinate of the left point
@@ -416,7 +417,7 @@ public class RenderHelper {
      * Draw a button box. x2 and y2 are not included.
      */
     public static void drawThickButtonBox(int x1, int y1, int x2, int y2, int bright, int average, int dark) {
-        Gui.drawRect(x1+2, y1+2, x2-2, y2-2, average);
+        Screen.drawRect(x1+2, y1+2, x2-2, y2-2, average);
         drawHorizontalLine(x1+1, y1, x2-1, 0xff000000); // @todo fabric: StyleConfig.colorButtonExternalBorder);
         drawHorizontalLine(x1+1, y2-1, x2-1, 0xff000000); // @todo fabric: StyleConfig.colorButtonExternalBorder);
         drawVerticalLine(x1, y1 + 1, y2 - 1, 0xff000000); // @todo fabric: StyleConfig.colorButtonExternalBorder);
@@ -437,7 +438,7 @@ public class RenderHelper {
      * Draw a button box. x2 and y2 are not included.
      */
     public static void drawThinButtonBox(int x1, int y1, int x2, int y2, int bright, int average, int dark) {
-        Gui.drawRect(x1 + 1, y1 + 1, x2 - 1, y2 - 1, average);
+        Screen.drawRect(x1 + 1, y1 + 1, x2 - 1, y2 - 1, average);
         drawHorizontalLine(x1+1, y1, x2-1, 0xff000000); // @todo fabric: StyleConfig.colorButtonExternalBorder);
         drawHorizontalLine(x1+1, y2-1, x2-1, 0xff000000); // @todo fabric: StyleConfig.colorButtonExternalBorder);
         drawVerticalLine(x1, y1 + 1, y2 - 1, 0xff000000); // @todo fabric: StyleConfig.colorButtonExternalBorder);
@@ -490,7 +491,7 @@ public class RenderHelper {
      */
     public static void drawBeveledBox(int x1, int y1, int x2, int y2, int topleftcolor, int botrightcolor, int fillcolor) {
         if (fillcolor != -1) {
-            Gui.drawRect(x1+1, y1+1, x2-1, y2-1, fillcolor);
+            Screen.drawRect(x1+1, y1+1, x2-1, y2-1, fillcolor);
         }
         drawHorizontalLine(x1, y1, x2-1, topleftcolor);
         drawVerticalLine(x1, y1, y2-1, topleftcolor);
@@ -503,12 +504,12 @@ public class RenderHelper {
      */
     public static void drawThickBeveledBox(int x1, int y1, int x2, int y2, int thickness, int topleftcolor, int botrightcolor, int fillcolor) {
         if (fillcolor != -1) {
-            Gui.drawRect(x1+1, y1+1, x2-1, y2-1, fillcolor);
+            Screen.drawRect(x1+1, y1+1, x2-1, y2-1, fillcolor);
         }
-        Gui.drawRect(x1, y1, x2-1, y1+thickness, topleftcolor);
-        Gui.drawRect(x1, y1, x1+thickness, y2-1, topleftcolor);
-        Gui.drawRect(x2-thickness, y1, x2, y2-1, botrightcolor);
-        Gui.drawRect(x1, y2 - thickness, x2, y2, botrightcolor);
+        Screen.drawRect(x1, y1, x2-1, y1+thickness, topleftcolor);
+        Screen.drawRect(x1, y1, x1+thickness, y2-1, topleftcolor);
+        Screen.drawRect(x2-thickness, y1, x2, y2-1, botrightcolor);
+        Screen.drawRect(x1, y2 - thickness, x2, y2, botrightcolor);
     }
 
     /**
@@ -516,7 +517,7 @@ public class RenderHelper {
      */
     public static void drawFlatBox(int x1, int y1, int x2, int y2, int border, int fill) {
         if (fill != -1) {
-            Gui.drawRect(x1+1, y1+1, x2-1, y2-1, fill);
+            Screen.drawRect(x1+1, y1+1, x2-1, y2-1, fill);
         }
         drawHorizontalLine(x1, y1, x2-1, border);
         drawVerticalLine(x1, y1, y2-1, border);

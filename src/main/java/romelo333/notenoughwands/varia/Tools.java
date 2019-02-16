@@ -1,7 +1,7 @@
 package romelo333.notenoughwands.varia;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.network.packet.PlaySoundClientPacket;
+import net.minecraft.client.network.packet.PlaySoundS2CPacket;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -141,7 +141,7 @@ public class Tools {
     }
 
     public static void playSound(World worldObj, SoundEvent soundEvent, double x, double y, double z, double volume, double pitch) {
-        PlaySoundClientPacket soundEffect = new PlaySoundClientPacket(soundEvent, SoundCategory.BLOCK, x, y, z, (float) volume, (float) pitch);
+        PlaySoundS2CPacket soundEffect = new PlaySoundS2CPacket(soundEvent, SoundCategory.BLOCK, x, y, z, (float) volume, (float) pitch);
 
         for (int j = 0; j < worldObj.players.size(); ++j) {
             ServerPlayerEntity PlayerEntitymp = (ServerPlayerEntity) worldObj.players.get(j);

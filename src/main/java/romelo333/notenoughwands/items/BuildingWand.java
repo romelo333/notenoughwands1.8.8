@@ -16,8 +16,9 @@ import net.minecraft.text.StringTextComponent;
 import net.minecraft.text.TextComponent;
 import net.minecraft.text.TextFormat;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.HitResult;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.Registry;
@@ -271,38 +272,41 @@ public class BuildingWand extends GenericWand {
     @Override
     public void renderOverlay(PlayerEntity player, ItemStack wand, float partialTicks) {
         HitResult mouseOver = MinecraftClient.getInstance().hitResult;
-        if (mouseOver != null && mouseOver.side != null && mouseOver.getBlockPos() != null) {
-            World world = player.getEntityWorld();
-            BlockPos blockPos = mouseOver.getBlockPos();
-            if (blockPos == null) {
-                return;
-            }
-            BlockState blockState = world.getBlockState(blockPos);
-            Block block = blockState.getBlock();
-            if (block != null && block.getMaterial(blockState) != Material.AIR) {
-                Set<BlockPos> coordinates;
+        if (mouseOver != null && mouseOver.getType() == HitResult.Type.BLOCK) {
+            BlockHitResult blockResult = (BlockHitResult) mouseOver;
+            if (blockResult.getSide() != null && blockResult.getBlockPos() != null) {
+                World world = player.getEntityWorld();
+                BlockPos blockPos = blockResult.getBlockPos();
+                if (blockPos == null) {
+                    return;
+                }
+                BlockState blockState = world.getBlockState(blockPos);
+                Block block = blockState.getBlock();
+                if (block != null && block.getMaterial(blockState) != Material.AIR) {
+                    Set<BlockPos> coordinates;
 
-                if (player.isSneaking()) {
-                    CompoundTag wandTag = Tools.getTagCompound(wand);
-                    CompoundTag undoTag1 = (CompoundTag) wandTag.getTag("undo1");
-                    CompoundTag undoTag2 = (CompoundTag) wandTag.getTag("undo2");
+                    if (player.isSneaking()) {
+                        CompoundTag wandTag = Tools.getTagCompound(wand);
+                        CompoundTag undoTag1 = (CompoundTag) wandTag.getTag("undo1");
+                        CompoundTag undoTag2 = (CompoundTag) wandTag.getTag("undo2");
 
-                    Set<BlockPos> undo1 = checkUndo(player, world, undoTag1);
-                    Set<BlockPos> undo2 = checkUndo(player, world, undoTag2);
-                    if (undo1 == null && undo2 == null) {
-                        return;
+                        Set<BlockPos> undo1 = checkUndo(player, world, undoTag1);
+                        Set<BlockPos> undo2 = checkUndo(player, world, undoTag2);
+                        if (undo1 == null && undo2 == null) {
+                            return;
+                        }
+
+                        if (undo1 != null && undo1.contains(blockPos)) {
+                            coordinates = undo1;
+                            renderOutlines(player, coordinates, 240, 30, 0, partialTicks);
+                        } else if (undo2 != null && undo2.contains(blockPos)) {
+                            coordinates = undo2;
+                            renderOutlines(player, coordinates, 240, 30, 0, partialTicks);
+                        }
+                    } else {
+                        coordinates = findSuitableBlocks(wand, world, blockResult.getSide(), blockPos, block);
+                        renderOutlines(player, coordinates, 50, 250, 180, partialTicks);
                     }
-
-                    if (undo1 != null && undo1.contains(blockPos)) {
-                        coordinates = undo1;
-                        renderOutlines(player, coordinates, 240, 30, 0, partialTicks);
-                    } else if (undo2 != null && undo2.contains(blockPos)) {
-                        coordinates = undo2;
-                        renderOutlines(player, coordinates, 240, 30, 0, partialTicks);
-                    }
-                } else {
-                    coordinates = findSuitableBlocks(wand, world, mouseOver.side, blockPos, block);
-                    renderOutlines(player, coordinates, 50, 250, 180, partialTicks);
                 }
             }
         }

@@ -1,9 +1,10 @@
 package romelo333.notenoughwands.blocks;
 
 
-import net.fabricmc.fabric.block.FabricBlockSettings;
+import net.fabricmc.fabric.api.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.VerticalEntityPosition;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -37,9 +38,18 @@ public class LightBlock extends Block implements BlockEntityProvider {
     }
 
     @Override
-    public VoxelShape getBoundingShape(BlockState var1, BlockView var2, BlockPos var3) {
+    public VoxelShape getCollisionShape(BlockState blockState_1, BlockView blockView_1, BlockPos blockPos_1, VerticalEntityPosition verticalEntityPosition_1) {
+        return super.getCollisionShape(blockState_1, blockView_1, blockPos_1, verticalEntityPosition_1);
+    }
+
+    @Override
+    public VoxelShape getRayTraceShape(BlockState blockState_1, BlockView blockView_1, BlockPos blockPos_1) {
         return VoxelShapes.fullCube();
     }
+//    @Override
+//    public VoxelShape getBoundingShape(BlockState var1, BlockView var2, BlockPos var3) {
+//        return VoxelShapes.fullCube();
+//    }
 
     @Override
     public List<ItemStack> getDroppedStacks(BlockState var1, LootContext.Builder var2) {

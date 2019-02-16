@@ -16,7 +16,8 @@ import net.minecraft.text.StringTextComponent;
 import net.minecraft.text.TextComponent;
 import net.minecraft.text.TextFormat;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.HitResult;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -86,7 +87,7 @@ public class DisplacementWand extends GenericWand {
     public ActionResult useOnBlock(ItemUsageContext context) {
         World world = context.getWorld();
         PlayerEntity player = context.getPlayer();
-        BlockPos pos = context.getPos();
+        BlockPos pos = context.getBlockPos();
         Direction side = context.getFacing();
         ItemStack stack = context.getItemStack();
         if (!world.isClient) {
@@ -177,14 +178,17 @@ public class DisplacementWand extends GenericWand {
     @Override
     public void renderOverlay(PlayerEntity player, ItemStack wand, float partialTicks) {
         HitResult mouseOver = MinecraftClient.getInstance().hitResult;
-        if (mouseOver != null && mouseOver.getBlockPos() != null && mouseOver.side != null) {
-            World world = player.getEntityWorld();
-            BlockPos blockPos = mouseOver.getBlockPos();
-            BlockState state = world.getBlockState(blockPos);
-            Block block = state.getBlock();
-            if (block != null && block.getMaterial(state) != Material.AIR) {
-                Set<BlockPos> coordinates = findSuitableBlocks(wand, world, mouseOver.side, blockPos);
-                renderOutlines(player, coordinates, 200, 230, 180, partialTicks);
+        if (mouseOver != null && mouseOver.getType() == HitResult.Type.BLOCK) {
+            BlockHitResult blockHit = (BlockHitResult) mouseOver;
+            if (blockHit.getBlockPos() != null && blockHit.getSide() != null) {
+                World world = player.getEntityWorld();
+                BlockPos blockPos = blockHit.getBlockPos();
+                BlockState state = world.getBlockState(blockPos);
+                Block block = state.getBlock();
+                if (block != null && block.getMaterial(state) != Material.AIR) {
+                    Set<BlockPos> coordinates = findSuitableBlocks(wand, world, blockHit.getSide(), blockPos);
+                    renderOutlines(player, coordinates, 200, 230, 180, partialTicks);
+                }
             }
         }
     }

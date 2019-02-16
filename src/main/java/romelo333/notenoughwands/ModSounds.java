@@ -1,6 +1,6 @@
 package romelo333.notenoughwands;
 
-import net.minecraft.client.network.packet.PlaySoundClientPacket;
+import net.minecraft.client.network.packet.PlaySoundS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
@@ -20,7 +20,7 @@ public class ModSounds {
 
     // Server side: play a sound to all nearby players
     public static void playSound(World worldObj, SoundEvent sound, double x, double y, double z, double volume, double pitch) {
-        PlaySoundClientPacket soundEffect = new PlaySoundClientPacket(sound, SoundCategory.BLOCK, x, y, z, (float) volume, (float) pitch);
+        PlaySoundS2CPacket soundEffect = new PlaySoundS2CPacket(sound, SoundCategory.BLOCK, x, y, z, (float) volume, (float) pitch);
 
         for (int j = 0; j < worldObj.players.size(); ++j) {
             ServerPlayerEntity PlayerEntitymp = (ServerPlayerEntity)worldObj.players.get(j);
