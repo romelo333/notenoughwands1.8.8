@@ -124,7 +124,7 @@ public class ProtectionWand extends GenericWand {
     public ActionResult useOnBlock(ItemUsageContext context) {
         PlayerEntity player = context.getPlayer();
         World world = context.getWorld();
-        BlockPos pos = context.getPos();
+        BlockPos pos = context.getBlockPos();
         Direction side = context.getFacing();
 
         ItemStack stack = context.getItemStack();

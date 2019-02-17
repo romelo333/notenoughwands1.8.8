@@ -13,11 +13,16 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.text.StringTextComponent;
 import net.minecraft.text.TextComponent;
 import net.minecraft.text.TextFormat;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.RayTraceContext;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.WorldChunk;
@@ -75,7 +80,7 @@ public class MovingWand extends GenericWand {
                 Vec3d start = new Vec3d(player.x, player.y + player.getEyeHeight(), player.z);
                 int distance = this.placeDistance;
                 Vec3d end = start.add(lookVec.x * distance, lookVec.y * distance, lookVec.z * distance);
-                HitResult position = world.rayTrace(start, end);
+                HitResult position = world.rayTrace(new RayTraceContext(start, end, RayTraceContext.ShapeType.COLLIDER, RayTraceContext.FluidHandling.NONE, player));
                 if (position == null) {
                     place(stack, world, new BlockPos(end), null, player);
                 }
@@ -89,7 +94,7 @@ public class MovingWand extends GenericWand {
         ItemStack stack = context.getItemStack();
         World world = context.getWorld();
         PlayerEntity player = context.getPlayer();
-        BlockPos pos = context.getPos();
+        BlockPos pos = context.getBlockPos();
         Direction side = context.getFacing();
         if (!world.isClient) {
             CompoundTag compound = stack.getTag();

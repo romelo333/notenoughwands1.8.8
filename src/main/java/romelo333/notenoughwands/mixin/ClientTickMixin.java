@@ -10,8 +10,8 @@ import romelo333.notenoughwands.proxy.ClientProxy;
 @Mixin(MinecraftClient.class)
 public class ClientTickMixin {
 
-    @Inject(at = @At("HEAD"), method = "method_1508()V")
-    private void method_1508(CallbackInfo info) {
+    @Inject(at = @At("HEAD"), method = "handleInputEvents()V")
+    private void handleInputEvents(CallbackInfo info) {
         ClientProxy.checkKeys();
     }
 }

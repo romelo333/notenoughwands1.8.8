@@ -20,7 +20,7 @@ public class HudMixin {
                     target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
                     args = "ldc=blockentities"
             ),
-            method = "renderEntities(Lnet/minecraft/entity/Entity;Lnet/minecraft/class_856;F)V"
+            method = "renderEntities(Lnet/minecraft/entity/Entity;Lnet/minecraft/client/render/VisibleRegion;F)V"
     )
     public void renderEntities(Entity var1, VisibleRegion var2, float var3, CallbackInfo info) {
         ClientProxy.renderWorldLastEvent();

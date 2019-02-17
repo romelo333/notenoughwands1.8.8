@@ -7,11 +7,16 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.StringTextComponent;
 import net.minecraft.text.TextComponent;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.RayTraceContext;
 import net.minecraft.world.World;
 import romelo333.notenoughwands.Config;
 import romelo333.notenoughwands.Configuration;
@@ -73,8 +78,8 @@ public class TeleportationWand extends GenericWand {
             }
 
             Vec3d end = start.add(lookVec.x * distance, lookVec.y * distance, lookVec.z * distance);
-            HitResult position = gothrough ? null : world.rayTrace(start, end);
-            if (position == null) {
+            HitResult position = gothrough ? null : world.rayTrace(new RayTraceContext(start, end, RayTraceContext.ShapeType.COLLIDER, RayTraceContext.FluidHandling.NONE, player));
+            if (position == null || position.getType() != HitResult.Type.BLOCK) {
                 if (gothrough) {
                     // First check if the destination is safe
                     BlockPos blockPos = new BlockPos(end.x, end.y, end.z);
@@ -85,14 +90,15 @@ public class TeleportationWand extends GenericWand {
                 }
                 player.method_5859(end.x, end.y, end.z);        // @todo fabric: setPositionAndUpdate
             } else {
-                BlockPos blockPos = position.getBlockPos();
+                BlockHitResult blockResult = (BlockHitResult) position;
+                BlockPos blockPos = blockResult.getBlockPos();
                 int x = blockPos.getX();
                 int y = blockPos.getY();
                 int z = blockPos.getZ();
                 if (world.isAir(blockPos.up()) && world.isAir(blockPos.up(2))) {
                     player.method_5859(x+.5, y + 1, z+.5);        // @todo fabric: setPositionAndUpdate
                 } else {
-                    switch (position.side) {
+                    switch (blockResult.getSide()) {
                         case DOWN:
                             player.method_5859(x+.5, y - 2, z+.5);  // @todo fabric: setPositionAndUpdate
                             break;

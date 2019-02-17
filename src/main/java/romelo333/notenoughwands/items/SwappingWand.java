@@ -17,6 +17,7 @@ import net.minecraft.text.StringTextComponent;
 import net.minecraft.text.TextComponent;
 import net.minecraft.text.TextFormat;
 import net.minecraft.util.*;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -143,7 +144,7 @@ public class SwappingWand extends GenericWand {
         ItemStack stack = context.getItemStack();
         World world = context.getWorld();
         PlayerEntity player = context.getPlayer();
-        BlockPos pos = context.getPos();
+        BlockPos pos = context.getBlockPos();
         Direction side = context.getFacing();
         if (!world.isClient) {
             if (player.isSneaking()) {
@@ -288,20 +289,23 @@ public class SwappingWand extends GenericWand {
     @Override
     public void renderOverlay(PlayerEntity player, ItemStack wand, float partialTicks) {
         HitResult mouseOver = MinecraftClient.getInstance().hitResult;
-        if (mouseOver != null && mouseOver.getBlockPos() != null && mouseOver.side != null) {
-            BlockState state = player.getEntityWorld().getBlockState(mouseOver.getBlockPos());
-            Block block = state.getBlock();
-            if (block != null && block.getMaterial(state) != Material.AIR) {
+        if (mouseOver != null && mouseOver.getType() == HitResult.Type.BLOCK) {
+            BlockHitResult blockResult = (BlockHitResult) mouseOver;
+            if (blockResult.getBlockPos() != null && blockResult.getSide() != null) {
+                BlockState state = player.getEntityWorld().getBlockState(blockResult.getBlockPos());
+                Block block = state.getBlock();
+                if (block != null && block.getMaterial(state) != Material.AIR) {
 //                int meta = block.getMetaFromState(state);
 
-                String wandId = Tools.getTagCompound(wand).getString("block");
-                Block wandBlock = Registry.BLOCK.get(new Identifier(wandId));
-                if (wandBlock == block) {
-                    return;
-                }
+                    String wandId = Tools.getTagCompound(wand).getString("block");
+                    Block wandBlock = Registry.BLOCK.get(new Identifier(wandId));
+                    if (wandBlock == block) {
+                        return;
+                    }
 
-                Set<BlockPos> coordinates = findSuitableBlocks(wand, player.getEntityWorld(), mouseOver.side, mouseOver.getBlockPos(), block);
-                renderOutlines(player, coordinates, 200, 230, 180, partialTicks);
+                    Set<BlockPos> coordinates = findSuitableBlocks(wand, player.getEntityWorld(), blockResult.getSide(), blockResult.getBlockPos(), block);
+                    renderOutlines(player, coordinates, 200, 230, 180, partialTicks);
+                }
             }
         }
     }

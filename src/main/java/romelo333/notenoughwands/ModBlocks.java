@@ -13,7 +13,7 @@ public class ModBlocks {
     public static BlockEntityType<LightTE> LIGHT;
 
     public static <T extends BlockEntity> BlockEntityType<T> register(String name, BlockEntityType.Builder<T> builder) {
-        BlockEntityType<T> blockEntityType = builder.method_11034(null);
+        BlockEntityType<T> blockEntityType = builder.build(null);
         Registry.register(Registry.BLOCK_ENTITY, NotEnoughWands.MODID + ":" + name, blockEntityType);
         return blockEntityType;
     }

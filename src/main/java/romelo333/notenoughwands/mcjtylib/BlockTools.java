@@ -11,8 +11,10 @@ import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.block.BlockItem;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
@@ -93,7 +95,8 @@ public class BlockTools {
 
     public static BlockState placeStackAt(PlayerEntity player, ItemStack blockStack, World world, BlockPos pos, @Nullable BlockState origState) {
         if (blockStack.getItem() instanceof BlockItem) {
-            ItemUsageContext usageContext = new ItemUsageContext(player, blockStack, pos, Direction.UP, 0, 0, 0);
+            // @todo check!
+            ItemUsageContext usageContext = new ItemUsageContext(player, blockStack, new BlockHitResult(new Vec3d(0, 0, 0), Direction.UP, pos, true));
             ItemPlacementContext context = new ItemPlacementContext(usageContext);
 
             BlockItem itemBlock = (BlockItem) blockStack.getItem();
@@ -107,7 +110,8 @@ public class BlockTools {
         } else {
             player.setStackInHand(Hand.MAIN, blockStack);
             player.setPosition(pos.getX()+.5, pos.getY()+1.5, pos.getZ()+.5);
-            ItemUsageContext usageContext = new ItemUsageContext(player, blockStack, pos, Direction.UP, 0, 0, 0);
+            ItemUsageContext usageContext = new ItemUsageContext(player, blockStack, new BlockHitResult(new Vec3d(0, 0, 0), Direction.UP, pos, true));
+//            ItemUsageContext usageContext = new ItemUsageContext(player, blockStack, pos, Direction.UP, 0, 0, 0);
             blockStack.getItem().useOnBlock(usageContext);
             return world.getBlockState(pos);
         }

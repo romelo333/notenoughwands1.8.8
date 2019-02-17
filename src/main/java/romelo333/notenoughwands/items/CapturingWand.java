@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.StringTextComponent;
 import net.minecraft.text.TextComponent;
 import net.minecraft.text.TextFormat;
@@ -69,7 +70,7 @@ public class CapturingWand extends GenericWand {
     public ActionResult useOnBlock(ItemUsageContext context) {
         ItemStack stack = context.getItemStack();
         World world = context.getWorld();
-        BlockPos pos = context.getPos();
+        BlockPos pos = context.getBlockPos();
         PlayerEntity player = context.getPlayer();
         if (!world.isClient) {
             CompoundTag tagCompound = Tools.getTagCompound(stack);
@@ -141,7 +142,9 @@ public class CapturingWand extends GenericWand {
                 entity.toTag(tagCompound);
                 Tools.getTagCompound(stack).put("mob", tagCompound);
                 Tools.getTagCompound(stack).putString("type", entity.getClass().getCanonicalName());
-                player.getEntityWorld().removeEntity(entity);
+                ((ServerWorld)player.getEntityWorld()).method_18217(entity);
+                // @todo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//                player.getEntityWorld().removeEntity(entity);
 
                 registerUsage(stack, player, difficultyScale);
             } else {

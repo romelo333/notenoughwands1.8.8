@@ -62,7 +62,9 @@ public class BlockOutlineRenderer {
         // @todo fabric
         GuiLighting.disable(); //        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
 
-        MinecraftClient.getInstance().worldRenderer.disableLightmap();
+
+        MinecraftClient.getInstance().gameRenderer.disableLightmap();
+//        MinecraftClient.getInstance().worldRenderer.disableLightmap();
 
 
         GlStateManager.disableDepthTest();
@@ -78,7 +80,7 @@ public class BlockOutlineRenderer {
 
         GlStateManager.popMatrix();
 
-        MinecraftClient.getInstance().worldRenderer.enableLightmap();
+        MinecraftClient.getInstance().gameRenderer.enableLightmap();
 
         GlStateManager.enableTexture();
         GlStateManager.enableDepthTest();
@@ -147,7 +149,7 @@ public class BlockOutlineRenderer {
     public static void renderBoxOutline(BlockPos pos) {
         // @todo fabric
         GuiLighting.disable(); //        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
-        MinecraftClient.getInstance().worldRenderer.disableLightmap();
+        MinecraftClient.getInstance().gameRenderer.disableLightmap();
 
         GlStateManager.disableTexture();
         GlStateManager.disableBlend();
@@ -167,7 +169,7 @@ public class BlockOutlineRenderer {
         tessellator.draw();
 
         // @todo fabric
-        MinecraftClient.getInstance().worldRenderer.enableLightmap();
+        MinecraftClient.getInstance().gameRenderer.enableLightmap();
         GlStateManager.enableTexture();
     }
 

@@ -79,7 +79,7 @@ public class AccelerationWand extends GenericWand {
     public ActionResult useOnBlock(ItemUsageContext context) {
         PlayerEntity player = context.getPlayer();
         World world = context.getWorld();
-        BlockPos pos = context.getPos();
+        BlockPos pos = context.getBlockPos();
         Direction side = context.getFacing();
         ItemStack stack = context.getItemStack();
         if (!world.isClient) {
@@ -109,7 +109,7 @@ public class AccelerationWand extends GenericWand {
             BlockEntity tileEntity = world.getBlockEntity(pos);
             for (int i = 0; i < amount /(tileEntity == null ? 5 : 1); i ++){
                 if (tileEntity == null){
-                    block.randomTick(state, world, pos, random);
+                    block.randomDisplayTick(state, world, pos, random);
                 } else if (tileEntity instanceof Tickable) {
                     ((Tickable)tileEntity).tick();
                 }

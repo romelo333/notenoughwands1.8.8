@@ -111,7 +111,7 @@ public class BuildingWand extends GenericWand {
     public ActionResult useOnBlock(ItemUsageContext context) {
         PlayerEntity player = context.getPlayer();
         World world = context.getWorld();
-        BlockPos pos = context.getPos();
+        BlockPos pos = context.getBlockPos();
         ItemStack stack = context.getItemStack();
         if (!world.isClient) {
             if (player.isSneaking()) {
