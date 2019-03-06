@@ -13,7 +13,7 @@ public class WandCore extends Item {
         setMaxStackSize(64);
         setUnlocalizedName(NotEnoughWands.MODID + "." + name);
         setRegistryName(name);
-        setCreativeTab(NotEnoughWands.tabNew);
+        setCreativeTab(NotEnoughWands.setup.getTab());
     }
 
     @SideOnly(Side.CLIENT)

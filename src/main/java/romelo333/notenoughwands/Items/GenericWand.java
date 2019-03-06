@@ -115,7 +115,7 @@ public class GenericWand extends Item implements IEnergyItem {
         setNoRepair();
         setUnlocalizedName(NotEnoughWands.MODID + "." + name);
         setRegistryName(name);
-        setCreativeTab(NotEnoughWands.tabNew);
+        setCreativeTab(NotEnoughWands.setup.getTab());
         wands.add(this);
         return this;
     }

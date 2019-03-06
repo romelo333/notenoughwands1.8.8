@@ -1,8 +1,8 @@
 package romelo333.notenoughwands.proxy;
 
-import mcjty.lib.McJtyLib;
 import mcjty.lib.network.PacketHandler;
-import mcjty.lib.proxy.AbstractCommonProxy;
+import mcjty.lib.setup.DefaultCommonSetup;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -14,7 +14,9 @@ import romelo333.notenoughwands.*;
 import romelo333.notenoughwands.network.NEWPacketHandler;
 import romelo333.notenoughwands.varia.WrenchChecker;
 
-public abstract class CommonProxy extends AbstractCommonProxy {
+import java.io.File;
+
+public class CommonSetup extends DefaultCommonSetup {
 
     @Override
     public void preInit(FMLPreInitializationEvent e) {
@@ -22,12 +24,17 @@ public abstract class CommonProxy extends AbstractCommonProxy {
         MinecraftForge.EVENT_BUS.register(new ForgeEventHandlers());
         ModItems.init();
 
-        mainConfig = NotEnoughWands.config;
+        mainConfig = new Configuration(new File(modConfigDir, "notenoughwands.cfg"));
         readMainConfig();
         FreezePotion.freezePotion = new FreezePotion();
 
         SimpleNetworkWrapper network = PacketHandler.registerMessages(NotEnoughWands.MODID, "notenoughwands");
         NEWPacketHandler.registerMessages(network);
+    }
+
+    @Override
+    public void createTabs() {
+        createTab("NotEnoughWands", new ItemStack(ModItems.teleportationWand));
     }
 
     private void readMainConfig() {
@@ -38,7 +45,7 @@ public abstract class CommonProxy extends AbstractCommonProxy {
             cfg.addCustomCategoryComment(Config.CATEGORY_WANDS, "Wand configuration");
             Config.init(cfg);
         } catch (Exception e1) {
-            NotEnoughWands.logger.log(Level.ERROR, "Problem loading config file!", e1);
+            getLogger().log(Level.ERROR, "Problem loading config file!", e1);
         } finally {
             if (mainConfig.hasChanged()) {
                 mainConfig.save();

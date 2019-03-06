@@ -1,19 +1,14 @@
 package romelo333.notenoughwands;
 
 import mcjty.lib.base.ModBase;
-import net.minecraft.creativetab.CreativeTabs;
+import mcjty.lib.proxy.IProxy;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import org.apache.logging.log4j.Logger;
-import romelo333.notenoughwands.proxy.CommonProxy;
-
-import java.io.File;
+import romelo333.notenoughwands.proxy.CommonSetup;
 
 @Mod(modid = NotEnoughWands.MODID, name="Not Enough Wands",
         dependencies =
@@ -30,21 +25,11 @@ public class NotEnoughWands implements ModBase {
     public static final String MIN_MCJTYLIB_VER = "3.1.0";
 
     @SidedProxy(clientSide="romelo333.notenoughwands.proxy.ClientProxy", serverSide="romelo333.notenoughwands.proxy.ServerProxy")
-    public static CommonProxy proxy;
+    public static IProxy proxy;
+    public static CommonSetup setup = new CommonSetup();
 
     @Mod.Instance("NotEnoughWands")
     public static NotEnoughWands instance;
-    public static Logger logger;
-    public static File mainConfigDir;
-    public static File modConfigDir;
-    public static Configuration config;
-
-    public static CreativeTabs tabNew = new CreativeTabs("NotEnoughWands") {
-        @Override
-        public ItemStack getTabIconItem() {
-            return new ItemStack(ModItems.teleportationWand);
-        }
-    };
 
     /**
      * Run before anything else. Read your config, create blocks, items, etc, and
@@ -52,13 +37,8 @@ public class NotEnoughWands implements ModBase {
      */
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
-        logger = e.getModLog();
-        mainConfigDir = e.getModConfigurationDirectory();
-        modConfigDir = new File(mainConfigDir.getPath());
-        config = new Configuration(new File(modConfigDir, "notenoughwands.cfg"));
+        setup.preInit(e);
         proxy.preInit(e);
-
-//        FMLInterModComms.sendMessage("Waila", "register", "mcjty.wailasupport.WailaCompatibility.load");
     }
 
     /**
@@ -66,6 +46,7 @@ public class NotEnoughWands implements ModBase {
      */
     @Mod.EventHandler
     public void init(FMLInitializationEvent e) {
+        setup.init(e);
         proxy.init(e);
     }
 
@@ -74,6 +55,7 @@ public class NotEnoughWands implements ModBase {
      */
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent e) {
+        setup.postInit(e);
         proxy.postInit(e);
     }
 
