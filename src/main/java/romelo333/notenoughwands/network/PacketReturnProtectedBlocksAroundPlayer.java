@@ -1,17 +1,17 @@
 package romelo333.notenoughwands.network;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
+import mcjty.lib.thirteen.Context;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import romelo333.notenoughwands.NotEnoughWands;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 public class PacketReturnProtectedBlocksAroundPlayer implements IMessage {
     private Map<ChunkPos, Set<BlockPos>> blocks;
@@ -55,16 +55,20 @@ public class PacketReturnProtectedBlocksAroundPlayer implements IMessage {
     public PacketReturnProtectedBlocksAroundPlayer() {
     }
 
+    public PacketReturnProtectedBlocksAroundPlayer(ByteBuf buf) {
+        fromBytes(buf);
+    }
+
     public PacketReturnProtectedBlocksAroundPlayer(Map<ChunkPos, Set<BlockPos>> blocks) {
         this.blocks = blocks;
     }
 
-    public static class Handler implements IMessageHandler<PacketReturnProtectedBlocksAroundPlayer, IMessage> {
-        @Override
-        public IMessage onMessage(PacketReturnProtectedBlocksAroundPlayer message, MessageContext ctx) {
-            Minecraft.getMinecraft().addScheduledTask(() -> ReturnProtectedBlocksAroundPlayerHelper.setProtectedBlocks(
-                    Minecraft.getMinecraft().world.provider.getDimension(), message));
-            return null;
-        }
+    public void handle(Supplier<Context> supplier) {
+        Context ctx = supplier.get();
+        ctx.enqueueWork(() -> {
+            ReturnProtectedBlocksAroundPlayerHelper.setProtectedBlocks(
+                    NotEnoughWands.proxy.getClientWorld().provider.getDimension(), this);
+        });
+        ctx.setPacketHandled(true);
     }
 }

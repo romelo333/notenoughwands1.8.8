@@ -1,18 +1,17 @@
 package romelo333.notenoughwands.network;
 
 import io.netty.buffer.ByteBuf;
+import mcjty.lib.thirteen.Context;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import romelo333.notenoughwands.ProtectedBlocks;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 public class PacketGetProtectedBlocksAroundPlayer implements IMessage {
 
@@ -27,25 +26,24 @@ public class PacketGetProtectedBlocksAroundPlayer implements IMessage {
     public PacketGetProtectedBlocksAroundPlayer() {
     }
 
+    public PacketGetProtectedBlocksAroundPlayer(ByteBuf buf) {
+        fromBytes(buf);
+    }
+
     public PacketGetProtectedBlocksAroundPlayer(int chunkx, int chunkz) {
     }
 
-    public static class Handler implements IMessageHandler<PacketGetProtectedBlocksAroundPlayer, IMessage> {
-        @Override
-        public IMessage onMessage(PacketGetProtectedBlocksAroundPlayer message, MessageContext ctx) {
-            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
-            return null;
-        }
-
-        private void handle(PacketGetProtectedBlocksAroundPlayer message, MessageContext ctx) {
-            // @todo
-            EntityPlayerMP player = ctx.getServerHandler().player;
+    public void handle(Supplier<Context> supplier) {
+        Context ctx = supplier.get();
+        ctx.enqueueWork(() -> {
+            EntityPlayerMP player = ctx.getSender();
             World world = player.getEntityWorld();
 
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
             Map<ChunkPos, Set<BlockPos>> blocks = protectedBlocks.fetchProtectedBlocks(world, player.getPosition());
             PacketReturnProtectedBlocksAroundPlayer msg = new PacketReturnProtectedBlocksAroundPlayer(blocks);
             NEWPacketHandler.INSTANCE.sendTo(msg, player);
-        }
+        });
+        ctx.setPacketHandled(true);
     }
 }

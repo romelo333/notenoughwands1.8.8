@@ -2,25 +2,39 @@ package romelo333.notenoughwands.network;
 
 
 import mcjty.lib.network.PacketHandler;
+import mcjty.lib.thirteen.ChannelBuilder;
+import mcjty.lib.thirteen.SimpleChannel;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.relauncher.Side;
+import romelo333.notenoughwands.NotEnoughWands;
 
 public class NEWPacketHandler {
     public static SimpleNetworkWrapper INSTANCE;
 
-    public static void registerMessages(SimpleNetworkWrapper network) {
-        INSTANCE = network;
+    public static void registerMessages(String name) {
+        SimpleChannel net = ChannelBuilder
+                .named(new ResourceLocation(NotEnoughWands.MODID, name))
+                .networkProtocolVersion(() -> "1.0")
+                .clientAcceptedVersions(s -> true)
+                .serverAcceptedVersions(s -> true)
+                .simpleChannel();
+
+        INSTANCE = net.getNetwork();
 
         // Server side
-        INSTANCE.registerMessage(PacketToggleMode.Handler.class, PacketToggleMode.class, PacketHandler.nextPacketID(), Side.SERVER);
-        INSTANCE.registerMessage(PacketToggleSubMode.Handler.class, PacketToggleSubMode.class, PacketHandler.nextPacketID(), Side.SERVER);
-        INSTANCE.registerMessage(PacketGetProtectedBlocks.Handler.class, PacketGetProtectedBlocks.class, PacketHandler.nextPacketID(), Side.SERVER);
-        INSTANCE.registerMessage(PacketGetProtectedBlockCount.Handler.class, PacketGetProtectedBlockCount.class, PacketHandler.nextPacketID(), Side.SERVER);
-        INSTANCE.registerMessage(PacketGetProtectedBlocksAroundPlayer.Handler.class, PacketGetProtectedBlocksAroundPlayer.class, PacketHandler.nextPacketID(), Side.SERVER);
+        net.registerMessageServer(id(), PacketToggleMode.class, PacketToggleMode::toBytes, PacketToggleMode::new, PacketToggleMode::handle);
+        net.registerMessageServer(id(), PacketToggleSubMode.class, PacketToggleSubMode::toBytes, PacketToggleSubMode::new, PacketToggleSubMode::handle);
+        net.registerMessageServer(id(), PacketGetProtectedBlocks.class, PacketGetProtectedBlocks::toBytes, PacketGetProtectedBlocks::new, PacketGetProtectedBlocks::handle);
+        net.registerMessageServer(id(), PacketGetProtectedBlockCount.class, PacketGetProtectedBlockCount::toBytes, PacketGetProtectedBlockCount::new, PacketGetProtectedBlockCount::handle);
+        net.registerMessageServer(id(), PacketGetProtectedBlocksAroundPlayer.class, PacketGetProtectedBlocksAroundPlayer::toBytes, PacketGetProtectedBlocksAroundPlayer::new, PacketGetProtectedBlocksAroundPlayer::handle);
 
         // Client side
-        INSTANCE.registerMessage(PacketReturnProtectedBlocks.Handler.class, PacketReturnProtectedBlocks.class, PacketHandler.nextPacketID(), Side.CLIENT);
-        INSTANCE.registerMessage(PacketReturnProtectedBlockCount.Handler.class, PacketReturnProtectedBlockCount.class, PacketHandler.nextPacketID(), Side.CLIENT);
-        INSTANCE.registerMessage(PacketReturnProtectedBlocksAroundPlayer.Handler.class, PacketReturnProtectedBlocksAroundPlayer.class, PacketHandler.nextPacketID(), Side.CLIENT);
+        net.registerMessageClient(id(), PacketReturnProtectedBlocks.class, PacketReturnProtectedBlocks::toBytes, PacketReturnProtectedBlocks::new, PacketReturnProtectedBlocks::handle);
+        net.registerMessageClient(id(), PacketReturnProtectedBlockCount.class, PacketReturnProtectedBlockCount::toBytes, PacketReturnProtectedBlockCount::new, PacketReturnProtectedBlockCount::handle);
+        net.registerMessageClient(id(), PacketReturnProtectedBlocksAroundPlayer.class, PacketReturnProtectedBlocksAroundPlayer::toBytes, PacketReturnProtectedBlocksAroundPlayer::new, PacketReturnProtectedBlocksAroundPlayer::handle);
+    }
+
+    private static int id() {
+        return PacketHandler.nextPacketID();
     }
 }

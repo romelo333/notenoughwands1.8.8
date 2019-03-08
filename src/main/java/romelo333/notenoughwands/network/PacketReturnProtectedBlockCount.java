@@ -1,10 +1,10 @@
 package romelo333.notenoughwands.network;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
+import mcjty.lib.thirteen.Context;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+
+import java.util.function.Supplier;
 
 public class PacketReturnProtectedBlockCount implements IMessage {
     private int count;
@@ -26,16 +26,19 @@ public class PacketReturnProtectedBlockCount implements IMessage {
     public PacketReturnProtectedBlockCount() {
     }
 
+    public PacketReturnProtectedBlockCount(ByteBuf buf) {
+        fromBytes(buf);
+    }
+
     public PacketReturnProtectedBlockCount(int count) {
         this.count = count;
     }
 
-    public static class Handler implements IMessageHandler<PacketReturnProtectedBlockCount, IMessage> {
-        @Override
-        public IMessage onMessage(PacketReturnProtectedBlockCount message, MessageContext ctx) {
-            Minecraft.getMinecraft().addScheduledTask(() -> ReturnProtectedBlockCountHelper.setProtectedBlocks(message));
-            return null;
-        }
-
+    public void handle(Supplier<Context> supplier) {
+        Context ctx = supplier.get();
+        ctx.enqueueWork(() -> {
+            ReturnProtectedBlockCountHelper.setProtectedBlocks(this);
+        });
+        ctx.setPacketHandled(true);
     }
 }

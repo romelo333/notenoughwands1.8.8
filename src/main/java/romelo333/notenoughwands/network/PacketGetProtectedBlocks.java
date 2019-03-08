@@ -1,20 +1,19 @@
 package romelo333.notenoughwands.network;
 
 import io.netty.buffer.ByteBuf;
+import mcjty.lib.thirteen.Context;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import romelo333.notenoughwands.Items.ProtectionWand;
 import romelo333.notenoughwands.ProtectedBlocks;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Supplier;
 
 public class PacketGetProtectedBlocks implements IMessage {
     @Override
@@ -28,16 +27,14 @@ public class PacketGetProtectedBlocks implements IMessage {
     public PacketGetProtectedBlocks() {
     }
 
-    public static class Handler implements IMessageHandler<PacketGetProtectedBlocks, IMessage> {
-        @Override
-        public IMessage onMessage(PacketGetProtectedBlocks message, MessageContext ctx) {
-            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
-            return null;
-        }
+    public PacketGetProtectedBlocks(ByteBuf buf) {
+        fromBytes(buf);
+    }
 
-        private void handle(PacketGetProtectedBlocks message, MessageContext ctx) {
-            // @todo (compatlayer?)
-            EntityPlayerMP player = ctx.getServerHandler().player;
+    public void handle(Supplier<Context> supplier) {
+        Context ctx = supplier.get();
+        ctx.enqueueWork(() -> {
+            EntityPlayerMP player = ctx.getSender();
             World world = player.getEntityWorld();
 
             ItemStack heldItem = player.getHeldItem(EnumHand.MAIN_HAND);
@@ -58,6 +55,7 @@ public class PacketGetProtectedBlocks implements IMessage {
             }
             PacketReturnProtectedBlocks msg = new PacketReturnProtectedBlocks(blocks, childBlocks);
             NEWPacketHandler.INSTANCE.sendTo(msg, player);
-        }
+        });
+        ctx.setPacketHandled(true);
     }
 }

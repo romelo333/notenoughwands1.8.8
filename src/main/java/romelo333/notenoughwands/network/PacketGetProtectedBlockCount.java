@@ -1,13 +1,13 @@
 package romelo333.notenoughwands.network;
 
 import io.netty.buffer.ByteBuf;
+import mcjty.lib.thirteen.Context;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import romelo333.notenoughwands.ProtectedBlocks;
+
+import java.util.function.Supplier;
 
 public class PacketGetProtectedBlockCount implements IMessage {
     private int id;
@@ -25,25 +25,24 @@ public class PacketGetProtectedBlockCount implements IMessage {
     public PacketGetProtectedBlockCount() {
     }
 
+    public PacketGetProtectedBlockCount(ByteBuf buf) {
+        fromBytes(buf);
+    }
+
     public PacketGetProtectedBlockCount(int id) {
         this.id = id;
     }
 
-    public static class Handler implements IMessageHandler<PacketGetProtectedBlockCount, IMessage> {
-        @Override
-        public IMessage onMessage(PacketGetProtectedBlockCount message, MessageContext ctx) {
-            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
-            return null;
-        }
-
-        private void handle(PacketGetProtectedBlockCount message, MessageContext ctx) {
-            // @todo
-            EntityPlayerMP player = ctx.getServerHandler().player;
+    public void handle(Supplier<Context> supplier) {
+        Context ctx = supplier.get();
+        ctx.enqueueWork(() -> {
+            EntityPlayerMP player = ctx.getSender();
             World world = player.getEntityWorld();
 
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
-            PacketReturnProtectedBlockCount msg = new PacketReturnProtectedBlockCount(protectedBlocks.getProtectedBlockCount(message.id));
+            PacketReturnProtectedBlockCount msg = new PacketReturnProtectedBlockCount(protectedBlocks.getProtectedBlockCount(id));
             NEWPacketHandler.INSTANCE.sendTo(msg, player);
-        }
+        });
+        ctx.setPacketHandled(true);
     }
 }

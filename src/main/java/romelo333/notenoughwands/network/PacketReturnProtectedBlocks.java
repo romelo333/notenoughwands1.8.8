@@ -1,14 +1,13 @@
 package romelo333.notenoughwands.network;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
+import mcjty.lib.thirteen.Context;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Supplier;
 
 public class PacketReturnProtectedBlocks implements IMessage {
     private Set<BlockPos> blocks;
@@ -56,16 +55,20 @@ public class PacketReturnProtectedBlocks implements IMessage {
     public PacketReturnProtectedBlocks() {
     }
 
+    public PacketReturnProtectedBlocks(ByteBuf buf) {
+        fromBytes(buf);
+    }
+
     public PacketReturnProtectedBlocks(Set<BlockPos> blocks, Set<BlockPos> childBlocks) {
         this.blocks = blocks;
         this.childBlocks = childBlocks;
     }
 
-    public static class Handler implements IMessageHandler<PacketReturnProtectedBlocks, IMessage> {
-        @Override
-        public IMessage onMessage(PacketReturnProtectedBlocks message, MessageContext ctx) {
-            Minecraft.getMinecraft().addScheduledTask(() -> ReturnProtectedBlocksHelper.setProtectedBlocks(message));
-            return null;
-        }
+    public void handle(Supplier<Context> supplier) {
+        Context ctx = supplier.get();
+        ctx.enqueueWork(() -> {
+            ReturnProtectedBlocksHelper.setProtectedBlocks(this);
+        });
+        ctx.setPacketHandled(true);
     }
 }
