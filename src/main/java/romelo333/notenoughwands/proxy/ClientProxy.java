@@ -65,7 +65,7 @@ public class ClientProxy extends DefaultClientProxy {
 
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
-        if (Config.clientSideProtection < 0) {
+        if (ConfigSetup.clientSideProtection < 0) {
             return;
         }
 
@@ -73,7 +73,7 @@ public class ClientProxy extends DefaultClientProxy {
         if (timer > 0) {
             return;
         }
-        timer = Config.clientSideProtection;
+        timer = ConfigSetup.clientSideProtection;
         NEWPacketHandler.INSTANCE.sendToServer(new PacketGetProtectedBlocksAroundPlayer());
     }
 }

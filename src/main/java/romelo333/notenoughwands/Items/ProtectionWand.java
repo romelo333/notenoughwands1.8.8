@@ -16,7 +16,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import romelo333.notenoughwands.Config;
+import romelo333.notenoughwands.ConfigSetup;
 import romelo333.notenoughwands.ProtectedBlocks;
 import romelo333.notenoughwands.network.*;
 import romelo333.notenoughwands.varia.Tools;
@@ -53,8 +53,8 @@ public class ProtectionWand extends GenericWand {
     @Override
     public void initConfig(Configuration cfg) {
         super.initConfig(cfg, 200, 100000, 100, 200000, 50, 500000);
-        blockShowRadius = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_blockShowRadius", blockShowRadius, "How far around the player protected blocks will be hilighted").getInt();
-        maximumProtectedBlocks = cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maximumProtectedBlocks", master ? 0 : maximumProtectedBlocks, "The maximum number of blocks to protect with this wand (set to 0 for no maximum)").getInt();
+        blockShowRadius = cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_blockShowRadius", blockShowRadius, "How far around the player protected blocks will be hilighted").getInt();
+        maximumProtectedBlocks = cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_maximumProtectedBlocks", master ? 0 : maximumProtectedBlocks, "The maximum number of blocks to protect with this wand (set to 0 for no maximum)").getInt();
     }
 
     private static long tooltipLastTime = 0;

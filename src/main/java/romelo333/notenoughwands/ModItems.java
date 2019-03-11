@@ -20,6 +20,7 @@ public class ModItems {
     public static ProtectionWand masterProtectionWand;
     public static FreezingWand freezingWand;
     public static PotionWand potionWand;
+    public static FreezePotion freezePotion;
 
     public static void init() {
         wandCore = new WandCore("wandcore");
@@ -36,6 +37,7 @@ public class ModItems {
         masterProtectionWand = new ProtectionWand(true);
         freezingWand = new FreezingWand();
         potionWand = new PotionWand();
+        freezePotion = new FreezePotion();
     }
 
     @SideOnly(Side.CLIENT)

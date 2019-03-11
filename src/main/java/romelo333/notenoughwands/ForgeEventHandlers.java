@@ -112,7 +112,7 @@ public class ForgeEventHandlers {
             // Server side
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
             if (protectedBlocks != null && protectedBlocks.isProtected(world, pos)) {
-                if (Config.interactionProtection) {
+                if (ConfigSetup.interactionProtection) {
                     event.setCanceled(true);
                 } else {
                     // We still allow right click interaction.

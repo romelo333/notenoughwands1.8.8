@@ -28,7 +28,7 @@ import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import romelo333.notenoughwands.Config;
+import romelo333.notenoughwands.ConfigSetup;
 import romelo333.notenoughwands.ProtectedBlocks;
 import romelo333.notenoughwands.varia.Tools;
 
@@ -58,7 +58,7 @@ public class SwappingWand extends GenericWand {
     @Override
     public void initConfig(Configuration cfg) {
         super.initConfig(cfg, 2000, 100000, 500, 200000, 200, 500000);
-        hardnessDistance = (float) cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_hardnessDistance", hardnessDistance, "How far away the hardness can be to allow swapping (100 means basically everything allowed)").getDouble();
+        hardnessDistance = (float) cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_hardnessDistance", hardnessDistance, "How far away the hardness can be to allow swapping (100 means basically everything allowed)").getDouble();
     }
 
     @Override

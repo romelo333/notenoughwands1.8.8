@@ -24,7 +24,7 @@ import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import romelo333.notenoughwands.Config;
+import romelo333.notenoughwands.ConfigSetup;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.HashSet;
@@ -55,7 +55,7 @@ public class DisplacementWand extends GenericWand {
     @Override
     public void initConfig(Configuration cfg) {
         super.initConfig(cfg, 2000, 100000, 500, 200000, 200, 500000);
-        maxHardness = (float) cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_maxHardness", maxHardness, "Max hardness this block can move.)").getDouble();
+        maxHardness = (float) cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_maxHardness", maxHardness, "Max hardness this block can move.)").getDouble();
     }
 
     @Override

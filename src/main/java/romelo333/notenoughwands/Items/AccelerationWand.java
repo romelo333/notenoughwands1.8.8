@@ -16,7 +16,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.util.FakePlayer;
-import romelo333.notenoughwands.Config;
+import romelo333.notenoughwands.ConfigSetup;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.List;
@@ -67,9 +67,9 @@ public class AccelerationWand extends GenericWand {
     @Override
     public void initConfig(Configuration cfg) {
         super.initConfig(cfg, 500, 100000, 200, 200000, 100, 500000);
-        fakePlayerFactor = (float) cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_fakePlayerFactor", fakePlayerFactor,
+        fakePlayerFactor = (float) cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_fakePlayerFactor", fakePlayerFactor,
                 "Factor to apply to the cost when this wand is used by a fake player (a machine). Set to -1 to disable its use this way").getDouble();
-        lessEffectiveForFakePlayer =  cfg.get(Config.CATEGORY_WANDS, getConfigPrefix() + "_lessEffectiveForFakePlayer", lessEffectiveForFakePlayer,
+        lessEffectiveForFakePlayer =  cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_lessEffectiveForFakePlayer", lessEffectiveForFakePlayer,
                 "If true this wand will be less effective for fake players").getBoolean();
     }
 

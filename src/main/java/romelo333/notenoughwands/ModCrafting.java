@@ -2,7 +2,6 @@ package romelo333.notenoughwands;
 
 
 import net.minecraftforge.oredict.RecipeSorter;
-import romelo333.notenoughwands.Items.GenericWand;
 import romelo333.notenoughwands.varia.ContainerToItemRecipe;
 
 public class ModCrafting {
@@ -10,9 +9,5 @@ public class ModCrafting {
         RecipeSorter.register("NotEnoughWands:containertoitem", ContainerToItemRecipe.class, RecipeSorter.Category.SHAPED, "after:minecraft:shaped");
         RecipeSorter.register("NotEnoughWands:addpotion", AddPotionRecipe.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
         RecipeSorter.register("NotEnoughWands:clearpotions", ClearPotionsRecipe.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
-    }
-
-
-    public static void init() {
     }
 }

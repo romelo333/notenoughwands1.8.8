@@ -10,7 +10,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
-import romelo333.notenoughwands.Config;
+import romelo333.notenoughwands.ConfigSetup;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +38,7 @@ public class BlackListSettings {
     }
 
     private static void setCostBlock(Configuration cfg, String name, double cost) {
-        cfg.get(Config.CATEGORY_MOVINGBLACKLIST, name, cost);
+        cfg.get(ConfigSetup.CATEGORY_MOVINGBLACKLIST, name, cost);
         blacklistedBlocks.put(name, cost);
     }
 
@@ -57,13 +57,13 @@ public class BlackListSettings {
 
     private static void setCostEntity(Configuration cfg, String name, double cost) {
         if (name != null && !name.isEmpty()) {
-            cfg.get(Config.CATEGORY_CAPTUREBLACKLIST, name, cost);
+            cfg.get(ConfigSetup.CATEGORY_CAPTUREBLACKLIST, name, cost);
             blackListedMobs.put(name, cost);
         }
     }
 
     public static void setupMovingWandBlacklist(Configuration cfg) {
-        ConfigCategory category = cfg.getCategory(Config.CATEGORY_MOVINGBLACKLIST);
+        ConfigCategory category = cfg.getCategory(ConfigSetup.CATEGORY_MOVINGBLACKLIST);
         if (category.isEmpty()) {
             // Initialize with defaults
             blackListBlock(cfg, "rftools:shield_block1");
@@ -87,7 +87,7 @@ public class BlackListSettings {
     }
 
     public static void setupCapturingWandBlacklist(Configuration cfg) {
-        ConfigCategory category = cfg.getCategory(Config.CATEGORY_CAPTUREBLACKLIST);
+        ConfigCategory category = cfg.getCategory(ConfigSetup.CATEGORY_CAPTUREBLACKLIST);
         if (category.isEmpty()) {
             // Initialize with defaults
             blackListEntity(cfg, EntityTools.findEntityIdByClass(EntityDragon.class));
