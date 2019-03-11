@@ -1,4 +1,4 @@
-package romelo333.notenoughwands.proxy;
+package romelo333.notenoughwands.setup;
 
 import mcjty.lib.McJtyLibClient;
 import mcjty.lib.setup.DefaultClientProxy;

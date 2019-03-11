@@ -8,7 +8,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import romelo333.notenoughwands.proxy.CommonSetup;
+import romelo333.notenoughwands.setup.CommonSetup;
 
 @Mod(modid = NotEnoughWands.MODID, name="Not Enough Wands",
         dependencies =
