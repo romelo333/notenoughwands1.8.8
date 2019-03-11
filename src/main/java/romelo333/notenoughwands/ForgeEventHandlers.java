@@ -1,48 +1,19 @@
 package romelo333.notenoughwands;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.loot.LootPool;
 import net.minecraft.world.storage.loot.LootTableList;
 import net.minecraftforge.event.LootTableLoadEvent;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import romelo333.notenoughwands.Items.GenericWand;
-import romelo333.notenoughwands.blocks.LightBlock;
-import romelo333.notenoughwands.blocks.LightTE;
 
 import java.util.List;
 
 public class ForgeEventHandlers {
-
-    @SubscribeEvent
-    public void registerSounds(RegistryEvent.Register<SoundEvent> event) {
-        ModSounds.init(event.getRegistry());
-    }
-
-    @SubscribeEvent
-    public void registerBlocks(RegistryEvent.Register<Block> event) {
-        ModBlocks.lightBlock = new LightBlock();
-        event.getRegistry().register(ModBlocks.lightBlock);
-        GameRegistry.registerTileEntity(LightTE.class, "LightTileEntity");
-    }
-
-    @SubscribeEvent
-    public void registerItems(RegistryEvent.Register<Item> event) {
-        event.getRegistry().register(ModItems.wandCore);
-        event.getRegistry().register(ModItems.advancedWandCore);
-
-        for (GenericWand wand : GenericWand.getWands()) {
-            event.getRegistry().register(wand);
-        }
-    }
 
     @SubscribeEvent
     public void onBlockBreakEvent (BlockEvent.BreakEvent event){

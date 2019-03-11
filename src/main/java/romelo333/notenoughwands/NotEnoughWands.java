@@ -24,7 +24,7 @@ public class NotEnoughWands implements ModBase {
     public static final String MIN_COFH_VER = "2.0.0";
     public static final String MIN_MCJTYLIB_VER = "3.1.0";
 
-    @SidedProxy(clientSide="romelo333.notenoughwands.proxy.ClientProxy", serverSide="romelo333.notenoughwands.proxy.ServerProxy")
+    @SidedProxy(clientSide="romelo333.notenoughwands.setup.ClientProxy", serverSide="romelo333.notenoughwands.setup.ServerProxy")
     public static IProxy proxy;
     public static CommonSetup setup = new CommonSetup();
 
