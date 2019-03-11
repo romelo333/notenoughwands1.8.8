@@ -1,6 +1,5 @@
 package romelo333.notenoughwands.setup;
 
-import mcjty.lib.McJtyLibClient;
 import mcjty.lib.setup.DefaultClientProxy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -25,7 +24,6 @@ public class ClientProxy extends DefaultClientProxy {
     public void preInit(FMLPreInitializationEvent e) {
         super.preInit(e);
         MinecraftForge.EVENT_BUS.register(this);
-        McJtyLibClient.preInit(e);
     }
 
     @Override
