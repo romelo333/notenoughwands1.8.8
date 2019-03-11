@@ -22,7 +22,6 @@ public class CommonSetup extends DefaultCommonSetup {
         MinecraftForge.EVENT_BUS.register(new ForgeEventHandlers());
         ModItems.init();
 
-        mainConfig = new Configuration(new File(modConfigDir, "notenoughwands.cfg"));
         readMainConfig();
         FreezePotion.freezePotion = new FreezePotion();
 
@@ -34,7 +33,10 @@ public class CommonSetup extends DefaultCommonSetup {
         createTab("NotEnoughWands", new ItemStack(ModItems.teleportationWand));
     }
 
+    private Configuration mainConfig;
+
     private void readMainConfig() {
+        mainConfig = new Configuration(new File(modConfigDir, "notenoughwands.cfg"));
         Configuration cfg = mainConfig;
         try {
             cfg.load();
