@@ -1,6 +1,6 @@
 package romelo333.notenoughwands.setup;
 
-import mcjty.lib.setup.DefaultCommonSetup;
+import mcjty.lib.setup.DefaultModSetup;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -11,7 +11,7 @@ import romelo333.notenoughwands.ModItems;
 import romelo333.notenoughwands.network.NEWPacketHandler;
 import romelo333.notenoughwands.varia.WrenchChecker;
 
-public class CommonSetup extends DefaultCommonSetup {
+public class ModSetup extends DefaultModSetup {
 
     @Override
     public void preInit(FMLPreInitializationEvent e) {

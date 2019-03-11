@@ -8,7 +8,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import romelo333.notenoughwands.setup.CommonSetup;
+import romelo333.notenoughwands.setup.ModSetup;
 
 @Mod(modid = NotEnoughWands.MODID, name="Not Enough Wands",
         dependencies =
@@ -26,7 +26,7 @@ public class NotEnoughWands implements ModBase {
 
     @SidedProxy(clientSide="romelo333.notenoughwands.setup.ClientProxy", serverSide="romelo333.notenoughwands.setup.ServerProxy")
     public static IProxy proxy;
-    public static CommonSetup setup = new CommonSetup();
+    public static ModSetup setup = new ModSetup();
 
     @Mod.Instance("NotEnoughWands")
     public static NotEnoughWands instance;
