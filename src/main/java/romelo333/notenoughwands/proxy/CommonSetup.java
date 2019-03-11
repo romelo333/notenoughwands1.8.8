@@ -26,6 +26,11 @@ public class CommonSetup extends DefaultCommonSetup {
     }
 
     @Override
+    protected void setupModCompat() {
+
+    }
+
+    @Override
     public void createTabs() {
         createTab("NotEnoughWands", new ItemStack(ModItems.teleportationWand));
     }
