@@ -6,16 +6,16 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
-import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import romelo333.notenoughwands.*;
+import romelo333.notenoughwands.ConfigSetup;
 import romelo333.notenoughwands.Items.GenericWand;
+import romelo333.notenoughwands.KeyBindings;
+import romelo333.notenoughwands.KeyInputHandler;
 import romelo333.notenoughwands.network.NEWPacketHandler;
 import romelo333.notenoughwands.network.PacketGetProtectedBlocksAroundPlayer;
 
@@ -36,13 +36,6 @@ public class ClientProxy extends DefaultClientProxy {
     }
 
     @SubscribeEvent
-    public void registerModels(ModelRegistryEvent event) {
-        ModRenderers.init();
-        ModItems.initModels();
-    }
-
-
-    @SubscribeEvent
     public void renderWorldLastEvent(RenderWorldLastEvent evt) {
         Minecraft mc = Minecraft.getMinecraft();
         EntityPlayerSP p = mc.player;
@@ -54,11 +47,6 @@ public class ClientProxy extends DefaultClientProxy {
             GenericWand genericWand = (GenericWand) heldItem.getItem();
             genericWand.renderOverlay(evt, p, heldItem);
         }
-    }
-
-    @Override
-    public void postInit(FMLPostInitializationEvent e) {
-        super.postInit(e);
     }
 
     public static int timer = 0;
