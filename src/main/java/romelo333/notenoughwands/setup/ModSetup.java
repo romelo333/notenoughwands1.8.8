@@ -19,8 +19,6 @@ public class ModSetup extends DefaultModSetup {
 
         MinecraftForge.EVENT_BUS.register(new ForgeEventHandlers());
 
-        ConfigSetup.init();
-
         NEWPacketHandler.registerMessages("notenoughwands");
 
         ModItems.init();
@@ -29,6 +27,11 @@ public class ModSetup extends DefaultModSetup {
     @Override
     protected void setupModCompat() {
 
+    }
+
+    @Override
+    protected void setupConfig() {
+        ConfigSetup.init();
     }
 
     @Override
