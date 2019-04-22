@@ -36,7 +36,7 @@ public class ModSetup extends DefaultModSetup {
 
     @Override
     public void createTabs() {
-        createTab("NotEnoughWands", new ItemStack(ModItems.teleportationWand));
+        createTab("NotEnoughWands", () -> new ItemStack(ModItems.teleportationWand));
     }
 
     @Override
