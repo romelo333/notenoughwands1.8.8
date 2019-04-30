@@ -4,7 +4,6 @@ package romelo333.notenoughwands;
 import net.minecraftforge.common.config.Configuration;
 import org.apache.logging.log4j.Level;
 import romelo333.notenoughwands.Items.BlackListSettings;
-import romelo333.notenoughwands.Items.GenericWand;
 
 import java.io.File;
 
@@ -45,7 +44,6 @@ public class ConfigSetup {
                 wandUsage = WandUsage.DEFAULT;
             }
 
-            GenericWand.setupConfig(cfg);
             BlackListSettings.setupCapturingWandBlacklist(cfg);
             BlackListSettings.setupMovingWandBlacklist(cfg);
 
@@ -55,6 +53,10 @@ public class ConfigSetup {
         } catch (Exception e1) {
             NotEnoughWands.setup.getLogger().log(Level.ERROR, "Problem loading config file!", e1);
         }
+    }
+
+    public static Configuration getMainConfig() {
+        return mainConfig;
     }
 
     public static void postInit() {
