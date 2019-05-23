@@ -1,12 +1,12 @@
 package romelo333.notenoughwands.items;
 
 
-import net.minecraft.client.item.TooltipOptions;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.text.StringTextComponent;
-import net.minecraft.text.TextComponent;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
@@ -39,15 +39,15 @@ public class TeleportationWand extends GenericWand {
     }
 
     @Override
-    public void buildTooltip(ItemStack stack, @Nullable World player, List<TextComponent> list, TooltipOptions b) {
+    public void buildTooltip(ItemStack stack, @Nullable World player, List<Component> list, TooltipContext b) {
         super.buildTooltip(stack, player, list, b);
-        list.add(new StringTextComponent("Right click to teleport forward"));
-        list.add(new StringTextComponent("until a block is hit or maximum"));
-        list.add(new StringTextComponent("distance is reached."));
+        list.add(new TextComponent("Right click to teleport forward"));
+        list.add(new TextComponent("until a block is hit or maximum"));
+        list.add(new TextComponent("distance is reached."));
         if (teleportThroughWalls) {
-            list.add(new StringTextComponent("Sneak to teleport through walls"));
+            list.add(new TextComponent("Sneak to teleport through walls"));
         } else {
-            list.add(new StringTextComponent("Sneak for half distance"));
+            list.add(new TextComponent("Sneak for half distance"));
         }
     }
 
@@ -67,7 +67,7 @@ public class TeleportationWand extends GenericWand {
                 return new TypedActionResult<>(ActionResult.PASS, stack);
             }
             Vec3d lookVec = player.getRotationVec(0);
-            Vec3d start = new Vec3d(player.x, player.y + player.getEyeHeight(), player.z);
+            Vec3d start = new Vec3d(player.x, player.y + player.getEyeHeight(player.getPose()), player.z);
             int distance = this.maxdist;
             boolean gothrough = false;
             if (player.isSneaking()) {
@@ -88,7 +88,7 @@ public class TeleportationWand extends GenericWand {
                         return new TypedActionResult<>(ActionResult.PASS, stack);
                     }
                 }
-                player.method_5859(end.x, end.y, end.z);        // @todo fabric: setPositionAndUpdate
+                player.requestTeleport(end.x, end.y, end.z);
             } else {
                 BlockHitResult blockResult = (BlockHitResult) position;
                 BlockPos blockPos = blockResult.getBlockPos();
@@ -96,26 +96,26 @@ public class TeleportationWand extends GenericWand {
                 int y = blockPos.getY();
                 int z = blockPos.getZ();
                 if (world.isAir(blockPos.up()) && world.isAir(blockPos.up(2))) {
-                    player.method_5859(x+.5, y + 1, z+.5);        // @todo fabric: setPositionAndUpdate
+                    player.requestTeleport(x+.5, y + 1, z+.5);
                 } else {
                     switch (blockResult.getSide()) {
                         case DOWN:
-                            player.method_5859(x+.5, y - 2, z+.5);  // @todo fabric: setPositionAndUpdate
+                            player.requestTeleport(x+.5, y - 2, z+.5);
                             break;
                         case UP:
                             Tools.error(player, "You will suffocate if you teleport there!");
                             return new TypedActionResult<>(ActionResult.PASS, stack);
                         case NORTH:
-                            player.method_5859(x+.5, y, z - 1 + .5);    // @todo fabric: setPositionAndUpdate
+                            player.requestTeleport(x+.5, y, z - 1 + .5);
                             break;
                         case SOUTH:
-                            player.method_5859(x+.5, y, z + 1+.5);  // @todo fabric: setPositionAndUpdate
+                            player.requestTeleport(x+.5, y, z + 1+.5);
                             break;
                         case WEST:
-                            player.method_5859(x - 1+.5, y, z+.5);  // @todo fabric: setPositionAndUpdate
+                            player.requestTeleport(x - 1+.5, y, z+.5);
                             break;
                         case EAST:
-                            player.method_5859(x + 1+.5, y, z+.5);  // @todo fabric: setPositionAndUpdate
+                            player.requestTeleport(x + 1+.5, y, z+.5);
                             break;
                     }
                 }

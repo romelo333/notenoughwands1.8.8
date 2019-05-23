@@ -4,7 +4,7 @@ package romelo333.notenoughwands.blocks;
 import net.fabricmc.fabric.api.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.VerticalEntityPosition;
+import net.minecraft.entity.EntityContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -23,7 +23,7 @@ import java.util.List;
 public class LightBlock extends Block implements BlockEntityProvider {
     public LightBlock() {
         super(FabricBlockSettings.of(Material.PORTAL).hardness(0.0f).collidable(false).build());
-        Registry.BLOCK.register(new Identifier(NotEnoughWands.MODID, "lightblock"), this);
+        Registry.register(Registry.BLOCK, new Identifier(NotEnoughWands.MODID, "lightblock"), this);
     }
 
     @Nullable
@@ -38,7 +38,7 @@ public class LightBlock extends Block implements BlockEntityProvider {
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState blockState_1, BlockView blockView_1, BlockPos blockPos_1, VerticalEntityPosition verticalEntityPosition_1) {
+    public VoxelShape getCollisionShape(BlockState blockState_1, BlockView blockView_1, BlockPos blockPos_1, EntityContext verticalEntityPosition_1) {
         return super.getCollisionShape(blockState_1, blockView_1, blockPos_1, verticalEntityPosition_1);
     }
 

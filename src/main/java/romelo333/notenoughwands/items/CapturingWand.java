@@ -1,7 +1,8 @@
 package romelo333.notenoughwands.items;
 
 
-import net.minecraft.client.item.TooltipOptions;
+import net.minecraft.ChatFormat;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.player.PlayerEntity;
@@ -9,10 +10,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.StringTextComponent;
-import net.minecraft.text.TextComponent;
-import net.minecraft.text.TextFormat;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -45,7 +45,7 @@ public class CapturingWand extends GenericWand {
 
 
     @Override
-    public void buildTooltip(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
+    public void buildTooltip(ItemStack stack, World player, List<Component> list, TooltipContext b) {
         super.buildTooltip(stack, player, list, b);
         CompoundTag tagCompound = stack.getTag();
         if (tagCompound != null) {
@@ -57,11 +57,11 @@ public class CapturingWand extends GenericWand {
                 } catch (ClassNotFoundException e) {
                     name = "?";
                 }
-                list.add(new StringTextComponent(TextFormat.GREEN + "Captured mob: " + name));
+                list.add(new TextComponent(ChatFormat.GREEN + "Captured mob: " + name));
             }
         }
-        list.add(new StringTextComponent("Left click on creature to capture it."));
-        list.add(new StringTextComponent("Right click on block to respawn creature."));
+        list.add(new TextComponent("Left click on creature to capture it."));
+        list.add(new TextComponent("Right click on block to respawn creature."));
     }
 
 
@@ -80,7 +80,7 @@ public class CapturingWand extends GenericWand {
                 LivingEntity entityLivingBase = createEntity(player, world, type);
                 if (entityLivingBase == null) {
                     Tools.error(player, "Something went wrong trying to spawn creature!");
-                    return ActionResult.FAILURE;
+                    return ActionResult.FAIL;
                 }
                 entityLivingBase.fromTag((CompoundTag) mobCompound);
                 entityLivingBase.setPosition(pos.getX()+.5, pos.getY()+1, pos.getZ()+.5);
@@ -142,9 +142,7 @@ public class CapturingWand extends GenericWand {
                 entity.toTag(tagCompound);
                 Tools.getTagCompound(stack).put("mob", tagCompound);
                 Tools.getTagCompound(stack).putString("type", entity.getClass().getCanonicalName());
-                ((ServerWorld)player.getEntityWorld()).method_18217(entity);
-                // @todo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-//                player.getEntityWorld().removeEntity(entity);
+                ((ServerWorld)player.getEntityWorld()).removeEntity(entity);
 
                 registerUsage(stack, player, difficultyScale);
             } else {

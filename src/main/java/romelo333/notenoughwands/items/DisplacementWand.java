@@ -1,20 +1,20 @@
 package romelo333.notenoughwands.items;
 
 
+import net.minecraft.ChatFormat;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.item.TooltipOptions;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.text.StringTextComponent;
-import net.minecraft.text.TextComponent;
-import net.minecraft.text.TextFormat;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -60,11 +60,11 @@ public class DisplacementWand extends GenericWand {
     }
 
     @Override
-    public void buildTooltip(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
+    public void buildTooltip(ItemStack stack, World player, List<Component> list, TooltipContext b) {
         super.buildTooltip(stack, player, list, b);
-        list.add(new StringTextComponent(TextFormat.GREEN + "Mode: " + descriptions[getMode(stack)]));
-        list.add(new StringTextComponent("Right click to push blocks forward."));
-        list.add(new StringTextComponent("Sneak right click to pull blocks."));
+        list.add(new TextComponent(ChatFormat.GREEN + "Mode: " + descriptions[getMode(stack)]));
+        list.add(new TextComponent("Right click to push blocks forward."));
+        list.add(new TextComponent("Sneak right click to pull blocks."));
         showModeKeyDescription(list, "switch mode");
     }
 

@@ -1,10 +1,11 @@
 package romelo333.notenoughwands.mcjtylib;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.ChatFormat;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.FontRenderer;
-import net.minecraft.client.gui.Screen;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GuiLighting;
@@ -15,7 +16,6 @@ import net.minecraft.client.texture.Sprite;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.TextFormat;
 import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
@@ -45,7 +45,7 @@ public class RenderHelper {
         GlStateManager.rotatef(0.0F, 1.0F, 0.0F, 0.0F);
         entity.pitch = 0.0F;
         GlStateManager.translatef(0.0F, (float) entity.getHeightOffset(), 0.0F);
-        MinecraftClient.getInstance().getEntityRenderManager().field_4679 = 180F;   // playerViewY @todo fabric
+        MinecraftClient.getInstance().getEntityRenderManager().cameraYaw = 180F;
         MinecraftClient.getInstance().getEntityRenderManager().render(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, false);
         GlStateManager.popMatrix();
         // @todo fabric
@@ -203,7 +203,7 @@ public class RenderHelper {
 //            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, short1 / 1.0F, short2 / 1.0F);
 //            itemRender.renderItemAndGlowInGui(itm, x, y);
             itemRender.renderGuiItemIcon(itm, x, y);
-            renderItemOverlayIntoGUI(mc.fontRenderer, itm, x, y, txt, txt.length() - 2);
+            renderItemOverlayIntoGUI(mc.textRenderer, itm, x, y, txt, txt.length() - 2);
 //            itemRender.renderItemOverlayIntoGUI(mc.fontRenderer, itm, x, y, txt);
             GlStateManager.popMatrix();
             GlStateManager.disableRescaleNormal();
@@ -217,14 +217,14 @@ public class RenderHelper {
     /**
      * Renders the stack size and/or damage bar for the given ItemStack.
      */
-    private static void renderItemOverlayIntoGUI(FontRenderer fr, ItemStack stack, int xPosition, int yPosition, @Nullable String text,
+    private static void renderItemOverlayIntoGUI(TextRenderer fr, ItemStack stack, int xPosition, int yPosition, @Nullable String text,
                                                  int scaled) {
         if (!stack.isEmpty()) {
             int stackSize = stack.getAmount();
             if (stackSize != 1 || text != null) {
                 String s = text == null ? String.valueOf(stackSize) : text;
                 if (text == null && stackSize < 1) {
-                    s = TextFormat.RED + String.valueOf(stackSize);
+                    s = ChatFormat.RED + String.valueOf(stackSize);
                 }
 
                 GlStateManager.disableLighting();
@@ -378,11 +378,11 @@ public class RenderHelper {
     }
 
     public static void drawHorizontalLine(int x1, int y1, int x2, int color) {
-        Screen.drawRect(x1, y1, x2, y1+1, color);
+        Screen.fill(x1, y1, x2, y1+1, color);
     }
 
     public static void drawVerticalLine(int x1, int y1, int y2, int color) {
-        Screen.drawRect(x1, y1, x1+1, y2, color);
+        Screen.fill(x1, y1, x1+1, y2, color);
     }
 
     // Draw a small triangle. x,y is the coordinate of the left point
@@ -417,7 +417,7 @@ public class RenderHelper {
      * Draw a button box. x2 and y2 are not included.
      */
     public static void drawThickButtonBox(int x1, int y1, int x2, int y2, int bright, int average, int dark) {
-        Screen.drawRect(x1+2, y1+2, x2-2, y2-2, average);
+        Screen.fill(x1+2, y1+2, x2-2, y2-2, average);
         drawHorizontalLine(x1+1, y1, x2-1, 0xff000000); // @todo fabric: StyleConfig.colorButtonExternalBorder);
         drawHorizontalLine(x1+1, y2-1, x2-1, 0xff000000); // @todo fabric: StyleConfig.colorButtonExternalBorder);
         drawVerticalLine(x1, y1 + 1, y2 - 1, 0xff000000); // @todo fabric: StyleConfig.colorButtonExternalBorder);
@@ -438,7 +438,7 @@ public class RenderHelper {
      * Draw a button box. x2 and y2 are not included.
      */
     public static void drawThinButtonBox(int x1, int y1, int x2, int y2, int bright, int average, int dark) {
-        Screen.drawRect(x1 + 1, y1 + 1, x2 - 1, y2 - 1, average);
+        Screen.fill(x1 + 1, y1 + 1, x2 - 1, y2 - 1, average);
         drawHorizontalLine(x1+1, y1, x2-1, 0xff000000); // @todo fabric: StyleConfig.colorButtonExternalBorder);
         drawHorizontalLine(x1+1, y2-1, x2-1, 0xff000000); // @todo fabric: StyleConfig.colorButtonExternalBorder);
         drawVerticalLine(x1, y1 + 1, y2 - 1, 0xff000000); // @todo fabric: StyleConfig.colorButtonExternalBorder);
@@ -491,7 +491,7 @@ public class RenderHelper {
      */
     public static void drawBeveledBox(int x1, int y1, int x2, int y2, int topleftcolor, int botrightcolor, int fillcolor) {
         if (fillcolor != -1) {
-            Screen.drawRect(x1+1, y1+1, x2-1, y2-1, fillcolor);
+            Screen.fill(x1+1, y1+1, x2-1, y2-1, fillcolor);
         }
         drawHorizontalLine(x1, y1, x2-1, topleftcolor);
         drawVerticalLine(x1, y1, y2-1, topleftcolor);
@@ -504,12 +504,12 @@ public class RenderHelper {
      */
     public static void drawThickBeveledBox(int x1, int y1, int x2, int y2, int thickness, int topleftcolor, int botrightcolor, int fillcolor) {
         if (fillcolor != -1) {
-            Screen.drawRect(x1+1, y1+1, x2-1, y2-1, fillcolor);
+            Screen.fill(x1+1, y1+1, x2-1, y2-1, fillcolor);
         }
-        Screen.drawRect(x1, y1, x2-1, y1+thickness, topleftcolor);
-        Screen.drawRect(x1, y1, x1+thickness, y2-1, topleftcolor);
-        Screen.drawRect(x2-thickness, y1, x2, y2-1, botrightcolor);
-        Screen.drawRect(x1, y2 - thickness, x2, y2, botrightcolor);
+        Screen.fill(x1, y1, x2-1, y1+thickness, topleftcolor);
+        Screen.fill(x1, y1, x1+thickness, y2-1, topleftcolor);
+        Screen.fill(x2-thickness, y1, x2, y2-1, botrightcolor);
+        Screen.fill(x1, y2 - thickness, x2, y2, botrightcolor);
     }
 
     /**
@@ -517,7 +517,7 @@ public class RenderHelper {
      */
     public static void drawFlatBox(int x1, int y1, int x2, int y2, int border, int fill) {
         if (fill != -1) {
-            Screen.drawRect(x1+1, y1+1, x2-1, y2-1, fill);
+            Screen.fill(x1+1, y1+1, x2-1, y2-1, fill);
         }
         drawHorizontalLine(x1, y1, x2-1, border);
         drawVerticalLine(x1, y1, y2-1, border);
@@ -608,8 +608,8 @@ public class RenderHelper {
     }
 
     public static void rotateToPlayer() {
-        GlStateManager.rotatef(-MinecraftClient.getInstance().getEntityRenderManager().field_4679, 0.0F, 1.0F, 0.0F);   // @todo fabric playerViewY
-        GlStateManager.rotatef(MinecraftClient.getInstance().getEntityRenderManager().field_4677, 1.0F, 0.0F, 0.0F);   // @todo fabric playerViewX
+        GlStateManager.rotatef(-MinecraftClient.getInstance().getEntityRenderManager().cameraYaw, 0.0F, 1.0F, 0.0F);   // @todo fabric playerViewY
+        GlStateManager.rotatef(MinecraftClient.getInstance().getEntityRenderManager().cameraPitch, 1.0F, 0.0F, 0.0F);   // @todo fabric playerViewX
     }
 
     public static int renderText(MinecraftClient mc, int x, int y, String txt) {
@@ -626,8 +626,8 @@ public class RenderHelper {
         GlStateManager.disableLighting();
         GlStateManager.disableDepthTest();
         GlStateManager.disableBlend();
-        int width = mc.fontRenderer.getStringWidth(txt);
-        mc.fontRenderer.drawWithShadow(txt, x, y, 16777215);
+        int width = mc.textRenderer.getStringWidth(txt);
+        mc.textRenderer.drawWithShadow(txt, x, y, 16777215);
         GlStateManager.enableLighting();
         GlStateManager.enableDepthTest();
         // Fixes opaque cooldown overlay a bit lower
@@ -656,8 +656,8 @@ public class RenderHelper {
         GlStateManager.disableLighting();
         GlStateManager.disableDepthTest();
         GlStateManager.disableBlend();
-        int width = mc.fontRenderer.getStringWidth(txt);
-        mc.fontRenderer.draw(txt, x, y, color);
+        int width = mc.textRenderer.getStringWidth(txt);
+        mc.textRenderer.draw(txt, x, y, color);
         GlStateManager.enableLighting();
         GlStateManager.enableDepthTest();
         // Fixes opaque cooldown overlay a bit lower

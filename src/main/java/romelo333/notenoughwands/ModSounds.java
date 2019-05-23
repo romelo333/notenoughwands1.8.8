@@ -20,10 +20,10 @@ public class ModSounds {
 
     // Server side: play a sound to all nearby players
     public static void playSound(World worldObj, SoundEvent sound, double x, double y, double z, double volume, double pitch) {
-        PlaySoundS2CPacket soundEffect = new PlaySoundS2CPacket(sound, SoundCategory.BLOCK, x, y, z, (float) volume, (float) pitch);
+        PlaySoundS2CPacket soundEffect = new PlaySoundS2CPacket(sound, SoundCategory.BLOCKS, x, y, z, (float) volume, (float) pitch);
 
-        for (int j = 0; j < worldObj.players.size(); ++j) {
-            ServerPlayerEntity PlayerEntitymp = (ServerPlayerEntity)worldObj.players.get(j);
+        for (int j = 0; j < worldObj.getPlayers().size(); ++j) {
+            ServerPlayerEntity PlayerEntitymp = (ServerPlayerEntity)worldObj.getPlayers().get(j);
             double d7 = x - PlayerEntitymp.x;
             double d8 = y - PlayerEntitymp.y;
             double d9 = z - PlayerEntitymp.z;

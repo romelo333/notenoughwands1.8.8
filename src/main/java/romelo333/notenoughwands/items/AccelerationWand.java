@@ -1,16 +1,17 @@
 package romelo333.notenoughwands.items;
 
 
+import javafx.scene.control.Tooltip;
+import net.minecraft.ChatFormat;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.item.TooltipOptions;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.text.StringTextComponent;
-import net.minecraft.text.TextComponent;
-import net.minecraft.text.TextFormat;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Tickable;
 import net.minecraft.util.math.BlockPos;
@@ -49,20 +50,20 @@ public class AccelerationWand extends GenericWand {
     private Random random = new Random();
 
     @Override
-    public void buildTooltip(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
+    public void buildTooltip(ItemStack stack, World player, List<Component> list, TooltipContext b) {
         super.buildTooltip(stack, player, list, b);
-        list.add(new StringTextComponent(TextFormat.GREEN + "Mode: " + descriptions[getMode(stack)]));
-        list.add(new StringTextComponent("Right click on block to speed up ticks."));
+        list.add(new TextComponent(ChatFormat.GREEN + "Mode: " + descriptions[getMode(stack)]));
+        list.add(new TextComponent("Right click on block to speed up ticks."));
         showModeKeyDescription(list, "change speed");
         if (Math.abs(fakePlayerFactor-1.0f) >= 0.01) {
             if (fakePlayerFactor < 0) {
-                list.add(new StringTextComponent(TextFormat.RED + "Usage in a machine has been disabled in config!"));
+                list.add(new TextComponent(ChatFormat.RED + "Usage in a machine has been disabled in config!"));
             } else if (fakePlayerFactor > 1) {
-                list.add(new StringTextComponent(TextFormat.YELLOW + "Usage in a machine will cost more!"));
+                list.add(new TextComponent(ChatFormat.YELLOW + "Usage in a machine will cost more!"));
             }
         }
         if (fakePlayerFactor >= 0.0 && lessEffectiveForFakePlayer) {
-            list.add(new StringTextComponent(TextFormat.YELLOW + "Usage in a machine will be less effective!"));
+            list.add(new TextComponent(ChatFormat.YELLOW + "Usage in a machine will be less effective!"));
         }
     }
 
@@ -104,7 +105,7 @@ public class AccelerationWand extends GenericWand {
 //            }
 
             if (!checkUsage(stack, player, cost)) {
-                return ActionResult.FAILURE;
+                return ActionResult.FAIL;
             }
             BlockEntity tileEntity = world.getBlockEntity(pos);
             for (int i = 0; i < amount /(tileEntity == null ? 5 : 1); i ++){

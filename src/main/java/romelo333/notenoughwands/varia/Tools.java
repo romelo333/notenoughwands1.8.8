@@ -1,5 +1,6 @@
 package romelo333.notenoughwands.varia;
 
+import net.minecraft.ChatFormat;
 import net.minecraft.block.Block;
 import net.minecraft.client.network.packet.PlaySoundS2CPacket;
 import net.minecraft.entity.ItemEntity;
@@ -8,11 +9,10 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.text.StringTextComponent;
-import net.minecraft.text.TextFormat;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
@@ -22,11 +22,11 @@ import javax.annotation.Nonnull;
 
 public class Tools {
     public static void error(PlayerEntity player, String msg) {
-        player.addChatMessage(new StringTextComponent(TextFormat.RED + msg), false);
+        player.addChatMessage(new TextComponent(ChatFormat.RED + msg), false);
     }
 
     public static void notify(PlayerEntity player, String msg) {
-        player.addChatMessage(new StringTextComponent(TextFormat.GREEN + msg), false);
+        player.addChatMessage(new TextComponent(ChatFormat.GREEN + msg), false);
     }
 
     @Nonnull
@@ -94,7 +94,7 @@ public class Tools {
     }
 
     public static int getPlayerXP(PlayerEntity player) {
-        return (int)(getExperienceForLevel(player.experienceLevel) + (player.experience * player.method_7349()));   // @todo fabric xpBarCap()
+        return (int)(getExperienceForLevel(player.totalExperience) + (player.experienceLevel * player.getNextLevelExperience()));
     }
 
     public static boolean addPlayerXP(PlayerEntity player, int amount) {
@@ -102,10 +102,10 @@ public class Tools {
         if (experience < 0) {
             return false;
         }
-        player.experience = experience;
-        player.experienceLevel = getLevelForExperience(experience);
+        player.experienceLevel = experience;
+        player.totalExperience = getLevelForExperience(experience);
         int expForLevel = getExperienceForLevel(player.experienceLevel);
-        player.experienceBarProgress = (experience - expForLevel) / (float)player.method_7349();   // @todo fabric xpBarCap()
+        player.experienceProgress = (experience - expForLevel) / (float)player.getNextLevelExperience();
         return true;
     }
 
@@ -141,10 +141,10 @@ public class Tools {
     }
 
     public static void playSound(World worldObj, SoundEvent soundEvent, double x, double y, double z, double volume, double pitch) {
-        PlaySoundS2CPacket soundEffect = new PlaySoundS2CPacket(soundEvent, SoundCategory.BLOCK, x, y, z, (float) volume, (float) pitch);
+        PlaySoundS2CPacket soundEffect = new PlaySoundS2CPacket(soundEvent, SoundCategory.BLOCKS, x, y, z, (float) volume, (float) pitch);
 
-        for (int j = 0; j < worldObj.players.size(); ++j) {
-            ServerPlayerEntity PlayerEntitymp = (ServerPlayerEntity) worldObj.players.get(j);
+        for (int j = 0; j < worldObj.getPlayers().size(); ++j) {
+            ServerPlayerEntity PlayerEntitymp = (ServerPlayerEntity) worldObj.getPlayers().get(j);
             double d7 = x - PlayerEntitymp.x;
             double d8 = y - PlayerEntitymp.y;
             double d9 = z - PlayerEntitymp.z;

@@ -1,0 +1,24 @@
+{
+"item.notenoughwands.swapping_wand" : "Swapping Wand",
+"item.notenoughwands.teleportation_wand" : "Teleportation Wand",
+"item.notenoughwands.capturing_wand" : "Capturing Wand",
+"item.notenoughwands.building_wand" : "Building Wand",
+"item.notenoughwands.illumination_wand" : "Illumination Wand",
+"item.notenoughwands.moving_wand" : "Moving Wand",
+"item.notenoughwands.protection_wand" : "Protection Wand",
+"item.notenoughwands.master_protection_wand" : "Master Protection Wand",
+"item.notenoughwands.displacement_wand" : "Displacement Wand",
+"item.notenoughwands.acceleration_wand" : "Acceleration Wand",
+"item.notenoughwands.freezing_wand" : "Freezing Wand (WIP)",
+"item.notenoughwands.potion_wand" : "Potion Wand",
+"item.notenoughwands.wandcore" : "Wand Core",
+"item.notenoughwands.advanced_wandcore" : "Advanced Wand Core",
+
+"tile.notenoughwands.blockLight" : "Illuminating Orb",
+
+
+"key.modifier" : "Wand Modifier",
+"key.categories.notenoughwands" : "Not Enough Wands",
+
+"itemGroup.NotEnoughWands" : "Not Enough Wands"
+}

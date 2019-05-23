@@ -3,12 +3,12 @@ package romelo333.notenoughwands.items;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.item.TooltipOptions;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.text.StringTextComponent;
-import net.minecraft.text.TextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -30,10 +30,10 @@ public class IlluminationWand extends GenericWand {
     }
 
     @Override
-    public void buildTooltip(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
+    public void buildTooltip(ItemStack stack, World player, List<Component> list, TooltipContext b) {
         super.buildTooltip(stack, player, list, b);
-        list.add(new StringTextComponent("Right click on block to spawn light."));
-        list.add(new StringTextComponent("Right click on light to remove it again."));
+        list.add(new TextComponent("Right click on block to spawn light."));
+        list.add(new TextComponent("Right click on light to remove it again."));
     }
 
     @Override

@@ -1,21 +1,21 @@
 package romelo333.notenoughwands.items;
 
 
+import net.minecraft.ChatFormat;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.item.TooltipOptions;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.item.block.BlockItem;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.text.StringTextComponent;
-import net.minecraft.text.TextComponent;
-import net.minecraft.text.TextFormat;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -71,27 +71,27 @@ public class SwappingWand extends GenericWand {
     }
 
     @Override
-    public void buildTooltip(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
+    public void buildTooltip(ItemStack stack, World player, List<Component> list, TooltipContext b) {
         super.buildTooltip(stack, player, list, b);
         CompoundTag compound = stack.getTag();
         if (compound == null) {
-            list.add(new StringTextComponent(TextFormat.RED + "No selected block"));
+            list.add(new TextComponent(ChatFormat.RED + "No selected block"));
         } else {
             if (isSwappingWithOffHand(stack)) {
-                list.add(new StringTextComponent(TextFormat.GREEN + "Will swap with block in offhand"));
+                list.add(new TextComponent(ChatFormat.GREEN + "Will swap with block in offhand"));
             } else {
                 String id = compound.getString("block");
                 Block block = Registry.BLOCK.get(new Identifier(id));
                 if (block != Blocks.AIR) {
                     String name = Tools.getBlockName(block);
-                    list.add(new StringTextComponent(TextFormat.GREEN + "Selected block: " + name));
-                    list.add(new StringTextComponent(TextFormat.GREEN + "Mode: " + descriptions[compound.getInt("mode")]));
+                    list.add(new TextComponent(ChatFormat.GREEN + "Selected block: " + name));
+                    list.add(new TextComponent(ChatFormat.GREEN + "Mode: " + descriptions[compound.getInt("mode")]));
                 }
             }
         }
-        list.add(new StringTextComponent("Sneak right click to select a block."));
-        list.add(new StringTextComponent("Right click in empty air to select 'offhand' mode."));
-        list.add(new StringTextComponent("Right click on block to replace."));
+        list.add(new TextComponent("Sneak right click to select a block."));
+        list.add(new TextComponent("Right click in empty air to select 'offhand' mode."));
+        list.add(new TextComponent("Right click on block to replace."));
         showModeKeyDescription(list, "switch mode");
     }
 
@@ -150,13 +150,13 @@ public class SwappingWand extends GenericWand {
             if (player.isSneaking()) {
                 selectBlock(stack, player, world, pos);
             } else {
-                placeBlock(stack, player, world, pos, side);
+                placeBlock(stack, player, context.getHand(), world, pos, side);
             }
         }
         return ActionResult.SUCCESS;
     }
 
-    private void placeBlock(ItemStack stack, PlayerEntity player, World world, BlockPos pos, Direction side) {
+    private void placeBlock(ItemStack stack, PlayerEntity player, Hand hand, World world, BlockPos pos, Direction side) {
         if (!checkUsage(stack, player, 1.0f)) {
             return;
         }
@@ -242,7 +242,7 @@ public class SwappingWand extends GenericWand {
                 Tools.playSound(world, block.getSoundGroup(oldState).getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
 //                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, coordinate);
                 world.setBlockState(coordinate, Blocks.AIR.getDefaultState(), 3);   // @todo fabric
-                BlockTools.placeStackAt(player, consumed, world, coordinate, null);
+                BlockTools.placeStackAt(player, consumed, hand, world, coordinate, null);
 
                 // @todo fabric
 //                if (ForgeEventFactory.onPlayerBlockPlace(player, blocksnapshot, Direction.UP, EnumHand.MAIN_HAND).isCanceled()) {

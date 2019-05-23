@@ -1,14 +1,14 @@
 package romelo333.notenoughwands.items;
 
 
-import net.minecraft.client.item.TooltipOptions;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.text.StringTextComponent;
-import net.minecraft.text.TextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
@@ -39,9 +39,9 @@ public class FreezingWand extends GenericWand {
     }
 
     @Override
-    public void buildTooltip(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
+    public void buildTooltip(ItemStack stack, World player, List<Component> list, TooltipContext b) {
         super.buildTooltip(stack, player, list, b);
-        list.add(new StringTextComponent("Right click on creature to freeze creature."));
+        list.add(new TextComponent("Right click on creature to freeze creature."));
     }
 
     @Override
@@ -50,7 +50,7 @@ public class FreezingWand extends GenericWand {
         if (!world.isClient) {
 
         }
-        return ActionResult.FAILURE;
+        return ActionResult.FAIL;
     }
 
     private void freezeMob(LivingEntity mob){

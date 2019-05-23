@@ -1,13 +1,13 @@
 package romelo333.notenoughwands.items;
 
 
-import net.minecraft.client.item.TooltipOptions;
+import net.minecraft.ChatFormat;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.text.StringTextComponent;
-import net.minecraft.text.TextComponent;
-import net.minecraft.text.TextFormat;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -58,7 +58,7 @@ public class ProtectionWand extends GenericWand {
     private static long tooltipLastTime = 0;
 
     @Override
-    public void buildTooltip(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
+    public void buildTooltip(ItemStack stack, World player, List<Component> list, TooltipContext b) {
         super.buildTooltip(stack, player, list, b);
         boolean hasid = stack.getTag() != null && stack.getTag().containsKey("id");
         int mode = getMode(stack);
@@ -69,18 +69,18 @@ public class ProtectionWand extends GenericWand {
                 NetworkInit.sendToServer(new PacketGetProtectedBlockCount(id));
             }
         }
-        list.add(new StringTextComponent(TextFormat.GREEN + "Mode: " + descriptions[mode]));
+        list.add(new TextComponent(ChatFormat.GREEN + "Mode: " + descriptions[mode]));
         if (master) {
-            list.add(new StringTextComponent(TextFormat.YELLOW + "Master wand"));
+            list.add(new TextComponent(ChatFormat.YELLOW + "Master wand"));
         } else {
             if (id != 0) {
-                list.add(new StringTextComponent(TextFormat.GREEN + "Id: " + id));
+                list.add(new TextComponent(ChatFormat.GREEN + "Id: " + id));
             }
         }
         if (hasid) {
-            list.add(new StringTextComponent(TextFormat.GREEN + "Number of protected blocks: " + ReturnProtectedBlockCountHelper.count));
+            list.add(new TextComponent(ChatFormat.GREEN + "Number of protected blocks: " + ReturnProtectedBlockCountHelper.count));
         }
-        list.add(new StringTextComponent("Right click to protect or unprotect a block."));
+        list.add(new TextComponent("Right click to protect or unprotect a block."));
         showModeKeyDescription(list, "switch mode");
     }
 
@@ -134,15 +134,15 @@ public class ProtectionWand extends GenericWand {
             int mode = getMode(stack);
             if (mode == MODE_PROTECT) {
                 if (!checkUsage(stack, player, 1.0f)) {
-                    return ActionResult.FAILURE;
+                    return ActionResult.FAIL;
                 }
                 if (!protectedBlocks.protect(player, world, pos, id)) {
-                    return ActionResult.FAILURE;
+                    return ActionResult.FAIL;
                 }
                 registerUsage(stack, player, 1.0f);
             } else if (mode == MODE_UNPROTECT) {
                 if (!protectedBlocks.unprotect(player, world, pos, id)) {
-                    return ActionResult.FAILURE;
+                    return ActionResult.FAIL;
                 }
             } else {
                 int cnt = protectedBlocks.clearProtections(world, id);

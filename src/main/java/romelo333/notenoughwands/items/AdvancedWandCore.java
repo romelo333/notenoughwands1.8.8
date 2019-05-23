@@ -10,7 +10,7 @@ import romelo333.notenoughwands.NotEnoughWands;
 public class AdvancedWandCore extends Item {
     public AdvancedWandCore(String name) {
         super(new Settings().itemGroup(ItemGroup.TOOLS));
-        Registry.ITEM.register(new Identifier(NotEnoughWands.MODID, name), this);
+        Registry.register(Registry.ITEM, new Identifier(NotEnoughWands.MODID, name), this);
     }
 
 }

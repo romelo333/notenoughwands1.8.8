@@ -13,8 +13,8 @@ public class KeyBindings {
     public static FabricKeyBinding wandSubMode;
 
     public static void init() {
-        wandModifier = FabricKeyBinding.Builder.create(new Identifier(NotEnoughWands.MODID, "key.modifier"), InputUtil.Type.KEY_KEYBOARD, GLFW.GLFW_KEY_EQUAL, "key.categories.gameplay").build();
-        wandSubMode = FabricKeyBinding.Builder.create(new Identifier(NotEnoughWands.MODID, "key.submode"), InputUtil.Type.KEY_KEYBOARD, -1, "key.categories.gameplay").build();
+        wandModifier = FabricKeyBinding.Builder.create(new Identifier(NotEnoughWands.MODID, "key.modifier"), InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_EQUAL, "key.categories.gameplay").build();
+        wandSubMode = FabricKeyBinding.Builder.create(new Identifier(NotEnoughWands.MODID, "key.submode"), InputUtil.Type.KEYSYM, -1, "key.categories.gameplay").build();
 //        wandModifier = new KeyBinding("key.modifier", InputUtil.Type.KEY_KEYBOARD, GLFW.GLFW_KEY_EQUAL, "key.categories.gameplay");
 //        wandSubMode = new KeyBinding("key.submode", InputUtil.Type.KEY_KEYBOARD, -1, "key.categories.gameplay");
         KeyBindingRegistry.INSTANCE.register(wandModifier);

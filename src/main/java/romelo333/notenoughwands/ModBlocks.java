@@ -20,7 +20,7 @@ public class ModBlocks {
 
     public static void init() {
         lightBlock = new LightBlock();
-        LIGHT = register("light", BlockEntityType.Builder.create(LightTE::new));
+        LIGHT = register("light", BlockEntityType.Builder.create(LightTE::new,lightBlock));
 
     }
 
