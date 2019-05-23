@@ -1,3 +1,6 @@
+1.7.5:
+- Alexander fixed a server-side crash
+
 1.7.4:
 - Alexander ported the mod to 1.14.1
 

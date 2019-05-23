@@ -4,7 +4,6 @@ import io.netty.buffer.Unpooled;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.packet.CustomPayloadS2CPacket;
