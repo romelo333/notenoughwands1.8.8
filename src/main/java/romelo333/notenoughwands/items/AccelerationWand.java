@@ -1,7 +1,6 @@
 package romelo333.notenoughwands.items;
 
 
-import javafx.scene.control.Tooltip;
 import net.minecraft.ChatFormat;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
