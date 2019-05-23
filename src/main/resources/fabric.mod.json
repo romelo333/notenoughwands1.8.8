@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "notenoughwands",
-  "version": "1.7.4.alpha",
+  "version": "1.7.5.alpha",
   "name": "Not Enough Wands",
   "description": "Wands, wands, and more wands",
   "authors": [
@@ -24,7 +24,8 @@
       "romelo333.notenoughwands.network.NetworkInit"
     ],
     "client": [
-      "romelo333.notenoughwands.ClientInit"
+      "romelo333.notenoughwands.ClientInit",
+      "romelo333.notenoughwands.network.ClientNetworkInit"
     ]
   },
   "mixins": [
