@@ -5,7 +5,7 @@
 "item.notenoughwands.building_wand" : "Building Wand",
 "item.notenoughwands.illumination_wand" : "Illumination Wand",
 "item.notenoughwands.moving_wand" : "Moving Wand",
-"item.notenoughwands.protection_wand" : "Protection Wand",
+"item.notenoughwands.protection_wand" : "Protection Wand (CRASHES THE GAME!)",
 "item.notenoughwands.master_protection_wand" : "Master Protection Wand",
 "item.notenoughwands.displacement_wand" : "Displacement Wand",
 "item.notenoughwands.acceleration_wand" : "Acceleration Wand",

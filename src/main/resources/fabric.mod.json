@@ -1,15 +1,37 @@
 {
+  "schemaVersion": 1,
   "id": "notenoughwands",
+  "version": "1.7.4.alpha",
   "name": "Not Enough Wands",
-  "version": "1.7.3.alpha",
-  "side": "universal",
-  "initializers": [
-    "romelo333.notenoughwands.NotEnoughWands",
-    "romelo333.notenoughwands.network.NetworkInit",
-    "romelo333.notenoughwands.ClientInit"
+  "description": "Wands, wands, and more wands",
+  "authors": [
+    "romelo333",
+    "McJty"
   ],
-  "mixins": {
-    "client": "notenoughwands.client.json",
-    "common": "notenoughwands.common.json"
+  "contributors": [
+    "Shnupbups"
+  ],
+  "contact": {
+    "homepage": "https://minecraft.curseforge.com/projects/not-enough-wands",
+    "sources": "https://github.com/romelo333/notenoughwands1.8.8/tree/fabric",
+    "issues": "https://github.com/romelo333/notenoughwands1.8.8/issues"
+  },
+  "license": "MIT License",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "romelo333.notenoughwands.NotEnoughWands",
+      "romelo333.notenoughwands.network.NetworkInit"
+    ],
+    "client": [
+      "romelo333.notenoughwands.ClientInit"
+    ]
+  },
+  "mixins": [
+    "notenoughwands.mixins.json"
+  ],
+  "requires": {
+    "fabricloader": ">=0.4.0",
+    "fabric": "*"
   }
 }
