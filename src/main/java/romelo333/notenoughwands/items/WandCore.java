@@ -12,6 +12,6 @@ public class WandCore extends Item {
     public WandCore (String name) {
         super(new Settings().itemGroup(ItemGroup.TOOLS));
 
-        Registry.ITEM.register(new Identifier(NotEnoughWands.MODID, name), this);
+        Registry.register(Registry.ITEM, new Identifier(NotEnoughWands.MODID, name), this);
     }
 }

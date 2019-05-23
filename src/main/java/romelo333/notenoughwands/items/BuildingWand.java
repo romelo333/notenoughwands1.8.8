@@ -1,21 +1,22 @@
 package romelo333.notenoughwands.items;
 
 
+import net.minecraft.ChatFormat;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.item.TooltipOptions;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.text.StringTextComponent;
-import net.minecraft.text.TextComponent;
-import net.minecraft.text.TextFormat;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -58,23 +59,23 @@ public class BuildingWand extends GenericWand {
 
 
     @Override
-    public void buildTooltip(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
+    public void buildTooltip(ItemStack stack, World player, List<Component> list, TooltipContext b) {
         super.buildTooltip(stack, player, list, b);
         CompoundTag compound = stack.getTag();
         if (compound != null) {
             int cnt = (compound.containsKey("undo1") ? 1 : 0) + (compound.containsKey("undo2") ? 1 : 0);
-            list.add(new StringTextComponent(TextFormat.GREEN + "Has " + cnt + " undo states"));
+            list.add(new TextComponent(ChatFormat.GREEN + "Has " + cnt + " undo states"));
             int mode = compound.getInt("mode");
             if (mode == MODE_9ROW || mode == MODE_25ROW) {
                 int submode = getSubMode(stack);
-                list.add(new StringTextComponent(TextFormat.GREEN + "Mode: " + descriptions[mode] + (submode == 1 ? " [Rotated]" : "")));
+                list.add(new TextComponent(ChatFormat.GREEN + "Mode: " + descriptions[mode] + (submode == 1 ? " [Rotated]" : "")));
             } else {
-                list.add(new StringTextComponent(TextFormat.GREEN + "Mode: " + descriptions[mode]));
+                list.add(new TextComponent(ChatFormat.GREEN + "Mode: " + descriptions[mode]));
             }
         }
-        list.add(new StringTextComponent("Right click to extend blocks in that direction."));
-        list.add(new StringTextComponent("Sneak right click on such a block to undo one of"));
-        list.add(new StringTextComponent("the last two operations."));
+        list.add(new TextComponent("Right click to extend blocks in that direction."));
+        list.add(new TextComponent("Sneak right click on such a block to undo one of"));
+        list.add(new TextComponent("the last two operations."));
 
         showModeKeyDescription(list, "switch mode");
         showSubModeKeyDescription(list, "change orientation");
@@ -117,13 +118,13 @@ public class BuildingWand extends GenericWand {
             if (player.isSneaking()) {
                 undoPlaceBlock(stack, player, world, pos);
             } else {
-                placeBlock(stack, player, world, pos, context.getFacing());
+                placeBlock(stack, player, context.getHand(), world, pos, context.getFacing());
             }
         }
         return ActionResult.SUCCESS;
     }
 
-    private void placeBlock(ItemStack stack, PlayerEntity player, World world, BlockPos pos, Direction side) {
+    private void placeBlock(ItemStack stack, PlayerEntity player, Hand hand, World world, BlockPos pos, Direction side) {
         if (!checkUsage(stack, player, 1.0f)) {
             return;
         }
@@ -144,7 +145,7 @@ public class BuildingWand extends GenericWand {
 //                IBlockState state = block.getStateFromMeta(meta);
 //                world.setBlockState(coordinate, state, 2);
 //                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, coordinate);
-                BlockTools.placeStackAt(player, consumed, world, coordinate, null);
+                BlockTools.placeStackAt(player, consumed, hand, world, coordinate, null);
 //                if (ForgeEventFactory.onPlayerBlockPlace(player, blocksnapshot, Direction.UP, EnumHand.MAIN_HAND).isCanceled()) {
 //                    blocksnapshot.restore(true, false);
 //                    if (!player.capabilities.isCreativeMode) {

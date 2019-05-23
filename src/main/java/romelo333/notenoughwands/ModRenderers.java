@@ -35,7 +35,7 @@ public final class ModRenderers {
 
     public static void rotateToPlayer() {
         EntityRenderDispatcher manager = MinecraftClient.getInstance().getEntityRenderManager();
-        GlStateManager.rotatef(-manager.field_4679, 0.0F, 1.0F, 0.0F);  // @todo fabric playerViewY
-        GlStateManager.rotatef(manager.field_4677, 1.0F, 0.0F, 0.0F);   // @todo fabric playerViewX
+        GlStateManager.rotatef(-manager.cameraYaw, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotatef(manager.cameraPitch, 1.0F, 0.0F, 0.0F);
     }
 }

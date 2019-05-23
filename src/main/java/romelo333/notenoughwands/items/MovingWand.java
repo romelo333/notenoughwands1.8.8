@@ -1,18 +1,18 @@
 package romelo333.notenoughwands.items;
 
 
+import net.minecraft.ChatFormat;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.item.TooltipOptions;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.text.StringTextComponent;
-import net.minecraft.text.TextComponent;
-import net.minecraft.text.TextFormat;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
@@ -49,19 +49,19 @@ public class MovingWand extends GenericWand {
     }
 
     @Override
-    public void buildTooltip(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
+    public void buildTooltip(ItemStack stack, World player, List<Component> list, TooltipContext b) {
         super.buildTooltip(stack, player, list, b);
         CompoundTag compound = stack.getTag();
         if (!hasBlock(compound)) {
-            list.add(new StringTextComponent(TextFormat.RED + "Wand is empty."));
+            list.add(new TextComponent(ChatFormat.RED + "Wand is empty."));
         } else {
             String id = compound.getString("block");
             Block block = Registry.BLOCK.get(new Identifier(id));
             String name = Tools.getBlockName(block);
-            list.add(new StringTextComponent(TextFormat.GREEN + "Block: " + name));
+            list.add(new TextComponent(ChatFormat.GREEN + "Block: " + name));
         }
-        list.add(new StringTextComponent("Right click to take a block."));
-        list.add(new StringTextComponent("Right click again on block to place it down."));
+        list.add(new TextComponent("Right click to take a block."));
+        list.add(new TextComponent("Right click again on block to place it down."));
     }
 
     private boolean hasBlock(CompoundTag compound) {
@@ -77,7 +77,7 @@ public class MovingWand extends GenericWand {
             CompoundTag compound = stack.getTag();
             if (hasBlock(compound)) {
                 Vec3d lookVec = player.getRotationVec(0);   // @todo fabric: partialticks?
-                Vec3d start = new Vec3d(player.x, player.y + player.getEyeHeight(), player.z);
+                Vec3d start = new Vec3d(player.x, player.y + player.getEyeHeight(player.getPose()), player.z);
                 int distance = this.placeDistance;
                 Vec3d end = start.add(lookVec.x * distance, lookVec.y * distance, lookVec.z * distance);
                 HitResult position = world.rayTrace(new RayTraceContext(start, end, RayTraceContext.ShapeType.COLLIDER, RayTraceContext.FluidHandling.NONE, player));

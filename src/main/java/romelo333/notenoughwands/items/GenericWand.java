@@ -1,16 +1,16 @@
 package romelo333.notenoughwands.items;
 
+import net.minecraft.ChatFormat;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.item.TooltipOptions;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.text.StringTextComponent;
-import net.minecraft.text.TextComponent;
-import net.minecraft.text.TextFormat;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
@@ -80,10 +80,10 @@ public class GenericWand extends Item implements IEnergyItem /*, IEnergyContaine
 
 
     @Override
-    public void buildTooltip(ItemStack stack, World player, List<TextComponent> list, TooltipOptions b) {
+    public void buildTooltip(ItemStack stack, World player, List<Component> list, TooltipContext b) {
         super.buildTooltip(stack, player, list, b);
         if (needsrf > 0) {
-            list.add(new StringTextComponent(TextFormat.GREEN+"Energy: " + getEnergyStored(stack) + " / " + getMaxEnergyStored(stack)));
+            list.add(new TextComponent(ChatFormat.GREEN+"Energy: " + getEnergyStored(stack) + " / " + getMaxEnergyStored(stack)));
         }
     }
 
@@ -106,7 +106,7 @@ public class GenericWand extends Item implements IEnergyItem /*, IEnergyContaine
 //    }
 
     protected GenericWand setup(String name) {
-        Registry.ITEM.register(new Identifier(NotEnoughWands.MODID, name), this);
+        Registry.register(Registry.ITEM, new Identifier(NotEnoughWands.MODID, name), this);
         wands.add(this);
         return this;
     }
@@ -277,14 +277,14 @@ public class GenericWand extends Item implements IEnergyItem /*, IEnergyContaine
         BlockOutlineRenderer.renderOutlines(p, coordinates, r, g, b, partialTicks);
     }
 
-    protected void showModeKeyDescription(List<TextComponent> list, String suffix) {
+    protected void showModeKeyDescription(List<Component> list, String suffix) {
         String keyDescription = KeyBindings.wandModifier != null ? KeyBindings.wandModifier.getName() : "unknown";
-        list.add(new StringTextComponent("Mode key (" + keyDescription + ") to " + suffix));
+        list.add(new TextComponent("Mode key (" + keyDescription + ") to " + suffix));
     }
 
-    protected void showSubModeKeyDescription(List<TextComponent> list, String suffix) {
+    protected void showSubModeKeyDescription(List<Component> list, String suffix) {
         String keyDescription = KeyBindings.wandSubMode != null ? KeyBindings.wandSubMode.getName() : "unknown";
-        list.add(new StringTextComponent("Sub-mode key (" + keyDescription + ") to " + suffix));
+        list.add(new TextComponent("Sub-mode key (" + keyDescription + ") to " + suffix));
     }
 
     //------------------------------------------------------------------------------

@@ -2,7 +2,9 @@
   "required": true,
   "package": "romelo333.notenoughwands.mixin",
   "compatibilityLevel": "JAVA_8",
-  "mixins": [
+  "client": [
+    "HudMixin",
+    "ClientTickMixin"
   ],
   "injectors": {
     "defaultRequire": 1

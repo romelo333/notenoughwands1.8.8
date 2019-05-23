@@ -5,10 +5,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.item.block.BlockItem;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -52,12 +52,10 @@ public class BlockTools {
                 itemstack.addAmount(amount);
                 entityitem = new ItemEntity(world, (x + f), (y + f1), (z + f2), new ItemStack(itemstack.getItem(), j));
                 float f3 = 0.05F;
-                entityitem.velocityX = ((float)random.nextGaussian() * f3);
-                entityitem.velocityY = ((float)random.nextGaussian() * f3 + 0.2F);
-                entityitem.velocityZ = ((float)random.nextGaussian() * f3);
+                entityitem.setVelocity(((float)random.nextGaussian() * f3),((float)random.nextGaussian() * f3 + 0.2F),((float)random.nextGaussian() * f3));
 
                 if (itemstack.hasTag()) {
-                    entityitem.getStack().setTag(itemstack.getTag().copy());
+                    entityitem.getStack().setTag(itemstack.getTag().method_10553());
                 }
                 world.spawnEntity(entityitem);
             }
@@ -93,10 +91,10 @@ public class BlockTools {
         return stack.getDisplayName().getFormattedText();
     }
 
-    public static BlockState placeStackAt(PlayerEntity player, ItemStack blockStack, World world, BlockPos pos, @Nullable BlockState origState) {
+    public static BlockState placeStackAt(PlayerEntity player, ItemStack blockStack, Hand hand, World world, BlockPos pos, @Nullable BlockState origState) {
         if (blockStack.getItem() instanceof BlockItem) {
             // @todo check!
-            ItemUsageContext usageContext = new ItemUsageContext(player, blockStack, new BlockHitResult(new Vec3d(0, 0, 0), Direction.UP, pos, true));
+            ItemUsageContext usageContext = new ItemUsageContext(player, hand, new BlockHitResult(new Vec3d(0, 0, 0), Direction.UP, pos, true));
             ItemPlacementContext context = new ItemPlacementContext(usageContext);
 
             BlockItem itemBlock = (BlockItem) blockStack.getItem();
@@ -108,9 +106,9 @@ public class BlockTools {
             }
             return origState;
         } else {
-            player.setStackInHand(Hand.MAIN, blockStack);
+            player.setStackInHand(Hand.MAIN_HAND, blockStack);
             player.setPosition(pos.getX()+.5, pos.getY()+1.5, pos.getZ()+.5);
-            ItemUsageContext usageContext = new ItemUsageContext(player, blockStack, new BlockHitResult(new Vec3d(0, 0, 0), Direction.UP, pos, true));
+            ItemUsageContext usageContext = new ItemUsageContext(player, hand, new BlockHitResult(new Vec3d(0, 0, 0), Direction.UP, pos, true));
 //            ItemUsageContext usageContext = new ItemUsageContext(player, blockStack, pos, Direction.UP, 0, 0, 0);
             blockStack.getItem().useOnBlock(usageContext);
             return world.getBlockState(pos);

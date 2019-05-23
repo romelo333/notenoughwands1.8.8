@@ -1,8 +1,8 @@
 package romelo333.notenoughwands.mixin;
 
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VisibleRegion;
 import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -20,9 +20,9 @@ public class HudMixin {
                     target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
                     args = "ldc=blockentities"
             ),
-            method = "renderEntities(Lnet/minecraft/entity/Entity;Lnet/minecraft/client/render/VisibleRegion;F)V"
+            method = "renderEntities(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/VisibleRegion;F)V"
     )
-    public void renderEntities(Entity var1, VisibleRegion var2, float var3, CallbackInfo info) {
+    public void renderEntities(Camera var1, VisibleRegion var2, float var3, CallbackInfo info) {
         ClientProxy.renderWorldLastEvent();
     }
 }

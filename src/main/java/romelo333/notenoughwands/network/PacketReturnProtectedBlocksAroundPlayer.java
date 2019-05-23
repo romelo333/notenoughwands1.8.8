@@ -2,7 +2,7 @@ package romelo333.notenoughwands.network;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.ChunkPos;
+import net.minecraft.util.math.ChunkPos;
 
 import java.util.HashMap;
 import java.util.HashSet;
