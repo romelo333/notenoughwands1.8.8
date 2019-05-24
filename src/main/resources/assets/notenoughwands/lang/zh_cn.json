@@ -1,0 +1,24 @@
+{
+"item.notenoughwands.swapping_wand" : "交换魔杖",
+"item.notenoughwands.teleportation_wand" : "传送魔杖",
+"item.notenoughwands.capturing_wand" : "捕获魔杖",
+"item.notenoughwands.building_wand" : "建筑魔杖",
+"item.notenoughwands.illumination_wand" : "照明魔杖",
+"item.notenoughwands.moving_wand" : "移动魔杖",
+"item.notenoughwands.protection_wand" : "防爆魔杖",
+"item.notenoughwands.master_protection_wand" : "大师防爆魔杖",
+"item.notenoughwands.displacement_wand" : "位移魔杖",
+"item.notenoughwands.acceleration_wand" : "加速魔杖",
+"item.notenoughwands.freezing_wand" : "冰冻魔杖(WIP)",
+"item.notenoughwands.potion_wand" : "药剂魔杖",
+"item.notenoughwands.wandcore" : "魔杖核心",
+"item.notenoughwands.advanced_wandcore" : "高级魔杖核心",
+
+"tile.notenoughwands.blockLight" : "照明宝珠",
+
+
+"key.modifier" : "魔杖调节",
+"key.categories.notenoughwands" : "更多魔杖",
+
+"itemGroup.NotEnoughWands" : "更多魔杖"
+}
