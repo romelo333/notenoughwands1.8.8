@@ -78,6 +78,7 @@ public class BlackListSettings {
             blackListBlock(cfg, Blocks.BEDROCK.getRegistryName().toString());
             blackListBlock(cfg, Blocks.PORTAL.getRegistryName().toString());
             blackListBlock(cfg, Blocks.END_PORTAL.getRegistryName().toString());
+            blackListBlock(cfg,Blocks.PISTON_HEAD.getRegistryName().toString());
             setCostBlock(cfg, Blocks.MOB_SPAWNER.getRegistryName().toString(), 5.0);
         } else {
             for (Map.Entry<String, Property> entry : category.entrySet()) {
