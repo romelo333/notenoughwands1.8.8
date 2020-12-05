@@ -1,11 +1,8 @@
 package romelo333.notenoughwands.blocks;
 
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-@SideOnly(Side.CLIENT)
 public class LightItemRenderer {
-//        implements IItemRenderer {
+// @todo 1.15
+    //        implements IItemRenderer {
 //    ResourceLocation texture = new ResourceLocation(NotEnoughWands.MODID.toLowerCase(), "textures/blocks/light.png");
 //
 //    @Override
