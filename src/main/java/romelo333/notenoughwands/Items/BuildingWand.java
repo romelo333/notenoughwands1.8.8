@@ -86,7 +86,7 @@ public class BuildingWand extends GenericWand {
             mode = MODE_FIRST;
         }
         Tools.notify(player, "Switched to " + descriptions[mode] + " mode");
-        Tools.getTagCompound(stack).setInteger("mode", mode);
+        stack.getOrCreateTag().setInteger("mode", mode);
     }
 
     @Override
@@ -94,15 +94,15 @@ public class BuildingWand extends GenericWand {
         int submode = getSubMode(stack);
         submode = submode == 1 ? 0 : 1;
         Tools.notify(player, "Switched orientation");
-        Tools.getTagCompound(stack).setInteger("submode", submode);
+        stack.getOrCreateTag().setInteger("submode", submode);
     }
 
     private int getMode(ItemStack stack) {
-        return Tools.getTagCompound(stack).getInteger("mode");
+        return stack.getOrCreateTag().getInteger("mode");
     }
 
     private int getSubMode(ItemStack stack) {
-        return Tools.getTagCompound(stack).getInteger("submode");
+        return stack.getOrCreateTag().getInteger("submode");
     }
 
     @Override
@@ -180,7 +180,7 @@ public class BuildingWand extends GenericWand {
         undoTag.setIntArray("x", undoX);
         undoTag.setIntArray("y", undoY);
         undoTag.setIntArray("z", undoZ);
-        NBTTagCompound wandTag = Tools.getTagCompound(stack);
+        NBTTagCompound wandTag = stack.getOrCreateTag();
         if (wandTag.hasKey("undo1")) {
             wandTag.setTag("undo2", wandTag.getTag("undo1"));
         }
@@ -188,7 +188,7 @@ public class BuildingWand extends GenericWand {
     }
 
     private void undoPlaceBlock(ItemStack stack, EntityPlayer player, World world, BlockPos pos) {
-        NBTTagCompound wandTag = Tools.getTagCompound(stack);
+        NBTTagCompound wandTag = stack.getOrCreateTag();
         NBTTagCompound undoTag1 = (NBTTagCompound) wandTag.getTag("undo1");
         NBTTagCompound undoTag2 = (NBTTagCompound) wandTag.getTag("undo2");
 
@@ -285,7 +285,7 @@ public class BuildingWand extends GenericWand {
                 int meta = block.getMetaFromState(blockState);
 
                 if (player.isSneaking()) {
-                    NBTTagCompound wandTag = Tools.getTagCompound(wand);
+                    NBTTagCompound wandTag = wand.getOrCreateTag();
                     NBTTagCompound undoTag1 = (NBTTagCompound) wandTag.getTag("undo1");
                     NBTTagCompound undoTag2 = (NBTTagCompound) wandTag.getTag("undo2");
 

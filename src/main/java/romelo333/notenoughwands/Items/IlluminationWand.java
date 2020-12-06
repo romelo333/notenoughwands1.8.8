@@ -2,24 +2,29 @@ package romelo333.notenoughwands.Items;
 
 
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import romelo333.notenoughwands.ModBlocks;
+import romelo333.notenoughwands.setup.Configuration;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class IlluminationWand extends GenericWand {
     public IlluminationWand() {
-        setup("illumination_wand").xpUsage(3).loot(6);
+        setup().xpUsage(3).loot(6);
     }
 
     @Override
@@ -28,43 +33,49 @@ public class IlluminationWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List list, ITooltipFlag b) {
-        super.addInformation(stack, player, list, b);
-        list.add("Right click on block to spawn light.");
-        list.add("Right click on light to remove it again.");
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> list, ITooltipFlag flagIn) {
+        super.addInformation(stack, worldIn, list, flagIn);
+        // @todo 1.15 tooltip
+        list.add(new StringTextComponent("Right click on block to spawn light."));
+        list.add(new StringTextComponent("Right click on light to remove it again."));
     }
 
     @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public ActionResultType onItemUse(ItemUseContext context) {
+        PlayerEntity player = context.getPlayer();
+        Hand hand = context.getHand();
+        World world = context.getWorld();
+        BlockPos pos = context.getPos();
+        Direction side = context.getFace();
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             Block block = world.getBlockState(pos).getBlock();
             if (block == ModBlocks.lightBlock) {
                 BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, pos);
-                world.setBlockToAir(pos);
-                if (ForgeEventFactory.onPlayerBlockPlace(player, blocksnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
+                world.setBlockState(pos, Blocks.AIR.getDefaultState());
+                if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
                     blocksnapshot.restore(true, false);
                 }
-                return EnumActionResult.SUCCESS;
+                return ActionResultType.SUCCESS;
             }
 
             BlockPos offset = pos.offset(side);
             if (!world.isAirBlock(offset)) {
-                return EnumActionResult.SUCCESS;
+                return ActionResultType.SUCCESS;
             }
 
             if (!checkUsage(stack, player, 1.0f)) {
-                return EnumActionResult.SUCCESS;
+                return ActionResultType.SUCCESS;
             }
 
             BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, offset);
             world.setBlockState(offset, ModBlocks.lightBlock.getDefaultState(), 3);
-            if (ForgeEventFactory.onPlayerBlockPlace(player, blocksnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
+            if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
                 blocksnapshot.restore(true, false);
             } else {
                 registerUsage(stack, player, 1.0f);
             }
         }
-        return EnumActionResult.SUCCESS;
+        return ActionResultType.SUCCESS;
     }
 }

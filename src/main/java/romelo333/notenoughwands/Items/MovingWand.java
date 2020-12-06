@@ -2,27 +2,30 @@ package romelo333.notenoughwands.Items;
 
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.registries.ForgeRegistries;
 import romelo333.notenoughwands.ConfigSetup;
+import romelo333.notenoughwands.setup.Configuration;
 import romelo333.notenoughwands.varia.Tools;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class MovingWand extends GenericWand {
@@ -30,7 +33,7 @@ public class MovingWand extends GenericWand {
     private int placeDistance = 4;
 
     public MovingWand() {
-        setup("moving_wand").xpUsage(3).loot(5);
+        setup().xpUsage(3).loot(5);
     }
 
     @Override
@@ -41,114 +44,117 @@ public class MovingWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
-        super.addInformation(stack, player, list, b);
-        NBTTagCompound compound = stack.getTagCompound();
+    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flagIn) {
+        super.addInformation(stack, world, list, flagIn);
+        CompoundNBT compound = stack.getTag();
+        // @todo 1.15 better tooltip
         if (!hasBlock(compound)) {
-            list.add(TextFormatting.RED + "Wand is empty.");
+            list.add(new StringTextComponent(TextFormatting.RED + "Wand is empty."));
         } else {
-            int id = compound.getInteger("block");
-            Block block = Block.REGISTRY.getObjectById(id);
-            int meta = compound.getInteger("meta");
-            String name = Tools.getBlockName(block, meta);
-            list.add(TextFormatting.GREEN + "Block: " + name);
+            String id = compound.getString("block");    // @todo 1.15 blockstate
+            Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(id));
+            String name = Tools.getBlockName(block);
+            list.add(new StringTextComponent(TextFormatting.GREEN + "Block: " + name));
         }
-        list.add("Right click to take a block.");
-        list.add("Right click again on block to place it down.");
+        list.add(new StringTextComponent("Right click to take a block."));
+        list.add(new StringTextComponent("Right click again on block to place it down."));
     }
 
-    private boolean hasBlock(NBTTagCompound compound) {
-        return compound != null && compound.hasKey("block");
+    private boolean hasBlock(CompoundNBT compound) {
+        return compound != null && compound.contains("block");
     }
 
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
-            NBTTagCompound compound = stack.getTagCompound();
+            CompoundNBT compound = stack.getTag();
             if (hasBlock(compound)) {
                 Vec3d lookVec = player.getLookVec();
-                Vec3d start = new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
+                Vec3d start = new Vec3d(player.getPosX(), player.getPosY() + player.getEyeHeight(), player.getPosZ());
                 int distance = this.placeDistance;
-                Vec3d end = start.addVector(lookVec.x * distance, lookVec.y * distance, lookVec.z * distance);
-                RayTraceResult position = world.rayTraceBlocks(start, end);
+                Vec3d end = start.add(lookVec.x * distance, lookVec.y * distance, lookVec.z * distance);
+                RayTraceResult position = null; // @todo 1.15 world.rayTraceBlocks(start, end);
                 if (position == null) {
                     place(stack, world, new BlockPos(end), null, player);
                 }
             }
         }
-        return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+        return ActionResult.resultSuccess(stack);
     }
 
     @Override
-    public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
-        ItemStack stack = player.getHeldItem(hand);
+    public ActionResultType onItemUseFirst(ItemStack stack, ItemUseContext context) {
+        PlayerEntity player = context.getPlayer();
+        Hand hand = context.getHand();
+        World world = context.getWorld();
+        BlockPos pos = context.getPos();
+        Direction side = context.getFace();
         if (!world.isRemote) {
-            NBTTagCompound compound = stack.getTagCompound();
+            CompoundNBT compound = stack.getTag();
             if (hasBlock(compound)) {
                 place(stack, world, pos, side, player);
             } else {
                 pickup(stack, player, world, pos);
             }
-            return EnumActionResult.SUCCESS;
+            return ActionResultType.SUCCESS;
         }
-        return EnumActionResult.PASS;
+        return ActionResultType.PASS;
     }
 
     @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        return EnumActionResult.SUCCESS;
+    public ActionResultType onItemUse(ItemUseContext context) {
+        return ActionResultType.SUCCESS;
     }
 
-    private void place(ItemStack stack, World world, BlockPos pos, EnumFacing side, EntityPlayer player) {
+
+    private void place(ItemStack stack, World world, BlockPos pos, Direction side, PlayerEntity player) {
 
         BlockPos pp = side == null ? pos : pos.offset(side);
 
         // First check what's already there
-        IBlockState old = world.getBlockState(pp);
-        if (!world.isAirBlock(pp) && !old.getBlock().isReplaceable(world, pp)) {
-            Tools.error(player, "Something is in the way!");
-            return;
-        }
+        BlockState old = world.getBlockState(pp);
+//        if (!world.isAirBlock(pp) && !old.isReplaceable(null)) {//@todo 1.15 getBlock().isReplaceable(world, pp)) {
+//            Tools.error(player, "Something is in the way!");
+//            return;
+//        }
 
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        int id = tagCompound.getInteger("block");
-        Block block = Block.REGISTRY.getObjectById(id);
-        int meta = tagCompound.getInteger("meta");
+        CompoundNBT tagCompound = stack.getTag();
+        String id = tagCompound.getString("block");        // @todo 1.15 blockstate
+        Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(id));
 
         BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, pp);
 
-        IBlockState blockState = block.getStateFromMeta(meta);
-        world.setBlockState(pp, blockState, 3);
-        if (ForgeEventFactory.onPlayerBlockPlace(player, blocksnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
+        BlockState blockState = block.getDefaultState();    // @todo 1.15
+        world.setBlockState(pp, blockState, 3); // @todo 1.15 use constants
+        if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
             blocksnapshot.restore(true, false);
             return;
         }
 
-        if (tagCompound.hasKey("tedata")) {
-            NBTTagCompound tc = (NBTTagCompound) tagCompound.getTag("tedata");
-            tc.setInteger("x", pp.getX());
-            tc.setInteger("y", pp.getY());
-            tc.setInteger("z", pp.getZ());
-            TileEntity tileEntity = TileEntity.create(world, tc);
+        if (tagCompound.contains("tedata")) {
+            CompoundNBT tc = (CompoundNBT) tagCompound.get("tedata");
+            tc.putInt("x", pp.getX());
+            tc.putInt("y", pp.getY());
+            tc.putInt("z", pp.getZ());
+            TileEntity tileEntity = TileEntity.create(tc);
             if (tileEntity != null) {
-                world.getChunkFromBlockCoords(pp).addTileEntity(tileEntity);
+                world.getChunk(pp).addTileEntity(pp, tileEntity);
                 tileEntity.markDirty();
                 world.notifyBlockUpdate(pp, blockState, blockState, 3);
             }
         }
 
-        tagCompound.removeTag("block");
-        tagCompound.removeTag("tedata");
-        tagCompound.removeTag("meta");
-        stack.setTagCompound(tagCompound);
+        tagCompound.remove("block");
+        tagCompound.remove("tedata");
+        tagCompound.remove("meta");
+        stack.setTag(tagCompound);
     }
 
-    private void pickup(ItemStack stack, EntityPlayer player, World world, BlockPos pos) {
-        IBlockState state = world.getBlockState(pos);
-        Block block = state.getBlock();
-        int meta = block.getMetaFromState(state);
+    private void pickup(ItemStack stack, PlayerEntity player, World world, BlockPos pos) {
+        BlockState state = world.getBlockState(pos);
+        Block block = state.getBlock(); // @todo 1.15 meta/blockstate
         double cost = checkPickup(player, world, pos, block, maxHardness);
         if (cost < 0.0) {
             return;
@@ -158,33 +164,31 @@ public class MovingWand extends GenericWand {
             return;
         }
 
-        NBTTagCompound tagCompound = Tools.getTagCompound(stack);
+        CompoundNBT tagCompound = stack.getOrCreateTag();
 //        ItemStack s = block.getItem(world, pos, state);
         ItemStack s = block.getPickBlock(state, null, world, pos, player);
         String name;
         if (s.isEmpty()) {
-            name = Tools.getBlockName(block, meta);
+            name = Tools.getBlockName(block);
         } else {
-            name = s.getDisplayName();
+            name = s.getDisplayName().getFormattedText(); // @todo 1.15 bad
         }
         if (name == null) {
             Tools.error(player, "You cannot select this block!");
         } else {
-            int id = Block.REGISTRY.getIDForObject(block);
-            tagCompound.setInteger("block", id);
-            tagCompound.setInteger("meta", meta);
+            tagCompound.putString("block", block.getRegistryName().toString()); // @todo 1.15 put blockstate here
 
             TileEntity tileEntity = world.getTileEntity(pos);
             if (tileEntity != null) {
-                NBTTagCompound tc = new NBTTagCompound();
-                tileEntity.writeToNBT(tc);
+                CompoundNBT tc = new CompoundNBT();
+                tileEntity.write(tc);
                 world.removeTileEntity(pos);
-                tc.removeTag("x");
-                tc.removeTag("y");
-                tc.removeTag("z");
-                tagCompound.setTag("tedata", tc);
+                tc.remove("x");
+                tc.remove("y");
+                tc.remove("z");
+                tagCompound.put("tedata", tc);
             }
-            world.setBlockToAir(pos);
+            world.setBlockState(pos, Blocks.AIR.getDefaultState());
 
             Tools.notify(player, "You took: " + name);
             registerUsage(stack, player, (float) cost);

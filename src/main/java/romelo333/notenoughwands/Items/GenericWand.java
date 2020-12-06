@@ -1,35 +1,28 @@
 package romelo333.notenoughwands.Items;
 
-import mcjty.lib.client.BlockOutlineRenderer;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.loot.LootEntryItem;
 import net.minecraft.world.storage.loot.LootPool;
-import net.minecraft.world.storage.loot.conditions.LootCondition;
-import net.minecraft.world.storage.loot.functions.LootFunction;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import romelo333.notenoughwands.ConfigSetup;
-import romelo333.notenoughwands.KeyBindings;
 import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.ProtectedBlocks;
+import romelo333.notenoughwands.setup.Configuration;
 import romelo333.notenoughwands.varia.ItemCapabilityProvider;
 import romelo333.notenoughwands.varia.Tools;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -45,20 +38,24 @@ public class GenericWand extends Item implements IEnergyItem {
 
     private static List<GenericWand> wands = new ArrayList<>();
 
-    @SideOnly(Side.CLIENT)
-    public void registerModel() {
-        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
+    public GenericWand() {
+        super(new Item.Properties().group(NotEnoughWands.setup.getTab())
+                .setNoRepair()
+                .maxDamage(666) // @todo 1.15
+                .defaultMaxDamage(666) // @todo 1.15
+                .maxStackSize(1));
     }
 
+    @Nullable
     @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, NBTTagCompound nbt) {
+    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT nbt) {
         return new ItemCapabilityProvider(stack, this);
     }
 
 
     // Check if a given block can be picked up.
-    public static double checkPickup(EntityPlayer player, World world, BlockPos pos, Block block, float maxHardness) {
-        IBlockState state = world.getBlockState(pos);
+    public static double checkPickup(PlayerEntity player, World world, BlockPos pos, Block block, float maxHardness) {
+        BlockState state = world.getBlockState(pos);
         float hardness = block.getBlockHardness(state, world, pos);
         if (hardness < 0 || hardness > maxHardness){
             Tools.error(player, "This block is to hard to take!");
@@ -84,10 +81,10 @@ public class GenericWand extends Item implements IEnergyItem {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
-        super.addInformation(stack, player, list, b);
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        super.addInformation(stack, worldIn, tooltip, flagIn);
         if (needsrf > 0) {
-            list.add(TextFormatting.GREEN+"Energy: " + getEnergyStored(stack) + " / " + getMaxEnergyStored(stack));
+            tooltip.add(new StringTextComponent("Energy: " + getEnergyStored(stack) + " / " + getMaxEnergyStored(stack)).applyTextStyle(TextFormatting.GREEN));
         }
     }
 
@@ -108,12 +105,8 @@ public class GenericWand extends Item implements IEnergyItem {
         return super.getDurabilityForDisplay(stack);
     }
 
-    protected GenericWand setup(String name) {
-        setMaxStackSize(1);
-        setNoRepair();
-        setUnlocalizedName(NotEnoughWands.MODID + "." + name);
-        setRegistryName(name);
-        setCreativeTab(NotEnoughWands.setup.getTab());
+    protected GenericWand setup() {
+        // @todo 1.15
         wands.add(this);
         return this;
     }
@@ -129,18 +122,13 @@ public class GenericWand extends Item implements IEnergyItem {
         return this;
     }
 
-    GenericWand durabilityUsage(int maxdurability) {
-        setMaxDamage(maxdurability);
-        return this;
-    }
-
     GenericWand loot(int rarity) {
         lootRarity = rarity;
         return this;
     }
 
     protected String getConfigPrefix() {
-        return getRegistryName().getResourcePath();
+        return getRegistryName().getPath();
     }
 
     protected void initConfig(Configuration cfg) {
@@ -153,11 +141,12 @@ public class GenericWand extends Item implements IEnergyItem {
                 needsxp = cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_needsxp", needsxp, "How much levels this wand should consume on usage").getInt();
                 needsrf = cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_needsrf", needsrf, "How much RF this wand should consume on usage").getInt();
                 maxrf = cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_maxrf", maxrf, "Maximum RF this wand can hold").getInt();
-                setMaxDamage(cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_maxdurability", getMaxDamage(), "Maximum durability for this wand").getInt());
+                // @todo 1.15
+//                setMaxDamage(cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_maxdurability", getMaxDamage(), "Maximum durability for this wand").getInt());
                 break;
             case EASY_RF:
                 needsxp = 0;
-                setMaxDamage(0);
+//                setMaxDamage(0); @todo 1.15
                 needsrf = easy_maxrf / easy_usages;
                 maxrf = easy_maxrf;
                 cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_needsxp", needsxp, "How much levels this wand should consume on usage").getInt();
@@ -167,7 +156,7 @@ public class GenericWand extends Item implements IEnergyItem {
                 break;
             case NORMAL_RF:
                 needsxp = 0;
-                setMaxDamage(0);
+//                setMaxDamage(0);  @todo 1.15
                 needsrf = normal_maxrf / normal_usages;
                 maxrf = normal_maxrf;
                 cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_needsxp", needsxp, "How much levels this wand should consume on usage").getInt();
@@ -177,7 +166,7 @@ public class GenericWand extends Item implements IEnergyItem {
                 break;
             case HARD_RF:
                 needsxp = 0;
-                setMaxDamage(0);
+//                setMaxDamage(0);  @todo 1.15
                 needsrf = hard_maxrf / hard_usages;
                 maxrf = hard_maxrf;
                 cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_needsxp", needsxp, "How much levels this wand should consume on usage").getInt();
@@ -192,8 +181,8 @@ public class GenericWand extends Item implements IEnergyItem {
 
     //------------------------------------------------------------------------------
 
-    protected boolean checkUsage(ItemStack stack, EntityPlayer player, float difficultyScale) {
-        if (player.capabilities.isCreativeMode) {
+    protected boolean checkUsage(ItemStack stack, PlayerEntity player, float difficultyScale) {
+        if (player.abilities.isCreativeMode) {
             return true;
         }
         if (needsxp > 0) {
@@ -204,7 +193,7 @@ public class GenericWand extends Item implements IEnergyItem {
             }
         }
         if (isDamageable()) {
-            if (stack.getItemDamage() >= stack.getMaxDamage()) {
+            if (stack.getDamage() >= stack.getMaxDamage()) {
                 Tools.error(player, "This wand can no longer be used!");
                 return false;
             }
@@ -218,25 +207,25 @@ public class GenericWand extends Item implements IEnergyItem {
         return true;
     }
 
-    protected void registerUsage(ItemStack stack, EntityPlayer player, float difficultyScale) {
-        if (player.capabilities.isCreativeMode) {
+    protected void registerUsage(ItemStack stack, PlayerEntity player, float difficultyScale) {
+        if (player.abilities.isCreativeMode) {
             return;
         }
         if (needsxp > 0) {
             Tools.addPlayerXP(player, -(int) (needsxp * difficultyScale));
         }
         if (isDamageable()) {
-            stack.damageItem(1, player);
+            stack.damageItem(1, player, playerEntity -> {});
         }
         if (needsrf > 0) {
             extractEnergy(stack, (int) (needsrf * difficultyScale), false);
         }
     }
 
-    public void toggleMode(EntityPlayer player, ItemStack stack) {
+    public void toggleMode(PlayerEntity player, ItemStack stack) {
     }
 
-    public void toggleSubMode(EntityPlayer player, ItemStack stack) {
+    public void toggleSubMode(PlayerEntity player, ItemStack stack) {
     }
 
     //------------------------------------------------------------------------------
@@ -244,13 +233,6 @@ public class GenericWand extends Item implements IEnergyItem {
 
     public static List<GenericWand> getWands() {
         return wands;
-    }
-
-    @SideOnly(Side.CLIENT)
-    public static void setupModels() {
-        for (GenericWand wand : wands) {
-            wand.registerModel();
-        }
     }
 
     //------------------------------------------------------------------------------
@@ -271,30 +253,33 @@ public class GenericWand extends Item implements IEnergyItem {
 
     private void setupChestLootInt(LootPool main) {
         if (lootRarity > 0) {
-            String entryName = NotEnoughWands.MODID + ":" + getRegistryName().getResourcePath();
-            main.addEntry(new LootEntryItem(this, lootRarity, 0, new LootFunction[0], new LootCondition[0], entryName));
+            // @todo 1.15
+//            String entryName = NotEnoughWands.MODID + ":" + getRegistryName().getResourcePath();
+//            main.addEntry(new LootEntryItem(this, lootRarity, 0, new LootFunction[0], new LootCondition[0], entryName));
         }
     }
 
     //------------------------------------------------------------------------------
 
-    @SideOnly(Side.CLIENT)
-    public void renderOverlay(RenderWorldLastEvent evt, EntityPlayerSP player, ItemStack wand) {
+    public void renderOverlay(RenderWorldLastEvent evt, PlayerEntity player, ItemStack wand) {
 
     }
 
-    protected static void renderOutlines(RenderWorldLastEvent evt, EntityPlayerSP p, Set<BlockPos> coordinates, int r, int g, int b) {
-        BlockOutlineRenderer.renderOutlines(p, coordinates, r, g, b, evt.getPartialTicks());
+    protected static void renderOutlines(RenderWorldLastEvent evt, PlayerEntity p, Set<BlockPos> coordinates, int r, int g, int b) {
+        // @todo 1.15
+//        BlockOutlineRenderer.renderOutlines(p, coordinates, r, g, b, evt.getPartialTicks());
     }
 
-    protected void showModeKeyDescription(List<String> list, String suffix) {
-        String keyDescription = KeyBindings.wandModifier != null ? KeyBindings.wandModifier.getDisplayName() : "unknown";
-        list.add("Mode key (" + keyDescription + ") to " + suffix);
+    protected void showModeKeyDescription(List<ITextComponent> list, String suffix) {
+        // @todo 1.15
+//        String keyDescription = KeyBindings.wandModifier != null ? KeyBindings.wandModifier.getDisplayName() : "unknown";
+//        list.add("Mode key (" + keyDescription + ") to " + suffix);
     }
 
-    protected void showSubModeKeyDescription(List<String> list, String suffix) {
-        String keyDescription = KeyBindings.wandSubMode != null ? KeyBindings.wandSubMode.getDisplayName() : "unknown";
-        list.add("Sub-mode key (" + keyDescription + ") to " + suffix);
+    protected void showSubModeKeyDescription(List<ITextComponent> list, String suffix) {
+        // @todo 1.15
+//        String keyDescription = KeyBindings.wandSubMode != null ? KeyBindings.wandSubMode.getDisplayName() : "unknown";
+//        list.add("Sub-mode key (" + keyDescription + ") to " + suffix);
     }
 
     //------------------------------------------------------------------------------
@@ -305,15 +290,15 @@ public class GenericWand extends Item implements IEnergyItem {
             return 0;
         }
 
-        if (container.getTagCompound() == null || !container.getTagCompound().hasKey("Energy")) {
+        if (container.getTag() == null || !container.getTag().contains("Energy")) {
             return 0;
         }
-        int energy = container.getTagCompound().getInteger("Energy");
+        int energy = container.getTag().getInt("Energy");
         int energyExtracted = Math.min(energy, Math.min(this.needsrf, maxExtract));
 
         if (!simulate) {
             energy -= energyExtracted;
-            container.getTagCompound().setInteger("Energy", energy);
+            container.getTag().putInt("Energy", energy);
         }
         return energyExtracted;
     }
@@ -324,25 +309,23 @@ public class GenericWand extends Item implements IEnergyItem {
             return 0;
         }
 
-        if (container.getTagCompound() == null) {
-            container.setTagCompound(new NBTTagCompound());
-        }
-        int energy = container.getTagCompound().getInteger("Energy");
+        container.getOrCreateTag();
+        int energy = container.getTag().getInt("Energy");
         int energyReceived = Math.min(maxrf - energy, Math.min(this.maxrf, maxReceive));
 
         if (!simulate) {
             energy += energyReceived;
-            container.getTagCompound().setInteger("Energy", energy);
+            container.getTag().putInt("Energy", energy);
         }
         return energyReceived;
     }
 
     @Override
     public int getEnergyStored(ItemStack container) {
-        if (container.getTagCompound() == null || !container.getTagCompound().hasKey("Energy")) {
+        if (container.getTag() == null || !container.getTag().contains("Energy")) {
             return 0;
         }
-        return container.getTagCompound().getInteger("Energy");
+        return container.getTag().getInt("Energy");
     }
 
     @Override

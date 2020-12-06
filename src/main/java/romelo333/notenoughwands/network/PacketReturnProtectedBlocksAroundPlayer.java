@@ -1,11 +1,11 @@
 package romelo333.notenoughwands.network;
 
-import io.netty.buffer.ByteBuf;
-import mcjty.lib.thirteen.Context;
+import mcjty.lib.McJtyLib;
+import mcjty.lib.varia.DimensionId;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import romelo333.notenoughwands.NotEnoughWands;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,11 +13,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
-public class PacketReturnProtectedBlocksAroundPlayer implements IMessage {
+public class PacketReturnProtectedBlocksAroundPlayer {
     private Map<ChunkPos, Set<BlockPos>> blocks;
 
-    @Override
-    public void fromBytes(ByteBuf buf) {
+    public void fromBytes(PacketBuffer buf) {
         int size = buf.readInt();
         blocks = new HashMap<ChunkPos, Set<BlockPos>> (size);
         for (int i = 0 ; i < size ; i++) {
@@ -32,8 +31,7 @@ public class PacketReturnProtectedBlocksAroundPlayer implements IMessage {
         }
     }
 
-    @Override
-    public void toBytes(ByteBuf buf) {
+    public void toBytes(PacketBuffer buf) {
         buf.writeInt(blocks.size());
         for (Map.Entry<ChunkPos, Set<BlockPos>> entry : blocks.entrySet()) {
             Set<BlockPos> positions = entry.getValue();
@@ -55,7 +53,7 @@ public class PacketReturnProtectedBlocksAroundPlayer implements IMessage {
     public PacketReturnProtectedBlocksAroundPlayer() {
     }
 
-    public PacketReturnProtectedBlocksAroundPlayer(ByteBuf buf) {
+    public PacketReturnProtectedBlocksAroundPlayer(PacketBuffer buf) {
         fromBytes(buf);
     }
 
@@ -63,11 +61,11 @@ public class PacketReturnProtectedBlocksAroundPlayer implements IMessage {
         this.blocks = blocks;
     }
 
-    public void handle(Supplier<Context> supplier) {
-        Context ctx = supplier.get();
+    public void handle(Supplier<NetworkEvent.Context> supplier) {
+        NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
             ReturnProtectedBlocksAroundPlayerHelper.setProtectedBlocks(
-                    NotEnoughWands.proxy.getClientWorld().provider.getDimension(), this);
+                    DimensionId.fromWorld(McJtyLib.proxy.getClientWorld()), this); // @todo 1.15 no need for proxy here!
         });
         ctx.setPacketHandled(true);
     }

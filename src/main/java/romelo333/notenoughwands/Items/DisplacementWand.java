@@ -2,31 +2,29 @@ package romelo333.notenoughwands.Items;
 
 
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import romelo333.notenoughwands.ConfigSetup;
+import romelo333.notenoughwands.setup.Configuration;
 import romelo333.notenoughwands.varia.Tools;
 
+import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -49,7 +47,7 @@ public class DisplacementWand extends GenericWand {
     public static final int[] amount = new int[] { 9, 9, 25, 1 };
 
     public DisplacementWand() {
-        setup("displacement_wand").xpUsage(1).loot(3);
+        setup().xpUsage(1).loot(3);
     }
 
     @Override
@@ -59,44 +57,48 @@ public class DisplacementWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List list, ITooltipFlag b) {
-        super.addInformation(stack, player, list, b);
-        list.add(TextFormatting.GREEN + "Mode: " + descriptions[getMode(stack)]);
-        list.add("Right click to push blocks forward.");
-        list.add("Sneak right click to pull blocks.");
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> list, ITooltipFlag flagIn) {
+        super.addInformation(stack, worldIn, list, flagIn);
+        // @todo 1.15 tooltips
+        list.add(new StringTextComponent(TextFormatting.GREEN + "Mode: " + descriptions[getMode(stack)]));
+        list.add(new StringTextComponent("Right click to push blocks forward."));
+        list.add(new StringTextComponent("Sneak right click to pull blocks."));
         showModeKeyDescription(list, "switch mode");
     }
 
     @Override
-    public void toggleMode(EntityPlayer player, ItemStack stack) {
+    public void toggleMode(PlayerEntity player, ItemStack stack) {
         int mode = getMode(stack);
         mode++;
         if (mode > MODE_LAST) {
             mode = MODE_FIRST;
         }
         Tools.notify(player, "Switched to " + descriptions[mode] + " mode");
-        Tools.getTagCompound(stack).setInteger("mode", mode);
+        stack.getOrCreateTag().putInt("mode", mode);
     }
 
     private int getMode(ItemStack stack) {
-        return Tools.getTagCompound(stack).getInteger("mode");
+        return stack.getOrCreateTag().getInt("mode");
     }
 
     @Override
-    public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
-        ItemStack stack = player.getHeldItem(hand);
+    public ActionResultType onItemUseFirst(ItemStack stack, ItemUseContext context) {
+        World world = context.getWorld();
+        PlayerEntity player = context.getPlayer();
+        BlockPos pos = context.getPos();
+        Direction side = context.getFace();
         if (!world.isRemote) {
             if (player.isSneaking()) {
                 pullBlocks(stack, player, world, pos, side);
             } else {
                 pushBlocks(stack, player, world, pos, side);
             }
-            return EnumActionResult.SUCCESS;
+            return ActionResultType.SUCCESS;
         }
-        return EnumActionResult.PASS;
+        return ActionResultType.PASS;
     }
 
-    private void pullBlocks(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side) {
+    private void pullBlocks(ItemStack stack, PlayerEntity player, World world, BlockPos pos, Direction side) {
         if (!checkUsage(stack, player, 1.0f)) {
             return;
         }
@@ -107,7 +109,7 @@ public class DisplacementWand extends GenericWand {
         }
     }
 
-    private void pushBlocks(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side) {
+    private void pushBlocks(ItemStack stack, PlayerEntity player, World world, BlockPos pos, Direction side) {
         if (!checkUsage(stack, player, 1.0f)) {
             return;
         }
@@ -118,34 +120,34 @@ public class DisplacementWand extends GenericWand {
         }
     }
 
-    private int moveBlocks(EntityPlayer player, World world, Set<BlockPos> coordinates, EnumFacing direction) {
+    private int moveBlocks(PlayerEntity player, World world, Set<BlockPos> coordinates, Direction direction) {
         int cnt = 0;
         for (BlockPos coordinate : coordinates) {
-            IBlockState state = world.getBlockState(coordinate);
+            BlockState state = world.getBlockState(coordinate);
             Block block = state.getBlock();
             BlockPos otherC = coordinate.offset(direction);
-            IBlockState otherState = world.getBlockState(otherC);
+            BlockState otherState = world.getBlockState(otherC);// @todo 1.15 better support for blockstates
             Block otherBlock = otherState.getBlock();
-            if (otherBlock.isReplaceable(world, otherC)) {
+            if (true) {
+//            if (otherBlock.isReplaceable(world, otherC)) {// @todo 1.15
                 double cost = GenericWand.checkPickup(player, world, otherC, block, maxHardness);
                 if (cost >= 0.0) {
                     cnt++;
-                    int meta = block.getMetaFromState(state);
-                    Tools.playSound(world, block.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
+                    Tools.playSound(world, block.getSoundType(state).getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
                     TileEntity tileEntity = world.getTileEntity(coordinate);
-                    NBTTagCompound tc = null;
+                    CompoundNBT tc = null;
                     if (tileEntity != null) {
-                        tc = new NBTTagCompound();
-                        tileEntity.writeToNBT(tc);
+                        tc = new CompoundNBT();
+                        tileEntity.write(tc);
                         world.removeTileEntity(coordinate);
                     }
 
-                    world.setBlockToAir(coordinate);
+                    world.setBlockState(coordinate, Blocks.AIR.getDefaultState());
 
                     BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, otherC);
-                    IBlockState blockState = block.getStateFromMeta(meta);
+                    BlockState blockState = block.getDefaultState();    // @todo 1.15 blockstate
                     world.setBlockState(otherC, blockState, 3);
-                    if (ForgeEventFactory.onPlayerBlockPlace(player, blocksnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
+                    if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
                         blocksnapshot.restore(true, false);
                         world.setBlockState(coordinate, blockState, 3);
                         // Make sure we restore the tileentity at the original spot
@@ -153,21 +155,21 @@ public class DisplacementWand extends GenericWand {
                     }
 
                     if (tc != null) {
-                        tc.setInteger("x", otherC.getX());
-                        tc.setInteger("y", otherC.getY());
-                        tc.setInteger("z", otherC.getZ());
-                        tileEntity = TileEntity.create(world, tc);
+                        tc.putInt("x", otherC.getX());
+                        tc.putInt("y", otherC.getY());
+                        tc.putInt("z", otherC.getZ());
+                        tileEntity = TileEntity.create(tc);
                         if (tileEntity != null) {
-                            world.getChunkFromBlockCoords(otherC).addTileEntity(tileEntity);
+                            world.getChunk(otherC).addTileEntity(otherC, tileEntity);
                             tileEntity.markDirty();
-                            world.notifyBlockUpdate(otherC, blockState, blockState, 3);
+                            world.notifyBlockUpdate(otherC, blockState, blockState, 3); // @todo 1.15 constants
                         }
 
 //                        tileEntity = world.getTileEntity(otherC);
 //                        if (tileEntity != null) {
-//                            tc.setInteger("x", otherC.getX());
-//                            tc.setInteger("y", otherC.getY());
-//                            tc.setInteger("z", otherC.getZ());
+//                            tc.putInt("x", otherC.getX());
+//                            tc.putInt("y", otherC.getY());
+//                            tc.putInt("z", otherC.getZ());
 //                            tileEntity.readFromNBT(tc);
 //                            tileEntity.markDirty();
 //                            world.notifyBlockUpdate(otherC, blockState, blockState, 3);
@@ -179,23 +181,23 @@ public class DisplacementWand extends GenericWand {
         return cnt;
     }
 
-    @SideOnly(Side.CLIENT)
     @Override
-    public void renderOverlay(RenderWorldLastEvent evt, EntityPlayerSP player, ItemStack wand) {
-        RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver;
-        if (mouseOver != null && mouseOver.getBlockPos() != null && mouseOver.sideHit != null) {
-            World world = player.getEntityWorld();
-            BlockPos blockPos = mouseOver.getBlockPos();
-            IBlockState state = world.getBlockState(blockPos);
-            Block block = state.getBlock();
-            if (block != null && block.getMaterial(state) != Material.AIR) {
-                Set<BlockPos> coordinates = findSuitableBlocks(wand, world, mouseOver.sideHit, blockPos);
-                renderOutlines(evt, player, coordinates, 200, 230, 180);
-            }
-        }
+    public void renderOverlay(RenderWorldLastEvent evt, PlayerEntity player, ItemStack wand) {
+        // @todo 1.15
+//        RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver;
+//        if (mouseOver != null && mouseOver.getBlockPos() != null && mouseOver.sideHit != null) {
+//            World world = player.getEntityWorld();
+//            BlockPos blockPos = mouseOver.getBlockPos();
+//            IBlockState state = world.getBlockState(blockPos);
+//            Block block = state.getBlock();
+//            if (block != null && block.getMaterial(state) != Material.AIR) {
+//                Set<BlockPos> coordinates = findSuitableBlocks(wand, world, mouseOver.sideHit, blockPos);
+//                renderOutlines(evt, player, coordinates, 200, 230, 180);
+//            }
+//        }
     }
 
-    private Set<BlockPos> findSuitableBlocks(ItemStack stack, World world, EnumFacing sideHit, BlockPos pos) {
+    private Set<BlockPos> findSuitableBlocks(ItemStack stack, World world, Direction sideHit, BlockPos pos) {
         Set<BlockPos> coordinates = new HashSet<>();
         int mode = getMode(stack);
         int dim = 0;

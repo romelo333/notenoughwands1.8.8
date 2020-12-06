@@ -3,19 +3,20 @@ package romelo333.notenoughwands.Items;
 
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.IMob;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.common.config.Configuration;
 import romelo333.notenoughwands.ConfigSetup;
+import romelo333.notenoughwands.setup.Configuration;
 import romelo333.notenoughwands.varia.Tools;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class FreezingWand extends GenericWand {
@@ -25,7 +26,7 @@ public class FreezingWand extends GenericWand {
     private float diffcultyAdd = 1.0f;
 
     public FreezingWand() {
-        setup("freezing_wand").xpUsage(10).loot(0);
+        setup().xpUsage(10).loot(0);
     }
 
     @Override
@@ -38,29 +39,31 @@ public class FreezingWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List list, ITooltipFlag b) {
-        super.addInformation(stack, player, list, b);
-        list.add("Right click on creature to freeze creature.");
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> list, ITooltipFlag flagIn) {
+        super.addInformation(stack, worldIn, list, flagIn);
+        // @todo 1.15 better tooltips
+        list.add(new StringTextComponent("Right click on creature to freeze creature."));
     }
 
     @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public ActionResultType onItemUse(ItemUseContext context) {
+        World world = context.getWorld();
         if (!world.isRemote) {
 
         }
-        return EnumActionResult.FAIL;
+        return ActionResultType.FAIL;
     }
 
-    private void freezeMob(EntityLivingBase mob){
+    private void freezeMob(LivingEntity mob){
 //        mob.addPotionEffect(new PotionEffect(FreezePotion.freezePotion, 200, 4));
     }
 
     @Override
-    public boolean onLeftClickEntity(ItemStack stack, EntityPlayer player, Entity entity) {
+    public boolean onLeftClickEntity(ItemStack stack, PlayerEntity player, Entity entity) {
         if (!player.getEntityWorld().isRemote) {
-            if (entity instanceof EntityLivingBase) {
-                EntityLivingBase entityLivingBase = (EntityLivingBase) entity;
-                if (entityLivingBase instanceof EntityPlayer) {
+            if (entity instanceof LivingEntity) {
+                LivingEntity entityLivingBase = (LivingEntity) entity;
+                if (entityLivingBase instanceof PlayerEntity) {
                     Tools.error(player, "You cannot use this on players!");
                     return true;
                 }

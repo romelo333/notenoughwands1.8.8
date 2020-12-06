@@ -1,20 +1,18 @@
 package romelo333.notenoughwands.network;
 
-import io.netty.buffer.ByteBuf;
-import mcjty.lib.thirteen.Context;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Supplier;
 
-public class PacketReturnProtectedBlocks implements IMessage {
+public class PacketReturnProtectedBlocks {
     private Set<BlockPos> blocks;
     private Set<BlockPos> childBlocks;
 
-    @Override
-    public void fromBytes(ByteBuf buf) {
+    public void fromBytes(PacketBuffer buf) {
         int size = buf.readInt();
         blocks = new HashSet<BlockPos>(size);
         for (int i = 0 ; i < size ; i++) {
@@ -27,8 +25,7 @@ public class PacketReturnProtectedBlocks implements IMessage {
         }
     }
 
-    @Override
-    public void toBytes(ByteBuf buf) {
+    public void toBytes(PacketBuffer buf) {
         buf.writeInt(blocks.size());
         for (BlockPos block : blocks) {
             buf.writeInt(block.getX());
@@ -55,7 +52,7 @@ public class PacketReturnProtectedBlocks implements IMessage {
     public PacketReturnProtectedBlocks() {
     }
 
-    public PacketReturnProtectedBlocks(ByteBuf buf) {
+    public PacketReturnProtectedBlocks(PacketBuffer buf) {
         fromBytes(buf);
     }
 
@@ -64,8 +61,8 @@ public class PacketReturnProtectedBlocks implements IMessage {
         this.childBlocks = childBlocks;
     }
 
-    public void handle(Supplier<Context> supplier) {
-        Context ctx = supplier.get();
+    public void handle(Supplier<NetworkEvent.Context> supplier) {
+        NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
             ReturnProtectedBlocksHelper.setProtectedBlocks(this);
         });

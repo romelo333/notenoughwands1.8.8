@@ -122,10 +122,10 @@ public class AccelerationWand extends GenericWand {
             mode = MODE_FIRST;
         }
         Tools.notify(player, "Switched to " + descriptions[mode] + " mode");
-        Tools.getTagCompound(stack).setInteger("mode", mode);
+        stack.getOrCreateTag().setInteger("mode", mode);
     }
 
     private int getMode(ItemStack stack) {
-        return Tools.getTagCompound(stack).getInteger("mode");
+        return stack.getOrCreateTag().getInteger("mode");
     }
 }

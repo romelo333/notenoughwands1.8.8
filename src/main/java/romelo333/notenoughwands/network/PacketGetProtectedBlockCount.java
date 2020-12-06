@@ -1,31 +1,30 @@
 package romelo333.notenoughwands.network;
 
-import io.netty.buffer.ByteBuf;
-import mcjty.lib.thirteen.Context;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.fml.network.NetworkEvent;
 import romelo333.notenoughwands.ProtectedBlocks;
 
 import java.util.function.Supplier;
 
-public class PacketGetProtectedBlockCount implements IMessage {
+public class PacketGetProtectedBlockCount {
     private int id;
 
-    @Override
-    public void fromBytes(ByteBuf buf) {
+    public void fromBytes(PacketBuffer buf) {
         id = buf.readInt();
     }
 
-    @Override
-    public void toBytes(ByteBuf buf) {
+    public void toBytes(PacketBuffer buf) {
         buf.writeInt(id);
     }
 
     public PacketGetProtectedBlockCount() {
     }
 
-    public PacketGetProtectedBlockCount(ByteBuf buf) {
+    public PacketGetProtectedBlockCount(PacketBuffer buf) {
         fromBytes(buf);
     }
 
@@ -33,15 +32,15 @@ public class PacketGetProtectedBlockCount implements IMessage {
         this.id = id;
     }
 
-    public void handle(Supplier<Context> supplier) {
-        Context ctx = supplier.get();
+    public void handle(Supplier<NetworkEvent.Context> supplier) {
+        NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            EntityPlayerMP player = ctx.getSender();
+            PlayerEntity player = ctx.getSender();
             World world = player.getEntityWorld();
 
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
             PacketReturnProtectedBlockCount msg = new PacketReturnProtectedBlockCount(protectedBlocks.getProtectedBlockCount(id));
-            NEWPacketHandler.INSTANCE.sendTo(msg, player);
+            NEWPacketHandler.INSTANCE.sendTo(msg, ((ServerPlayerEntity) player).connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
         });
         ctx.setPacketHandled(true);
     }

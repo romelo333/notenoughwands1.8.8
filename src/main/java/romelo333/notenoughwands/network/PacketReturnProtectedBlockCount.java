@@ -1,21 +1,19 @@
 package romelo333.notenoughwands.network;
 
-import io.netty.buffer.ByteBuf;
-import mcjty.lib.thirteen.Context;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class PacketReturnProtectedBlockCount implements IMessage {
+public class PacketReturnProtectedBlockCount {
     private int count;
 
-    @Override
-    public void fromBytes(ByteBuf buf) {
+    public void fromBytes(PacketBuffer buf) {
         count = buf.readInt();
     }
 
-    @Override
-    public void toBytes(ByteBuf buf) {
+    public void toBytes(PacketBuffer buf) {
         buf.writeInt(count);
     }
 
@@ -26,7 +24,7 @@ public class PacketReturnProtectedBlockCount implements IMessage {
     public PacketReturnProtectedBlockCount() {
     }
 
-    public PacketReturnProtectedBlockCount(ByteBuf buf) {
+    public PacketReturnProtectedBlockCount(PacketBuffer buf) {
         fromBytes(buf);
     }
 
@@ -34,8 +32,8 @@ public class PacketReturnProtectedBlockCount implements IMessage {
         this.count = count;
     }
 
-    public void handle(Supplier<Context> supplier) {
-        Context ctx = supplier.get();
+    public void handle(Supplier<NetworkEvent.Context> supplier) {
+        NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
             ReturnProtectedBlockCountHelper.setProtectedBlocks(this);
         });
