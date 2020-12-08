@@ -4,11 +4,11 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import romelo333.notenoughwands.ConfigSetup;
-import romelo333.notenoughwands.KeyBindings;
-import romelo333.notenoughwands.KeyInputHandler;
+import romelo333.notenoughwands.keys.KeyBindings;
+import romelo333.notenoughwands.keys.KeyInputHandler;
+import romelo333.notenoughwands.modules.protectionwand.ProtectionWandConfiguration;
+import romelo333.notenoughwands.modules.protectionwand.network.PacketGetProtectedBlocksAroundPlayer;
 import romelo333.notenoughwands.network.NEWPacketHandler;
-import romelo333.notenoughwands.network.PacketGetProtectedBlocksAroundPlayer;
 
 public class ClientProxy {
 
@@ -39,7 +39,7 @@ public class ClientProxy {
 
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
-        if (ConfigSetup.clientSideProtection < 0) {
+        if (ProtectionWandConfiguration.clientSideProtection.get() < 0) {
             return;
         }
 
@@ -47,7 +47,7 @@ public class ClientProxy {
         if (timer > 0) {
             return;
         }
-        timer = ConfigSetup.clientSideProtection;
+        timer = ProtectionWandConfiguration.clientSideProtection.get();
         NEWPacketHandler.INSTANCE.sendToServer(new PacketGetProtectedBlocksAroundPlayer());
     }
 }

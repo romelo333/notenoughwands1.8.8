@@ -1,0 +1,442 @@
+package romelo333.notenoughwands.modules.wands.Items;
+
+
+import mcjty.lib.varia.BlockTools;
+import mcjty.lib.varia.DimensionId;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.registries.ForgeRegistries;
+import romelo333.notenoughwands.setup.Configuration;
+import romelo333.notenoughwands.varia.Tools;
+
+import javax.annotation.Nullable;
+import java.util.*;
+
+public class BuildingWand extends GenericWand {
+
+    public static final int MODE_FIRST = 0;
+    public static final int MODE_9 = 0;
+    public static final int MODE_9ROW = 1;
+    public static final int MODE_25 = 2;
+    public static final int MODE_25ROW = 3;
+    public static final int MODE_SINGLE = 4;
+    public static final int MODE_LAST = MODE_SINGLE;
+
+    public static final String[] descriptions = new String[] {
+            "9 blocks", "9 blocks row", "25 blocks", "25 blocks row", "single"
+    };
+
+    public static final int[] amount = new int[] { 9, 9, 25, 25, 1 };
+
+    public BuildingWand() {
+        setup().loot(3).usageFactory(1.0f);
+    }
+
+    @Override
+    protected void initConfig(Configuration cfg) {
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flagIn) {
+        super.addInformation(stack, world, list, flagIn);
+        // @todo 1.15 tooltips
+        CompoundNBT compound = stack.getTag();
+        if (compound != null) {
+            int cnt = (compound.contains("undo1") ? 1 : 0) + (compound.contains("undo2") ? 1 : 0);
+            list.add(new StringTextComponent(TextFormatting.GREEN + "Has " + cnt + " undo states"));
+            int mode = compound.getInt("mode");
+            if (mode == MODE_9ROW || mode == MODE_25ROW) {
+                int submode = getSubMode(stack);
+                list.add(new StringTextComponent(TextFormatting.GREEN + "Mode: " + descriptions[mode] + (submode == 1 ? " [Rotated]" : "")));
+            } else {
+                list.add(new StringTextComponent(TextFormatting.GREEN + "Mode: " + descriptions[mode]));
+            }
+        }
+        list.add(new StringTextComponent("Right click to extend blocks in that direction."));
+        list.add(new StringTextComponent("Sneak right click on such a block to undo one of"));
+        list.add(new StringTextComponent("the last two operations."));
+
+        showModeKeyDescription(list, "switch mode");
+        showSubModeKeyDescription(list, "change orientation");
+    }
+
+    @Override
+    public void toggleMode(PlayerEntity player, ItemStack stack) {
+        int mode = getMode(stack);
+        mode++;
+        if (mode > MODE_LAST) {
+            mode = MODE_FIRST;
+        }
+        Tools.notify(player, "Switched to " + descriptions[mode] + " mode");
+        stack.getOrCreateTag().putInt("mode", mode);
+    }
+
+    @Override
+    public void toggleSubMode(PlayerEntity player, ItemStack stack) {
+        int submode = getSubMode(stack);
+        submode = submode == 1 ? 0 : 1;
+        Tools.notify(player, "Switched orientation");
+        stack.getOrCreateTag().putInt("submode", submode);
+    }
+
+    private int getMode(ItemStack stack) {
+        return stack.getOrCreateTag().getInt("mode");
+    }
+
+    private int getSubMode(ItemStack stack) {
+        return stack.getOrCreateTag().getInt("submode");
+    }
+
+    @Override
+    public ActionResultType onItemUse(ItemUseContext context) {
+        PlayerEntity player = context.getPlayer();
+        Hand hand = context.getHand();
+        World world = context.getWorld();
+        BlockPos pos = context.getPos();
+        Direction side = context.getFace();
+        ItemStack stack = player.getHeldItem(hand);
+        if (!world.isRemote) {
+            if (player.isSneaking()) {
+                undoPlaceBlock(stack, player, world, pos);
+            } else {
+                placeBlock(stack, player, world, pos, side);
+            }
+        }
+        return ActionResultType.SUCCESS;
+    }
+
+    private void placeBlock(ItemStack stack, PlayerEntity player, World world, BlockPos pos, Direction side) {
+        if (!checkUsage(stack, player, 1.0f)) {
+            return;
+        }
+        boolean notenough = false;
+        BlockState blockState = world.getBlockState(pos);
+        Block block = blockState.getBlock();        // @todo 1.15 blockstate
+
+
+        Set<BlockPos> coordinates = findSuitableBlocks(stack, world, side, pos, block);
+        Set<BlockPos> undo = new HashSet<BlockPos>();
+        for (BlockPos coordinate : coordinates) {
+            if (!checkUsage(stack, player, 1.0f)) {
+                break;
+            }
+            ItemStack consumed = Tools.consumeInventoryItem(Item.getItemFromBlock(block), player.inventory, player);
+            if (!consumed.isEmpty()) {
+                Tools.playSound(world, block.getSoundType(block.getDefaultState()).getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
+//                IBlockState state = block.getStateFromMeta(meta);
+//                world.setBlockState(coordinate, state, 2);
+                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, coordinate);
+                BlockTools.placeStackAt(player, consumed, world, coordinate, null);
+                if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
+                    blocksnapshot.restore(true, false);
+                    if (!player.abilities.isCreativeMode) {
+                        Tools.giveItem(player, consumed);
+                    }
+                }
+                player.openContainer.detectAndSendChanges();
+                registerUsage(stack, player, 1.0f);
+                undo.add(coordinate);
+            } else {
+                notenough = true;
+            }
+        }
+        if (notenough) {
+            Tools.error(player, "You don't have the right block");
+        }
+
+        registerUndo(stack, block, world, undo);
+    }
+
+    // @todo 1.15 support blockstate
+    private void registerUndo(ItemStack stack, Block block, World world, Set<BlockPos> undo) {
+        CompoundNBT undoTag = new CompoundNBT();
+        undoTag.putString("block", block.getRegistryName().toString());
+        undoTag.putString("dimension", DimensionId.fromWorld(world).getRegistryName().toString());
+        int[] undoX = new int[undo.size()];
+        int[] undoY = new int[undo.size()];
+        int[] undoZ = new int[undo.size()];
+        int idx = 0;
+        for (BlockPos coordinate : undo) {
+            undoX[idx] = coordinate.getX();
+            undoY[idx] = coordinate.getY();
+            undoZ[idx] = coordinate.getZ();
+            idx++;
+        }
+
+        undoTag.putIntArray("x", undoX);
+        undoTag.putIntArray("y", undoY);
+        undoTag.putIntArray("z", undoZ);
+        CompoundNBT wandTag = stack.getOrCreateTag();
+        if (wandTag.contains("undo1")) {
+            wandTag.put("undo2", wandTag.get("undo1"));
+        }
+        wandTag.put("undo1", undoTag);
+    }
+
+    private void undoPlaceBlock(ItemStack stack, PlayerEntity player, World world, BlockPos pos) {
+        CompoundNBT wandTag = stack.getOrCreateTag();
+        CompoundNBT undoTag1 = (CompoundNBT) wandTag.get("undo1");
+        CompoundNBT undoTag2 = (CompoundNBT) wandTag.get("undo2");
+
+        Set<BlockPos> undo1 = checkUndo(player, world, undoTag1);
+        Set<BlockPos> undo2 = checkUndo(player, world, undoTag2);
+        if (undo1 == null && undo2 == null) {
+            Tools.error(player, "Nothing to undo!");
+            return;
+        }
+
+        if (undo1 != null && undo1.contains(pos)) {
+            performUndo(stack, player, world, pos, undoTag1, undo1);
+            if (wandTag.contains("undo2")) {
+                wandTag.put("undo1", wandTag.get("undo2"));
+                wandTag.remove("undo2");
+            } else {
+                wandTag.remove("undo1");
+            }
+            return;
+        }
+        if (undo2 != null && undo2.contains(pos)) {
+            performUndo(stack, player, world, pos, undoTag2, undo2);
+            wandTag.remove("undo2");
+            return;
+        }
+
+        Tools.error(player, "Select at least one block of the area you want to undo!");
+    }
+
+    private void performUndo(ItemStack stack, PlayerEntity player, World world, BlockPos pos, CompoundNBT undoTag, Set<BlockPos> undo) {
+        Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(undoTag.getString("block")));    // @todo 1.15 blockstate
+
+        int cnt = 0;
+        for (BlockPos coordinate : undo) {
+            BlockState testState = world.getBlockState(coordinate);
+            Block testBlock = testState.getBlock();
+            // @todo 1.15 blockstate
+            if (testBlock == block) {
+                Tools.playSound(world, block.getSoundType(block.getDefaultState()).getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
+
+                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, coordinate);
+                world.setBlockState(coordinate, Blocks.AIR.getDefaultState());
+                if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
+                    blocksnapshot.restore(true, false);
+                } else {
+                    cnt++;
+                }
+            }
+        }
+        if (cnt > 0) {
+            if (!player.abilities.isCreativeMode) {
+                ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(block, cnt));
+                player.openContainer.detectAndSendChanges();
+            }
+        }
+    }
+
+    private Set<BlockPos> checkUndo(PlayerEntity player, World world, CompoundNBT undoTag) {
+        if (undoTag == null) {
+            return null;
+        }
+        String dimension = undoTag.getString("dimension");
+        DimensionId dim = DimensionId.fromResourceLocation(new ResourceLocation(dimension));
+        if (!Objects.equals(dim, DimensionId.fromWorld(world))) {
+            Tools.error(player, "Select at least one block of the area you want to undo!");
+            return null;
+        }
+
+        int[] undoX = undoTag.getIntArray("x");
+        int[] undoY = undoTag.getIntArray("y");
+        int[] undoZ = undoTag.getIntArray("z");
+        Set<BlockPos> undo = new HashSet<BlockPos>();
+        for (int i = 0 ; i < undoX.length ; i++) {
+            undo.add(new BlockPos(undoX[i], undoY[i], undoZ[i]));
+        }
+        return undo;
+    }
+
+
+    @Override
+    public void renderOverlay(RenderWorldLastEvent evt, PlayerEntity player, ItemStack wand) {
+        RayTraceResult mouseOver = Minecraft.getInstance().objectMouseOver;
+        if (!(mouseOver instanceof BlockRayTraceResult)) {
+            return;
+        }
+
+        BlockRayTraceResult btrace = (BlockRayTraceResult) mouseOver;
+
+        if (btrace.getFace() != null && btrace.getPos() != null) {
+            World world = player.getEntityWorld();
+            BlockPos blockPos = btrace.getPos();
+            if (blockPos == null) {
+                return;
+            }
+            BlockState blockState = world.getBlockState(blockPos);
+            Block block = blockState.getBlock();
+            if (block != null && block.getMaterial(blockState) != Material.AIR) {
+                Set<BlockPos> coordinates;
+
+                if (player.isSneaking()) {
+                    CompoundNBT wandTag = wand.getOrCreateTag();
+                    CompoundNBT undoTag1 = (CompoundNBT) wandTag.get("undo1");
+                    CompoundNBT undoTag2 = (CompoundNBT) wandTag.get("undo2");
+
+                    Set<BlockPos> undo1 = checkUndo(player, world, undoTag1);
+                    Set<BlockPos> undo2 = checkUndo(player, world, undoTag2);
+                    if (undo1 == null && undo2 == null) {
+                        return;
+                    }
+
+                    if (undo1 != null && undo1.contains(blockPos)) {
+                        coordinates = undo1;
+                        renderOutlines(evt, player, coordinates, 240, 30, 0);
+                    } else if (undo2 != null && undo2.contains(blockPos)) {
+                        coordinates = undo2;
+                        renderOutlines(evt, player, coordinates, 240, 30, 0);
+                    }
+                } else {
+                    coordinates = findSuitableBlocks(wand, world, btrace.getFace(), blockPos, block);
+                    renderOutlines(evt, player, coordinates, 50, 250, 180);
+                }
+            }
+        }
+    }
+
+    // @todo 1.15 support BlockState
+    private Set<BlockPos> findSuitableBlocks(ItemStack stack, World world, Direction sideHit, BlockPos pos, Block block) {
+        Set<BlockPos> coordinates = new HashSet<>();
+        Set<BlockPos> done = new HashSet<>();
+        Deque<BlockPos> todo = new ArrayDeque<>();
+        todo.addLast(pos);
+        findSuitableBlocks(world, coordinates, done, todo, sideHit, block, amount[getMode(stack)],
+                getMode(stack) == MODE_9ROW || getMode(stack) == MODE_25ROW, getSubMode(stack));
+
+        return coordinates;
+    }
+
+    private void findSuitableBlocks(World world, Set<BlockPos> coordinates, Set<BlockPos> done, Deque<BlockPos> todo, Direction direction, Block block, int maxAmount,
+                                    boolean rowMode, int rotated) {
+
+        Direction dirA = null;
+        Direction dirB = null;
+        if (rowMode) {
+            BlockPos base = todo.getFirst();
+            BlockPos offset = base.offset(direction);
+            dirA = rotated == 1 ? dir2(direction) : dir1(direction);
+            dirB = dirA.getOpposite();
+            if (!isSuitable(world, block, base.offset(dirA), offset.offset(dirA)) ||
+                !isSuitable(world, block, base.offset(dirB), offset.offset(dirB))) {
+                dirA = rotated == 1 ? dir3(direction) : dir2(direction);
+                dirB = dirA.getOpposite();
+                if (!isSuitable(world, block, base.offset(dirA), offset.offset(dirA)) ||
+                        !isSuitable(world, block, base.offset(dirB), offset.offset(dirB))) {
+                    dirA = rotated == 1 ? dir1(direction) : dir3(direction);
+                    dirB = dirA.getOpposite();
+                }
+            }
+        }
+
+        while (!todo.isEmpty() && coordinates.size() < maxAmount) {
+            BlockPos base = todo.pollFirst();
+            if (!done.contains(base)) {
+                done.add(base);
+                BlockPos offset = base.offset(direction);
+                if (isSuitable(world, block, base, offset)) {
+                    coordinates.add(offset);
+                    if (rowMode) {
+                        todo.addLast(base.offset(dirA));
+                        todo.addLast(base.offset(dirB));
+                    } else {
+                        todo.addLast(base.offset(dir1(direction)));
+                        todo.addLast(base.offset(dir1(direction).getOpposite()));
+                        todo.addLast(base.offset(dir2(direction)));
+                        todo.addLast(base.offset(dir2(direction).getOpposite()));
+                        todo.addLast(base.offset(dir1(direction)).offset(dir2(direction)));
+                        todo.addLast(base.offset(dir1(direction)).offset(dir2(direction).getOpposite()));
+                        todo.addLast(base.offset(dir1(direction).getOpposite()).offset(dir2(direction)));
+                        todo.addLast(base.offset(dir1(direction).getOpposite()).offset(dir2(direction).getOpposite()));
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean isSuitable(World world, Block block, BlockPos base, BlockPos offset) {
+        BlockState destState = world.getBlockState(offset);
+        Block destBlock = destState.getBlock();
+        if (destBlock == null) {
+            destBlock = Blocks.AIR;
+        }
+        BlockState baseState = world.getBlockState(base);
+        return baseState.getBlock() == block;// @todo 1.15 &&
+//                destBlock.isReplaceable(world, offset);
+    }
+
+    private Direction dir1(Direction direction) {
+        switch (direction) {
+            case DOWN:
+            case UP:
+                return Direction.EAST;
+            case NORTH:
+            case SOUTH:
+                return Direction.EAST;
+            case WEST:
+            case EAST:
+                return Direction.DOWN;
+        }
+        return null;
+    }
+
+    private Direction dir2(Direction direction) {
+        switch (direction) {
+            case DOWN:
+            case UP:
+                return Direction.SOUTH;
+            case NORTH:
+            case SOUTH:
+                return Direction.DOWN;
+            case WEST:
+            case EAST:
+                return Direction.SOUTH;
+        }
+        return null;
+    }
+
+    private Direction dir3(Direction direction) {
+        switch (direction) {
+            case DOWN:
+            case UP:
+                return Direction.SOUTH;
+            case NORTH:
+            case SOUTH:
+                return Direction.WEST;
+            case WEST:
+            case EAST:
+                return Direction.SOUTH;
+        }
+        return null;
+    }
+
+}

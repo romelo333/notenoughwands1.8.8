@@ -5,7 +5,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.Hand;
 import net.minecraftforge.fml.network.NetworkEvent;
-import romelo333.notenoughwands.Items.GenericWand;
+import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 
 import java.util.function.Supplier;
 

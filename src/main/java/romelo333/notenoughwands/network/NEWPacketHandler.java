@@ -5,6 +5,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import romelo333.notenoughwands.NotEnoughWands;
+import romelo333.notenoughwands.modules.protectionwand.network.*;
 
 public class NEWPacketHandler {
     public static SimpleChannel INSTANCE;

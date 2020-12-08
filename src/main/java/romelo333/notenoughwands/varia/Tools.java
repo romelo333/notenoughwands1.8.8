@@ -49,8 +49,7 @@ public class Tools {
     }
 
     public static void giveItem(PlayerEntity player, Block block, int cnt) {
-        ItemStack stack = new ItemStack(block, cnt);
-        giveItem(player, stack);
+        giveItem(player, new ItemStack(block, cnt));
     }
 
     public static void giveItem(PlayerEntity player, ItemStack stack) {

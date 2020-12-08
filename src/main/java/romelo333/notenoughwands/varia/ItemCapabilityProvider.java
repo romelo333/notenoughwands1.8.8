@@ -7,7 +7,6 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
-import romelo333.notenoughwands.Items.IEnergyItem;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

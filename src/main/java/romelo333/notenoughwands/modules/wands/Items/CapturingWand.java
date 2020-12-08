@@ -1,0 +1,152 @@
+package romelo333.notenoughwands.modules.wands.Items;
+
+
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.monster.IMob;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
+import romelo333.notenoughwands.modules.wands.BlackListSettings;
+import romelo333.notenoughwands.setup.Configuration;
+import romelo333.notenoughwands.varia.Tools;
+
+import javax.annotation.Nullable;
+import java.util.List;
+
+public class CapturingWand extends GenericWand {
+    private boolean allowPassive = true;
+    private boolean allowHostile = true;
+    private float difficultyMult = 0.0f;
+    private float diffcultyAdd = 1.0f;
+
+    public CapturingWand() {
+        setup().loot(3).usageFactory(3.0f);
+    }
+
+    @Override
+    public void initConfig(Configuration cfg) {
+        // @todo 1.15 config
+//        allowPassive =  cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_allowPassive", allowPassive, "Allow capturing passive mobs").getBoolean();
+//        allowHostile =  cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_allowHostile", allowHostile, "Allow capturing hostile mobs").getBoolean();
+//        difficultyMult = (float) cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_difficultyMult", difficultyMult, "Multiply the HP of a mob with this number to get the difficulty scale that affects XP/RF usage (a final result of 1.0 means that the default XP/RF is used)").getDouble();
+//        diffcultyAdd = (float) cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_diffcultyAdd", diffcultyAdd, "Add this to the HP * difficultyMult to get the final difficulty scale that affects XP/RF usage (a final result of 1.0 means that the default XP/RF is used)").getDouble();
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> list, ITooltipFlag flagIn) {
+        super.addInformation(stack, worldIn, list, flagIn);
+        CompoundNBT tagCompound = stack.getTag();
+        // @todo 1.15 tooltips
+        if (tagCompound != null) {
+            if (tagCompound.contains("mob")) {
+                String type = tagCompound.getString("type");
+                String name = null;
+                try {
+                    name = Class.forName(type).getSimpleName();
+                } catch (ClassNotFoundException e) {
+                    name = "?";
+                }
+                list.add(new StringTextComponent(TextFormatting.GREEN + "Captured mob: " + name));
+            }
+        }
+        list.add(new StringTextComponent("Left click on creature to capture it."));
+        list.add(new StringTextComponent("Right click on block to respawn creature."));
+    }
+
+    @Override
+    public ActionResultType onItemUse(ItemUseContext context) {
+        PlayerEntity player = context.getPlayer();
+        Hand hand = context.getHand();
+        World world = context.getWorld();
+        ItemStack stack = player.getHeldItem(hand);
+        BlockPos pos = context.getPos();
+        if (!world.isRemote) {
+            CompoundNBT tagCompound = stack.getOrCreateTag();
+            if (tagCompound.contains("mob")) {
+                INBT mobCompound = tagCompound.get("mob");
+                String type = tagCompound.getString("type");
+                LivingEntity entityLivingBase = createEntity(player, world, type);
+                if (entityLivingBase == null) {
+                    Tools.error(player, "Something went wrong trying to spawn creature!");
+                    return ActionResultType.FAIL;
+                }
+                entityLivingBase.read((CompoundNBT) mobCompound);
+                entityLivingBase.setLocationAndAngles(pos.getX()+.5, pos.getY()+1, pos.getZ()+.5, 0, 0);
+                tagCompound.remove("mob");
+                tagCompound.remove("type");
+                world.addEntity(entityLivingBase);
+            } else {
+                Tools.error(player, "There is no mob captured in this wand!");
+            }
+        }
+        return ActionResultType.SUCCESS;
+    }
+
+    private LivingEntity createEntity(PlayerEntity player, World world, String type) {
+        LivingEntity entityLivingBase;
+        try {
+            entityLivingBase = (LivingEntity) Class.forName(type).getConstructor(World.class).newInstance(world);
+        } catch (Exception e) {
+            entityLivingBase = null;
+        }
+        return entityLivingBase;
+    }
+
+    @Override
+    public boolean onLeftClickEntity(ItemStack stack, PlayerEntity player, Entity entity) {
+        if (!player.getEntityWorld().isRemote) {
+            if (entity instanceof LivingEntity) {
+                if (stack.getOrCreateTag().contains("mob")) {
+                    Tools.error(player, "There is already a mob in this wand!");
+                    return true;
+                }
+                LivingEntity entityLivingBase = (LivingEntity) entity;
+                if (entityLivingBase instanceof PlayerEntity) {
+                    Tools.error(player, "I don't think that player would appreciate being captured!");
+                    return true;
+                }
+
+                if ((!allowHostile) && entityLivingBase instanceof IMob) {
+                    Tools.error(player, "It is not possible to capture hostile mobs with this wand!");
+                    return true;
+                }
+                if ((!allowPassive) && !(entityLivingBase instanceof IMob)) {
+                    Tools.error(player, "It is not possible to capture passive mobs with this wand!");
+                    return true;
+                }
+                double cost = BlackListSettings.getBlacklistEntity(entity);
+                if (cost <= 0.001f) {
+                    Tools.error(player, "It is illegal to take this entity");
+                    return true;
+                }
+
+                float difficultyScale = (float) (entityLivingBase.getMaxHealth() * cost * difficultyMult + diffcultyAdd);
+                if (!checkUsage(stack, player, difficultyScale)) {
+                    return true;
+                }
+
+                CompoundNBT tagCompound = new CompoundNBT();
+                entityLivingBase.writeAdditional(tagCompound);  // @todo 1.15 is this right?
+                stack.getOrCreateTag().put("mob", tagCompound);
+                stack.getOrCreateTag().putString("type", entity.getClass().getCanonicalName());
+//                player.getEntityWorld().removeEntity(entity); // @todo 1.15 how to do?
+
+                registerUsage(stack, player, difficultyScale);
+            } else {
+                Tools.error(player, "Please select a living entity!");
+            }
+        }
+        return true;
+    }
+}

@@ -1,14 +1,15 @@
 package romelo333.notenoughwands;
 
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.loot.LootPool;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import romelo333.notenoughwands.Items.GenericWand;
+import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
+import romelo333.notenoughwands.modules.protectionwand.ProtectionWandConfiguration;
 
 import java.util.List;
 
@@ -16,13 +17,13 @@ public class ForgeEventHandlers {
 
     @SubscribeEvent
     public void onBlockBreakEvent (BlockEvent.BreakEvent event){
-        World world = event.getWorld();
-        if (world.isRemote) {
+        IWorld world = event.getWorld();
+        if (world.isRemote()) {
             return;
         }
         BlockPos pos = event.getPos();
-        ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
-        if (protectedBlocks.isProtected(world, pos)) {
+        ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world.getWorld());
+        if (protectedBlocks.isProtected(world.getWorld(), pos)) {
             event.setCanceled(true);
         }
     }
@@ -82,7 +83,7 @@ public class ForgeEventHandlers {
             // Server side
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
             if (protectedBlocks != null && protectedBlocks.isProtected(world, pos)) {
-                if (ConfigSetup.interactionProtection) {
+                if (ProtectionWandConfiguration.interactionProtection.get()) {
                     event.setCanceled(true);
                 } else {
                     // We still allow right click interaction.
@@ -111,19 +112,20 @@ public class ForgeEventHandlers {
 
     @SubscribeEvent
     public void onLootLoad(LootTableLoadEvent event) {
-        if (event.getName().equals(LootTableList.CHESTS_ABANDONED_MINESHAFT) ||
-                event.getName().equals(LootTableList.CHESTS_IGLOO_CHEST) ||
-                event.getName().equals(LootTableList.CHESTS_DESERT_PYRAMID) ||
-                event.getName().equals(LootTableList.CHESTS_JUNGLE_TEMPLE) ||
-                event.getName().equals(LootTableList.CHESTS_NETHER_BRIDGE) ||
-                event.getName().equals(LootTableList.CHESTS_SIMPLE_DUNGEON) ||
-                event.getName().equals(LootTableList.CHESTS_VILLAGE_BLACKSMITH)) {
-            LootPool main = event.getTable().getPool("main");
-            // Safety, check if the main lootpool is still present
-            if (main != null) {
-                GenericWand.setupChestLoot(main);
-            }
-        }
+        // @todo 1.15
+//        if (event.getName().equals(LootTableList.CHESTS_ABANDONED_MINESHAFT) ||
+//                event.getName().equals(LootTableList.CHESTS_IGLOO_CHEST) ||
+//                event.getName().equals(LootTableList.CHESTS_DESERT_PYRAMID) ||
+//                event.getName().equals(LootTableList.CHESTS_JUNGLE_TEMPLE) ||
+//                event.getName().equals(LootTableList.CHESTS_NETHER_BRIDGE) ||
+//                event.getName().equals(LootTableList.CHESTS_SIMPLE_DUNGEON) ||
+//                event.getName().equals(LootTableList.CHESTS_VILLAGE_BLACKSMITH)) {
+//            LootPool main = event.getTable().getPool("main");
+//            // Safety, check if the main lootpool is still present
+//            if (main != null) {
+//                GenericWand.setupChestLoot(main);
+//            }
+//        }
     }
 
 //    @SubscribeEvent

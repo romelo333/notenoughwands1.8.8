@@ -5,7 +5,11 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import romelo333.notenoughwands.modules.lightmodule.LightModule;
+import romelo333.notenoughwands.modules.lightwand.LightModule;
+import romelo333.notenoughwands.modules.protectionwand.ProtectionWandModule;
+import romelo333.notenoughwands.modules.wands.WandsModule;
+import romelo333.notenoughwands.setup.ClientSetup;
+import romelo333.notenoughwands.setup.Config;
 import romelo333.notenoughwands.setup.ModSetup;
 import romelo333.notenoughwands.setup.Registration;
 
@@ -19,16 +23,22 @@ public class NotEnoughWands {
 
     public NotEnoughWands() {
         setupModules();
+
+        Config.register(modules);
+
         Registration.register();
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(setup::init);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(modules::init);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             FMLJavaModLoadingContext.get().getModEventBus().addListener(modules::initClient);
+            FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientSetup::onTextureStitch);
         });
     }
 
     private void setupModules() {
         modules.register(new LightModule());
+        modules.register(new WandsModule());
+        modules.register(new ProtectionWandModule());
     }
 }
