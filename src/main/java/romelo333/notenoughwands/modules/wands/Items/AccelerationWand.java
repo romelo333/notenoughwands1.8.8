@@ -18,7 +18,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.FakePlayer;
-import romelo333.notenoughwands.setup.Configuration;
+import romelo333.notenoughwands.modules.wands.WandsConfiguration;
 import romelo333.notenoughwands.varia.Tools;
 
 import javax.annotation.Nullable;
@@ -32,9 +32,6 @@ public class AccelerationWand extends GenericWand {
     public static final int MODE_50 = 1;
     public static final int MODE_100 = 2;
     public static final int MODE_LAST = MODE_100;
-
-    private float fakePlayerFactor = 1.0f;
-    private boolean lessEffectiveForFakePlayer = false;
 
     public static final String[] descriptions = new String[] {
             "fast", "faster", "fastest"
@@ -56,25 +53,16 @@ public class AccelerationWand extends GenericWand {
         list.add(new StringTextComponent(TextFormatting.GREEN + "Mode: " + descriptions[getMode(stack)]));
         list.add(new StringTextComponent("Right click on block to speed up ticks."));
         showModeKeyDescription(list, "change speed");
-        if (Math.abs(fakePlayerFactor-1.0f) >= 0.01) {
-            if (fakePlayerFactor < 0) {
+        if (Math.abs(WandsConfiguration.fakePlayerFactor.get() -1.0f) >= 0.01) {
+            if (WandsConfiguration.fakePlayerFactor.get() < 0) {
                 list.add(new StringTextComponent(TextFormatting.RED + "Usage in a machine has been disabled in config!"));
-            } else if (fakePlayerFactor > 1) {
+            } else if (WandsConfiguration.fakePlayerFactor.get() > 1) {
                 list.add(new StringTextComponent(TextFormatting.YELLOW + "Usage in a machine will cost more!"));
             }
         }
-        if (fakePlayerFactor >= 0.0 && lessEffectiveForFakePlayer) {
+        if (WandsConfiguration.fakePlayerFactor.get() >= 0.0 && WandsConfiguration.lessEffectiveForFakePlayer.get()) {
             list.add(new StringTextComponent(TextFormatting.YELLOW + "Usage in a machine will be less effective!"));
         }
-    }
-
-    @Override
-    public void initConfig(Configuration cfg) {
-        // @todo 1.15
-//        fakePlayerFactor = (float) cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_fakePlayerFactor", fakePlayerFactor,
-//                "Factor to apply to the cost when this wand is used by a fake player (a machine). Set to -1 to disable its use this way").getDouble();
-//        lessEffectiveForFakePlayer =  cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_lessEffectiveForFakePlayer", lessEffectiveForFakePlayer,
-//                "If true this wand will be less effective for fake players").getBoolean();
     }
 
     @Override
@@ -93,13 +81,13 @@ public class AccelerationWand extends GenericWand {
             int amount = AccelerationWand.amount[mode];
 
             if (player instanceof FakePlayer) {
-                if (fakePlayerFactor < 0) {
+                if (WandsConfiguration.fakePlayerFactor.get() < 0) {
                     // Blocked by usage in a machine
                     return ActionResultType.FAIL;
                 }
-                cost *= fakePlayerFactor;
+                cost *= WandsConfiguration.fakePlayerFactor.get();
 
-                if (lessEffectiveForFakePlayer) {
+                if (WandsConfiguration.lessEffectiveForFakePlayer.get()) {
                     amount /= 2;
                 }
             }

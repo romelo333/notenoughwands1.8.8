@@ -5,6 +5,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import romelo333.notenoughwands.modules.buildingwands.BuildingWandsModule;
 import romelo333.notenoughwands.modules.lightwand.LightModule;
 import romelo333.notenoughwands.modules.protectionwand.ProtectionWandModule;
 import romelo333.notenoughwands.modules.wands.WandsModule;
@@ -40,5 +41,6 @@ public class NotEnoughWands {
         modules.register(new LightModule());
         modules.register(new WandsModule());
         modules.register(new ProtectionWandModule());
+        modules.register(new BuildingWandsModule());
     }
 }

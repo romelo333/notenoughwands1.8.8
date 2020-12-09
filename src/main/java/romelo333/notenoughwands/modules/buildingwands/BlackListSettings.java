@@ -1,4 +1,4 @@
-package romelo333.notenoughwands.modules.wands;
+package romelo333.notenoughwands.modules.buildingwands;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;

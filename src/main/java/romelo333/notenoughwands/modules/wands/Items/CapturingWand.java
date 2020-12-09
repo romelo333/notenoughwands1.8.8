@@ -17,30 +17,17 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import romelo333.notenoughwands.modules.wands.BlackListSettings;
-import romelo333.notenoughwands.setup.Configuration;
+import romelo333.notenoughwands.modules.buildingwands.BlackListSettings;
+import romelo333.notenoughwands.modules.wands.WandsConfiguration;
 import romelo333.notenoughwands.varia.Tools;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
 public class CapturingWand extends GenericWand {
-    private boolean allowPassive = true;
-    private boolean allowHostile = true;
-    private float difficultyMult = 0.0f;
-    private float diffcultyAdd = 1.0f;
 
     public CapturingWand() {
         setup().loot(3).usageFactory(3.0f);
-    }
-
-    @Override
-    public void initConfig(Configuration cfg) {
-        // @todo 1.15 config
-//        allowPassive =  cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_allowPassive", allowPassive, "Allow capturing passive mobs").getBoolean();
-//        allowHostile =  cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_allowHostile", allowHostile, "Allow capturing hostile mobs").getBoolean();
-//        difficultyMult = (float) cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_difficultyMult", difficultyMult, "Multiply the HP of a mob with this number to get the difficulty scale that affects XP/RF usage (a final result of 1.0 means that the default XP/RF is used)").getDouble();
-//        diffcultyAdd = (float) cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_diffcultyAdd", diffcultyAdd, "Add this to the HP * difficultyMult to get the final difficulty scale that affects XP/RF usage (a final result of 1.0 means that the default XP/RF is used)").getDouble();
     }
 
     @Override
@@ -117,11 +104,11 @@ public class CapturingWand extends GenericWand {
                     return true;
                 }
 
-                if ((!allowHostile) && entityLivingBase instanceof IMob) {
+                if ((!WandsConfiguration.allowHostile.get()) && entityLivingBase instanceof IMob) {
                     Tools.error(player, "It is not possible to capture hostile mobs with this wand!");
                     return true;
                 }
-                if ((!allowPassive) && !(entityLivingBase instanceof IMob)) {
+                if ((!WandsConfiguration.allowPassive.get()) && !(entityLivingBase instanceof IMob)) {
                     Tools.error(player, "It is not possible to capture passive mobs with this wand!");
                     return true;
                 }
@@ -131,7 +118,7 @@ public class CapturingWand extends GenericWand {
                     return true;
                 }
 
-                float difficultyScale = (float) (entityLivingBase.getMaxHealth() * cost * difficultyMult + diffcultyAdd);
+                float difficultyScale = (float) (entityLivingBase.getMaxHealth() * cost * WandsConfiguration.difficultyMult.get() + WandsConfiguration.difficultyAdd.get());
                 if (!checkUsage(stack, player, difficultyScale)) {
                     return true;
                 }

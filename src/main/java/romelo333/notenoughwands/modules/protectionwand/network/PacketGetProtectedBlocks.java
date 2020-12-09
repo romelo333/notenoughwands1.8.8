@@ -9,8 +9,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
-import romelo333.notenoughwands.modules.protectionwand.items.ProtectionWand;
 import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
+import romelo333.notenoughwands.modules.protectionwand.ProtectionWandConfiguration;
+import romelo333.notenoughwands.modules.protectionwand.items.ProtectionWand;
 import romelo333.notenoughwands.network.NEWPacketHandler;
 
 import java.util.HashSet;
@@ -47,11 +48,11 @@ public class PacketGetProtectedBlocks {
 
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
             Set<BlockPos> blocks = new HashSet<>();
-            protectedBlocks.fetchProtectedBlocks(blocks, world, (int)player.getPosX(), (int)player.getPosY(), (int)player.getPosZ(), protectionWand.blockShowRadius, id);
+            protectedBlocks.fetchProtectedBlocks(blocks, world, (int)player.getPosX(), (int)player.getPosY(), (int)player.getPosZ(), ProtectionWandConfiguration.blockShowRadius.get(), id);
             Set<BlockPos> childBlocks = new HashSet<>();
             if (id == -1) {
                 // Master wand:
-                protectedBlocks.fetchProtectedBlocks(childBlocks, world, (int)player.getPosX(), (int)player.getPosY(), (int)player.getPosZ(), protectionWand.blockShowRadius, -2);
+                protectedBlocks.fetchProtectedBlocks(childBlocks, world, (int)player.getPosX(), (int)player.getPosY(), (int)player.getPosZ(), ProtectionWandConfiguration.blockShowRadius.get(), -2);
             }
             PacketReturnProtectedBlocks msg = new PacketReturnProtectedBlocks(blocks, childBlocks);
             NEWPacketHandler.INSTANCE.sendTo(msg, ((ServerPlayerEntity) player).connection.netManager, NetworkDirection.PLAY_TO_CLIENT);

@@ -85,9 +85,9 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
 
     private int getMaxProtectedBlocks(int id) {
         if (id == -1) {
-            return ProtectionWandModule.MASTER_PROTECTION_WAND.get().maximumProtectedBlocks;
+            return 0;   // Master protection has no limit
         } else {
-            return ProtectionWandModule.PROTECTION_WAND.get().maximumProtectedBlocks;
+            return ProtectionWandConfiguration.maximumProtectedBlocks.get();
         }
     }
 

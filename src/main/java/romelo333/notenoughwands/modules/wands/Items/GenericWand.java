@@ -16,11 +16,10 @@ import net.minecraft.world.storage.loot.LootPool;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import romelo333.notenoughwands.NotEnoughWands;
-import romelo333.notenoughwands.WandUsage;
+import romelo333.notenoughwands.modules.buildingwands.BlackListSettings;
 import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
-import romelo333.notenoughwands.modules.wands.BlackListSettings;
+import romelo333.notenoughwands.modules.wands.WandUsage;
 import romelo333.notenoughwands.modules.wands.WandsConfiguration;
-import romelo333.notenoughwands.setup.Configuration;
 import romelo333.notenoughwands.varia.IEnergyItem;
 import romelo333.notenoughwands.varia.ItemCapabilityProvider;
 import romelo333.notenoughwands.varia.Tools;
@@ -53,9 +52,9 @@ public class GenericWand extends Item implements IEnergyItem {
 
 
     // Check if a given block can be picked up.
-    public static double checkPickup(PlayerEntity player, World world, BlockPos pos, Block block, float maxHardness) {
+    public static double checkPickup(PlayerEntity player, World world, BlockPos pos, Block block, double maxHardness) {
         BlockState state = world.getBlockState(pos);
-        float hardness = block.getBlockHardness(state, world, pos);
+        float hardness = state.getBlockHardness(world, pos);
         if (hardness < 0 || hardness > maxHardness){
             Tools.error(player, "This block is to hard to take!");
             return -1.0f;
@@ -122,10 +121,6 @@ public class GenericWand extends Item implements IEnergyItem {
 
     protected String getConfigPrefix() {
         return getRegistryName().getPath();
-    }
-
-    protected void initConfig(Configuration cfg) {
-
     }
 
 //    public void initConfig(Configuration cfg, int easy_usages, int easy_maxrf, int normal_usages, int normal_maxrf, int hard_usages, int hard_maxrf) {
@@ -228,14 +223,6 @@ public class GenericWand extends Item implements IEnergyItem {
 
     public static List<GenericWand> getWands() {
         return wands;
-    }
-
-    //------------------------------------------------------------------------------
-
-    public static void setupConfig(Configuration cfg) {
-        for (GenericWand wand : wands) {
-            wand.initConfig(cfg);
-        }
     }
 
     //------------------------------------------------------------------------------

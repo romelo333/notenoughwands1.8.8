@@ -1,4 +1,4 @@
-package romelo333.notenoughwands.modules.wands.Items;
+package romelo333.notenoughwands.modules.buildingwands.items;
 
 
 import net.minecraft.block.Block;
@@ -20,7 +20,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
-import romelo333.notenoughwands.setup.Configuration;
+import romelo333.notenoughwands.modules.buildingwands.BuildingWandsConfiguration;
+import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 import romelo333.notenoughwands.varia.Tools;
 
 import javax.annotation.Nullable;
@@ -29,8 +30,6 @@ import java.util.List;
 import java.util.Set;
 
 public class DisplacementWand extends GenericWand {
-
-    private float maxHardness = 50;
 
     public static final int MODE_FIRST = 0;
     public static final int MODE_3X3 = 0;
@@ -47,12 +46,6 @@ public class DisplacementWand extends GenericWand {
 
     public DisplacementWand() {
         setup().loot(3).usageFactory(1.0f);
-    }
-
-    @Override
-    public void initConfig(Configuration cfg) {
-        // @todo 1.15 config
-//        maxHardness = (float) cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_maxHardness", maxHardness, "Max hardness this block can move.)").getDouble();
     }
 
     @Override
@@ -127,9 +120,8 @@ public class DisplacementWand extends GenericWand {
             BlockPos otherC = coordinate.offset(direction);
             BlockState otherState = world.getBlockState(otherC);// @todo 1.15 better support for blockstates
             Block otherBlock = otherState.getBlock();
-            if (true) {
-//            if (otherBlock.isReplaceable(world, otherC)) {// @todo 1.15
-                double cost = GenericWand.checkPickup(player, world, otherC, block, maxHardness);
+            if (otherState.getMaterial().isReplaceable()) { // @todo 1.15 check if this is right?
+                double cost = GenericWand.checkPickup(player, world, otherC, block, BuildingWandsConfiguration.maxHardness.get());
                 if (cost >= 0.0) {
                     cnt++;
                     Tools.playSound(world, block.getSoundType(state).getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);

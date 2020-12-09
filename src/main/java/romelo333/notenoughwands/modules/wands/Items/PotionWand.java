@@ -15,29 +15,16 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import romelo333.notenoughwands.setup.Configuration;
+import romelo333.notenoughwands.modules.wands.WandsConfiguration;
 import romelo333.notenoughwands.varia.Tools;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
 public class PotionWand extends GenericWand {
-    private boolean allowPassive = true;
-    private boolean allowHostile = true;
-    private float difficultyMult = 0.0f;
-    private float diffcultyAdd = 1.0f;
 
     public PotionWand() {
         setup().loot(3).usageFactory(2.0f);
-    }
-
-    @Override
-    public void initConfig(Configuration cfg) {
-        // @todo 1.15 config
-//        allowPassive =  cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_allowPassive", allowPassive, "Allow freeze passive mobs").getBoolean();
-//        allowHostile =  cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_allowHostile", allowHostile, "Allow freeze hostile mobs").getBoolean();
-//        difficultyMult = (float) cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_difficultyMult", difficultyMult, "Multiply the HP of a mob with this number to get the difficulty scale that affects XP/RF usage (a final result of 1.0 means that the default XP/RF is used)").getDouble();
-//        diffcultyAdd = (float) cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_diffcultyAdd", diffcultyAdd, "Add this to the HP * difficultyMult to get the final difficulty scale that affects XP/RF usage (a final result of 1.0 means that the default XP/RF is used)").getDouble();
     }
 
     private String getEffectName(EffectInstance potioneffect){
@@ -64,7 +51,7 @@ public class PotionWand extends GenericWand {
             return;
         }
         ListNBT effects = (ListNBT) tagCompound.get("effects");
-        if (effects == null || effects.size()==0){
+        if (effects == null || effects.isEmpty()){
             list.add(new StringTextComponent(TextFormatting.YELLOW+"No effects. Combine with potion"));
             list.add(new StringTextComponent(TextFormatting.YELLOW+"in crafting table to add effect"));
             return;
@@ -92,7 +79,7 @@ public class PotionWand extends GenericWand {
             return;
         }
         ListNBT effects = (ListNBT) tagCompound.get("effects");
-        if (effects == null || effects.size()==0){
+        if (effects == null || effects.isEmpty()){
             return;
         }
         if (mode >= effects.size()) {
@@ -116,7 +103,7 @@ public class PotionWand extends GenericWand {
             return;
         }
         ListNBT effects = (ListNBT) tagCompound.get("effects");
-        if (effects == null || effects.size()==0){
+        if (effects == null || effects.isEmpty()){
             Tools.error(player, "There are no effects in this wand!");
             return;
         }
@@ -130,16 +117,16 @@ public class PotionWand extends GenericWand {
         if (!player.getEntityWorld().isRemote) {
             if (entity instanceof LivingEntity) {
                 LivingEntity entityLivingBase = (LivingEntity) entity;
-                if ((!allowHostile) && entityLivingBase instanceof IMob) {
+                if ((!WandsConfiguration.potionAllowHostile.get()) && entityLivingBase instanceof IMob) {
                     Tools.error(player, "It is not possible to add effects to hostile mobs with this wand!");
                     return true;
                 }
-                if ((!allowPassive) && !(entityLivingBase instanceof IMob)) {
+                if ((!WandsConfiguration.potionAllowPassive.get()) && !(entityLivingBase instanceof IMob)) {
                     Tools.error(player, "It is not possible to add effects to passive mobs with this wand!");
                     return true;
                 }
 
-                float difficultyScale = entityLivingBase.getMaxHealth() * difficultyMult + diffcultyAdd;
+                float difficultyScale = (float) (entityLivingBase.getMaxHealth() * WandsConfiguration.potionDifficultyMult.get() + WandsConfiguration.potionDifficultyAdd.get());
                 if (!checkUsage(stack, player, difficultyScale)) {
                     return true;
                 }

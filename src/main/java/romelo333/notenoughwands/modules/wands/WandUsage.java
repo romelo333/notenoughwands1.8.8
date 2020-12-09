@@ -1,4 +1,4 @@
-package romelo333.notenoughwands;
+package romelo333.notenoughwands.modules.wands;
 
 public enum WandUsage {
     NONE,

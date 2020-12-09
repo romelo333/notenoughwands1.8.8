@@ -1,4 +1,4 @@
-package romelo333.notenoughwands.modules.wands.Items;
+package romelo333.notenoughwands.modules.buildingwands.items;
 
 
 import mcjty.lib.varia.BlockTools;
@@ -23,9 +23,10 @@ import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.registries.ForgeRegistries;
+import romelo333.notenoughwands.modules.buildingwands.BlackListSettings;
+import romelo333.notenoughwands.modules.buildingwands.BuildingWandsConfiguration;
 import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
-import romelo333.notenoughwands.modules.wands.BlackListSettings;
-import romelo333.notenoughwands.setup.Configuration;
+import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 import romelo333.notenoughwands.varia.Tools;
 
 import javax.annotation.Nullable;
@@ -42,20 +43,12 @@ public class SwappingWand extends GenericWand {
     public static final int MODE_SINGLE = 3;
     public static final int MODE_LAST = MODE_SINGLE;
 
-    private float hardnessDistance = 35.0f;
-
     public static final String[] descriptions = new String[] {
         "3x3", "5x5", "7x7", "single"
     };
 
     public SwappingWand() {
         setup().loot(5).usageFactory(1.0f);
-    }
-
-    @Override
-    public void initConfig(Configuration cfg) {
-        // @todo 1.15 config
-//        hardnessDistance = (float) cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_hardnessDistance", (int) hardnessDistance, "How far away the hardness can be to allow swapping (100 means basically everything allowed)").getDouble();
     }
 
     @Override
@@ -209,7 +202,7 @@ public class SwappingWand extends GenericWand {
             return;
         }
 
-        if ((!player.isCreative()) && Math.abs(hardness-blockHardness) >= hardnessDistance) {
+        if ((!player.isCreative()) && Math.abs(hardness-blockHardness) >= BuildingWandsConfiguration.hardnessDistance.get()) {
             Tools.error(player, "The hardness of this blocks differs too much to swap!");
             return;
         }

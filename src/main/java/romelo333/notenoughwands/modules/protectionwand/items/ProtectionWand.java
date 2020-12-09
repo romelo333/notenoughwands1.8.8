@@ -20,7 +20,6 @@ import romelo333.notenoughwands.modules.protectionwand.network.ReturnProtectedBl
 import romelo333.notenoughwands.modules.protectionwand.network.ReturnProtectedBlocksHelper;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 import romelo333.notenoughwands.network.NEWPacketHandler;
-import romelo333.notenoughwands.setup.Configuration;
 import romelo333.notenoughwands.varia.Tools;
 
 import javax.annotation.Nullable;
@@ -33,9 +32,6 @@ public class ProtectionWand extends GenericWand {
     public static final int MODE_UNPROTECT = 1;
     public static final int MODE_CLEAR = 2;
     public static final int MODE_LAST = MODE_CLEAR;
-
-    public int blockShowRadius = 10;
-    public int maximumProtectedBlocks = 16;
 
     private final boolean master;
 
@@ -51,13 +47,6 @@ public class ProtectionWand extends GenericWand {
             setup().loot(1).usageFactory(3.0f);
         }
         this.master = master;
-    }
-
-    @Override
-    public void initConfig(Configuration cfg) {
-        // @todo 1.15 config
-//        blockShowRadius = cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_blockShowRadius", blockShowRadius, "How far around the player protected blocks will be hilighted").getInt();
-//        maximumProtectedBlocks = cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_maximumProtectedBlocks", master ? 0 : maximumProtectedBlocks, "The maximum number of blocks to protect with this wand (set to 0 for no maximum)").getInt();
     }
 
     private static long tooltipLastTime = 0;

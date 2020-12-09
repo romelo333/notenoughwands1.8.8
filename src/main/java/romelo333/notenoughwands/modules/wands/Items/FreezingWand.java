@@ -12,29 +12,15 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
-import romelo333.notenoughwands.setup.Configuration;
+import romelo333.notenoughwands.modules.wands.WandsConfiguration;
 import romelo333.notenoughwands.varia.Tools;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
 public class FreezingWand extends GenericWand {
-    private boolean allowPassive = true;
-    private boolean allowHostile = true;
-    private float difficultyMult = 0.0f;
-    private float diffcultyAdd = 1.0f;
-
     public FreezingWand() {
         setup().loot(0).usageFactory(2.0f);
-    }
-
-    @Override
-    public void initConfig(Configuration cfg) {
-        // @todo 1.15 config
-//        allowPassive =  cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_allowPassive", allowPassive, "Allow freeze passive mobs").getBoolean();
-//        allowHostile =  cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_allowHostile", allowHostile, "Allow freeze hostile mobs").getBoolean();
-//        difficultyMult = (float) cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_difficultyMult", difficultyMult, "Multiply the HP of a mob with this number to get the difficulty scale that affects XP/RF usage (a final result of 1.0 means that the default XP/RF is used)").getDouble();
-//        diffcultyAdd = (float) cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_diffcultyAdd", diffcultyAdd, "Add this to the HP * difficultyMult to get the final difficulty scale that affects XP/RF usage (a final result of 1.0 means that the default XP/RF is used)").getDouble();
     }
 
     @Override
@@ -66,16 +52,16 @@ public class FreezingWand extends GenericWand {
                     Tools.error(player, "You cannot use this on players!");
                     return true;
                 }
-                if ((!allowHostile) && entityLivingBase instanceof IMob) {
+                if ((!WandsConfiguration.freezeAllowHostile.get()) && entityLivingBase instanceof IMob) {
                     Tools.error(player, "It is not possible to freeze hostile mobs with this wand!");
                     return true;
                 }
-                if ((!allowPassive) && !(entityLivingBase instanceof IMob)) {
+                if ((!WandsConfiguration.freezeAllowPassive.get()) && !(entityLivingBase instanceof IMob)) {
                     Tools.error(player, "It is not possible to freeze passive mobs with this wand!");
                     return true;
                 }
 
-                float difficultyScale = entityLivingBase.getMaxHealth() * difficultyMult + diffcultyAdd;
+                float difficultyScale = (float) (entityLivingBase.getMaxHealth() * WandsConfiguration.freezeDifficultyMult.get() + WandsConfiguration.freezeDifficultyAdd.get());
                 if (!checkUsage(stack, player, difficultyScale)) {
                     return true;
                 }

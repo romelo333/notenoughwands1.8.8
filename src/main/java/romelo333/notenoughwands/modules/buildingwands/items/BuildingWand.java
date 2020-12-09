@@ -1,6 +1,7 @@
-package romelo333.notenoughwands.modules.wands.Items;
+package romelo333.notenoughwands.modules.buildingwands.items;
 
 
+import mcjty.lib.builder.TooltipBuilder;
 import mcjty.lib.varia.BlockTools;
 import mcjty.lib.varia.DimensionId;
 import net.minecraft.block.Block;
@@ -22,19 +23,18 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.registries.ForgeRegistries;
-import romelo333.notenoughwands.setup.Configuration;
+import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 import romelo333.notenoughwands.varia.Tools;
 
-import javax.annotation.Nullable;
 import java.util.*;
+
+import static mcjty.lib.builder.TooltipBuilder.*;
 
 public class BuildingWand extends GenericWand {
 
@@ -46,9 +46,17 @@ public class BuildingWand extends GenericWand {
     public static final int MODE_SINGLE = 4;
     public static final int MODE_LAST = MODE_SINGLE;
 
-    public static final String[] descriptions = new String[] {
+    public static final String[] DESCRIPTIONS = new String[] {
             "9 blocks", "9 blocks row", "25 blocks", "25 blocks row", "single"
     };
+
+
+    private final TooltipBuilder tooltipBuilder = new TooltipBuilder()
+            .info(key("message.notenoughwands.shiftmessage"))
+            .infoShift(header(), gold(),
+                    parameter("undo", stack -> countUndoStates(stack) > 0, stack -> Integer.toString(countUndoStates(stack))),
+                    parameter("mode", stack -> DESCRIPTIONS[getMode(stack)]),
+                    parameter("submode", stack -> getSubMode(stack) == 1, stack -> getSubMode(stack) == 1 ? "Rotated" : ""));
 
     public static final int[] amount = new int[] { 9, 9, 25, 25, 1 };
 
@@ -56,30 +64,21 @@ public class BuildingWand extends GenericWand {
         setup().loot(3).usageFactory(1.0f);
     }
 
-    @Override
-    protected void initConfig(Configuration cfg) {
+    private int countUndoStates(ItemStack stack) {
+        if (stack.hasTag()) {
+            CompoundNBT compound = stack.getTag();
+            return (compound.contains("undo1") ? 1 : 0) + (compound.contains("undo2") ? 1 : 0);
+        } else {
+            return 0;
+        }
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flagIn) {
-        super.addInformation(stack, world, list, flagIn);
-        // @todo 1.15 tooltips
-        CompoundNBT compound = stack.getTag();
-        if (compound != null) {
-            int cnt = (compound.contains("undo1") ? 1 : 0) + (compound.contains("undo2") ? 1 : 0);
-            list.add(new StringTextComponent(TextFormatting.GREEN + "Has " + cnt + " undo states"));
-            int mode = compound.getInt("mode");
-            if (mode == MODE_9ROW || mode == MODE_25ROW) {
-                int submode = getSubMode(stack);
-                list.add(new StringTextComponent(TextFormatting.GREEN + "Mode: " + descriptions[mode] + (submode == 1 ? " [Rotated]" : "")));
-            } else {
-                list.add(new StringTextComponent(TextFormatting.GREEN + "Mode: " + descriptions[mode]));
-            }
-        }
-        list.add(new StringTextComponent("Right click to extend blocks in that direction."));
-        list.add(new StringTextComponent("Sneak right click on such a block to undo one of"));
-        list.add(new StringTextComponent("the last two operations."));
+    public void addInformation(ItemStack itemStack, World world, List<ITextComponent> list, ITooltipFlag flags) {
+        super.addInformation(itemStack, world, list, flags);
+        tooltipBuilder.makeTooltip(getRegistryName(), itemStack, list, flags);
 
+        // @todo 1.15
         showModeKeyDescription(list, "switch mode");
         showSubModeKeyDescription(list, "change orientation");
     }
@@ -91,7 +90,7 @@ public class BuildingWand extends GenericWand {
         if (mode > MODE_LAST) {
             mode = MODE_FIRST;
         }
-        Tools.notify(player, "Switched to " + descriptions[mode] + " mode");
+        Tools.notify(player, "Switched to " + DESCRIPTIONS[mode] + " mode");
         stack.getOrCreateTag().putInt("mode", mode);
     }
 

@@ -18,17 +18,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.registries.ForgeRegistries;
 import romelo333.notenoughwands.ModSounds;
 import romelo333.notenoughwands.NotEnoughWands;
-import romelo333.notenoughwands.setup.Configuration;
+import romelo333.notenoughwands.modules.wands.WandsConfiguration;
 import romelo333.notenoughwands.varia.Tools;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
 public class TeleportationWand extends GenericWand {
-
-    private float teleportVolume = 1.0f;
-    private int maxdist = 30;
-    private boolean teleportThroughWalls = true;
 
     public TeleportationWand() {
         setup().loot(6).usageFactory(2.0f);
@@ -41,19 +37,11 @@ public class TeleportationWand extends GenericWand {
         list.add(new StringTextComponent("Right click to teleport forward"));
         list.add(new StringTextComponent("until a block is hit or maximum"));
         list.add(new StringTextComponent("distance is reached."));
-        if (teleportThroughWalls) {
+        if (WandsConfiguration.teleportThroughWalls.get()) {
             list.add(new StringTextComponent("Sneak to teleport through walls"));
         } else {
             list.add(new StringTextComponent("Sneak for half distance"));
         }
-    }
-
-    @Override
-    public void initConfig(Configuration cfg) {
-        // @todo 1.15 config
-//        teleportVolume = (float) cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_volume", (int) teleportVolume, "Volume of the teleportation sound (set to 0 to disable)").getDouble();
-//        maxdist = cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_maxdist", maxdist, "Maximum teleportation distance").getInt();
-//        teleportThroughWalls = cfg.getBoolean(getConfigPrefix() + "_teleportThroughWalls", ConfigSetup.CATEGORY_WANDS, teleportThroughWalls, "If set to true then sneak-right click will teleport through walls. Otherwise sneak-right click will teleport half distance");
     }
 
     @Override
@@ -65,10 +53,10 @@ public class TeleportationWand extends GenericWand {
             }
             Vec3d lookVec = player.getLookVec();
             Vec3d start = new Vec3d(player.getPosX(), player.getPosY() + player.getEyeHeight(), player.getPosZ());
-            int distance = this.maxdist;
+            int distance = WandsConfiguration.maxdist.get();
             boolean gothrough = false;
             if (player.isSneaking()) {
-                if (teleportThroughWalls) {
+                if (WandsConfiguration.teleportThroughWalls.get()) {
                     gothrough = true;
                 }
                 distance /= 2;
@@ -118,9 +106,9 @@ public class TeleportationWand extends GenericWand {
                 }
             }
             registerUsage(stack, player, 1.0f);
-            if (teleportVolume >= 0.01) {
+            if (WandsConfiguration.teleportVolume.get() >= 0.01) {
                 SoundEvent teleport = ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation(NotEnoughWands.MODID, "teleport"));
-                ModSounds.playSound(player.getEntityWorld(), teleport, player.getPosX(), player.getPosY(), player.getPosZ(), teleportVolume, 1.0f);
+                ModSounds.playSound(player.getEntityWorld(), teleport, player.getPosX(), player.getPosY(), player.getPosZ(), WandsConfiguration.teleportVolume.get(), 1.0f);
             }
         }
         return ActionResult.resultPass(stack);

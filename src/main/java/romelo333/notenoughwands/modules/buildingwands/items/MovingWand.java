@@ -1,4 +1,4 @@
-package romelo333.notenoughwands.modules.wands.Items;
+package romelo333.notenoughwands.modules.buildingwands.items;
 
 
 import net.minecraft.block.Block;
@@ -21,25 +21,17 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.registries.ForgeRegistries;
-import romelo333.notenoughwands.setup.Configuration;
+import romelo333.notenoughwands.modules.buildingwands.BuildingWandsConfiguration;
+import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 import romelo333.notenoughwands.varia.Tools;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
 public class MovingWand extends GenericWand {
-    private float maxHardness = 50;
-    private int placeDistance = 4;
 
     public MovingWand() {
         setup().loot(5).usageFactory(1.5f);
-    }
-
-    @Override
-    public void initConfig(Configuration cfg) {
-        // @todo 1.15 config
-//        maxHardness = (float) cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_maxHardness", maxHardness, "Max hardness this block can move.)").getDouble();
-//        placeDistance = cfg.get(ConfigSetup.CATEGORY_WANDS, getConfigPrefix() + "_placeDistance", placeDistance, "Distance at which to place blocks in 'in-air' mode").getInt();
     }
 
     @Override
@@ -72,7 +64,7 @@ public class MovingWand extends GenericWand {
             if (hasBlock(compound)) {
                 Vec3d lookVec = player.getLookVec();
                 Vec3d start = new Vec3d(player.getPosX(), player.getPosY() + player.getEyeHeight(), player.getPosZ());
-                int distance = this.placeDistance;
+                int distance = BuildingWandsConfiguration.placeDistance.get();
                 Vec3d end = start.add(lookVec.x * distance, lookVec.y * distance, lookVec.z * distance);
                 RayTraceResult position = null; // @todo 1.15 world.rayTraceBlocks(start, end);
                 if (position == null) {
@@ -154,7 +146,7 @@ public class MovingWand extends GenericWand {
     private void pickup(ItemStack stack, PlayerEntity player, World world, BlockPos pos) {
         BlockState state = world.getBlockState(pos);
         Block block = state.getBlock(); // @todo 1.15 meta/blockstate
-        double cost = checkPickup(player, world, pos, block, maxHardness);
+        double cost = checkPickup(player, world, pos, block, BuildingWandsConfiguration.maxHardness.get());
         if (cost < 0.0) {
             return;
         }
