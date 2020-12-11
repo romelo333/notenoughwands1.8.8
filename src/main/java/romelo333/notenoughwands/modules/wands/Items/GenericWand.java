@@ -41,7 +41,8 @@ public class GenericWand extends Item implements IEnergyItem {
                 .setNoRepair()
                 .maxDamage(666) // @todo 1.15
                 .defaultMaxDamage(666) // @todo 1.15
-                .maxStackSize(1));
+//                .maxStackSize(1)
+        );
     }
 
     @Nullable

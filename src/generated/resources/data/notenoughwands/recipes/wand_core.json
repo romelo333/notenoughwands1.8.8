@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "Xn ",
+    "nXn",
+    " nX"
+  ],
+  "key": {
+    "X": {
+      "item": "minecraft:blaze_rod"
+    },
+    "n": {
+      "item": "minecraft:gold_nugget"
+    }
+  },
+  "result": {
+    "item": "notenoughwands:wand_core"
+  }
+}
