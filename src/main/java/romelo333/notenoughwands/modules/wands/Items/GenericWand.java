@@ -1,6 +1,5 @@
 package romelo333.notenoughwands.modules.wands.Items;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
@@ -53,14 +52,13 @@ public class GenericWand extends Item implements IEnergyItem {
 
 
     // Check if a given block can be picked up.
-    public static double checkPickup(PlayerEntity player, World world, BlockPos pos, Block block, double maxHardness) {
-        BlockState state = world.getBlockState(pos);
+    public static double checkPickup(PlayerEntity player, World world, BlockPos pos, BlockState state, double maxHardness) {
         float hardness = state.getBlockHardness(world, pos);
         if (hardness < 0 || hardness > maxHardness){
             Tools.error(player, "This block is to hard to take!");
             return -1.0f;
         }
-        if (!block.canEntityDestroy(state, world, pos, player)){
+        if (!state.canEntityDestroy(world, pos, player)){
             Tools.error(player, "You are not allowed to take this block!");
             return -1.0f;
         }
@@ -70,7 +68,7 @@ public class GenericWand extends Item implements IEnergyItem {
             return -1.0f;
         }
 
-        double cost = BlackListSettings.getBlacklistCost(block);
+        double cost = BlackListSettings.getBlacklistCost(state);
         if (cost <= 0.001f) {
             Tools.error(player, "It is illegal to take this block");
             return -1.0f;

@@ -117,7 +117,7 @@ public class AccelerationWand extends GenericWand {
         if (mode > MODE_LAST) {
             mode = MODE_FIRST;
         }
-        Tools.notify(player, "Switched to " + descriptions[mode] + " mode");
+        Tools.notify(player, new StringTextComponent("Switched to " + descriptions[mode] + " mode"));
         stack.getOrCreateTag().putInt("mode", mode);
     }
 

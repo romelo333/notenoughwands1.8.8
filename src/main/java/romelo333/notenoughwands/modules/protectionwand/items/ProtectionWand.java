@@ -86,7 +86,7 @@ public class ProtectionWand extends GenericWand {
         if (mode > MODE_LAST) {
             mode = MODE_FIRST;
         }
-        Tools.notify(player, "Switched to " + descriptions[mode] + " mode");
+        Tools.notify(player, new StringTextComponent("Switched to " + descriptions[mode] + " mode"));
         stack.getOrCreateTag().putInt("mode", mode);
     }
 
@@ -140,7 +140,7 @@ public class ProtectionWand extends GenericWand {
                 }
             } else {
                 int cnt = protectedBlocks.clearProtections(world, id);
-                Tools.notify(player, "Cleared " + cnt + " protected blocks");
+                Tools.notify(player, new StringTextComponent("Cleared " + cnt + " protected blocks"));
             }
         }
         return ActionResultType.SUCCESS;

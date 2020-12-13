@@ -12,7 +12,11 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.*;
+import net.minecraft.nbt.NBTUtil;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -22,7 +26,6 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.registries.ForgeRegistries;
 import romelo333.notenoughwands.modules.buildingwands.BlackListSettings;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsConfiguration;
 import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
@@ -58,7 +61,7 @@ public class SwappingWand extends GenericWand {
         if (mode > MODE_LAST) {
             mode = MODE_FIRST;
         }
-        Tools.notify(player, "Switched to " + descriptions[mode] + " mode");
+        Tools.notify(player, new StringTextComponent("Switched to " + descriptions[mode] + " mode"));
         stack.getOrCreateTag().putInt("mode", mode);
     }
 
@@ -73,12 +76,10 @@ public class SwappingWand extends GenericWand {
             if (isSwappingWithOffHand(stack)) {
                 list.add(new StringTextComponent(TextFormatting.GREEN + "Will swap with block in offhand"));
             } else {
-                // @todo 1.15 need to preserve blockstate?
-                String id = compound.getString("block");
-                Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(id));
-                if (block != Blocks.AIR) {
-                    String name = Tools.getBlockName(block);
-                    list.add(new StringTextComponent(TextFormatting.GREEN + "Selected block: " + name));
+                BlockState state = NBTUtil.readBlockState(compound.getCompound("block"));
+                if (state != null) {
+                    ITextComponent name = Tools.getBlockName(state.getBlock());
+                    list.add(new StringTextComponent("Selected block: ").appendSibling(name).applyTextStyle(TextFormatting.GREEN));
                     list.add(new StringTextComponent(TextFormatting.GREEN + "Mode: " + descriptions[compound.getInt("mode")]));
                 }
             }
@@ -117,12 +118,12 @@ public class SwappingWand extends GenericWand {
             if (isSwappingWithOffHand(heldItem)) {
                 disableSwappingWithOffHand(heldItem);
                 if (world.isRemote) {
-                    Tools.notify(player, "Switched to swapping with selected block");
+                    Tools.notify(player, new StringTextComponent("Switched to swapping with selected block"));
                 }
             } else {
                 enableSwappingWithOffHand(heldItem);
                 if (world.isRemote) {
-                    Tools.notify(player, "Switched to swapping with block in offhand");
+                    Tools.notify(player, new StringTextComponent("Switched to swapping with block in offhand"));
                 }
             }
         }
@@ -158,7 +159,7 @@ public class SwappingWand extends GenericWand {
             return;
         }
 
-        Block block;
+        BlockState blockState;
         float hardness;
 
         if (isSwappingWithOffHand(stack)) {
@@ -172,27 +173,25 @@ public class SwappingWand extends GenericWand {
                 return;
             }
             BlockItem itemBlock = (BlockItem) off.getItem();
-            block = itemBlock.getBlock();
-            BlockState s = block.getDefaultState(); // @todo 1.15 is this right?
-            hardness = s.getBlockHardness(world, pos);
+            blockState = itemBlock.getBlock().getDefaultState();    // @todo 1.15 is this right?
+            hardness = blockState.getBlockHardness(world, pos);
         } else {
-            String id = tagCompound.getString("block");
-            block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(id));
+            blockState = NBTUtil.readBlockState(tagCompound.getCompound("block"));
             hardness = tagCompound.getFloat("hardness");
         }
 
         BlockState oldState = world.getBlockState(pos);
         Block oldblock = oldState.getBlock();
 
-        double cost = BlackListSettings.getBlacklistCost(oldblock);
+        double cost = BlackListSettings.getBlacklistCost(oldState);
         if (cost <= 0.001f) {
             Tools.error(player, "It is illegal to swap this block");
             return;
         }
 
-        float blockHardness = oldblock.getBlockHardness(oldState, world, pos);
+        float blockHardness = oldState.getBlockHardness(world, pos);
 
-        if (block == oldblock) {    // @todo 1.15 compare blockstates
+        if (blockState == oldState) {
             // The same, nothing happens.
             return;
         }
@@ -213,19 +212,19 @@ public class SwappingWand extends GenericWand {
             return;
         }
 
-        Set<BlockPos> coordinates = findSuitableBlocks(stack, world, side, pos, oldblock);
+        Set<BlockPos> coordinates = findSuitableBlocks(stack, world, side, pos, oldState);
         boolean notenough = false;
         for (BlockPos coordinate : coordinates) {
             if (!checkUsage(stack, player, 1.0f)) {
                 return;
             }
-            ItemStack consumed = Tools.consumeInventoryItem(Item.getItemFromBlock(block), player.inventory, player);
+            ItemStack consumed = Tools.consumeInventoryItem(Item.getItemFromBlock(blockState.getBlock()), player.inventory, player);    // @todo 1.15 check
             if (!consumed.isEmpty()) {
                 if (!player.abilities.isCreativeMode) {
                     ItemStack oldblockItem = oldblock.getPickBlock(oldState, null, world, pos, player);
                     ItemHandlerHelper.giveItemToPlayer(player, oldblockItem);
                 }
-                Tools.playSound(world, block.getSoundType(block.getDefaultState()).getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
+                Tools.playSound(world, blockState.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
                 BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, coordinate);
                 world.setBlockState(coordinate, Blocks.AIR.getDefaultState());
                 BlockTools.placeStackAt(player, consumed, world, coordinate, null);
@@ -251,22 +250,22 @@ public class SwappingWand extends GenericWand {
     private void selectBlock(ItemStack stack, PlayerEntity player, World world, BlockPos pos) {
         BlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
-        ItemStack item = block.getPickBlock(state, null, world, pos, player);
+        ItemStack item = block.getPickBlock(state, null, world, pos, player);   // @todo 1.15 check?
         CompoundNBT tagCompound = stack.getOrCreateTag();
-        String name = Tools.getBlockName(block);    // @todo 1.15 need to do blockstate
+        ITextComponent name = Tools.getBlockName(block);
         if (name == null) {
             Tools.error(player, "You cannot select this block!");
         } else {
-            double cost = BlackListSettings.getBlacklistCost(block);
+            double cost = BlackListSettings.getBlacklistCost(state);
             if (cost <= 0.001f) {
                 Tools.error(player, "It is illegal to swap this block");
                 return;
             }
 
-            tagCompound.putString("block", block.getRegistryName().toString()); // @todo 1.15 need to store blockstate
-            float hardness = block.getBlockHardness(state, world, pos);
+            tagCompound.put("block", NBTUtil.writeBlockState(state));
+            float hardness = state.getBlockHardness(world, pos);
             tagCompound.putFloat("hardness", hardness);
-            Tools.notify(player, "Selected block: " + name);
+            Tools.notify(player, new StringTextComponent("Selected block: ").appendSibling(name));
         }
     }
 
@@ -294,7 +293,7 @@ public class SwappingWand extends GenericWand {
     }
 
     // @todo 1.15 needs to do blockstate instead of block
-    private Set<BlockPos> findSuitableBlocks(ItemStack stack, World world, Direction sideHit, BlockPos pos, Block centerBlock) {
+    private Set<BlockPos> findSuitableBlocks(ItemStack stack, World world, Direction sideHit, BlockPos pos, BlockState centerState) {
         Set<BlockPos> coordinates = new HashSet<BlockPos>();
         int mode = getMode(stack);
         int dim = 0;
@@ -320,7 +319,7 @@ public class SwappingWand extends GenericWand {
             case DOWN:
                 for (int dx = x - dim; dx <= x + dim; dx++) {
                     for (int dz = z - dim; dz <= z + dim; dz++) {
-                        checkAndAddBlock(world, dx, y, dz, centerBlock, coordinates);
+                        checkAndAddBlock(world, dx, y, dz, centerState, coordinates);
                     }
                 }
                 break;
@@ -328,7 +327,7 @@ public class SwappingWand extends GenericWand {
             case NORTH:
                 for (int dx = x - dim; dx <= x + dim; dx++) {
                     for (int dy = y - dim; dy <= y + dim; dy++) {
-                        checkAndAddBlock(world, dx, dy, z, centerBlock, coordinates);
+                        checkAndAddBlock(world, dx, dy, z, centerState, coordinates);
                     }
                 }
                 break;
@@ -336,7 +335,7 @@ public class SwappingWand extends GenericWand {
             case WEST:
                 for (int dy = y - dim; dy <= y + dim; dy++) {
                     for (int dz = z - dim; dz <= z + dim; dz++) {
-                        checkAndAddBlock(world, x, dy, dz, centerBlock, coordinates);
+                        checkAndAddBlock(world, x, dy, dz, centerState, coordinates);
                     }
                 }
                 break;
@@ -345,11 +344,10 @@ public class SwappingWand extends GenericWand {
         return coordinates;
     }
 
-    // @todo 1.15 blockstate instead of block
-    private void checkAndAddBlock(World world, int x, int y, int z, Block centerBlock, Set<BlockPos> coordinates) {
+    private void checkAndAddBlock(World world, int x, int y, int z, BlockState centerBlock, Set<BlockPos> coordinates) {
         BlockPos pos = new BlockPos(x, y, z);
         BlockState state = world.getBlockState(pos);
-        if (state.getBlock() == centerBlock) {  // @todo 1.15 compare blockstate
+        if (state == centerBlock) {
             coordinates.add(pos);
         }
     }

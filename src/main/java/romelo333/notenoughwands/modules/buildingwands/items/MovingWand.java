@@ -1,7 +1,6 @@
 package romelo333.notenoughwands.modules.buildingwands.items;
 
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
@@ -9,18 +8,23 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.registries.ForgeRegistries;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsConfiguration;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 import romelo333.notenoughwands.varia.Tools;
@@ -42,10 +46,9 @@ public class MovingWand extends GenericWand {
         if (!hasBlock(compound)) {
             list.add(new StringTextComponent(TextFormatting.RED + "Wand is empty."));
         } else {
-            String id = compound.getString("block");    // @todo 1.15 blockstate
-            Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(id));
-            String name = Tools.getBlockName(block);
-            list.add(new StringTextComponent(TextFormatting.GREEN + "Block: " + name));
+            BlockState state = NBTUtil.readBlockState(compound.getCompound("block"));
+            ITextComponent name = Tools.getBlockName(state.getBlock());
+            list.add(new StringTextComponent("Block:").appendSibling(name).applyTextStyle(TextFormatting.GREEN));
         }
         list.add(new StringTextComponent("Right click to take a block."));
         list.add(new StringTextComponent("Right click again on block to place it down."));
@@ -66,7 +69,8 @@ public class MovingWand extends GenericWand {
                 Vec3d start = new Vec3d(player.getPosX(), player.getPosY() + player.getEyeHeight(), player.getPosZ());
                 int distance = BuildingWandsConfiguration.placeDistance.get();
                 Vec3d end = start.add(lookVec.x * distance, lookVec.y * distance, lookVec.z * distance);
-                RayTraceResult position = null; // @todo 1.15 world.rayTraceBlocks(start, end);
+                RayTraceContext context = new RayTraceContext(start, end, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, null);
+                BlockRayTraceResult position = world.rayTraceBlocks(context);
                 if (position == null) {
                     place(stack, world, new BlockPos(end), null, player);
                 }
@@ -106,19 +110,17 @@ public class MovingWand extends GenericWand {
 
         // First check what's already there
         BlockState old = world.getBlockState(pp);
-//        if (!world.isAirBlock(pp) && !old.isReplaceable(null)) {//@todo 1.15 getBlock().isReplaceable(world, pp)) {
-//            Tools.error(player, "Something is in the way!");
-//            return;
-//        }
+        if (!world.isAirBlock(pp) && !old.getMaterial().isReplaceable()) {//@todo 1.15 check
+            Tools.error(player, "Something is in the way!");
+            return;
+        }
 
-        CompoundNBT tagCompound = stack.getTag();
-        String id = tagCompound.getString("block");        // @todo 1.15 blockstate
-        Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(id));
+        CompoundNBT tagCompound = stack.getOrCreateTag();
+        BlockState blockState = NBTUtil.readBlockState(tagCompound.getCompound("block"));
 
         BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, pp);
 
-        BlockState blockState = block.getDefaultState();    // @todo 1.15
-        world.setBlockState(pp, blockState, 3); // @todo 1.15 use constants
+        world.setBlockState(pp, blockState, Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
         if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
             blocksnapshot.restore(true, false);
             return;
@@ -145,8 +147,7 @@ public class MovingWand extends GenericWand {
 
     private void pickup(ItemStack stack, PlayerEntity player, World world, BlockPos pos) {
         BlockState state = world.getBlockState(pos);
-        Block block = state.getBlock(); // @todo 1.15 meta/blockstate
-        double cost = checkPickup(player, world, pos, block, BuildingWandsConfiguration.maxHardness.get());
+        double cost = checkPickup(player, world, pos, state, BuildingWandsConfiguration.maxHardness.get());
         if (cost < 0.0) {
             return;
         }
@@ -156,18 +157,17 @@ public class MovingWand extends GenericWand {
         }
 
         CompoundNBT tagCompound = stack.getOrCreateTag();
-//        ItemStack s = block.getItem(world, pos, state);
-        ItemStack s = block.getPickBlock(state, null, world, pos, player);
-        String name;
+        ItemStack s = state.getBlock().getItem(world, pos, state);
+        ITextComponent name;
         if (s.isEmpty()) {
-            name = Tools.getBlockName(block);
+            name = Tools.getBlockName(state.getBlock());
         } else {
-            name = s.getDisplayName().getFormattedText(); // @todo 1.15 bad
+            name = s.getDisplayName();
         }
         if (name == null) {
             Tools.error(player, "You cannot select this block!");
         } else {
-            tagCompound.putString("block", block.getRegistryName().toString()); // @todo 1.15 put blockstate here
+            tagCompound.put("block", NBTUtil.writeBlockState(state));
 
             TileEntity tileEntity = world.getTileEntity(pos);
             if (tileEntity != null) {
@@ -181,7 +181,7 @@ public class MovingWand extends GenericWand {
             }
             world.setBlockState(pos, Blocks.AIR.getDefaultState());
 
-            Tools.notify(player, "You took: " + name);
+            Tools.notify(player, new StringTextComponent("You took: ").appendSibling(name));
             registerUsage(stack, player, (float) cost);
         }
     }

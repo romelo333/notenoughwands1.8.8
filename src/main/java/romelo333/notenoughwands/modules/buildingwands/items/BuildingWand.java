@@ -15,6 +15,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
@@ -23,12 +24,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.registries.ForgeRegistries;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 import romelo333.notenoughwands.varia.Tools;
 
@@ -90,7 +91,7 @@ public class BuildingWand extends GenericWand {
         if (mode > MODE_LAST) {
             mode = MODE_FIRST;
         }
-        Tools.notify(player, "Switched to " + DESCRIPTIONS[mode] + " mode");
+        Tools.notify(player, new StringTextComponent("Switched to " + DESCRIPTIONS[mode] + " mode"));
         stack.getOrCreateTag().putInt("mode", mode);
     }
 
@@ -98,7 +99,7 @@ public class BuildingWand extends GenericWand {
     public void toggleSubMode(PlayerEntity player, ItemStack stack) {
         int submode = getSubMode(stack);
         submode = submode == 1 ? 0 : 1;
-        Tools.notify(player, "Switched orientation");
+        Tools.notify(player, new StringTextComponent("Switched orientation"));
         stack.getOrCreateTag().putInt("submode", submode);
     }
 
@@ -134,18 +135,17 @@ public class BuildingWand extends GenericWand {
         }
         boolean notenough = false;
         BlockState blockState = world.getBlockState(pos);
-        Block block = blockState.getBlock();        // @todo 1.15 blockstate
 
 
-        Set<BlockPos> coordinates = findSuitableBlocks(stack, world, side, pos, block);
+        Set<BlockPos> coordinates = findSuitableBlocks(stack, world, side, pos, blockState);
         Set<BlockPos> undo = new HashSet<BlockPos>();
         for (BlockPos coordinate : coordinates) {
             if (!checkUsage(stack, player, 1.0f)) {
                 break;
             }
-            ItemStack consumed = Tools.consumeInventoryItem(Item.getItemFromBlock(block), player.inventory, player);
+            ItemStack consumed = Tools.consumeInventoryItem(Item.getItemFromBlock(blockState.getBlock() /* @todo 1.15 */), player.inventory, player);
             if (!consumed.isEmpty()) {
-                Tools.playSound(world, block.getSoundType(block.getDefaultState()).getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
+                Tools.playSound(world, blockState.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
 //                IBlockState state = block.getStateFromMeta(meta);
 //                world.setBlockState(coordinate, state, 2);
                 BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, coordinate);
@@ -167,13 +167,13 @@ public class BuildingWand extends GenericWand {
             Tools.error(player, "You don't have the right block");
         }
 
-        registerUndo(stack, block, world, undo);
+        registerUndo(stack, blockState, world, undo);
     }
 
-    // @todo 1.15 support blockstate
-    private void registerUndo(ItemStack stack, Block block, World world, Set<BlockPos> undo) {
+    private void registerUndo(ItemStack stack, BlockState state, World world, Set<BlockPos> undo) {
         CompoundNBT undoTag = new CompoundNBT();
-        undoTag.putString("block", block.getRegistryName().toString());
+
+        undoTag.put("block", NBTUtil.writeBlockState(state));
         undoTag.putString("dimension", DimensionId.fromWorld(world).getRegistryName().toString());
         int[] undoX = new int[undo.size()];
         int[] undoY = new int[undo.size()];
@@ -228,15 +228,13 @@ public class BuildingWand extends GenericWand {
     }
 
     private void performUndo(ItemStack stack, PlayerEntity player, World world, BlockPos pos, CompoundNBT undoTag, Set<BlockPos> undo) {
-        Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(undoTag.getString("block")));    // @todo 1.15 blockstate
+        BlockState state = NBTUtil.readBlockState(undoTag.getCompound("block"));
 
         int cnt = 0;
         for (BlockPos coordinate : undo) {
             BlockState testState = world.getBlockState(coordinate);
-            Block testBlock = testState.getBlock();
-            // @todo 1.15 blockstate
-            if (testBlock == block) {
-                Tools.playSound(world, block.getSoundType(block.getDefaultState()).getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
+            if (testState == state) {
+                Tools.playSound(world, state.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
 
                 BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, coordinate);
                 world.setBlockState(coordinate, Blocks.AIR.getDefaultState());
@@ -249,7 +247,9 @@ public class BuildingWand extends GenericWand {
         }
         if (cnt > 0) {
             if (!player.abilities.isCreativeMode) {
-                ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(block, cnt));
+                ItemStack itemStack = state.getBlock().getItem(world, pos, state);  // @todo 1.15 is this right?
+                itemStack.setCount(cnt);
+                ItemHandlerHelper.giveItemToPlayer(player, itemStack);
                 player.openContainer.detectAndSendChanges();
             }
         }
@@ -316,27 +316,26 @@ public class BuildingWand extends GenericWand {
                         renderOutlines(evt, player, coordinates, 240, 30, 0);
                     }
                 } else {
-                    coordinates = findSuitableBlocks(wand, world, btrace.getFace(), blockPos, block);
+                    coordinates = findSuitableBlocks(wand, world, btrace.getFace(), blockPos, blockState);
                     renderOutlines(evt, player, coordinates, 50, 250, 180);
                 }
             }
         }
     }
 
-    // @todo 1.15 support BlockState
-    private Set<BlockPos> findSuitableBlocks(ItemStack stack, World world, Direction sideHit, BlockPos pos, Block block) {
+    private Set<BlockPos> findSuitableBlocks(ItemStack stack, World world, Direction sideHit, BlockPos pos, BlockState state) {
         Set<BlockPos> coordinates = new HashSet<>();
         Set<BlockPos> done = new HashSet<>();
         Deque<BlockPos> todo = new ArrayDeque<>();
         todo.addLast(pos);
-        findSuitableBlocks(world, coordinates, done, todo, sideHit, block, amount[getMode(stack)],
+        findSuitableBlocks(world, coordinates, done, todo, sideHit, state, amount[getMode(stack)],
                 getMode(stack) == MODE_9ROW || getMode(stack) == MODE_25ROW, getSubMode(stack));
 
         return coordinates;
     }
 
-    private void findSuitableBlocks(World world, Set<BlockPos> coordinates, Set<BlockPos> done, Deque<BlockPos> todo, Direction direction, Block block, int maxAmount,
-                                    boolean rowMode, int rotated) {
+    private void findSuitableBlocks(World world, Set<BlockPos> coordinates, Set<BlockPos> done, Deque<BlockPos> todo, Direction direction,
+                                    BlockState state, int maxAmount, boolean rowMode, int rotated) {
 
         Direction dirA = null;
         Direction dirB = null;
@@ -345,12 +344,12 @@ public class BuildingWand extends GenericWand {
             BlockPos offset = base.offset(direction);
             dirA = rotated == 1 ? dir2(direction) : dir1(direction);
             dirB = dirA.getOpposite();
-            if (!isSuitable(world, block, base.offset(dirA), offset.offset(dirA)) ||
-                !isSuitable(world, block, base.offset(dirB), offset.offset(dirB))) {
+            if (!isSuitable(world, state, base.offset(dirA), offset.offset(dirA)) ||
+                !isSuitable(world, state, base.offset(dirB), offset.offset(dirB))) {
                 dirA = rotated == 1 ? dir3(direction) : dir2(direction);
                 dirB = dirA.getOpposite();
-                if (!isSuitable(world, block, base.offset(dirA), offset.offset(dirA)) ||
-                        !isSuitable(world, block, base.offset(dirB), offset.offset(dirB))) {
+                if (!isSuitable(world, state, base.offset(dirA), offset.offset(dirA)) ||
+                        !isSuitable(world, state, base.offset(dirB), offset.offset(dirB))) {
                     dirA = rotated == 1 ? dir1(direction) : dir3(direction);
                     dirB = dirA.getOpposite();
                 }
@@ -362,7 +361,7 @@ public class BuildingWand extends GenericWand {
             if (!done.contains(base)) {
                 done.add(base);
                 BlockPos offset = base.offset(direction);
-                if (isSuitable(world, block, base, offset)) {
+                if (isSuitable(world, state, base, offset)) {
                     coordinates.add(offset);
                     if (rowMode) {
                         todo.addLast(base.offset(dirA));
@@ -382,15 +381,10 @@ public class BuildingWand extends GenericWand {
         }
     }
 
-    private boolean isSuitable(World world, Block block, BlockPos base, BlockPos offset) {
+    private boolean isSuitable(World world, BlockState state, BlockPos base, BlockPos offset) {
         BlockState destState = world.getBlockState(offset);
-        Block destBlock = destState.getBlock();
-        if (destBlock == null) {
-            destBlock = Blocks.AIR;
-        }
         BlockState baseState = world.getBlockState(base);
-        return baseState.getBlock() == block;// @todo 1.15 &&
-//                destBlock.isReplaceable(world, offset);
+        return baseState == state && destState.getMaterial().isReplaceable();// @todo 1.15 check replacable?
     }
 
     private Direction dir1(Direction direction) {

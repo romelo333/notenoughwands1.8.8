@@ -7,6 +7,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
@@ -20,8 +21,8 @@ public class Tools {
         player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + msg), false);
     }
 
-    public static void notify(PlayerEntity player, String msg) {
-        player.sendStatusMessage(new StringTextComponent(TextFormatting.GREEN + msg), false);
+    public static void notify(PlayerEntity player, ITextComponent msg) {
+        player.sendStatusMessage(msg.applyTextStyle(TextFormatting.GREEN), false);
     }
 
     @Nonnull
@@ -67,12 +68,12 @@ public class Tools {
         return -1;
     }
 
-    public static String getBlockName(Block block) {
+    public static ITextComponent getBlockName(Block block) {
         ItemStack s = new ItemStack(block, 1);
         if (s.getItem() == null) {
             return null;
         }
-        return s.getDisplayName().getFormattedText();   // @todo 1.15 not ideal
+        return s.getDisplayName();
     }
 
     public static int getPlayerXP(PlayerEntity player) {

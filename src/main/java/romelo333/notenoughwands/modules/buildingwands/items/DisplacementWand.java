@@ -65,7 +65,7 @@ public class DisplacementWand extends GenericWand {
         if (mode > MODE_LAST) {
             mode = MODE_FIRST;
         }
-        Tools.notify(player, "Switched to " + descriptions[mode] + " mode");
+        Tools.notify(player, new StringTextComponent("Switched to " + descriptions[mode] + " mode"));
         stack.getOrCreateTag().putInt("mode", mode);
     }
 
@@ -121,7 +121,7 @@ public class DisplacementWand extends GenericWand {
             BlockState otherState = world.getBlockState(otherC);// @todo 1.15 better support for blockstates
             Block otherBlock = otherState.getBlock();
             if (otherState.getMaterial().isReplaceable()) { // @todo 1.15 check if this is right?
-                double cost = GenericWand.checkPickup(player, world, otherC, block, BuildingWandsConfiguration.maxHardness.get());
+                double cost = GenericWand.checkPickup(player, world, otherC, state, BuildingWandsConfiguration.maxHardness.get());
                 if (cost >= 0.0) {
                     cnt++;
                     Tools.playSound(world, block.getSoundType(state).getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);

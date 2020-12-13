@@ -1,6 +1,6 @@
 package romelo333.notenoughwands.modules.buildingwands;
 
-import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import romelo333.notenoughwands.setup.Configuration;
@@ -12,9 +12,10 @@ public class BlackListSettings {
     protected static Map<String,Double> blacklistedBlocks = new HashMap<>();
     protected static Map<String,Double> blackListedMobs = new HashMap<>();
 
-    public static double getBlacklistCost(Block block) {
+    public static double getBlacklistCost(BlockState state) {
         double cost = 1.0f;
-        ResourceLocation registryName = block.getRegistryName();
+        // @todo 1.15?
+        ResourceLocation registryName = state.getBlock().getRegistryName();
         if (blacklistedBlocks.containsKey(registryName.getPath() + ":*")) {
             cost = blacklistedBlocks.get(registryName.getPath() + ":*");
         } else {
