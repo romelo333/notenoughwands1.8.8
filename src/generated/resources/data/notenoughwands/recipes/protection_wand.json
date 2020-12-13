@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "xo ",
+    "ow ",
+    "  w"
+  ],
+  "key": {
+    "x": {
+      "item": "minecraft:comparator"
+    },
+    "w": {
+      "item": "notenoughwands:advanced_wand_core"
+    },
+    "o": {
+      "tag": "forge:ender_pearls"
+    }
+  },
+  "result": {
+    "item": "notenoughwands:protection_wand"
+  }
+}

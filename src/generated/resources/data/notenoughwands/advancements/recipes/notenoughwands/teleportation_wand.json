@@ -2,16 +2,16 @@
   "parent": "minecraft:recipes/root",
   "rewards": {
     "recipes": [
-      "notenoughwands:wand_core"
+      "notenoughwands:teleportation_wand"
     ]
   },
   "criteria": {
-    "rod": {
+    "core": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "item": "minecraft:blaze_rod"
+            "item": "notenoughwands:wand_core"
           }
         ]
       }
@@ -19,13 +19,13 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "notenoughwands:wand_core"
+        "recipe": "notenoughwands:teleportation_wand"
       }
     }
   },
   "requirements": [
     [
-      "rod",
+      "core",
       "has_the_recipe"
     ]
   ]

@@ -6,7 +6,7 @@
     ]
   },
   "criteria": {
-    "marble": {
+    "rod": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
@@ -25,7 +25,7 @@
   },
   "requirements": [
     [
-      "marble",
+      "rod",
       "has_the_recipe"
     ]
   ]

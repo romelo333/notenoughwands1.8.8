@@ -1,0 +1,6 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "notenoughwands:item/master_protection_wand"
+  }
+}

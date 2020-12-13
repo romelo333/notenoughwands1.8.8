@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "dx ",
+    "xw ",
+    "  w"
+  ],
+  "key": {
+    "x": {
+      "item": "minecraft:rotten_flesh"
+    },
+    "w": {
+      "item": "notenoughwands:advanced_wand_core"
+    },
+    "d": {
+      "item": "minecraft:diamond"
+    }
+  },
+  "result": {
+    "item": "notenoughwands:capturing_wand"
+  }
+}

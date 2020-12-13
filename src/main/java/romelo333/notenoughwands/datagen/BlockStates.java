@@ -4,6 +4,9 @@ import mcjty.lib.datagen.BaseBlockStateProvider;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.client.model.generators.ExistingFileHelper;
 import romelo333.notenoughwands.NotEnoughWands;
+import romelo333.notenoughwands.modules.lightwand.LightModule;
+
+import static net.minecraftforge.client.model.generators.ModelProvider.BLOCK_FOLDER;
 
 public class BlockStates extends BaseBlockStateProvider {
 
@@ -13,5 +16,6 @@ public class BlockStates extends BaseBlockStateProvider {
 
     @Override
     protected void registerStatesAndModels() {
+        singleTextureBlock(LightModule.LIGHT.get(), BLOCK_FOLDER + "/light", "block/empty");
     }
 }
