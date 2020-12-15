@@ -8,10 +8,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
@@ -63,7 +60,13 @@ public class TeleportationWand extends GenericWand {
             }
 
             Vec3d end = start.add(lookVec.x * distance, lookVec.y * distance, lookVec.z * distance);
-            RayTraceResult position = gothrough ? null : null;// @todo 1.15 world.rayTraceBlocks(start, end);
+            RayTraceResult position;
+            if (gothrough) {
+                position = null;
+            } else {
+                RayTraceContext context = new RayTraceContext(start, end, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, player);
+                position = world.rayTraceBlocks(context);
+            }
             if (position == null) {
                 if (gothrough) {
                     // First check if the destination is safe

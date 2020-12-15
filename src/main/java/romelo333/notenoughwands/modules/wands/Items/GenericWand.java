@@ -11,7 +11,6 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.loot.LootPool;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import romelo333.notenoughwands.NotEnoughWands;
@@ -118,10 +117,6 @@ public class GenericWand extends Item implements IEnergyItem {
         return this;
     }
 
-    protected String getConfigPrefix() {
-        return getRegistryName().getPath();
-    }
-
 //    public void initConfig(Configuration cfg, int easy_usages, int easy_maxrf, int normal_usages, int normal_maxrf, int hard_usages, int hard_maxrf) {
 //        switch (WandsConfiguration.wandUsage) {
 //            case DEFAULT:
@@ -222,22 +217,6 @@ public class GenericWand extends Item implements IEnergyItem {
 
     public static List<GenericWand> getWands() {
         return wands;
-    }
-
-    //------------------------------------------------------------------------------
-
-    public static void setupChestLoot(LootPool main) {
-        for (GenericWand wand : wands) {
-            wand.setupChestLootInt(main);
-        }
-    }
-
-    private void setupChestLootInt(LootPool main) {
-        if (lootRarity > 0) {
-            // @todo 1.15
-//            String entryName = NotEnoughWands.MODID + ":" + getRegistryName().getResourcePath();
-//            main.addEntry(new LootEntryItem(this, lootRarity, 0, new LootFunction[0], new LootCondition[0], entryName));
-        }
     }
 
     //------------------------------------------------------------------------------

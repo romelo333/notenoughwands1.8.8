@@ -1,6 +1,7 @@
 package romelo333.notenoughwands.modules.buildingwands.items;
 
 
+import mcjty.lib.builder.TooltipBuilder;
 import mcjty.lib.varia.BlockTools;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -8,7 +9,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
@@ -18,6 +18,9 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -37,6 +40,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static mcjty.lib.builder.TooltipBuilder.*;
+
 public class SwappingWand extends GenericWand {
 
     public static final int MODE_FIRST = 0;
@@ -46,9 +51,15 @@ public class SwappingWand extends GenericWand {
     public static final int MODE_SINGLE = 3;
     public static final int MODE_LAST = MODE_SINGLE;
 
-    public static final String[] descriptions = new String[] {
+    public static final String[] DESCRIPTIONS = new String[] {
         "3x3", "5x5", "7x7", "single"
     };
+
+    private final TooltipBuilder tooltipBuilder = new TooltipBuilder()
+            .info(key("message.notenoughwands.shiftmessage"))
+            .infoShift(header(), gold(),
+                parameter("mode", stack -> DESCRIPTIONS[getMode(stack)]));
+
 
     public SwappingWand() {
         setup().loot(5).usageFactory(1.0f);
@@ -61,33 +72,33 @@ public class SwappingWand extends GenericWand {
         if (mode > MODE_LAST) {
             mode = MODE_FIRST;
         }
-        Tools.notify(player, new StringTextComponent("Switched to " + descriptions[mode] + " mode"));
+        Tools.notify(player, new StringTextComponent("Switched to " + DESCRIPTIONS[mode] + " mode"));
         stack.getOrCreateTag().putInt("mode", mode);
     }
 
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flagIn) {
         super.addInformation(stack, world, list, flagIn);
+        tooltipBuilder.makeTooltip(getRegistryName(), stack, list, flagIn);
+        list.add(getBlockDescription(stack));
+
+        // @todo 1.15
+        showModeKeyDescription(list, "switch mode");
+    }
+
+    private ITextComponent getBlockDescription(ItemStack stack) {
         CompoundNBT compound = stack.getTag();
         if (compound == null) {
-            // @todo 1.15 proper tooltips
-            list.add(new StringTextComponent(TextFormatting.RED + "No selected block"));
+            return new StringTextComponent("No selected block").applyTextStyle(TextFormatting.RED);
         } else {
             if (isSwappingWithOffHand(stack)) {
-                list.add(new StringTextComponent(TextFormatting.GREEN + "Will swap with block in offhand"));
+                return new StringTextComponent("Will swap with block in offhand").applyTextStyle(TextFormatting.GREEN);
             } else {
                 BlockState state = NBTUtil.readBlockState(compound.getCompound("block"));
-                if (state != null) {
-                    ITextComponent name = Tools.getBlockName(state.getBlock());
-                    list.add(new StringTextComponent("Selected block: ").appendSibling(name).applyTextStyle(TextFormatting.GREEN));
-                    list.add(new StringTextComponent(TextFormatting.GREEN + "Mode: " + descriptions[compound.getInt("mode")]));
-                }
+                ITextComponent name = Tools.getBlockName(state.getBlock());
+                return new StringTextComponent("Block: ").appendSibling(name).applyTextStyle(TextFormatting.GREEN);
             }
         }
-        list.add(new StringTextComponent("Sneak right click to select a block."));
-        list.add(new StringTextComponent("Right click in empty air to select 'offhand' mode."));
-        list.add(new StringTextComponent("Right click on block to replace."));
-        showModeKeyDescription(list, "switch mode");
     }
 
     private static boolean isSwappingWithOffHand(ItemStack stack) {
@@ -218,7 +229,9 @@ public class SwappingWand extends GenericWand {
             if (!checkUsage(stack, player, 1.0f)) {
                 return;
             }
-            ItemStack consumed = Tools.consumeInventoryItem(Item.getItemFromBlock(blockState.getBlock()), player.inventory, player);    // @todo 1.15 check
+            RayTraceResult result = new BlockRayTraceResult(new Vec3d(0, 0, 0), Direction.UP, coordinate, false);
+            ItemStack pickBlock = blockState.getPickBlock(result, world, coordinate, player);
+            ItemStack consumed = Tools.consumeInventoryItem(pickBlock, player.inventory, player);
             if (!consumed.isEmpty()) {
                 if (!player.abilities.isCreativeMode) {
                     ItemStack oldblockItem = oldblock.getPickBlock(oldState, null, world, pos, player);

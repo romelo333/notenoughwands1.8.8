@@ -11,7 +11,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
@@ -23,6 +22,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
@@ -143,7 +143,9 @@ public class BuildingWand extends GenericWand {
             if (!checkUsage(stack, player, 1.0f)) {
                 break;
             }
-            ItemStack consumed = Tools.consumeInventoryItem(Item.getItemFromBlock(blockState.getBlock() /* @todo 1.15 */), player.inventory, player);
+            RayTraceResult result = new BlockRayTraceResult(new Vec3d(0, 0, 0), Direction.UP, coordinate, false);
+            ItemStack pickBlock = blockState.getPickBlock(result, world, coordinate, player);
+            ItemStack consumed = Tools.consumeInventoryItem(pickBlock, player.inventory, player);
             if (!consumed.isEmpty()) {
                 Tools.playSound(world, blockState.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
 //                IBlockState state = block.getStateFromMeta(meta);
@@ -247,7 +249,8 @@ public class BuildingWand extends GenericWand {
         }
         if (cnt > 0) {
             if (!player.abilities.isCreativeMode) {
-                ItemStack itemStack = state.getBlock().getItem(world, pos, state);  // @todo 1.15 is this right?
+                RayTraceResult result = new BlockRayTraceResult(new Vec3d(0, 0, 0), Direction.UP, pos, false);
+                ItemStack itemStack = state.getPickBlock(result, world, pos, player);
                 itemStack.setCount(cnt);
                 ItemHandlerHelper.giveItemToPlayer(player, itemStack);
                 player.openContainer.detectAndSendChanges();

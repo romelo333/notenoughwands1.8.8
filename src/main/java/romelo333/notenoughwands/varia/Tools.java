@@ -3,7 +3,6 @@ package romelo333.notenoughwands.varia;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
@@ -26,10 +25,9 @@ public class Tools {
     }
 
     @Nonnull
-    public static ItemStack consumeInventoryItem(Item item, PlayerInventory inv, PlayerEntity player) {
-        // @todo 1.15 check
+    public static ItemStack consumeInventoryItem(ItemStack item, PlayerInventory inv, PlayerEntity player) {
         if (player.abilities.isCreativeMode) {
-            return new ItemStack(item, 1);
+            return item;
         }
         int i = finditem(item, inv);
 
@@ -57,10 +55,10 @@ public class Tools {
         ItemHandlerHelper.giveItemToPlayer(player, stack);
     }
 
-    public static int finditem(Item item, PlayerInventory inv) {
+    public static int finditem(ItemStack item, PlayerInventory inv) {
         for (int i = 0; i < 36; ++i) {
             ItemStack stack = inv.getStackInSlot(i);
-            if (!stack.isEmpty() && stack.getItem() == item) {
+            if (!stack.isEmpty() && ItemHandlerHelper.canItemStacksStack(item, stack)) {
                 return i;
             }
         }

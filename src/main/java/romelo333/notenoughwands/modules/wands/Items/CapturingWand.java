@@ -17,6 +17,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import romelo333.notenoughwands.modules.buildingwands.BlackListSettings;
 import romelo333.notenoughwands.modules.wands.WandsConfiguration;
 import romelo333.notenoughwands.varia.Tools;
@@ -127,7 +128,7 @@ public class CapturingWand extends GenericWand {
                 entityLivingBase.writeAdditional(tagCompound);  // @todo 1.15 is this right?
                 stack.getOrCreateTag().put("mob", tagCompound);
                 stack.getOrCreateTag().putString("type", entity.getClass().getCanonicalName());
-//                player.getEntityWorld().removeEntity(entity); // @todo 1.15 how to do?
+                ((ServerWorld)player.getEntityWorld()).removeEntity(entity);
 
                 registerUsage(stack, player, difficultyScale);
             } else {

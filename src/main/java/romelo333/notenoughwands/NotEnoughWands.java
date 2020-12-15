@@ -9,7 +9,6 @@ import romelo333.notenoughwands.modules.buildingwands.BuildingWandsModule;
 import romelo333.notenoughwands.modules.lightwand.LightModule;
 import romelo333.notenoughwands.modules.protectionwand.ProtectionWandModule;
 import romelo333.notenoughwands.modules.wands.WandsModule;
-import romelo333.notenoughwands.setup.ClientSetup;
 import romelo333.notenoughwands.setup.Config;
 import romelo333.notenoughwands.setup.ModSetup;
 import romelo333.notenoughwands.setup.Registration;
@@ -33,7 +32,7 @@ public class NotEnoughWands {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(modules::init);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             FMLJavaModLoadingContext.get().getModEventBus().addListener(modules::initClient);
-            FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientSetup::onTextureStitch);
+            FMLJavaModLoadingContext.get().getModEventBus().addListener(LightModule::onTextureStitch);
         });
     }
 

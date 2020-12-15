@@ -1,6 +1,7 @@
 package romelo333.notenoughwands.modules.buildingwands.items;
 
 
+import mcjty.lib.builder.TooltipBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
@@ -32,26 +33,34 @@ import romelo333.notenoughwands.varia.Tools;
 import javax.annotation.Nullable;
 import java.util.List;
 
+import static mcjty.lib.builder.TooltipBuilder.*;
+
 public class MovingWand extends GenericWand {
 
     public MovingWand() {
         setup().loot(5).usageFactory(1.5f);
     }
 
+    private final TooltipBuilder tooltipBuilder = new TooltipBuilder()
+            .info(key("message.notenoughwands.shiftmessage"))
+            .infoShift(header(), gold());
+
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flagIn) {
         super.addInformation(stack, world, list, flagIn);
+        tooltipBuilder.makeTooltip(getRegistryName(), stack, list, flagIn);
+        list.add(getBlockDescription(stack));
+    }
+
+    private ITextComponent getBlockDescription(ItemStack stack) {
         CompoundNBT compound = stack.getTag();
-        // @todo 1.15 better tooltip
         if (!hasBlock(compound)) {
-            list.add(new StringTextComponent(TextFormatting.RED + "Wand is empty."));
+            return new StringTextComponent("Wand is empty").applyTextStyle(TextFormatting.RED);
         } else {
             BlockState state = NBTUtil.readBlockState(compound.getCompound("block"));
             ITextComponent name = Tools.getBlockName(state.getBlock());
-            list.add(new StringTextComponent("Block:").appendSibling(name).applyTextStyle(TextFormatting.GREEN));
+            return new StringTextComponent("Block: ").appendSibling(name).applyTextStyle(TextFormatting.GREEN);
         }
-        list.add(new StringTextComponent("Right click to take a block."));
-        list.add(new StringTextComponent("Right click again on block to place it down."));
     }
 
     private boolean hasBlock(CompoundNBT compound) {

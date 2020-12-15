@@ -1,6 +1,7 @@
 package romelo333.notenoughwands.modules.buildingwands.items;
 
 
+import mcjty.lib.builder.TooltipBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -15,7 +16,6 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.util.BlockSnapshot;
@@ -29,6 +29,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static mcjty.lib.builder.TooltipBuilder.*;
+
 public class DisplacementWand extends GenericWand {
 
     public static final int MODE_FIRST = 0;
@@ -38,11 +40,15 @@ public class DisplacementWand extends GenericWand {
     public static final int MODE_SINGLE = 3;
     public static final int MODE_LAST = MODE_SINGLE;
 
-    public static final String[] descriptions = new String[] {
+    public static final String[] DESCRIPTIONS = new String[] {
             "3x3", "5x5", "7x7", "single"
     };
 
-    public static final int[] amount = new int[] { 9, 9, 25, 1 };
+    private final TooltipBuilder tooltipBuilder = new TooltipBuilder()
+            .info(key("message.notenoughwands.shiftmessage"))
+            .infoShift(header(), gold(),
+                    parameter("mode", stack -> DESCRIPTIONS[getMode(stack)]));
+
 
     public DisplacementWand() {
         setup().loot(3).usageFactory(1.0f);
@@ -51,10 +57,9 @@ public class DisplacementWand extends GenericWand {
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> list, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, list, flagIn);
-        // @todo 1.15 tooltips
-        list.add(new StringTextComponent(TextFormatting.GREEN + "Mode: " + descriptions[getMode(stack)]));
-        list.add(new StringTextComponent("Right click to push blocks forward."));
-        list.add(new StringTextComponent("Sneak right click to pull blocks."));
+        tooltipBuilder.makeTooltip(getRegistryName(), stack, list, flagIn);
+
+        // @todo 1.15
         showModeKeyDescription(list, "switch mode");
     }
 
@@ -65,7 +70,7 @@ public class DisplacementWand extends GenericWand {
         if (mode > MODE_LAST) {
             mode = MODE_FIRST;
         }
-        Tools.notify(player, new StringTextComponent("Switched to " + descriptions[mode] + " mode"));
+        Tools.notify(player, new StringTextComponent("Switched to " + DESCRIPTIONS[mode] + " mode"));
         stack.getOrCreateTag().putInt("mode", mode);
     }
 

@@ -24,6 +24,18 @@
   "message.notenoughwands.building_wand.mode": "Mode: ",
   "message.notenoughwands.building_wand.submode": "Submode: ",
 
+  "message.notenoughwands.displacement_wand.header": "Right click to push blocks forward",
+  "message.notenoughwands.displacement_wand.gold": "Sneak right click to pull blocks",
+  "message.notenoughwands.displacement_wand.mode": "Mode: ",
+
+  "message.notenoughwands.moving_wand.header": "Right click to take a block",
+  "message.notenoughwands.moving_wand.gold": "Right click again on block to place it down",
+
+  "message.notenoughwands.swapping_wand.header": "Sneak right click to select a block",
+  "message.notenoughwands.swapping_wand.gold": "Right click in empty air to select 'offhand' mode or right click on block to replace",
+  "message.notenoughwands.swapping_wand.mode": "Mode: ",
+
+
   "key.modifier": "Wand Modifier",
   "key.categories.notenoughwands": "Not Enough Wands",
 
