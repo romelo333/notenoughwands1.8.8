@@ -14,7 +14,7 @@ import romelo333.notenoughwands.modules.lightwand.blocks.LightTE;
 
 public class LightRenderer extends TileEntityRenderer<LightTE> {
 
-    public static final ResourceLocation LIGHT = new ResourceLocation(NotEnoughWands.MODID, "textures/blocks/light.png");
+    public static final ResourceLocation LIGHT = new ResourceLocation(NotEnoughWands.MODID, "block/light");
 
     public LightRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
         super(rendererDispatcherIn);
