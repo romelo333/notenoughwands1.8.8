@@ -2,10 +2,10 @@ package romelo333.notenoughwands.modules.buildingwands.items;
 
 
 import mcjty.lib.builder.TooltipBuilder;
-import mcjty.lib.varia.BlockTools;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
@@ -62,7 +62,7 @@ public class SwappingWand extends GenericWand {
 
 
     public SwappingWand() {
-        setup().loot(5).usageFactory(1.0f);
+        setup().usageFactor(1.0f);
     }
 
     @Override
@@ -240,7 +240,7 @@ public class SwappingWand extends GenericWand {
                 Tools.playSound(world, blockState.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
                 BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, coordinate);
                 world.setBlockState(coordinate, Blocks.AIR.getDefaultState());
-                BlockTools.placeStackAt(player, consumed, world, coordinate, null);
+                Tools.placeStackAt(player, consumed, world, coordinate, null);
 
                 if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
                     blocksnapshot.restore(true, false);
@@ -284,28 +284,25 @@ public class SwappingWand extends GenericWand {
 
     @Override
     public void renderOverlay(RenderWorldLastEvent evt, PlayerEntity player, ItemStack wand) {
-        // @todo 1.15
-//        RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver;
-//        if (mouseOver != null && mouseOver.getBlockPos() != null && mouseOver.sideHit != null) {
-//            BlockState state = player.getEntityWorld().getBlockState(mouseOver.getBlockPos());
-//            Block block = state.getBlock();
-//            if (block != null && block.getMaterial(state) != Material.AIR) {
-//                int meta = block.getMetaFromState(state);
-//
-//                int wandId = Tools.getTagCompound(wand).getInt("block");
-//                Block wandBlock = Block.REGISTRY.getObjectById(wandId);
-//                int wandMeta = Tools.getTagCompound(wand).getInt("meta");
-//                if (wandBlock == block && wandMeta == meta) {
-//                    return;
-//                }
-//
-//                Set<BlockPos> coordinates = findSuitableBlocks(wand, player.getEntityWorld(), mouseOver.sideHit, mouseOver.getBlockPos(), block, meta);
-//                renderOutlines(evt, player, coordinates, 200, 230, 180);
-//            }
-//        }
+        RayTraceResult mouseOver = Minecraft.getInstance().objectMouseOver;
+
+        if (mouseOver instanceof BlockRayTraceResult) {
+            BlockRayTraceResult br = (BlockRayTraceResult) mouseOver;
+
+            World world = player.getEntityWorld();
+            BlockPos blockPos = br.getPos();
+            BlockState state = world.getBlockState(blockPos);
+            if (!state.isAir(world, blockPos) && wand.hasTag()) {
+                BlockState wandState = NBTUtil.readBlockState(wand.getTag().getCompound("block"));
+                if (wandState == state) {
+                    return;
+                }
+                Set<BlockPos> coordinates = findSuitableBlocks(wand, world, br.getFace(), blockPos, state);
+                renderOutlines(evt, player, coordinates, 200, 230, 180);
+            }
+        }
     }
 
-    // @todo 1.15 needs to do blockstate instead of block
     private Set<BlockPos> findSuitableBlocks(ItemStack stack, World world, Direction sideHit, BlockPos pos, BlockState centerState) {
         Set<BlockPos> coordinates = new HashSet<BlockPos>();
         int mode = getMode(stack);

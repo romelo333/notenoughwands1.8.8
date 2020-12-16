@@ -27,10 +27,6 @@ public class PacketGetProtectedBlocksAroundPlayer {
     }
 
     public PacketGetProtectedBlocksAroundPlayer(PacketBuffer buf) {
-        fromBytes(buf);
-    }
-
-    public PacketGetProtectedBlocksAroundPlayer(int chunkx, int chunkz) {
     }
 
     public void handle(Supplier<NetworkEvent.Context> supplier) {

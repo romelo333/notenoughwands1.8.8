@@ -24,7 +24,7 @@ import java.util.List;
 public class TeleportationWand extends GenericWand {
 
     public TeleportationWand() {
-        setup().loot(6).usageFactory(2.0f);
+        setup().usageFactor(2.0f);
     }
 
     @Override

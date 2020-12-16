@@ -20,7 +20,7 @@ import java.util.List;
 
 public class FreezingWand extends GenericWand {
     public FreezingWand() {
-        setup().loot(0).usageFactory(2.0f);
+        setup().usageFactor(2.0f);
     }
 
     @Override

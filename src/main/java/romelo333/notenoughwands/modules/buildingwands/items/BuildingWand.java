@@ -2,7 +2,6 @@ package romelo333.notenoughwands.modules.buildingwands.items;
 
 
 import mcjty.lib.builder.TooltipBuilder;
-import mcjty.lib.varia.BlockTools;
 import mcjty.lib.varia.DimensionId;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -62,7 +61,7 @@ public class BuildingWand extends GenericWand {
     public static final int[] amount = new int[] { 9, 9, 25, 25, 1 };
 
     public BuildingWand() {
-        setup().loot(3).usageFactory(1.0f);
+        setup().usageFactor(1.0f);
     }
 
     private int countUndoStates(ItemStack stack) {
@@ -118,29 +117,28 @@ public class BuildingWand extends GenericWand {
         World world = context.getWorld();
         BlockPos pos = context.getPos();
         Direction side = context.getFace();
-        ItemStack stack = player.getHeldItem(hand);
+        ItemStack wandStack = player.getHeldItem(hand);
         if (!world.isRemote) {
             if (player.isSneaking()) {
-                undoPlaceBlock(stack, player, world, pos);
+                undoPlaceBlock(wandStack, player, world, pos);
             } else {
-                placeBlock(stack, player, world, pos, side);
+                placeBlock(wandStack, player, world, pos, side);
             }
         }
         return ActionResultType.SUCCESS;
     }
 
-    private void placeBlock(ItemStack stack, PlayerEntity player, World world, BlockPos pos, Direction side) {
-        if (!checkUsage(stack, player, 1.0f)) {
+    private void placeBlock(ItemStack wandStack, PlayerEntity player, World world, BlockPos pos, Direction side) {
+        if (!checkUsage(wandStack, player, 1.0f)) {
             return;
         }
         boolean notenough = false;
         BlockState blockState = world.getBlockState(pos);
 
-
-        Set<BlockPos> coordinates = findSuitableBlocks(stack, world, side, pos, blockState);
-        Set<BlockPos> undo = new HashSet<BlockPos>();
+        Set<BlockPos> coordinates = findSuitableBlocks(wandStack, world, side, pos, blockState);
+        Set<BlockPos> undo = new HashSet<>();
         for (BlockPos coordinate : coordinates) {
-            if (!checkUsage(stack, player, 1.0f)) {
+            if (!checkUsage(wandStack, player, 1.0f)) {
                 break;
             }
             RayTraceResult result = new BlockRayTraceResult(new Vec3d(0, 0, 0), Direction.UP, coordinate, false);
@@ -151,7 +149,7 @@ public class BuildingWand extends GenericWand {
 //                IBlockState state = block.getStateFromMeta(meta);
 //                world.setBlockState(coordinate, state, 2);
                 BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, coordinate);
-                BlockTools.placeStackAt(player, consumed, world, coordinate, null);
+                Tools.placeStackAt(player, consumed, world, coordinate, null);
                 if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
                     blocksnapshot.restore(true, false);
                     if (!player.abilities.isCreativeMode) {
@@ -159,7 +157,7 @@ public class BuildingWand extends GenericWand {
                     }
                 }
                 player.openContainer.detectAndSendChanges();
-                registerUsage(stack, player, 1.0f);
+                registerUsage(wandStack, player, 1.0f);
                 undo.add(coordinate);
             } else {
                 notenough = true;
@@ -169,7 +167,7 @@ public class BuildingWand extends GenericWand {
             Tools.error(player, "You don't have the right block");
         }
 
-        registerUndo(stack, blockState, world, undo);
+        registerUndo(wandStack, blockState, world, undo);
     }
 
     private void registerUndo(ItemStack stack, BlockState state, World world, Set<BlockPos> undo) {

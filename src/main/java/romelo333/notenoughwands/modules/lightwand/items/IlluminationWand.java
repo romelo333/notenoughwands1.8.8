@@ -24,7 +24,7 @@ import java.util.List;
 
 public class IlluminationWand extends GenericWand {
     public IlluminationWand() {
-        setup().loot(6).usageFactory(1);
+        setup().usageFactor(1);
     }
 
     @Override

@@ -1,6 +1,9 @@
 package romelo333.notenoughwands.modules.wands.Items;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -18,6 +21,7 @@ import romelo333.notenoughwands.modules.buildingwands.BlackListSettings;
 import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
 import romelo333.notenoughwands.modules.wands.WandUsage;
 import romelo333.notenoughwands.modules.wands.WandsConfiguration;
+import romelo333.notenoughwands.varia.ClientTools;
 import romelo333.notenoughwands.varia.IEnergyItem;
 import romelo333.notenoughwands.varia.ItemCapabilityProvider;
 import romelo333.notenoughwands.varia.Tools;
@@ -30,16 +34,15 @@ import java.util.Set;
 public class GenericWand extends Item implements IEnergyItem {
 
     protected float usageFactor = 1.0f;
-    protected int lootRarity = 10;
 
     private static List<GenericWand> wands = new ArrayList<>();
 
     public GenericWand() {
         super(new Item.Properties().group(NotEnoughWands.setup.getTab())
                 .setNoRepair()
-                .maxDamage(666) // @todo 1.15
-                .defaultMaxDamage(666) // @todo 1.15
-//                .maxStackSize(1)
+                .maxStackSize(1)
+//                .maxDamage(666) // @todo 1.15
+//                .defaultMaxDamage(666) // @todo 1.15
         );
     }
 
@@ -107,13 +110,8 @@ public class GenericWand extends Item implements IEnergyItem {
         return this;
     }
 
-    public GenericWand usageFactory(float usageFactor) {
+    public GenericWand usageFactor(float usageFactor) {
         this.usageFactor = usageFactor;
-        return this;
-    }
-
-    public GenericWand loot(int rarity) {
-        lootRarity = rarity;
         return this;
     }
 
@@ -163,7 +161,7 @@ public class GenericWand extends Item implements IEnergyItem {
 
     //------------------------------------------------------------------------------
 
-    protected boolean checkUsage(ItemStack stack, PlayerEntity player, float difficultyScale) {
+    protected boolean checkUsage(ItemStack wandStack, PlayerEntity player, float difficultyScale) {
         if (player.abilities.isCreativeMode) {
             return true;
         }
@@ -175,15 +173,15 @@ public class GenericWand extends Item implements IEnergyItem {
                 return false;
             }
         }
-        if (needsDamage()) {
-            if (stack.getDamage() >= stack.getMaxDamage()) {
-                Tools.error(player, "This wand can no longer be used!");
-                return false;
-            }
-        }
+//        if (needsDamage()) {
+//            if (wandStack.getDamage() >= wandStack.getMaxDamage()) {
+//                Tools.error(player, "This wand can no longer be used!");
+//                return false;
+//            }
+//        }
         if (needsPower()) {
             int needsrf = calculatePower();
-            if (getEnergyStored(stack) < (int)(needsrf * difficultyScale)) {
+            if (getEnergyStored(wandStack) < (int)(needsrf * difficultyScale)) {
                 Tools.error(player, "Not enough energy to use this wand!");
                 return false;
             }
@@ -198,9 +196,9 @@ public class GenericWand extends Item implements IEnergyItem {
         if (needsXP()) {
             Tools.addPlayerXP(player, -(int) (calculateXP() * difficultyScale));
         }
-        if (isDamageable()) {
-            stack.damageItem(1, player, playerEntity -> {});
-        }
+//        if (isDamageable()) {
+//            stack.damageItem(1, player, playerEntity -> {});
+//        }
         if (needsPower()) {
             extractEnergy(stack, (int) (calculatePower() * difficultyScale), false);
         }
@@ -226,7 +224,9 @@ public class GenericWand extends Item implements IEnergyItem {
     }
 
     protected static void renderOutlines(RenderWorldLastEvent evt, PlayerEntity p, Set<BlockPos> coordinates, int r, int g, int b) {
-        // @todo 1.15
+        MatrixStack matrixStack = evt.getMatrixStack();
+        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
+        ClientTools.renderOutlines(matrixStack, buffer, coordinates, r, g, b);
 //        BlockOutlineRenderer.renderOutlines(p, coordinates, r, g, b, evt.getPartialTicks());
     }
 

@@ -42,9 +42,9 @@ public class ProtectionWand extends GenericWand {
 
     public ProtectionWand(boolean master) {
         if (master) {
-            setup().loot(0).usageFactory(3.0f);
+            setup().usageFactor(3.0f);
         } else {
-            setup().loot(1).usageFactory(3.0f);
+            setup().usageFactor(3.0f);
         }
         this.master = master;
     }

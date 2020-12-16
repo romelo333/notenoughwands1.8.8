@@ -1,11 +1,20 @@
 package romelo333.notenoughwands.varia;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -14,6 +23,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class Tools {
     public static void error(PlayerEntity player, String msg) {
@@ -23,6 +33,37 @@ public class Tools {
     public static void notify(PlayerEntity player, ITextComponent msg) {
         player.sendStatusMessage(msg.applyTextStyle(TextFormatting.GREEN), false);
     }
+
+    // PlaceStackAt from a perspective of a wand
+    @Nullable
+    public static BlockState placeStackAt(PlayerEntity player, ItemStack blockStack, World world, BlockPos pos, @Nullable BlockState origState) {
+        ItemStack old = player.getHeldItem(Hand.MAIN_HAND);
+        player.setHeldItem(Hand.MAIN_HAND, blockStack);
+
+        BlockRayTraceResult trace = new BlockRayTraceResult(new Vec3d(0, 0, 0), Direction.UP, pos, false);
+        BlockItemUseContext context = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, trace));
+        if (blockStack.getItem() instanceof BlockItem) {
+            BlockItem itemBlock = (BlockItem) blockStack.getItem();
+            if (origState == null) {
+                origState = itemBlock.getBlock().getStateForPlacement(context);
+                if (origState == null) {
+                    // Cannot place!
+                    return null;
+                }
+            }
+            if (itemBlock.tryPlace(context).isSuccessOrConsume()) {
+//                blockStack.shrink(1);
+            }
+            player.setHeldItem(Hand.MAIN_HAND, old);
+            return origState;
+        } else {
+            player.setPosition(pos.getX()+.5, pos.getY()+1.5, pos.getZ()+.5);
+            blockStack.getItem().onItemUse(context);
+            player.setHeldItem(Hand.MAIN_HAND, old);
+            return world.getBlockState(pos);
+        }
+    }
+
 
     @Nonnull
     public static ItemStack consumeInventoryItem(ItemStack item, PlayerInventory inv, PlayerEntity player) {

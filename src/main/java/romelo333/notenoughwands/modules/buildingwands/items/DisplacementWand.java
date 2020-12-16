@@ -5,6 +5,7 @@ import mcjty.lib.builder.TooltipBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -14,6 +15,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
@@ -51,7 +54,7 @@ public class DisplacementWand extends GenericWand {
 
 
     public DisplacementWand() {
-        setup().loot(3).usageFactory(1.0f);
+        setup().usageFactor(1.0f);
     }
 
     @Override
@@ -179,18 +182,19 @@ public class DisplacementWand extends GenericWand {
 
     @Override
     public void renderOverlay(RenderWorldLastEvent evt, PlayerEntity player, ItemStack wand) {
-        // @todo 1.15
-//        RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver;
-//        if (mouseOver != null && mouseOver.getBlockPos() != null && mouseOver.sideHit != null) {
-//            World world = player.getEntityWorld();
-//            BlockPos blockPos = mouseOver.getBlockPos();
-//            IBlockState state = world.getBlockState(blockPos);
-//            Block block = state.getBlock();
-//            if (block != null && block.getMaterial(state) != Material.AIR) {
-//                Set<BlockPos> coordinates = findSuitableBlocks(wand, world, mouseOver.sideHit, blockPos);
-//                renderOutlines(evt, player, coordinates, 200, 230, 180);
-//            }
-//        }
+        RayTraceResult mouseOver = Minecraft.getInstance().objectMouseOver;
+
+        if (mouseOver instanceof BlockRayTraceResult) {
+            BlockRayTraceResult br = (BlockRayTraceResult) mouseOver;
+
+            World world = player.getEntityWorld();
+            BlockPos blockPos = br.getPos();
+            BlockState state = world.getBlockState(blockPos);
+            if (!state.isAir(world, blockPos)) {
+                Set<BlockPos> coordinates = findSuitableBlocks(wand, world, br.getFace(), blockPos);
+                renderOutlines(evt, player, coordinates, 200, 230, 180);
+            }
+        }
     }
 
     private Set<BlockPos> findSuitableBlocks(ItemStack stack, World world, Direction sideHit, BlockPos pos) {

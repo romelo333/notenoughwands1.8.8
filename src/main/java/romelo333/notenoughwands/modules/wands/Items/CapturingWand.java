@@ -28,7 +28,7 @@ import java.util.List;
 public class CapturingWand extends GenericWand {
 
     public CapturingWand() {
-        setup().loot(3).usageFactory(3.0f);
+        setup().usageFactor(3.0f);
     }
 
     @Override
