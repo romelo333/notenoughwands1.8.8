@@ -35,6 +35,8 @@ public class Items extends BaseItemModelProvider {
         itemHandheld(ProtectionWandModule.MASTER_PROTECTION_WAND.get(), "item/master_protection_wand");
 
         itemHandheld(LightModule.ILLUMINATION_WAND.get(), "item/illumination_wand");
+
+        parentedItem(LightModule.LIGHT_ITEM.get(), "block/light");
     }
 
     @Override
