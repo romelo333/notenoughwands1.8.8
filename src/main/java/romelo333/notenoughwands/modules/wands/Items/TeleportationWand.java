@@ -34,7 +34,7 @@ public class TeleportationWand extends GenericWand {
 
 
     public TeleportationWand() {
-        setup().usageFactor(2.0f);
+        this.usageFactor(2.0f);
     }
 
     @Override

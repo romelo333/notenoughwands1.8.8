@@ -62,7 +62,7 @@ public class SwappingWand extends GenericWand {
 
 
     public SwappingWand() {
-        setup().usageFactor(1.0f);
+        this.usageFactor(1.0f);
     }
 
     @Override

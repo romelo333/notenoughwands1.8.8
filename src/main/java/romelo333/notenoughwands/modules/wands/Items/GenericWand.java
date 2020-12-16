@@ -28,15 +28,12 @@ import romelo333.notenoughwands.varia.ItemCapabilityProvider;
 import romelo333.notenoughwands.varia.Tools;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 public class GenericWand extends Item implements IEnergyItem {
 
     protected float usageFactor = 1.0f;
-
-    private static List<GenericWand> wands = new ArrayList<>();
 
     public GenericWand() {
         super(new Item.Properties().group(NotEnoughWands.setup.getTab())
@@ -103,12 +100,6 @@ public class GenericWand extends Item implements IEnergyItem {
             return (max - getEnergyStored(stack)) / (double) max;
         }
         return super.getDurabilityForDisplay(stack);
-    }
-
-    public GenericWand setup() {
-        // @todo 1.15
-        wands.add(this);
-        return this;
     }
 
     public GenericWand usageFactor(float usageFactor) {
@@ -213,13 +204,6 @@ public class GenericWand extends Item implements IEnergyItem {
 
     //------------------------------------------------------------------------------
 
-
-    public static List<GenericWand> getWands() {
-        return wands;
-    }
-
-    //------------------------------------------------------------------------------
-
     public void renderOverlay(RenderWorldLastEvent evt, PlayerEntity player, ItemStack wand) {
 
     }
@@ -293,11 +277,11 @@ public class GenericWand extends Item implements IEnergyItem {
     }
 
     private int calculatePower() {
-        return (int) (100 * usageFactor);       // @todo 1.15 balance
+        return (int) (500 * usageFactor);       // @todo 1.15 balance
     }
 
     private int calculateMaxPower() {
-        return (int) (10000 * usageFactor);       // @todo 1.15 balance
+        return (int) (100000 * usageFactor);       // @todo 1.15 balance
     }
 
     private int calculateXP() {

@@ -61,7 +61,7 @@ public class BuildingWand extends GenericWand {
     public static final int[] amount = new int[] { 9, 9, 25, 25, 1 };
 
     public BuildingWand() {
-        setup().usageFactor(1.0f);
+        this.usageFactor(1.0f);
     }
 
     private int countUndoStates(ItemStack stack) {

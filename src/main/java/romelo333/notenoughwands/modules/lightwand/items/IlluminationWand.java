@@ -27,7 +27,7 @@ import static mcjty.lib.builder.TooltipBuilder.*;
 public class IlluminationWand extends GenericWand {
 
     public IlluminationWand() {
-        setup().usageFactor(1);
+        this.usageFactor(1);
     }
 
     private final TooltipBuilder tooltipBuilder = new TooltipBuilder()

@@ -24,7 +24,7 @@ import java.util.List;
 public class PotionWand extends GenericWand {
 
     public PotionWand() {
-        setup().usageFactor(2.0f);
+        this.usageFactor(2.0f);
     }
 
     private String getEffectName(EffectInstance potioneffect){

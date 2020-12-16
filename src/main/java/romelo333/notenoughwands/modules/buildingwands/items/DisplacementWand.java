@@ -54,7 +54,7 @@ public class DisplacementWand extends GenericWand {
 
 
     public DisplacementWand() {
-        setup().usageFactor(1.0f);
+        this.usageFactor(1.0f);
     }
 
     @Override

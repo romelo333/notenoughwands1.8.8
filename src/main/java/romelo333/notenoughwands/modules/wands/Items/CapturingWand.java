@@ -34,7 +34,7 @@ import static mcjty.lib.builder.TooltipBuilder.*;
 public class CapturingWand extends GenericWand {
 
     public CapturingWand() {
-        setup().usageFactor(3.0f);
+        this.usageFactor(3.0f);
     }
 
 

@@ -50,7 +50,7 @@ public class AccelerationWand extends GenericWand {
     public static final float[] cost = new float[] { 1.0f, 2.0f, 5.0f};
 
     public AccelerationWand() {
-        setup().usageFactor(3.0f);
+        this.usageFactor(3.0f);
     }
 
     private Random random = new Random();
