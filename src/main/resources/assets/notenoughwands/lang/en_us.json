@@ -11,8 +11,8 @@
   "item.notenoughwands.acceleration_wand": "Acceleration Wand",
   "item.notenoughwands.freezing_wand": "Freezing Wand (WIP)",
   "item.notenoughwands.potion_wand": "Potion Wand",
-  "item.notenoughwands.wandcore": "Wand Core",
-  "item.notenoughwands.advanced_wandcore": "Advanced Wand Core",
+  "item.notenoughwands.wand_core": "Wand Core",
+  "item.notenoughwands.advanced_wand_core": "Advanced Wand Core",
 
   "block.notenoughwands.light": "Illuminating Orb",
 
