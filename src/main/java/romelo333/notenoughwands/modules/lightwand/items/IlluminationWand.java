@@ -1,6 +1,7 @@
 package romelo333.notenoughwands.modules.lightwand.items;
 
 
+import mcjty.lib.builder.TooltipBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
@@ -12,7 +13,6 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -22,17 +22,23 @@ import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 import javax.annotation.Nullable;
 import java.util.List;
 
+import static mcjty.lib.builder.TooltipBuilder.*;
+
 public class IlluminationWand extends GenericWand {
+
     public IlluminationWand() {
         setup().usageFactor(1);
     }
 
+    private final TooltipBuilder tooltipBuilder = new TooltipBuilder()
+            .info(key("message.notenoughwands.shiftmessage"))
+            .infoShift(header(), gold());
+
+
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> list, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, list, flagIn);
-        // @todo 1.15 tooltip
-        list.add(new StringTextComponent("Right click on block to spawn light."));
-        list.add(new StringTextComponent("Right click on light to remove it again."));
+        tooltipBuilder.makeTooltip(getRegistryName(), stack, list, flagIn);
     }
 
     @Override

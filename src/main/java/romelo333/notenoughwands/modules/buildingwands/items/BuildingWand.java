@@ -78,7 +78,6 @@ public class BuildingWand extends GenericWand {
         super.addInformation(itemStack, world, list, flags);
         tooltipBuilder.makeTooltip(getRegistryName(), itemStack, list, flags);
 
-        // @todo 1.15
         showModeKeyDescription(list, "switch mode");
         showSubModeKeyDescription(list, "change orientation");
     }

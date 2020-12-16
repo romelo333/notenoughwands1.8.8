@@ -35,6 +35,20 @@
   "message.notenoughwands.swapping_wand.gold": "Right click in empty air to select 'offhand' mode or right click on block to replace",
   "message.notenoughwands.swapping_wand.mode": "Mode: ",
 
+  "message.notenoughwands.illumination_wand.header": "Right click on block to spawn light",
+  "message.notenoughwands.illumination_wand.gold": "Right click on light to remove it again",
+
+  "message.notenoughwands.acceleration_wand.header": "Right click on block to speed up ticks",
+  "message.notenoughwands.acceleration_wand.gold": "Sneak right click to pull blocks",
+  "message.notenoughwands.acceleration_wand.mode": "Mode: ",
+
+  "message.notenoughwands.capturing_wand.header": "Left click on creature to capture it",
+  "message.notenoughwands.capturing_wand.gold": "Right click on block to respawn creature",
+
+  "message.notenoughwands.teleportation_wand.header": "Right click to teleport forward until a block is hit or maximum distance is reached",
+  "message.notenoughwands.teleportation_wand.sneak1": "Sneak to teleport through walls",
+  "message.notenoughwands.teleportation_wand.sneak2": "Sneak for half distance",
+
 
   "key.modifier": "Wand Modifier",
   "key.categories.notenoughwands": "Not Enough Wands",

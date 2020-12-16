@@ -82,7 +82,6 @@ public class SwappingWand extends GenericWand {
         tooltipBuilder.makeTooltip(getRegistryName(), stack, list, flagIn);
         list.add(getBlockDescription(stack));
 
-        // @todo 1.15
         showModeKeyDescription(list, "switch mode");
     }
 

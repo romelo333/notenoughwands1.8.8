@@ -1,6 +1,7 @@
 package romelo333.notenoughwands.modules.wands.Items;
 
 
+import mcjty.lib.builder.TooltipBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
@@ -25,6 +26,8 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
 
+import static mcjty.lib.builder.TooltipBuilder.*;
+
 public class AccelerationWand extends GenericWand {
 
     public static final int MODE_FIRST = 0;
@@ -33,9 +36,15 @@ public class AccelerationWand extends GenericWand {
     public static final int MODE_100 = 2;
     public static final int MODE_LAST = MODE_100;
 
-    public static final String[] descriptions = new String[] {
+    public static final String[] DESCRIPTIONS = new String[] {
             "fast", "faster", "fastest"
     };
+
+    private final TooltipBuilder tooltipBuilder = new TooltipBuilder()
+            .info(key("message.notenoughwands.shiftmessage"))
+            .infoShift(header(), gold(),
+                    parameter("mode", stack -> DESCRIPTIONS[getMode(stack)]));
+
 
     public static final int[] amount = new int[] { 20, 50, 100};
     public static final float[] cost = new float[] { 1.0f, 2.0f, 5.0f};
@@ -49,10 +58,10 @@ public class AccelerationWand extends GenericWand {
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flagIn) {
         super.addInformation(stack, world, list, flagIn);
-        // @todo 1.15 tooltips
-        list.add(new StringTextComponent(TextFormatting.GREEN + "Mode: " + descriptions[getMode(stack)]));
-        list.add(new StringTextComponent("Right click on block to speed up ticks."));
+        tooltipBuilder.makeTooltip(getRegistryName(), stack, list, flagIn);
+
         showModeKeyDescription(list, "change speed");
+
         if (Math.abs(WandsConfiguration.fakePlayerFactor.get() -1.0f) >= 0.01) {
             if (WandsConfiguration.fakePlayerFactor.get() < 0) {
                 list.add(new StringTextComponent(TextFormatting.RED + "Usage in a machine has been disabled in config!"));
@@ -117,7 +126,7 @@ public class AccelerationWand extends GenericWand {
         if (mode > MODE_LAST) {
             mode = MODE_FIRST;
         }
-        Tools.notify(player, new StringTextComponent("Switched to " + descriptions[mode] + " mode"));
+        Tools.notify(player, new StringTextComponent("Switched to " + DESCRIPTIONS[mode] + " mode"));
         stack.getOrCreateTag().putInt("mode", mode);
     }
 

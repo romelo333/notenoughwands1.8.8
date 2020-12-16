@@ -1,6 +1,7 @@
 package romelo333.notenoughwands.modules.wands.Items;
 
 
+import mcjty.lib.builder.TooltipBuilder;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -10,7 +11,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.*;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.registries.ForgeRegistries;
 import romelo333.notenoughwands.ModSounds;
@@ -21,7 +23,15 @@ import romelo333.notenoughwands.varia.Tools;
 import javax.annotation.Nullable;
 import java.util.List;
 
+import static mcjty.lib.builder.TooltipBuilder.header;
+import static mcjty.lib.builder.TooltipBuilder.key;
+
 public class TeleportationWand extends GenericWand {
+
+    private final TooltipBuilder tooltipBuilder = new TooltipBuilder()
+            .info(key("message.notenoughwands.shiftmessage"))
+            .infoShift(header());
+
 
     public TeleportationWand() {
         setup().usageFactor(2.0f);
@@ -30,14 +40,12 @@ public class TeleportationWand extends GenericWand {
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> list, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, list, flagIn);
-        // @todo 1.15 proper tooltip system
-        list.add(new StringTextComponent("Right click to teleport forward"));
-        list.add(new StringTextComponent("until a block is hit or maximum"));
-        list.add(new StringTextComponent("distance is reached."));
+        tooltipBuilder.makeTooltip(getRegistryName(), stack, list, flagIn);
+
         if (WandsConfiguration.teleportThroughWalls.get()) {
-            list.add(new StringTextComponent("Sneak to teleport through walls"));
+            list.add(new TranslationTextComponent("message.notenoughwands.teleportation_wand.sneak1").applyTextStyle(TextFormatting.GOLD));
         } else {
-            list.add(new StringTextComponent("Sneak for half distance"));
+            list.add(new TranslationTextComponent("message.notenoughwands.teleportation_wand.sneak2").applyTextStyle(TextFormatting.GOLD));
         }
     }
 

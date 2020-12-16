@@ -62,7 +62,6 @@ public class DisplacementWand extends GenericWand {
         super.addInformation(stack, worldIn, list, flagIn);
         tooltipBuilder.makeTooltip(getRegistryName(), stack, list, flagIn);
 
-        // @todo 1.15
         showModeKeyDescription(list, "switch mode");
     }
 

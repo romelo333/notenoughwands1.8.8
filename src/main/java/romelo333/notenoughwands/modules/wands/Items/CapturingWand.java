@@ -1,6 +1,7 @@
 package romelo333.notenoughwands.modules.wands.Items;
 
 
+import mcjty.lib.builder.TooltipBuilder;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -28,17 +29,26 @@ import romelo333.notenoughwands.varia.Tools;
 import javax.annotation.Nullable;
 import java.util.List;
 
+import static mcjty.lib.builder.TooltipBuilder.*;
+
 public class CapturingWand extends GenericWand {
 
     public CapturingWand() {
         setup().usageFactor(3.0f);
     }
 
+
+    private final TooltipBuilder tooltipBuilder = new TooltipBuilder()
+            .info(key("message.notenoughwands.shiftmessage"))
+            .infoShift(header(), gold());
+
+
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> list, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, list, flagIn);
+        tooltipBuilder.makeTooltip(getRegistryName(), stack, list, flagIn);
+
         CompoundNBT tagCompound = stack.getTag();
-        // @todo 1.15 tooltips
         if (tagCompound != null) {
             if (tagCompound.contains("mob")) {
                 String type = tagCompound.getString("type");
@@ -50,8 +60,6 @@ public class CapturingWand extends GenericWand {
                 }
             }
         }
-        list.add(new StringTextComponent("Left click on creature to capture it."));
-        list.add(new StringTextComponent("Right click on block to respawn creature."));
     }
 
     @Override

@@ -17,6 +17,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import romelo333.notenoughwands.NotEnoughWands;
+import romelo333.notenoughwands.keys.KeyBindings;
 import romelo333.notenoughwands.modules.buildingwands.BlackListSettings;
 import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
 import romelo333.notenoughwands.modules.wands.WandUsage;
@@ -227,19 +228,16 @@ public class GenericWand extends Item implements IEnergyItem {
         MatrixStack matrixStack = evt.getMatrixStack();
         IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
         ClientTools.renderOutlines(matrixStack, buffer, coordinates, r, g, b);
-//        BlockOutlineRenderer.renderOutlines(p, coordinates, r, g, b, evt.getPartialTicks());
     }
 
     protected void showModeKeyDescription(List<ITextComponent> list, String suffix) {
-        // @todo 1.15
-//        String keyDescription = KeyBindings.wandModifier != null ? KeyBindings.wandModifier.getDisplayName() : "unknown";
-//        list.add("Mode key (" + keyDescription + ") to " + suffix);
+        String keyDescription = KeyBindings.wandModifier != null ? KeyBindings.wandModifier.getLocalizedName() : "unknown";
+        list.add(new StringTextComponent("Mode key (" + keyDescription + ") to " + suffix).applyTextStyle(TextFormatting.YELLOW));
     }
 
     protected void showSubModeKeyDescription(List<ITextComponent> list, String suffix) {
-        // @todo 1.15
-//        String keyDescription = KeyBindings.wandSubMode != null ? KeyBindings.wandSubMode.getDisplayName() : "unknown";
-//        list.add("Sub-mode key (" + keyDescription + ") to " + suffix);
+        String keyDescription = KeyBindings.wandSubMode != null ? KeyBindings.wandSubMode.getLocalizedName() : "unknown";
+        list.add(new StringTextComponent("Sub-mode key (" + keyDescription + ") to " + suffix).applyTextStyle(TextFormatting.YELLOW));
     }
 
     //------------------------------------------------------------------------------
