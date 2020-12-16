@@ -3,6 +3,7 @@ package romelo333.notenoughwands.modules.wands.Items;
 
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.PlayerEntity;
@@ -12,12 +13,14 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.registries.ForgeRegistries;
 import romelo333.notenoughwands.modules.buildingwands.BlackListSettings;
 import romelo333.notenoughwands.modules.wands.WandsConfiguration;
 import romelo333.notenoughwands.varia.Tools;
@@ -39,13 +42,12 @@ public class CapturingWand extends GenericWand {
         if (tagCompound != null) {
             if (tagCompound.contains("mob")) {
                 String type = tagCompound.getString("type");
-                String name = null;
-                try {
-                    name = Class.forName(type).getSimpleName();
-                } catch (ClassNotFoundException e) {
-                    name = "?";
+                if (!type.isEmpty()) {
+                    EntityType<?> entityType = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(type));
+                    if (entityType != null) {
+                        list.add(new StringTextComponent(TextFormatting.GREEN + "Captured mob: ").appendSibling(entityType.getName()));
+                    }
                 }
-                list.add(new StringTextComponent(TextFormatting.GREEN + "Captured mob: " + name));
             }
         }
         list.add(new StringTextComponent("Left click on creature to capture it."));
@@ -82,13 +84,11 @@ public class CapturingWand extends GenericWand {
     }
 
     private LivingEntity createEntity(PlayerEntity player, World world, String type) {
-        LivingEntity entityLivingBase;
-        try {
-            entityLivingBase = (LivingEntity) Class.forName(type).getConstructor(World.class).newInstance(world);
-        } catch (Exception e) {
-            entityLivingBase = null;
+        EntityType<?> entityType = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(type));
+        if (entityType != null) {
+            return (LivingEntity) entityType.create(world);
         }
-        return entityLivingBase;
+        return null;
     }
 
     @Override
@@ -127,7 +127,7 @@ public class CapturingWand extends GenericWand {
                 CompoundNBT tagCompound = new CompoundNBT();
                 entityLivingBase.writeAdditional(tagCompound);  // @todo 1.15 is this right?
                 stack.getOrCreateTag().put("mob", tagCompound);
-                stack.getOrCreateTag().putString("type", entity.getClass().getCanonicalName());
+                stack.getOrCreateTag().putString("type", entity.getType().getRegistryName().toString());
                 ((ServerWorld)player.getEntityWorld()).removeEntity(entity);
 
                 registerUsage(stack, player, difficultyScale);
