@@ -31,6 +31,10 @@ public class NotEnoughWands {
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(setup::init);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(modules::init);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(Config::onLoad);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(Config::onReload);
+
+//        MinecraftForge.EVENT_BUS.addListener(Config::onLoad);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             FMLJavaModLoadingContext.get().getModEventBus().addListener(modules::initClient);
             FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientSetup::init);

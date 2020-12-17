@@ -10,8 +10,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -20,7 +18,6 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -110,7 +107,7 @@ public class Tools {
     public static ITextComponent getBlockName(Block block) {
         ItemStack s = new ItemStack(block, 1);
         if (s.getItem() == null) {
-            return null;
+            return new StringTextComponent("<null>");
         }
         return s.getDisplayName();
     }
@@ -155,28 +152,4 @@ public class Tools {
         }
         return i - 1;
     }
-
-    // Server side: play a sound to all nearby players
-    public static void playSound(World worldObj, String soundName, double x, double y, double z, double volume, double pitch) {
-        SoundEvent event = ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation(soundName));
-        playSound(worldObj, event, x, y, z, volume, pitch);
-    }
-
-    public static void playSound(World worldObj, SoundEvent soundEvent, double x, double y, double z, double volume, double pitch) {
-        // @todo 1.15
-//        SPacketSoundEffect soundEffect = new SPacketSoundEffect(soundEvent, SoundCategory.BLOCKS, x, y, z, (float) volume, (float) pitch);
-//
-//        for (int j = 0; j < worldObj.playerEntities.size(); ++j) {
-//            EntityPlayerMP entityplayermp = (EntityPlayerMP)worldObj.playerEntities.get(j);
-//            double d7 = x - entityplayermp.posX;
-//            double d8 = y - entityplayermp.posY;
-//            double d9 = z - entityplayermp.posZ;
-//            double d10 = d7 * d7 + d8 * d8 + d9 * d9;
-//
-//            if (d10 <= 256.0D) {
-//                entityplayermp.connection.sendPacket(soundEffect);
-//            }
-//        }
-    }
-
 }

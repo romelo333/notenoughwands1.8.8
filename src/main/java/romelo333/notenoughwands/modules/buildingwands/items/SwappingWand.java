@@ -2,6 +2,7 @@ package romelo333.notenoughwands.modules.buildingwands.items;
 
 
 import mcjty.lib.builder.TooltipBuilder;
+import mcjty.lib.varia.SoundTools;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -13,10 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
@@ -29,7 +27,6 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.items.ItemHandlerHelper;
-import romelo333.notenoughwands.modules.buildingwands.BlackListSettings;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsConfiguration;
 import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
@@ -193,7 +190,7 @@ public class SwappingWand extends GenericWand {
         BlockState oldState = world.getBlockState(pos);
         Block oldblock = oldState.getBlock();
 
-        double cost = BlackListSettings.getBlacklistCost(oldState);
+        double cost = BuildingWandsConfiguration.getBlockCost(oldState);
         if (cost <= 0.001f) {
             Tools.error(player, "It is illegal to swap this block");
             return;
@@ -236,7 +233,7 @@ public class SwappingWand extends GenericWand {
                     ItemStack oldblockItem = oldblock.getPickBlock(oldState, null, world, pos, player);
                     ItemHandlerHelper.giveItemToPlayer(player, oldblockItem);
                 }
-                Tools.playSound(world, blockState.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
+                SoundTools.playSound(world, blockState.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
                 BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, coordinate);
                 world.setBlockState(coordinate, Blocks.AIR.getDefaultState());
                 Tools.placeStackAt(player, consumed, world, coordinate, null);
@@ -268,7 +265,7 @@ public class SwappingWand extends GenericWand {
         if (name == null) {
             Tools.error(player, "You cannot select this block!");
         } else {
-            double cost = BlackListSettings.getBlacklistCost(state);
+            double cost = BuildingWandsConfiguration.getBlockCost(state);
             if (cost <= 0.001f) {
                 Tools.error(player, "It is illegal to swap this block");
                 return;

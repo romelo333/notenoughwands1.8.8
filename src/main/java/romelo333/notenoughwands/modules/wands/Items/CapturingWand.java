@@ -22,7 +22,6 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.registries.ForgeRegistries;
-import romelo333.notenoughwands.modules.buildingwands.BlackListSettings;
 import romelo333.notenoughwands.modules.wands.WandsConfiguration;
 import romelo333.notenoughwands.varia.Tools;
 
@@ -121,7 +120,7 @@ public class CapturingWand extends GenericWand {
                     Tools.error(player, "It is not possible to capture passive mobs with this wand!");
                     return true;
                 }
-                double cost = BlackListSettings.getBlacklistEntity(entity);
+                double cost = WandsConfiguration.getEntityCost(entity);
                 if (cost <= 0.001f) {
                     Tools.error(player, "It is illegal to take this entity");
                     return true;

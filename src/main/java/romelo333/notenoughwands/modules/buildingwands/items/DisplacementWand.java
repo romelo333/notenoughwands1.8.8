@@ -2,6 +2,7 @@ package romelo333.notenoughwands.modules.buildingwands.items;
 
 
 import mcjty.lib.builder.TooltipBuilder;
+import mcjty.lib.varia.SoundTools;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -131,7 +132,7 @@ public class DisplacementWand extends GenericWand {
                 double cost = GenericWand.checkPickup(player, world, otherC, state, BuildingWandsConfiguration.maxHardness.get());
                 if (cost >= 0.0) {
                     cnt++;
-                    Tools.playSound(world, block.getSoundType(state).getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
+                    SoundTools.playSound(world, block.getSoundType(state).getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
                     TileEntity tileEntity = world.getTileEntity(coordinate);
                     CompoundNBT tc = null;
                     if (tileEntity != null) {

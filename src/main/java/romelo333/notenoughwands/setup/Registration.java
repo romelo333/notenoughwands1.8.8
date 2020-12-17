@@ -32,22 +32,4 @@ public class Registration {
 //    public static void registerSounds(RegistryEvent.Register<SoundEvent> event) {
 //        ModSounds.init(event.getRegistry());
 //    }
-//
-//    @SubscribeEvent
-//    public static void registerBlocks(RegistryEvent.Register<Block> event) {
-//        ModBlocks.lightBlock = new LightBlock();
-//        event.getRegistry().register(ModBlocks.lightBlock);
-//        GameRegistry.registerTileEntity(LightTE.class, "LightTileEntity");
-//    }
-//
-//    @SubscribeEvent
-//    public static void registerItems(RegistryEvent.Register<Item> event) {
-//        event.getRegistry().register(ModItems.wandCore);
-//        event.getRegistry().register(ModItems.advancedWandCore);
-//
-//        for (GenericWand wand : GenericWand.getWands()) {
-//            event.getRegistry().register(wand);
-//        }
-//    }
-
 }

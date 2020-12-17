@@ -26,7 +26,6 @@ public class FreezingWand extends GenericWand {
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> list, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, list, flagIn);
-        // @todo 1.15 better tooltips
         list.add(new StringTextComponent("Right click on creature to freeze creature."));
     }
 

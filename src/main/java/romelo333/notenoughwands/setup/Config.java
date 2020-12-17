@@ -2,8 +2,12 @@ package romelo333.notenoughwands.setup;
 
 import mcjty.lib.modules.Modules;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import romelo333.notenoughwands.modules.buildingwands.BuildingWandsConfiguration;
+import romelo333.notenoughwands.modules.wands.WandsConfiguration;
 
 public class Config {
 
@@ -30,4 +34,17 @@ public class Config {
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CLIENT_CONFIG);
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, SERVER_CONFIG);
     }
+
+    public static void onLoad(final ModConfig.Loading configEvent) {
+        System.out.println("@@@@@@@@@@@@@@@@@@ Config.onLoad");
+        BuildingWandsConfiguration.reloadConfig();
+        WandsConfiguration.reloadConfig();
+    }
+
+    public static void onReload(final ModConfig.Reloading configEvent) {
+        System.out.println("@@@@@@@@@@@@@@@@@@ Config.onReload");
+        BuildingWandsConfiguration.reloadConfig();
+        WandsConfiguration.reloadConfig();
+    }
+
 }
