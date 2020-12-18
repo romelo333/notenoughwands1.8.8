@@ -21,8 +21,8 @@ public class ForgeEventHandlers {
             return;
         }
         BlockPos pos = event.getPos();
-        ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world.getWorld());
-        if (protectedBlocks.isProtected(world.getWorld(), pos)) {
+        ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks((World)world);
+        if (protectedBlocks.isProtected((World)world, pos)) {
             event.setCanceled(true);
         }
     }

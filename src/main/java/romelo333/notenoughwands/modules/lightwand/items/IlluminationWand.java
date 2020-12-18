@@ -52,7 +52,7 @@ public class IlluminationWand extends GenericWand {
         if (!world.isRemote) {
             Block block = world.getBlockState(pos).getBlock();
             if (block == LightModule.LIGHT.get()) {
-                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, pos);
+                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.create(world.getDimensionKey(), world, pos);
                 world.setBlockState(pos, Blocks.AIR.getDefaultState());
                 if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
                     blocksnapshot.restore(true, false);
@@ -69,7 +69,7 @@ public class IlluminationWand extends GenericWand {
                 return ActionResultType.SUCCESS;
             }
 
-            BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, offset);
+            BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.create(world.getDimensionKey(), world, offset);
             world.setBlockState(offset, LightModule.LIGHT.get().getDefaultState(), 3);
             if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
                 blocksnapshot.restore(true, false);

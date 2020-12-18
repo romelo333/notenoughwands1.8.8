@@ -21,7 +21,7 @@ public class LightBlock extends Block {
                 .notSolid()
                 .noDrops()
                 .doesNotBlockMovement()
-                .lightValue(15));
+                .setLightLevel(state -> 15));
     }
 
     @Override

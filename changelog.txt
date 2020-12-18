@@ -1,5 +1,5 @@
-2.0.0:
-- Port of Not Enough Wands to 1.15
+3.0.0:
+- Port of Not Enough Wands to 1.16
 
 1.8.1:
 - Fixed a problem where the wand configs weren't being respected anymore

@@ -79,7 +79,7 @@ public class GenericWand extends Item implements IEnergyItem {
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
         if (needsPower()) {
-            tooltip.add(new StringTextComponent("Energy: " + getEnergyStored(stack) + " / " + getMaxEnergyStored(stack)).applyTextStyle(TextFormatting.GREEN));
+            tooltip.add(new StringTextComponent("Energy: " + getEnergyStored(stack) + " / " + getMaxEnergyStored(stack)).mergeStyle(TextFormatting.GREEN));
         }
     }
 
@@ -179,13 +179,13 @@ public class GenericWand extends Item implements IEnergyItem {
     }
 
     protected void showModeKeyDescription(List<ITextComponent> list, String suffix) {
-        String keyDescription = KeyBindings.wandModifier != null ? KeyBindings.wandModifier.getLocalizedName() : "unknown";
-        list.add(new StringTextComponent("Mode key (" + keyDescription + ") to " + suffix).applyTextStyle(TextFormatting.YELLOW));
+        String keyDescription = KeyBindings.wandModifier != null ? KeyBindings.wandModifier.getKeyDescription() : "unknown";
+        list.add(new StringTextComponent("Mode key (" + keyDescription + ") to " + suffix).mergeStyle(TextFormatting.YELLOW));
     }
 
     protected void showSubModeKeyDescription(List<ITextComponent> list, String suffix) {
-        String keyDescription = KeyBindings.wandSubMode != null ? KeyBindings.wandSubMode.getLocalizedName() : "unknown";
-        list.add(new StringTextComponent("Sub-mode key (" + keyDescription + ") to " + suffix).applyTextStyle(TextFormatting.YELLOW));
+        String keyDescription = KeyBindings.wandSubMode != null ? KeyBindings.wandSubMode.getKeyDescription() : "unknown";
+        list.add(new StringTextComponent("Sub-mode key (" + keyDescription + ") to " + suffix).mergeStyle(TextFormatting.YELLOW));
     }
 
     //------------------------------------------------------------------------------

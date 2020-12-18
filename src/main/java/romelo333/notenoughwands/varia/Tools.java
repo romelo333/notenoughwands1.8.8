@@ -12,7 +12,8 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -27,8 +28,8 @@ public class Tools {
         player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + msg), false);
     }
 
-    public static void notify(PlayerEntity player, ITextComponent msg) {
-        player.sendStatusMessage(msg.applyTextStyle(TextFormatting.GREEN), false);
+    public static void notify(PlayerEntity player, IFormattableTextComponent msg) {
+        player.sendStatusMessage(msg.mergeStyle(TextFormatting.GREEN), false);
     }
 
     // PlaceStackAt from a perspective of a wand
@@ -37,7 +38,7 @@ public class Tools {
         ItemStack old = player.getHeldItem(Hand.MAIN_HAND);
         player.setHeldItem(Hand.MAIN_HAND, blockStack);
 
-        BlockRayTraceResult trace = new BlockRayTraceResult(new Vec3d(0, 0, 0), Direction.UP, pos, false);
+        BlockRayTraceResult trace = new BlockRayTraceResult(new Vector3d(0, 0, 0), Direction.UP, pos, false);
         BlockItemUseContext context = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, trace));
         if (blockStack.getItem() instanceof BlockItem) {
             BlockItem itemBlock = (BlockItem) blockStack.getItem();

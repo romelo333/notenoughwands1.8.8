@@ -18,7 +18,8 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceContext;
-import net.minecraft.util.math.Vec3d;
+;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -55,11 +56,11 @@ public class MovingWand extends GenericWand {
     private ITextComponent getBlockDescription(ItemStack stack) {
         CompoundNBT compound = stack.getTag();
         if (!hasBlock(compound)) {
-            return new StringTextComponent("Wand is empty").applyTextStyle(TextFormatting.RED);
+            return new StringTextComponent("Wand is empty").mergeStyle(TextFormatting.RED);
         } else {
             BlockState state = NBTUtil.readBlockState(compound.getCompound("block"));
             ITextComponent name = Tools.getBlockName(state.getBlock());
-            return new StringTextComponent("Block: ").appendSibling(name).applyTextStyle(TextFormatting.GREEN);
+            return new StringTextComponent("Block: ").append(name).mergeStyle(TextFormatting.GREEN);
         }
     }
 
@@ -74,10 +75,10 @@ public class MovingWand extends GenericWand {
         if (!world.isRemote) {
             CompoundNBT compound = stack.getTag();
             if (hasBlock(compound)) {
-                Vec3d lookVec = player.getLookVec();
-                Vec3d start = new Vec3d(player.getPosX(), player.getPosY() + player.getEyeHeight(), player.getPosZ());
+                Vector3d lookVec = player.getLookVec();
+                Vector3d start = new Vector3d(player.getPosX(), player.getPosY() + player.getEyeHeight(), player.getPosZ());
                 int distance = BuildingWandsConfiguration.placeDistance.get();
-                Vec3d end = start.add(lookVec.x * distance, lookVec.y * distance, lookVec.z * distance);
+                Vector3d end = start.add(lookVec.x * distance, lookVec.y * distance, lookVec.z * distance);
                 RayTraceContext context = new RayTraceContext(start, end, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, null);
                 BlockRayTraceResult position = world.rayTraceBlocks(context);
                 if (position == null) {
@@ -127,7 +128,7 @@ public class MovingWand extends GenericWand {
         CompoundNBT tagCompound = stack.getOrCreateTag();
         BlockState blockState = NBTUtil.readBlockState(tagCompound.getCompound("block"));
 
-        BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, pp);
+        BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.create(world.getDimensionKey(), world, pp);
 
         world.setBlockState(pp, blockState, Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
         if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
@@ -140,7 +141,7 @@ public class MovingWand extends GenericWand {
             tc.putInt("x", pp.getX());
             tc.putInt("y", pp.getY());
             tc.putInt("z", pp.getZ());
-            TileEntity tileEntity = TileEntity.create(tc);
+            TileEntity tileEntity = TileEntity.readTileEntity(blockState, tc);
             if (tileEntity != null) {
                 world.getChunk(pp).addTileEntity(pp, tileEntity);
                 tileEntity.markDirty();
@@ -190,7 +191,7 @@ public class MovingWand extends GenericWand {
             }
             world.setBlockState(pos, Blocks.AIR.getDefaultState());
 
-            Tools.notify(player, new StringTextComponent("You took: ").appendSibling(name));
+            Tools.notify(player, new StringTextComponent("You took: ").append(name));
             registerUsage(stack, player, (float) cost);
         }
     }

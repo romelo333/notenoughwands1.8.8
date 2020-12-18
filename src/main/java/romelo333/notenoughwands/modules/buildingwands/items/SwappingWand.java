@@ -18,7 +18,8 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -85,14 +86,14 @@ public class SwappingWand extends GenericWand {
     private ITextComponent getBlockDescription(ItemStack stack) {
         CompoundNBT compound = stack.getTag();
         if (compound == null) {
-            return new StringTextComponent("No selected block").applyTextStyle(TextFormatting.RED);
+            return new StringTextComponent("No selected block").mergeStyle(TextFormatting.RED);
         } else {
             if (isSwappingWithOffHand(stack)) {
-                return new StringTextComponent("Will swap with block in offhand").applyTextStyle(TextFormatting.GREEN);
+                return new StringTextComponent("Will swap with block in offhand").mergeStyle(TextFormatting.GREEN);
             } else {
                 BlockState state = NBTUtil.readBlockState(compound.getCompound("block"));
                 ITextComponent name = Tools.getBlockName(state.getBlock());
-                return new StringTextComponent("Block: ").appendSibling(name).applyTextStyle(TextFormatting.GREEN);
+                return new StringTextComponent("Block: ").append(name).mergeStyle(TextFormatting.GREEN);
             }
         }
     }
@@ -225,7 +226,7 @@ public class SwappingWand extends GenericWand {
             if (!checkUsage(stack, player, 1.0f)) {
                 return;
             }
-            RayTraceResult result = new BlockRayTraceResult(new Vec3d(0, 0, 0), Direction.UP, coordinate, false);
+            RayTraceResult result = new BlockRayTraceResult(new Vector3d(0, 0, 0), Direction.UP, coordinate, false);
             ItemStack pickBlock = blockState.getPickBlock(result, world, coordinate, player);
             ItemStack consumed = Tools.consumeInventoryItem(pickBlock, player.inventory, player);
             if (!consumed.isEmpty()) {
@@ -234,7 +235,7 @@ public class SwappingWand extends GenericWand {
                     ItemHandlerHelper.giveItemToPlayer(player, oldblockItem);
                 }
                 SoundTools.playSound(world, blockState.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
-                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, coordinate);
+                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.create(world.getDimensionKey(), world, coordinate);
                 world.setBlockState(coordinate, Blocks.AIR.getDefaultState());
                 Tools.placeStackAt(player, consumed, world, coordinate, null);
 
@@ -274,7 +275,7 @@ public class SwappingWand extends GenericWand {
             tagCompound.put("block", NBTUtil.writeBlockState(state));
             float hardness = state.getBlockHardness(world, pos);
             tagCompound.putFloat("hardness", hardness);
-            Tools.notify(player, new StringTextComponent("Selected block: ").appendSibling(name));
+            Tools.notify(player, new StringTextComponent("Selected block: ").append(name));
         }
     }
 

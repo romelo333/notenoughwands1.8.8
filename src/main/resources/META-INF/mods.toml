@@ -1,5 +1,6 @@
 modLoader="javafml"
 loaderVersion="[31,)"
+license="MIT License https://github.com/romelo333/notenoughwands1.8.8/blob/1.16/LICENCE"
 issueTrackerURL="http://github.com/romelo333/notenoughwands1.8.8/issues"
 displayURL="http://github.com/romelo333/notenoughwands1.8.8/"
 #logoFile="examplemod.png" #optional

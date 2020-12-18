@@ -142,7 +142,7 @@ public class DisplacementWand extends GenericWand {
 
                     world.setBlockState(coordinate, Blocks.AIR.getDefaultState());
 
-                    BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, otherC);
+                    BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.create(world.getDimensionKey(), world, otherC);
                     BlockState blockState = block.getDefaultState();    // @todo 1.15 blockstate
                     world.setBlockState(otherC, blockState, 3);
                     if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
@@ -156,7 +156,7 @@ public class DisplacementWand extends GenericWand {
                         tc.putInt("x", otherC.getX());
                         tc.putInt("y", otherC.getY());
                         tc.putInt("z", otherC.getZ());
-                        tileEntity = TileEntity.create(tc);
+                        tileEntity = TileEntity.readTileEntity(blockState, tc);
                         if (tileEntity != null) {
                             world.getChunk(otherC).addTileEntity(otherC, tileEntity);
                             tileEntity.markDirty();

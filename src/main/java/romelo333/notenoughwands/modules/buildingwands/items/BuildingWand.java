@@ -19,7 +19,8 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
@@ -138,14 +139,14 @@ public class BuildingWand extends GenericWand {
             if (!checkUsage(wandStack, player, 1.0f)) {
                 break;
             }
-            RayTraceResult result = new BlockRayTraceResult(new Vec3d(0, 0, 0), Direction.UP, coordinate, false);
+            RayTraceResult result = new BlockRayTraceResult(new Vector3d(0, 0, 0), Direction.UP, coordinate, false);
             ItemStack pickBlock = blockState.getPickBlock(result, world, coordinate, player);
             ItemStack consumed = Tools.consumeInventoryItem(pickBlock, player.inventory, player);
             if (!consumed.isEmpty()) {
                 SoundTools.playSound(world, blockState.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
                 //                IBlockState state = block.getStateFromMeta(meta);
 //                world.setBlockState(coordinate, state, 2);
-                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, coordinate);
+                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.create(world.getDimensionKey(), world, coordinate);
                 Tools.placeStackAt(player, consumed, world, coordinate, null);
                 if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
                     blocksnapshot.restore(true, false);
@@ -233,7 +234,7 @@ public class BuildingWand extends GenericWand {
             if (testState == state) {
                 SoundTools.playSound(world, state.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
 
-                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.getBlockSnapshot(world, coordinate);
+                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.create(world.getDimensionKey(), world, coordinate);
                 world.setBlockState(coordinate, Blocks.AIR.getDefaultState());
                 if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
                     blocksnapshot.restore(true, false);
@@ -244,7 +245,7 @@ public class BuildingWand extends GenericWand {
         }
         if (cnt > 0) {
             if (!player.abilities.isCreativeMode) {
-                RayTraceResult result = new BlockRayTraceResult(new Vec3d(0, 0, 0), Direction.UP, pos, false);
+                RayTraceResult result = new BlockRayTraceResult(new Vector3d(0, 0, 0), Direction.UP, pos, false);
                 ItemStack itemStack = state.getPickBlock(result, world, pos, player);
                 itemStack.setCount(cnt);
                 ItemHandlerHelper.giveItemToPlayer(player, itemStack);
@@ -292,7 +293,7 @@ public class BuildingWand extends GenericWand {
             }
             BlockState blockState = world.getBlockState(blockPos);
             Block block = blockState.getBlock();
-            if (block != null && block.getMaterial(blockState) != Material.AIR) {
+            if (block != null && blockState.getMaterial() != Material.AIR) {
                 Set<BlockPos> coordinates;
 
                 if (player.isSneaking()) {

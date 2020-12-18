@@ -10,6 +10,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.*;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -41,9 +42,9 @@ public class TeleportationWand extends GenericWand {
         tooltipBuilder.makeTooltip(getRegistryName(), stack, list, flagIn);
 
         if (WandsConfiguration.teleportThroughWalls.get()) {
-            list.add(new TranslationTextComponent("message.notenoughwands.teleportation_wand.sneak1").applyTextStyle(TextFormatting.GOLD));
+            list.add(new TranslationTextComponent("message.notenoughwands.teleportation_wand.sneak1").mergeStyle(TextFormatting.GOLD));
         } else {
-            list.add(new TranslationTextComponent("message.notenoughwands.teleportation_wand.sneak2").applyTextStyle(TextFormatting.GOLD));
+            list.add(new TranslationTextComponent("message.notenoughwands.teleportation_wand.sneak2").mergeStyle(TextFormatting.GOLD));
         }
     }
 
@@ -54,8 +55,8 @@ public class TeleportationWand extends GenericWand {
             if (!checkUsage(stack, player, 1.0f)) {
                 return ActionResult.resultPass(stack);
             }
-            Vec3d lookVec = player.getLookVec();
-            Vec3d start = new Vec3d(player.getPosX(), player.getPosY() + player.getEyeHeight(), player.getPosZ());
+            Vector3d lookVec = player.getLookVec();
+            Vector3d start = new Vector3d(player.getPosX(), player.getPosY() + player.getEyeHeight(), player.getPosZ());
             int distance = WandsConfiguration.maxdist.get();
             boolean gothrough = false;
             if (player.isSneaking()) {
@@ -65,7 +66,7 @@ public class TeleportationWand extends GenericWand {
                 distance /= 2;
             }
 
-            Vec3d end = start.add(lookVec.x * distance, lookVec.y * distance, lookVec.z * distance);
+            Vector3d end = start.add(lookVec.x * distance, lookVec.y * distance, lookVec.z * distance);
             RayTraceResult position;
             if (gothrough) {
                 position = null;
