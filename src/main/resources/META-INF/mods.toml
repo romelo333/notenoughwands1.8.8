@@ -1,0 +1,28 @@
+modLoader="javafml"
+loaderVersion="[31,)"
+issueTrackerURL="http://github.com/romelo333/notenoughwands1.8.8/issues"
+displayURL="http://github.com/romelo333/notenoughwands1.8.8/"
+#logoFile="examplemod.png" #optional
+#credits="Thanks for this example mod goes to Java" #optional
+authors="McJty, romelo333"
+
+[[mods]]
+modId="notenoughwands"
+version="${file.jarVersion}"
+displayName="Not Enough Wands"
+#updateJSONURL="http://myurl.me/" #optional
+description='''
+You can never have enough wands!
+'''
+[[dependencies.notenoughwands]]
+    modId="forge"
+    mandatory=true
+    versionRange="[31,)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.notenoughwands]]
+    modId="mcjtylib"
+    mandatory=false
+    versionRange="[1.15-4.1.7,)"
+    ordering="AFTER"
+    side="BOTH"

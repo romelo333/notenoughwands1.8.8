@@ -39,8 +39,6 @@ public class GenericWand extends Item implements IEnergyItem {
         super(new Item.Properties().group(NotEnoughWands.setup.getTab())
                 .setNoRepair()
                 .maxStackSize(1)
-//                .maxDamage(666) // @todo 1.15
-//                .defaultMaxDamage(666) // @todo 1.15
         );
     }
 
@@ -121,12 +119,12 @@ public class GenericWand extends Item implements IEnergyItem {
                 return false;
             }
         }
-//        if (needsDamage()) {
-//            if (wandStack.getDamage() >= wandStack.getMaxDamage()) {
-//                Tools.error(player, "This wand can no longer be used!");
-//                return false;
-//            }
-//        }
+        if (needsDamage()) {
+            if (wandStack.getDamage() >= wandStack.getMaxDamage()) {
+                Tools.error(player, "This wand can no longer be used!");
+                return false;
+            }
+        }
         if (needsPower()) {
             int needsrf = calculatePower();
             if (getEnergyStored(wandStack) < (int)(needsrf * difficultyScale)) {
@@ -137,6 +135,16 @@ public class GenericWand extends Item implements IEnergyItem {
         return true;
     }
 
+    @Override
+    public boolean isDamageable() {
+        return needsDamage();
+    }
+
+    @Override
+    public int getMaxDamage(ItemStack stack) {
+        return calculateMaxDamage();
+    }
+
     protected void registerUsage(ItemStack stack, PlayerEntity player, float difficultyScale) {
         if (player.abilities.isCreativeMode) {
             return;
@@ -144,9 +152,9 @@ public class GenericWand extends Item implements IEnergyItem {
         if (needsXP()) {
             Tools.addPlayerXP(player, -(int) (calculateXP() * difficultyScale));
         }
-//        if (isDamageable()) {
-//            stack.damageItem(1, player, playerEntity -> {});
-//        }
+        if (needsDamage()) {
+            stack.damageItem(1, player, playerEntity -> {});
+        }
         if (needsPower()) {
             extractEnergy(stack, (int) (calculatePower() * difficultyScale), false);
         }
@@ -238,6 +246,10 @@ public class GenericWand extends Item implements IEnergyItem {
 
     private int calculateMaxPower() {
         return (int) (100000 * usageFactor);       // @todo 1.15 balance
+    }
+
+    private int calculateMaxDamage() {
+        return (int) (200 / usageFactor);       // @todo 1.15 balance
     }
 
     private int calculateXP() {

@@ -3,7 +3,6 @@ package romelo333.notenoughwands;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
@@ -108,24 +107,6 @@ public class ForgeEventHandlers {
 //            }
 
         }
-    }
-
-    @SubscribeEvent
-    public void onLootLoad(LootTableLoadEvent event) {
-        // @todo 1.15
-//        if (event.getName().equals(LootTableList.CHESTS_ABANDONED_MINESHAFT) ||
-//                event.getName().equals(LootTableList.CHESTS_IGLOO_CHEST) ||
-//                event.getName().equals(LootTableList.CHESTS_DESERT_PYRAMID) ||
-//                event.getName().equals(LootTableList.CHESTS_JUNGLE_TEMPLE) ||
-//                event.getName().equals(LootTableList.CHESTS_NETHER_BRIDGE) ||
-//                event.getName().equals(LootTableList.CHESTS_SIMPLE_DUNGEON) ||
-//                event.getName().equals(LootTableList.CHESTS_VILLAGE_BLACKSMITH)) {
-//            LootPool main = event.getTable().getPool("main");
-//            // Safety, check if the main lootpool is still present
-//            if (main != null) {
-//                GenericWand.setupChestLoot(main);
-//            }
-//        }
     }
 
 //    @SubscribeEvent

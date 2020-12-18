@@ -45,6 +45,16 @@ public class WandsConfiguration {
         SERVER_BUILDER.comment("Settings for the wands").push(CATEGORY_WANDS);
         CLIENT_BUILDER.comment("Settings for the wands").push(CATEGORY_WANDS);
 
+        SERVER_BUILDER.push("general");
+        showDurabilityBarForRF = SERVER_BUILDER
+                .comment("Set this to false if you don't want the durability bar for wands using RF")
+                .define("showDurabilityBarForRF", true);
+        wandUsage = SERVER_BUILDER
+                .comment("Set the type of durability consumption for all wands")
+                .defineEnum("wandUsage", WandUsage.NORMAL_RF);
+        SERVER_BUILDER.pop();
+
+        SERVER_BUILDER.push("teleportation_wand");
         teleportVolume = SERVER_BUILDER
                 .comment("Volume of the teleportation sound (set to 0 to disable)")
                 .defineInRange("teleportVolume", 1.0, 0.0, 10.0);
@@ -54,20 +64,18 @@ public class WandsConfiguration {
         teleportThroughWalls = SERVER_BUILDER
                 .comment("If set to true then sneak-right click will teleport through walls. Otherwise sneak-right click will teleport half distance")
                 .define("teleportThroughWalls", true);
+        SERVER_BUILDER.pop();
 
-        showDurabilityBarForRF = SERVER_BUILDER
-                .comment("Set this to false if you don't want the durability bar for wands using RF")
-                .define("showDurabilityBarForRF", true);
-        wandUsage = SERVER_BUILDER
-                .comment("Set the type of durability consumption for all wands")
-                .defineEnum("wandUsage", WandUsage.NORMAL_RF);
+        SERVER_BUILDER.push("acceleration_wand");
         lessEffectiveForFakePlayer = SERVER_BUILDER
                 .comment("If true this wand will be less effective for fake players")
                 .define("lessEffectiveForFakePlayer", false);
         fakePlayerFactor = SERVER_BUILDER
                 .comment("Factor to apply to the cost when this wand is used by a fake player (a machine). Set to -1 to disable its use this way")
                 .defineInRange("fakePlayerFactor", 1.0, -1.0, 100000000.0);
+        SERVER_BUILDER.pop();
 
+        SERVER_BUILDER.push("capturing_wand");
         allowPassive = SERVER_BUILDER
                 .comment("Allow capturing passive mobs")
                 .define("allowPassive", true);
@@ -80,7 +88,13 @@ public class WandsConfiguration {
         difficultyAdd = SERVER_BUILDER
                 .comment("Add this to the HP * difficultyMult to get the final difficulty scale that affects XP/RF usage (a final result of 1.0 means that the default XP/RF is used)")
                 .defineInRange("difficultyAdd", 1.0, 0.0, 100000000.0);
+        entityBlackList = SERVER_BUILDER
+                .comment("Additional cost factor for capturing entities. -1 to prevent capturing")
+                .defineList("entityBlackList", Lists.newArrayList(
+                ), o -> true);
+        SERVER_BUILDER.pop();
 
+        SERVER_BUILDER.push("freezing_wand");
         freezeAllowPassive = SERVER_BUILDER
                 .comment("Allow freezing passive mobs")
                 .define("freezeAllowPassive", true);
@@ -93,7 +107,9 @@ public class WandsConfiguration {
         freezeDifficultyAdd = SERVER_BUILDER
                 .comment("Add this to the HP * difficultyMult to get the final difficulty scale that affects XP/RF usage (a final result of 1.0 means that the default XP/RF is used)")
                 .defineInRange("freezeDifficultyAdd", 1.0, 0.0, 100000000.0);
+        SERVER_BUILDER.pop();
 
+        SERVER_BUILDER.push("potion_wand");
         potionAllowPassive = SERVER_BUILDER
                 .comment("Allow the potion wand to affect passive mobs")
                 .define("potionAllowPassive", true);
@@ -106,11 +122,7 @@ public class WandsConfiguration {
         potionDifficultyAdd = SERVER_BUILDER
                 .comment("Add this to the HP * difficultyMult to get the final difficulty scale that affects XP/RF usage (a final result of 1.0 means that the default XP/RF is used)")
                 .defineInRange("potionDifficultyAdd", 1.0, 0.0, 100000000.0);
-
-        entityBlackList = SERVER_BUILDER
-                .comment("Additional cost factor for capturing entities. -1 to prevent capturing")
-                .defineList("entityBlackList", Lists.newArrayList(
-                ), o -> true);
+        SERVER_BUILDER.pop();
 
         SERVER_BUILDER.pop();
         CLIENT_BUILDER.pop();
@@ -124,7 +136,7 @@ public class WandsConfiguration {
             if (split.length > 1) {
                 cost = Double.parseDouble(split[1]);
             }
-            blacklistedEntities.put(new ResourceLocation(s), cost);
+            blacklistedEntities.put(new ResourceLocation(split[0]), cost);
         }
 
     }

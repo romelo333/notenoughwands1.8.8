@@ -126,8 +126,7 @@ public class DisplacementWand extends GenericWand {
             BlockState state = world.getBlockState(coordinate);
             Block block = state.getBlock();
             BlockPos otherC = coordinate.offset(direction);
-            BlockState otherState = world.getBlockState(otherC);// @todo 1.15 better support for blockstates
-            Block otherBlock = otherState.getBlock();
+            BlockState otherState = world.getBlockState(otherC);
             if (otherState.getMaterial().isReplaceable()) { // @todo 1.15 check if this is right?
                 double cost = GenericWand.checkPickup(player, world, otherC, state, BuildingWandsConfiguration.maxHardness.get());
                 if (cost >= 0.0) {

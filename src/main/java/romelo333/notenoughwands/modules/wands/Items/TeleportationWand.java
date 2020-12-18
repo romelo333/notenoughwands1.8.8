@@ -2,22 +2,20 @@ package romelo333.notenoughwands.modules.wands.Items;
 
 
 import mcjty.lib.builder.TooltipBuilder;
+import mcjty.lib.varia.SoundTools;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.*;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.registries.ForgeRegistries;
-import romelo333.notenoughwands.ModSounds;
-import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.modules.wands.WandsConfiguration;
+import romelo333.notenoughwands.modules.wands.WandsModule;
 import romelo333.notenoughwands.varia.Tools;
 
 import javax.annotation.Nullable;
@@ -118,8 +116,8 @@ public class TeleportationWand extends GenericWand {
             }
             registerUsage(stack, player, 1.0f);
             if (WandsConfiguration.teleportVolume.get() >= 0.01) {
-                SoundEvent teleport = ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation(NotEnoughWands.MODID, "teleport"));
-                ModSounds.playSound(player.getEntityWorld(), teleport, player.getPosX(), player.getPosY(), player.getPosZ(), WandsConfiguration.teleportVolume.get(), 1.0f);
+                SoundEvent teleport = WandsModule.TELEPORT_SOUND.get();
+                SoundTools.playSound(player.getEntityWorld(), teleport, player.getPosX(), player.getPosY(), player.getPosZ(), WandsConfiguration.teleportVolume.get(), 1.0f);
             }
         }
         return ActionResult.resultPass(stack);
