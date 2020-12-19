@@ -1,3 +1,6 @@
+3.0.1:
+- Forgotton recipe for the acceleration wand
+
 3.0.0:
 - Port of Not Enough Wands to 1.16
 

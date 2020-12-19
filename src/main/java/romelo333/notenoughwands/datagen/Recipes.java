@@ -83,5 +83,11 @@ public class Recipes extends BaseRecipeProvider {
                         .addCriterion("core", hasItem(WandsModule.WAND_CORE.get())),
                 "oo ", "ow ", "  w"
         );
+        build(consumer, ShapedRecipeBuilder.shapedRecipe(WandsModule.ACCELERATION_WAND.get())
+                        .key('x', Items.CLOCK)
+                        .key('w', WandsModule.ADVANCED_WAND_CORE.get())
+                        .addCriterion("core", hasItem(WandsModule.WAND_CORE.get())),
+                "xr ", "rw ", "  w"
+        );
     }
 }
