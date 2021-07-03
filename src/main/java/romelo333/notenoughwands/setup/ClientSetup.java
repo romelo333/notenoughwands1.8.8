@@ -29,7 +29,7 @@ public class ClientSetup {
     public void renderWorldLastEvent(RenderWorldLastEvent evt) {
         Minecraft mc = Minecraft.getInstance();
         PlayerEntity p = mc.player;
-        ItemStack heldItem = p.getHeldItem(Hand.MAIN_HAND);
+        ItemStack heldItem = p.getItemInHand(Hand.MAIN_HAND);
         if (heldItem.isEmpty()) {
             return;
         }

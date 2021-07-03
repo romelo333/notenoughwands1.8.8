@@ -43,8 +43,8 @@ public class CapturingWand extends GenericWand {
 
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> list, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, list, flagIn);
+    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> list, ITooltipFlag flagIn) {
+        super.appendHoverText(stack, worldIn, list, flagIn);
         tooltipBuilder.makeTooltip(getRegistryName(), stack, list, flagIn);
 
         CompoundNBT tagCompound = stack.getTag();
@@ -54,7 +54,7 @@ public class CapturingWand extends GenericWand {
                 if (!type.isEmpty()) {
                     EntityType<?> entityType = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(type));
                     if (entityType != null) {
-                        list.add(new StringTextComponent(TextFormatting.GREEN + "Captured mob: ").appendSibling(entityType.getName()));
+                        list.add(new StringTextComponent(TextFormatting.GREEN + "Captured mob: ").append(entityType.getDescription()));
                     }
                 }
             }
@@ -62,13 +62,13 @@ public class CapturingWand extends GenericWand {
     }
 
     @Override
-    public ActionResultType onItemUse(ItemUseContext context) {
+    public ActionResultType useOn(ItemUseContext context) {
         PlayerEntity player = context.getPlayer();
         Hand hand = context.getHand();
-        World world = context.getWorld();
-        ItemStack stack = player.getHeldItem(hand);
-        BlockPos pos = context.getPos();
-        if (!world.isRemote) {
+        World world = context.getLevel();
+        ItemStack stack = player.getItemInHand(hand);
+        BlockPos pos = context.getClickedPos();
+        if (!world.isClientSide) {
             CompoundNBT tagCompound = stack.getOrCreateTag();
             if (tagCompound.contains("mob")) {
                 INBT mobCompound = tagCompound.get("mob");
@@ -78,11 +78,11 @@ public class CapturingWand extends GenericWand {
                     Tools.error(player, "Something went wrong trying to spawn creature!");
                     return ActionResultType.FAIL;
                 }
-                entityLivingBase.read((CompoundNBT) mobCompound);
-                entityLivingBase.setLocationAndAngles(pos.getX()+.5, pos.getY()+1, pos.getZ()+.5, 0, 0);
+                entityLivingBase.load((CompoundNBT) mobCompound);
+                entityLivingBase.moveTo(pos.getX()+.5, pos.getY()+1, pos.getZ()+.5, 0, 0);
                 tagCompound.remove("mob");
                 tagCompound.remove("type");
-                world.addEntity(entityLivingBase);
+                world.addFreshEntity(entityLivingBase);
             } else {
                 Tools.error(player, "There is no mob captured in this wand!");
             }
@@ -100,7 +100,7 @@ public class CapturingWand extends GenericWand {
 
     @Override
     public boolean onLeftClickEntity(ItemStack stack, PlayerEntity player, Entity entity) {
-        if (!player.getEntityWorld().isRemote) {
+        if (!player.getCommandSenderWorld().isClientSide) {
             if (entity instanceof LivingEntity) {
                 if (stack.getOrCreateTag().contains("mob")) {
                     Tools.error(player, "There is already a mob in this wand!");
@@ -132,10 +132,10 @@ public class CapturingWand extends GenericWand {
                 }
 
                 CompoundNBT tagCompound = new CompoundNBT();
-                entityLivingBase.writeAdditional(tagCompound);  // @todo 1.15 is this right?
+                entityLivingBase.addAdditionalSaveData(tagCompound);  // @todo 1.15 is this right?
                 stack.getOrCreateTag().put("mob", tagCompound);
                 stack.getOrCreateTag().putString("type", entity.getType().getRegistryName().toString());
-                ((ServerWorld)player.getEntityWorld()).removeEntity(entity);
+                ((ServerWorld)player.getCommandSenderWorld()).despawn(entity);
 
                 registerUsage(stack, player, difficultyScale);
             } else {

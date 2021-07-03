@@ -17,7 +17,7 @@ public class ForgeEventHandlers {
     @SubscribeEvent
     public void onBlockBreakEvent (BlockEvent.BreakEvent event){
         IWorld world = event.getWorld();
-        if (world.isRemote()) {
+        if (world.isClientSide()) {
             return;
         }
         BlockPos pos = event.getPos();
@@ -30,7 +30,7 @@ public class ForgeEventHandlers {
     @SubscribeEvent
     public void onDetonate(ExplosionEvent.Detonate event) {
         World world = event.getWorld();
-        if (world.isRemote) {
+        if (world.isClientSide) {
             return;
         }
         ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
@@ -73,7 +73,7 @@ public class ForgeEventHandlers {
         World world = event.getWorld();
         BlockPos pos = event.getPos();
 
-        if (world.isRemote) {
+        if (world.isClientSide) {
             // Client side.
             if (ProtectedBlocks.isProtectedClientSide(world, pos)) {
                 event.setCanceled(true);

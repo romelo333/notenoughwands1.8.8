@@ -28,9 +28,9 @@ public class PotionWand extends GenericWand {
     }
 
     private String getEffectName(EffectInstance potioneffect){
-        String s1 = I18n.format(potioneffect.getEffectName()).trim();
+        String s1 = I18n.get(potioneffect.getDescriptionId()).trim();
         if (potioneffect.getAmplifier() > 0) {
-            s1 = s1 + " " + I18n.format("potion.potency." + potioneffect.getAmplifier()).trim();
+            s1 = s1 + " " + I18n.get("potion.potency." + potioneffect.getAmplifier()).trim();
         }
         if (potioneffect.getDuration() > 20) {
             // @todo 1.15
@@ -40,8 +40,8 @@ public class PotionWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flagIn) {
-        super.addInformation(stack, world, list, flagIn);
+    public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flagIn) {
+        super.appendHoverText(stack, world, list, flagIn);
         // @todo 1.15 better tooltips
         list.add(new StringTextComponent("Left click on creature to apply effect"));
         CompoundNBT tagCompound = stack.getTag();
@@ -61,7 +61,7 @@ public class PotionWand extends GenericWand {
         int mode = getMode(stack);
         for (int i=0;i<effects.size();i++) {
             CompoundNBT effecttag = effects.getCompound(i);
-            EffectInstance effect = EffectInstance.read(effecttag);
+            EffectInstance effect = EffectInstance.load(effecttag);
             if (i==mode){
                 list.add(new StringTextComponent("    + " + TextFormatting.GREEN + getEffectName(effect)));
             } else {
@@ -86,7 +86,7 @@ public class PotionWand extends GenericWand {
             mode = 0;
         }
         CompoundNBT effecttag = effects.getCompound(mode);
-        EffectInstance effect = EffectInstance.read(effecttag);
+        EffectInstance effect = EffectInstance.load(effecttag);
         Tools.notify(player, new StringTextComponent("Switched to " + getEffectName(effect) + " mode"));
         stack.getOrCreateTag().putInt("mode", mode);
     }
@@ -108,13 +108,13 @@ public class PotionWand extends GenericWand {
             return;
         }
         CompoundNBT effecttag = effects.getCompound(getMode(wand));
-        EffectInstance effect = EffectInstance.read(effecttag);
-        entity.addPotionEffect(effect);
+        EffectInstance effect = EffectInstance.load(effecttag);
+        entity.addEffect(effect);
     }
 
     @Override
     public boolean onLeftClickEntity(ItemStack stack, PlayerEntity player, Entity entity) {
-        if (!player.getEntityWorld().isRemote) {
+        if (!player.getCommandSenderWorld().isClientSide) {
             if (entity instanceof LivingEntity) {
                 LivingEntity entityLivingBase = (LivingEntity) entity;
                 if ((!WandsConfiguration.potionAllowHostile.get()) && entityLivingBase instanceof IMob) {

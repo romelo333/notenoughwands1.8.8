@@ -37,29 +37,29 @@ public class TeleportationWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> list, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, list, flagIn);
+    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> list, ITooltipFlag flagIn) {
+        super.appendHoverText(stack, worldIn, list, flagIn);
         tooltipBuilder.makeTooltip(getRegistryName(), stack, list, flagIn);
 
         if (WandsConfiguration.teleportThroughWalls.get()) {
-            list.add(new TranslationTextComponent("message.notenoughwands.teleportation_wand.sneak1").mergeStyle(TextFormatting.GOLD));
+            list.add(new TranslationTextComponent("message.notenoughwands.teleportation_wand.sneak1").withStyle(TextFormatting.GOLD));
         } else {
-            list.add(new TranslationTextComponent("message.notenoughwands.teleportation_wand.sneak2").mergeStyle(TextFormatting.GOLD));
+            list.add(new TranslationTextComponent("message.notenoughwands.teleportation_wand.sneak2").withStyle(TextFormatting.GOLD));
         }
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
-        ItemStack stack = player.getHeldItem(hand);
-        if (!world.isRemote) {
+    public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (!world.isClientSide) {
             if (!checkUsage(stack, player, 1.0f)) {
-                return ActionResult.resultPass(stack);
+                return ActionResult.pass(stack);
             }
-            Vector3d lookVec = player.getLookVec();
-            Vector3d start = new Vector3d(player.getPosX(), player.getPosY() + player.getEyeHeight(), player.getPosZ());
+            Vector3d lookVec = player.getLookAngle();
+            Vector3d start = new Vector3d(player.getX(), player.getY() + player.getEyeHeight(), player.getZ());
             int distance = WandsConfiguration.maxdist.get();
             boolean gothrough = false;
-            if (player.isSneaking()) {
+            if (player.isShiftKeyDown()) {
                 if (WandsConfiguration.teleportThroughWalls.get()) {
                     gothrough = true;
                 }
@@ -72,45 +72,45 @@ public class TeleportationWand extends GenericWand {
                 position = null;
             } else {
                 RayTraceContext context = new RayTraceContext(start, end, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, player);
-                position = world.rayTraceBlocks(context);
+                position = world.clip(context);
             }
             if (position == null) {
                 if (gothrough) {
                     // First check if the destination is safe
                     BlockPos blockPos = new BlockPos(end.x, end.y, end.z);
-                    if (!(world.isAirBlock(blockPos) && world.isAirBlock(blockPos.up()))) {
+                    if (!(world.isEmptyBlock(blockPos) && world.isEmptyBlock(blockPos.above()))) {
                         Tools.error(player, "You will suffocate if you teleport there!");
-                        return ActionResult.resultPass(stack);
+                        return ActionResult.pass(stack);
                     }
                 }
-                player.setPositionAndUpdate(end.x, end.y, end.z);
+                player.teleportTo(end.x, end.y, end.z);
             } else {
                 BlockRayTraceResult result = (BlockRayTraceResult) position;
-                BlockPos blockPos = result.getPos();
+                BlockPos blockPos = result.getBlockPos();
                 int x = blockPos.getX();
                 int y = blockPos.getY();
                 int z = blockPos.getZ();
-                if (world.isAirBlock(blockPos.up()) && world.isAirBlock(blockPos.up(2))) {
-                    player.setPositionAndUpdate(x+.5, y + 1, z+.5);
+                if (world.isEmptyBlock(blockPos.above()) && world.isEmptyBlock(blockPos.above(2))) {
+                    player.teleportTo(x+.5, y + 1, z+.5);
                 } else {
-                    switch (result.getFace()) {
+                    switch (result.getDirection()) {
                         case DOWN:
-                            player.setPositionAndUpdate(x+.5, y - 2, z+.5);
+                            player.teleportTo(x+.5, y - 2, z+.5);
                             break;
                         case UP:
                             Tools.error(player, "You will suffocate if you teleport there!");
-                            return ActionResult.resultPass(stack);
+                            return ActionResult.pass(stack);
                         case NORTH:
-                            player.setPositionAndUpdate(x+.5, y, z - 1 + .5);
+                            player.teleportTo(x+.5, y, z - 1 + .5);
                             break;
                         case SOUTH:
-                            player.setPositionAndUpdate(x+.5, y, z + 1+.5);
+                            player.teleportTo(x+.5, y, z + 1+.5);
                             break;
                         case WEST:
-                            player.setPositionAndUpdate(x - 1+.5, y, z+.5);
+                            player.teleportTo(x - 1+.5, y, z+.5);
                             break;
                         case EAST:
-                            player.setPositionAndUpdate(x + 1+.5, y, z+.5);
+                            player.teleportTo(x + 1+.5, y, z+.5);
                             break;
                     }
                 }
@@ -118,9 +118,9 @@ public class TeleportationWand extends GenericWand {
             registerUsage(stack, player, 1.0f);
             if (WandsConfiguration.teleportVolume.get() >= 0.01) {
                 SoundEvent teleport = WandsModule.TELEPORT_SOUND.get();
-                SoundTools.playSound(player.getEntityWorld(), teleport, player.getPosX(), player.getPosY(), player.getPosZ(), WandsConfiguration.teleportVolume.get(), 1.0f);
+                SoundTools.playSound(player.getCommandSenderWorld(), teleport, player.getX(), player.getY(), player.getZ(), WandsConfiguration.teleportVolume.get(), 1.0f);
             }
         }
-        return ActionResult.resultPass(stack);
+        return ActionResult.pass(stack);
     }
 }

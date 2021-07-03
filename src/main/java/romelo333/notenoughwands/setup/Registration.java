@@ -27,6 +27,6 @@ public class Registration {
     }
 
     public static Item.Properties createStandardProperties() {
-        return new Item.Properties().group(NotEnoughWands.setup.getTab());
+        return new Item.Properties().tab(NotEnoughWands.setup.getTab());
     }
 }

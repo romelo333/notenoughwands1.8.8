@@ -36,9 +36,9 @@ public class GenericWand extends Item implements IEnergyItem {
     protected float usageFactor = 1.0f;
 
     public GenericWand() {
-        super(new Item.Properties().group(NotEnoughWands.setup.getTab())
+        super(new Item.Properties().tab(NotEnoughWands.setup.getTab())
                 .setNoRepair()
-                .maxStackSize(1)
+                .stacksTo(1)
         );
     }
 
@@ -51,7 +51,7 @@ public class GenericWand extends Item implements IEnergyItem {
 
     // Check if a given block can be picked up.
     public static double checkPickup(PlayerEntity player, World world, BlockPos pos, BlockState state, double maxHardness) {
-        float hardness = state.getBlockHardness(world, pos);
+        float hardness = state.getDestroySpeed(world, pos);
         if (hardness < 0 || hardness > maxHardness){
             Tools.error(player, "This block is to hard to take!");
             return -1.0f;
@@ -76,10 +76,10 @@ public class GenericWand extends Item implements IEnergyItem {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
+    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        super.appendHoverText(stack, worldIn, tooltip, flagIn);
         if (needsPower()) {
-            tooltip.add(new StringTextComponent("Energy: " + getEnergyStored(stack) + " / " + getMaxEnergyStored(stack)).mergeStyle(TextFormatting.GREEN));
+            tooltip.add(new StringTextComponent("Energy: " + getEnergyStored(stack) + " / " + getMaxEnergyStored(stack)).withStyle(TextFormatting.GREEN));
         }
     }
 
@@ -108,7 +108,7 @@ public class GenericWand extends Item implements IEnergyItem {
     //------------------------------------------------------------------------------
 
     protected boolean checkUsage(ItemStack wandStack, PlayerEntity player, float difficultyScale) {
-        if (player.abilities.isCreativeMode) {
+        if (player.abilities.instabuild) {
             return true;
         }
         if (needsXP()) {
@@ -120,7 +120,7 @@ public class GenericWand extends Item implements IEnergyItem {
             }
         }
         if (needsDamage()) {
-            if (wandStack.getDamage() >= wandStack.getMaxDamage()) {
+            if (wandStack.getDamageValue() >= wandStack.getMaxDamage()) {
                 Tools.error(player, "This wand can no longer be used!");
                 return false;
             }
@@ -136,7 +136,7 @@ public class GenericWand extends Item implements IEnergyItem {
     }
 
     @Override
-    public boolean isDamageable() {
+    public boolean canBeDepleted() {
         return needsDamage();
     }
 
@@ -146,14 +146,14 @@ public class GenericWand extends Item implements IEnergyItem {
     }
 
     protected void registerUsage(ItemStack stack, PlayerEntity player, float difficultyScale) {
-        if (player.abilities.isCreativeMode) {
+        if (player.abilities.instabuild) {
             return;
         }
         if (needsXP()) {
             Tools.addPlayerXP(player, -(int) (calculateXP() * difficultyScale));
         }
         if (needsDamage()) {
-            stack.damageItem(1, player, playerEntity -> {});
+            stack.hurtAndBreak(1, player, playerEntity -> {});
         }
         if (needsPower()) {
             extractEnergy(stack, (int) (calculatePower() * difficultyScale), false);
@@ -174,18 +174,18 @@ public class GenericWand extends Item implements IEnergyItem {
 
     protected static void renderOutlines(RenderWorldLastEvent evt, PlayerEntity p, Set<BlockPos> coordinates, int r, int g, int b) {
         MatrixStack matrixStack = evt.getMatrixStack();
-        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
+        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().renderBuffers().bufferSource();
         ClientTools.renderOutlines(matrixStack, buffer, coordinates, r, g, b);
     }
 
     protected void showModeKeyDescription(List<ITextComponent> list, String suffix) {
-        String keyDescription = KeyBindings.wandModifier != null ? KeyBindings.wandModifier.getKeyDescription() : "unknown";
-        list.add(new StringTextComponent("Mode key (" + keyDescription + ") to " + suffix).mergeStyle(TextFormatting.YELLOW));
+        String keyDescription = KeyBindings.wandModifier != null ? KeyBindings.wandModifier.getName() : "unknown";
+        list.add(new StringTextComponent("Mode key (" + keyDescription + ") to " + suffix).withStyle(TextFormatting.YELLOW));
     }
 
     protected void showSubModeKeyDescription(List<ITextComponent> list, String suffix) {
-        String keyDescription = KeyBindings.wandSubMode != null ? KeyBindings.wandSubMode.getKeyDescription() : "unknown";
-        list.add(new StringTextComponent("Sub-mode key (" + keyDescription + ") to " + suffix).mergeStyle(TextFormatting.YELLOW));
+        String keyDescription = KeyBindings.wandSubMode != null ? KeyBindings.wandSubMode.getName() : "unknown";
+        list.add(new StringTextComponent("Sub-mode key (" + keyDescription + ") to " + suffix).withStyle(TextFormatting.YELLOW));
     }
 
     //------------------------------------------------------------------------------

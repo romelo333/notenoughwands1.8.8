@@ -59,8 +59,8 @@ public class DisplacementWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> list, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, list, flagIn);
+    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> list, ITooltipFlag flagIn) {
+        super.appendHoverText(stack, worldIn, list, flagIn);
         tooltipBuilder.makeTooltip(getRegistryName(), stack, list, flagIn);
 
         showModeKeyDescription(list, "switch mode");
@@ -83,12 +83,12 @@ public class DisplacementWand extends GenericWand {
 
     @Override
     public ActionResultType onItemUseFirst(ItemStack stack, ItemUseContext context) {
-        World world = context.getWorld();
+        World world = context.getLevel();
         PlayerEntity player = context.getPlayer();
-        BlockPos pos = context.getPos();
-        Direction side = context.getFace();
-        if (!world.isRemote) {
-            if (player.isSneaking()) {
+        BlockPos pos = context.getClickedPos();
+        Direction side = context.getClickedFace();
+        if (!world.isClientSide) {
+            if (player.isShiftKeyDown()) {
                 pullBlocks(stack, player, world, pos, side);
             } else {
                 pushBlocks(stack, player, world, pos, side);
@@ -125,29 +125,29 @@ public class DisplacementWand extends GenericWand {
         for (BlockPos coordinate : coordinates) {
             BlockState state = world.getBlockState(coordinate);
             Block block = state.getBlock();
-            BlockPos otherC = coordinate.offset(direction);
+            BlockPos otherC = coordinate.relative(direction);
             BlockState otherState = world.getBlockState(otherC);
             if (otherState.getMaterial().isReplaceable()) { // @todo 1.15 check if this is right?
                 double cost = GenericWand.checkPickup(player, world, otherC, state, BuildingWandsConfiguration.maxHardness.get());
                 if (cost >= 0.0) {
                     cnt++;
                     SoundTools.playSound(world, block.getSoundType(state).getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
-                    TileEntity tileEntity = world.getTileEntity(coordinate);
+                    TileEntity tileEntity = world.getBlockEntity(coordinate);
                     CompoundNBT tc = null;
                     if (tileEntity != null) {
                         tc = new CompoundNBT();
-                        tileEntity.write(tc);
-                        world.removeTileEntity(coordinate);
+                        tileEntity.save(tc);
+                        world.removeBlockEntity(coordinate);
                     }
 
-                    world.setBlockState(coordinate, Blocks.AIR.getDefaultState());
+                    world.setBlockAndUpdate(coordinate, Blocks.AIR.defaultBlockState());
 
-                    BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.create(world.getDimensionKey(), world, otherC);
-                    BlockState blockState = block.getDefaultState();    // @todo 1.15 blockstate
-                    world.setBlockState(otherC, blockState, 3);
+                    BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.create(world.dimension(), world, otherC);
+                    BlockState blockState = block.defaultBlockState();    // @todo 1.15 blockstate
+                    world.setBlock(otherC, blockState, 3);
                     if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
                         blocksnapshot.restore(true, false);
-                        world.setBlockState(coordinate, blockState, 3);
+                        world.setBlock(coordinate, blockState, 3);
                         // Make sure we restore the tileentity at the original spot
                         otherC = coordinate;
                     }
@@ -156,11 +156,11 @@ public class DisplacementWand extends GenericWand {
                         tc.putInt("x", otherC.getX());
                         tc.putInt("y", otherC.getY());
                         tc.putInt("z", otherC.getZ());
-                        tileEntity = TileEntity.readTileEntity(blockState, tc);
+                        tileEntity = TileEntity.loadStatic(blockState, tc);
                         if (tileEntity != null) {
-                            world.getChunk(otherC).addTileEntity(otherC, tileEntity);
-                            tileEntity.markDirty();
-                            world.notifyBlockUpdate(otherC, blockState, blockState, 3); // @todo 1.15 constants
+                            world.getChunk(otherC).setBlockEntity(otherC, tileEntity);
+                            tileEntity.setChanged();
+                            world.sendBlockUpdated(otherC, blockState, blockState, 3); // @todo 1.15 constants
                         }
 
 //                        tileEntity = world.getTileEntity(otherC);
@@ -181,16 +181,16 @@ public class DisplacementWand extends GenericWand {
 
     @Override
     public void renderOverlay(RenderWorldLastEvent evt, PlayerEntity player, ItemStack wand) {
-        RayTraceResult mouseOver = Minecraft.getInstance().objectMouseOver;
+        RayTraceResult mouseOver = Minecraft.getInstance().hitResult;
 
         if (mouseOver instanceof BlockRayTraceResult) {
             BlockRayTraceResult br = (BlockRayTraceResult) mouseOver;
 
-            World world = player.getEntityWorld();
-            BlockPos blockPos = br.getPos();
+            World world = player.getCommandSenderWorld();
+            BlockPos blockPos = br.getBlockPos();
             BlockState state = world.getBlockState(blockPos);
             if (!state.isAir(world, blockPos)) {
-                Set<BlockPos> coordinates = findSuitableBlocks(wand, world, br.getFace(), blockPos);
+                Set<BlockPos> coordinates = findSuitableBlocks(wand, world, br.getDirection(), blockPos);
                 renderOutlines(evt, player, coordinates, 200, 230, 180);
             }
         }
@@ -249,7 +249,7 @@ public class DisplacementWand extends GenericWand {
 
     private void checkAndAddBlock(World world, int x, int y, int z, Set<BlockPos> coordinates) {
         BlockPos pos = new BlockPos(x, y, z);
-        if (!world.isAirBlock(pos)) {
+        if (!world.isEmptyBlock(pos)) {
             coordinates.add(pos);
         }
     }

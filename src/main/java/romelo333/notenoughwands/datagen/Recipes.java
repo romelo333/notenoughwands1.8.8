@@ -19,74 +19,74 @@ public class Recipes extends BaseRecipeProvider {
     }
 
     @Override
-    protected void registerRecipes(Consumer<IFinishedRecipe> consumer) {
-        build(consumer, ShapedRecipeBuilder.shapedRecipe(WandsModule.WAND_CORE.get())
-                        .key('X', Items.BLAZE_ROD)
-                        .key('n', Items.GOLD_NUGGET)
-                        .addCriterion("rod", hasItem(Items.BLAZE_ROD)),
+    protected void buildShapelessRecipes(Consumer<IFinishedRecipe> consumer) {
+        build(consumer, ShapedRecipeBuilder.shaped(WandsModule.WAND_CORE.get())
+                        .define('X', Items.BLAZE_ROD)
+                        .define('n', Items.GOLD_NUGGET)
+                        .unlockedBy("rod", has(Items.BLAZE_ROD)),
                 "Xn ", "nXn", " nX"
         );
-        build(consumer, ShapedRecipeBuilder.shapedRecipe(WandsModule.ADVANCED_WAND_CORE.get())
-                        .key('t', Items.GHAST_TEAR)
-                        .key('x', Items.NETHER_STAR)
-                        .key('w', WandsModule.WAND_CORE.get())
-                        .addCriterion("rod", hasItem(Items.BLAZE_ROD)),
+        build(consumer, ShapedRecipeBuilder.shaped(WandsModule.ADVANCED_WAND_CORE.get())
+                        .define('t', Items.GHAST_TEAR)
+                        .define('x', Items.NETHER_STAR)
+                        .define('w', WandsModule.WAND_CORE.get())
+                        .unlockedBy("rod", has(Items.BLAZE_ROD)),
                 " x ", "twt", " d "
         );
 
-        build(consumer, ShapedRecipeBuilder.shapedRecipe(BuildingWandsModule.BUILDING_WAND.get())
-                        .key('x', Items.BRICK)
-                        .key('w', WandsModule.WAND_CORE.get())
-                        .addCriterion("core", hasItem(WandsModule.WAND_CORE.get())),
+        build(consumer, ShapedRecipeBuilder.shaped(BuildingWandsModule.BUILDING_WAND.get())
+                        .define('x', Items.BRICK)
+                        .define('w', WandsModule.WAND_CORE.get())
+                        .unlockedBy("core", has(WandsModule.WAND_CORE.get())),
                 "xx ", "xw ", "  w"
         );
-        build(consumer, ShapedRecipeBuilder.shapedRecipe(BuildingWandsModule.DISPLACEMENT_WAND.get())
-                        .key('x', Items.BRICK)
-                        .key('w', WandsModule.WAND_CORE.get())
-                        .addCriterion("core", hasItem(WandsModule.WAND_CORE.get())),
+        build(consumer, ShapedRecipeBuilder.shaped(BuildingWandsModule.DISPLACEMENT_WAND.get())
+                        .define('x', Items.BRICK)
+                        .define('w', WandsModule.WAND_CORE.get())
+                        .unlockedBy("core", has(WandsModule.WAND_CORE.get())),
                 "ox ", "xw ", "  w"
         );
-        build(consumer, ShapedRecipeBuilder.shapedRecipe(BuildingWandsModule.MOVING_WAND.get())
-                        .key('w', WandsModule.WAND_CORE.get())
-                        .addCriterion("core", hasItem(WandsModule.WAND_CORE.get())),
+        build(consumer, ShapedRecipeBuilder.shaped(BuildingWandsModule.MOVING_WAND.get())
+                        .define('w', WandsModule.WAND_CORE.get())
+                        .unlockedBy("core", has(WandsModule.WAND_CORE.get())),
                 "ro ", "ow ", "  w"
         );
-        build(consumer, ShapedRecipeBuilder.shapedRecipe(BuildingWandsModule.SWAPPING_WAND.get())
-                        .key('x', Items.GLOWSTONE)
-                        .key('w', WandsModule.WAND_CORE.get())
-                        .addCriterion("core", hasItem(WandsModule.WAND_CORE.get())),
+        build(consumer, ShapedRecipeBuilder.shaped(BuildingWandsModule.SWAPPING_WAND.get())
+                        .define('x', Items.GLOWSTONE)
+                        .define('w', WandsModule.WAND_CORE.get())
+                        .unlockedBy("core", has(WandsModule.WAND_CORE.get())),
                 "Rx ", "xw ", "  w"
         );
 
-        build(consumer, ShapedRecipeBuilder.shapedRecipe(LightModule.ILLUMINATION_WAND.get())
-                        .key('x', Items.GLOWSTONE_DUST)
-                        .key('w', WandsModule.WAND_CORE.get())
-                        .addCriterion("core", hasItem(WandsModule.WAND_CORE.get())),
+        build(consumer, ShapedRecipeBuilder.shaped(LightModule.ILLUMINATION_WAND.get())
+                        .define('x', Items.GLOWSTONE_DUST)
+                        .define('w', WandsModule.WAND_CORE.get())
+                        .unlockedBy("core", has(WandsModule.WAND_CORE.get())),
                 "xx ", "xw ", "  w"
         );
 
-        build(consumer, ShapedRecipeBuilder.shapedRecipe(ProtectionWandModule.PROTECTION_WAND.get())
-                        .key('x', Items.COMPARATOR)
-                        .key('w', WandsModule.ADVANCED_WAND_CORE.get())
-                        .addCriterion("core", hasItem(WandsModule.WAND_CORE.get())),
+        build(consumer, ShapedRecipeBuilder.shaped(ProtectionWandModule.PROTECTION_WAND.get())
+                        .define('x', Items.COMPARATOR)
+                        .define('w', WandsModule.ADVANCED_WAND_CORE.get())
+                        .unlockedBy("core", has(WandsModule.WAND_CORE.get())),
                 "xo ", "ow ", "  w"
         );
 
-        build(consumer, ShapedRecipeBuilder.shapedRecipe(WandsModule.CAPTURING_WAND.get())
-                        .key('x', Items.ROTTEN_FLESH)
-                        .key('w', WandsModule.ADVANCED_WAND_CORE.get())
-                        .addCriterion("core", hasItem(WandsModule.WAND_CORE.get())),
+        build(consumer, ShapedRecipeBuilder.shaped(WandsModule.CAPTURING_WAND.get())
+                        .define('x', Items.ROTTEN_FLESH)
+                        .define('w', WandsModule.ADVANCED_WAND_CORE.get())
+                        .unlockedBy("core", has(WandsModule.WAND_CORE.get())),
                 "dx ", "xw ", "  w"
         );
-        build(consumer, ShapedRecipeBuilder.shapedRecipe(WandsModule.TELEPORTATION_WAND.get())
-                        .key('w', WandsModule.WAND_CORE.get())
-                        .addCriterion("core", hasItem(WandsModule.WAND_CORE.get())),
+        build(consumer, ShapedRecipeBuilder.shaped(WandsModule.TELEPORTATION_WAND.get())
+                        .define('w', WandsModule.WAND_CORE.get())
+                        .unlockedBy("core", has(WandsModule.WAND_CORE.get())),
                 "oo ", "ow ", "  w"
         );
-        build(consumer, ShapedRecipeBuilder.shapedRecipe(WandsModule.ACCELERATION_WAND.get())
-                        .key('x', Items.CLOCK)
-                        .key('w', WandsModule.ADVANCED_WAND_CORE.get())
-                        .addCriterion("core", hasItem(WandsModule.WAND_CORE.get())),
+        build(consumer, ShapedRecipeBuilder.shaped(WandsModule.ACCELERATION_WAND.get())
+                        .define('x', Items.CLOCK)
+                        .define('w', WandsModule.ADVANCED_WAND_CORE.get())
+                        .unlockedBy("core", has(WandsModule.WAND_CORE.get())),
                 "xr ", "rw ", "  w"
         );
     }

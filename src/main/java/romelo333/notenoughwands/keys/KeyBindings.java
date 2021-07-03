@@ -11,8 +11,8 @@ public class KeyBindings {
     public static KeyBinding wandSubMode;
 
     public static void init() {
-        wandModifier = new KeyBinding("key.modifier", KeyConflictContext.IN_GAME, InputMappings.getInputByName("key.keyboard.equal"), "key.categories.notenoughwands");
-        wandSubMode = new KeyBinding("key.submode", KeyConflictContext.IN_GAME, InputMappings.INPUT_INVALID, "key.categories.notenoughwands");
+        wandModifier = new KeyBinding("key.modifier", KeyConflictContext.IN_GAME, InputMappings.getKey("key.keyboard.equal"), "key.categories.notenoughwands");
+        wandSubMode = new KeyBinding("key.submode", KeyConflictContext.IN_GAME, InputMappings.UNKNOWN, "key.categories.notenoughwands");
         ClientRegistry.registerKeyBinding(wandModifier);
         ClientRegistry.registerKeyBinding(wandSubMode);
     }

@@ -14,14 +14,16 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 public class LightBlock extends Block {
     public LightBlock() {
-        super(Properties.create(Material.PORTAL)
-                .hardnessAndResistance(0.0f, 1.0f)
-                .notSolid()
+        super(Properties.of(Material.PORTAL)
+                .strength(0.0f, 1.0f)
+                .noOcclusion()
                 .noDrops()
-                .doesNotBlockMovement()
-                .setLightLevel(state -> 15));
+                .noCollission()
+                .lightLevel(state -> 15));
     }
 
     @Override
@@ -36,7 +38,7 @@ public class LightBlock extends Block {
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState state) {
+    public BlockRenderType getRenderShape(BlockState state) {
         return BlockRenderType.INVISIBLE;
     }
 

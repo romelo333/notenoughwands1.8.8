@@ -23,12 +23,12 @@ public class LightModule implements IModule {
 
     public static final RegistryObject<Block> LIGHT = BLOCKS.register("light", LightBlock::new);
     public static final RegistryObject<Item> LIGHT_ITEM = ITEMS.register("light", () -> new BlockItem(LIGHT.get(), Registration.createStandardProperties()));
-    public static final RegistryObject<TileEntityType<LightTE>> TYPE_LIGHT = TILES.register("light", () -> TileEntityType.Builder.create(LightTE::new, LIGHT.get()).build(null));
+    public static final RegistryObject<TileEntityType<LightTE>> TYPE_LIGHT = TILES.register("light", () -> TileEntityType.Builder.of(LightTE::new, LIGHT.get()).build(null));
 
     public static final RegistryObject<Item> ILLUMINATION_WAND = ITEMS.register("illumination_wand", IlluminationWand::new);
 
     public static void onTextureStitch(TextureStitchEvent.Pre event) {
-        if (!event.getMap().getTextureLocation().equals(AtlasTexture.LOCATION_BLOCKS_TEXTURE)) {
+        if (!event.getMap().location().equals(AtlasTexture.LOCATION_BLOCKS)) {
             return;
         }
         event.addSprite(LightRenderer.LIGHT);

@@ -36,32 +36,32 @@ public class IlluminationWand extends GenericWand {
 
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> list, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, list, flagIn);
+    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> list, ITooltipFlag flagIn) {
+        super.appendHoverText(stack, worldIn, list, flagIn);
         tooltipBuilder.makeTooltip(getRegistryName(), stack, list, flagIn);
     }
 
     @Override
-    public ActionResultType onItemUse(ItemUseContext context) {
+    public ActionResultType useOn(ItemUseContext context) {
         PlayerEntity player = context.getPlayer();
         Hand hand = context.getHand();
-        World world = context.getWorld();
-        BlockPos pos = context.getPos();
-        Direction side = context.getFace();
-        ItemStack stack = player.getHeldItem(hand);
-        if (!world.isRemote) {
+        World world = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+        Direction side = context.getClickedFace();
+        ItemStack stack = player.getItemInHand(hand);
+        if (!world.isClientSide) {
             Block block = world.getBlockState(pos).getBlock();
             if (block == LightModule.LIGHT.get()) {
-                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.create(world.getDimensionKey(), world, pos);
-                world.setBlockState(pos, Blocks.AIR.getDefaultState());
+                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.create(world.dimension(), world, pos);
+                world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
                 if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
                     blocksnapshot.restore(true, false);
                 }
                 return ActionResultType.SUCCESS;
             }
 
-            BlockPos offset = pos.offset(side);
-            if (!world.isAirBlock(offset)) {
+            BlockPos offset = pos.relative(side);
+            if (!world.isEmptyBlock(offset)) {
                 return ActionResultType.SUCCESS;
             }
 
@@ -69,8 +69,8 @@ public class IlluminationWand extends GenericWand {
                 return ActionResultType.SUCCESS;
             }
 
-            BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.create(world.getDimensionKey(), world, offset);
-            world.setBlockState(offset, LightModule.LIGHT.get().getDefaultState(), 3);
+            BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.create(world.dimension(), world, offset);
+            world.setBlock(offset, LightModule.LIGHT.get().defaultBlockState(), 3);
             if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
                 blocksnapshot.restore(true, false);
             } else {

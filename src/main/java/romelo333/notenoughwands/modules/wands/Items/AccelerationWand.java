@@ -56,8 +56,8 @@ public class AccelerationWand extends GenericWand {
     private Random random = new Random();
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flagIn) {
-        super.addInformation(stack, world, list, flagIn);
+    public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flagIn) {
+        super.appendHoverText(stack, world, list, flagIn);
         tooltipBuilder.makeTooltip(getRegistryName(), stack, list, flagIn);
 
         showModeKeyDescription(list, "change speed");
@@ -75,13 +75,13 @@ public class AccelerationWand extends GenericWand {
     }
 
     @Override
-    public ActionResultType onItemUse(ItemUseContext context) {
+    public ActionResultType useOn(ItemUseContext context) {
         PlayerEntity player = context.getPlayer();
         Hand hand = context.getHand();
-        World world = context.getWorld();
-        BlockPos pos = context.getPos();
-        ItemStack stack = player.getHeldItem(hand);
-        if (!world.isRemote) {
+        World world = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+        ItemStack stack = player.getItemInHand(hand);
+        if (!world.isClientSide) {
             BlockState state = world.getBlockState(pos);
             Block block = state.getBlock();
             int mode = getMode(stack);
@@ -104,7 +104,7 @@ public class AccelerationWand extends GenericWand {
             if (!checkUsage(stack, player, cost)) {
                 return ActionResultType.FAIL;
             }
-            TileEntity tileEntity = world.getTileEntity(pos);
+            TileEntity tileEntity = world.getBlockEntity(pos);
             for (int i = 0; i < amount /(tileEntity == null ? 5 : 1); i ++){
                 if (tileEntity == null){
                     block.tick(state, (ServerWorld) world, pos, random);

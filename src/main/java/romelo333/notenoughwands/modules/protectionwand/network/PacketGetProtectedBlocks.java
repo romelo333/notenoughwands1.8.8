@@ -36,9 +36,9 @@ public class PacketGetProtectedBlocks {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
             PlayerEntity player = ctx.getSender();
-            World world = player.getEntityWorld();
+            World world = player.getCommandSenderWorld();
 
-            ItemStack heldItem = player.getHeldItem(Hand.MAIN_HAND);
+            ItemStack heldItem = player.getItemInHand(Hand.MAIN_HAND);
             if (heldItem.isEmpty() || !(heldItem.getItem() instanceof ProtectionWand)) {
                 // Cannot happen normally
                 return;
@@ -48,14 +48,14 @@ public class PacketGetProtectedBlocks {
 
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
             Set<BlockPos> blocks = new HashSet<>();
-            protectedBlocks.fetchProtectedBlocks(blocks, world, (int)player.getPosX(), (int)player.getPosY(), (int)player.getPosZ(), ProtectionWandConfiguration.blockShowRadius.get(), id);
+            protectedBlocks.fetchProtectedBlocks(blocks, world, (int)player.getX(), (int)player.getY(), (int)player.getZ(), ProtectionWandConfiguration.blockShowRadius.get(), id);
             Set<BlockPos> childBlocks = new HashSet<>();
             if (id == -1) {
                 // Master wand:
-                protectedBlocks.fetchProtectedBlocks(childBlocks, world, (int)player.getPosX(), (int)player.getPosY(), (int)player.getPosZ(), ProtectionWandConfiguration.blockShowRadius.get(), -2);
+                protectedBlocks.fetchProtectedBlocks(childBlocks, world, (int)player.getX(), (int)player.getY(), (int)player.getZ(), ProtectionWandConfiguration.blockShowRadius.get(), -2);
             }
             PacketReturnProtectedBlocks msg = new PacketReturnProtectedBlocks(blocks, childBlocks);
-            NEWPacketHandler.INSTANCE.sendTo(msg, ((ServerPlayerEntity) player).connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
+            NEWPacketHandler.INSTANCE.sendTo(msg, ((ServerPlayerEntity) player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
         });
         ctx.setPacketHandled(true);
     }

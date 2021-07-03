@@ -52,8 +52,8 @@ public class ProtectionWand extends GenericWand {
     private static long tooltipLastTime = 0;
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flagIn) {
-        super.addInformation(stack, world, list, flagIn);
+    public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flagIn) {
+        super.appendHoverText(stack, world, list, flagIn);
         boolean hasid = stack.getTag() != null && stack.getTag().contains("id");
         int mode = getMode(stack);
         int id = getId(stack);
@@ -116,13 +116,13 @@ public class ProtectionWand extends GenericWand {
     }
 
     @Override
-    public ActionResultType onItemUse(ItemUseContext context) {
+    public ActionResultType useOn(ItemUseContext context) {
         PlayerEntity player = context.getPlayer();
         Hand hand = context.getHand();
-        World world = context.getWorld();
-        BlockPos pos = context.getPos();
-        ItemStack stack = player.getHeldItem(hand);
-        if (!world.isRemote) {
+        World world = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+        ItemStack stack = player.getItemInHand(hand);
+        if (!world.isClientSide) {
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
             int id = getOrCreateId(stack, world, protectedBlocks);
             int mode = getMode(stack);
@@ -170,7 +170,7 @@ public class ProtectionWand extends GenericWand {
     @Override
     public ItemStack getContainerItem(ItemStack stack) {
         if (hasContainerItem(stack) && stack.hasTag()) {
-            ItemStack container = new ItemStack(getContainerItem());
+            ItemStack container = new ItemStack(getCraftingRemainingItem());
             container.setTag(stack.getTag().copy());
             return container;
         }

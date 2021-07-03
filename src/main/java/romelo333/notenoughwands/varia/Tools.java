@@ -25,18 +25,18 @@ import javax.annotation.Nullable;
 
 public class Tools {
     public static void error(PlayerEntity player, String msg) {
-        player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + msg), false);
+        player.displayClientMessage(new StringTextComponent(TextFormatting.RED + msg), false);
     }
 
     public static void notify(PlayerEntity player, IFormattableTextComponent msg) {
-        player.sendStatusMessage(msg.mergeStyle(TextFormatting.GREEN), false);
+        player.displayClientMessage(msg.withStyle(TextFormatting.GREEN), false);
     }
 
     // PlaceStackAt from a perspective of a wand
     @Nullable
     public static BlockState placeStackAt(PlayerEntity player, ItemStack blockStack, World world, BlockPos pos, @Nullable BlockState origState) {
-        ItemStack old = player.getHeldItem(Hand.MAIN_HAND);
-        player.setHeldItem(Hand.MAIN_HAND, blockStack);
+        ItemStack old = player.getItemInHand(Hand.MAIN_HAND);
+        player.setItemInHand(Hand.MAIN_HAND, blockStack);
 
         BlockRayTraceResult trace = new BlockRayTraceResult(new Vector3d(0, 0, 0), Direction.UP, pos, false);
         BlockItemUseContext context = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, trace));
@@ -49,15 +49,15 @@ public class Tools {
                     return null;
                 }
             }
-            if (itemBlock.tryPlace(context).isSuccessOrConsume()) {
+            if (itemBlock.place(context).consumesAction()) {
 //                blockStack.shrink(1);
             }
-            player.setHeldItem(Hand.MAIN_HAND, old);
+            player.setItemInHand(Hand.MAIN_HAND, old);
             return origState;
         } else {
-            player.setPosition(pos.getX()+.5, pos.getY()+1.5, pos.getZ()+.5);
-            blockStack.getItem().onItemUse(context);
-            player.setHeldItem(Hand.MAIN_HAND, old);
+            player.setPos(pos.getX()+.5, pos.getY()+1.5, pos.getZ()+.5);
+            blockStack.getItem().useOn(context);
+            player.setItemInHand(Hand.MAIN_HAND, old);
             return world.getBlockState(pos);
         }
     }
@@ -65,7 +65,7 @@ public class Tools {
 
     @Nonnull
     public static ItemStack consumeInventoryItem(ItemStack item, PlayerInventory inv, PlayerEntity player) {
-        if (player.abilities.isCreativeMode) {
+        if (player.abilities.instabuild) {
             return item;
         }
         int i = finditem(item, inv);
@@ -73,13 +73,13 @@ public class Tools {
         if (i < 0) {
             return ItemStack.EMPTY;
         } else {
-            ItemStack stackInSlot = inv.getStackInSlot(i);
+            ItemStack stackInSlot = inv.getItem(i);
             ItemStack result = stackInSlot.copy();
             result.setCount(1);
             int amount = -1;
             stackInSlot.grow(amount);
             if (stackInSlot.getCount() == 0) {
-                inv.setInventorySlotContents(i, ItemStack.EMPTY);
+                inv.setItem(i, ItemStack.EMPTY);
             }
 
             return result;
@@ -96,7 +96,7 @@ public class Tools {
 
     public static int finditem(ItemStack item, PlayerInventory inv) {
         for (int i = 0; i < 36; ++i) {
-            ItemStack stack = inv.getStackInSlot(i);
+            ItemStack stack = inv.getItem(i);
             if (!stack.isEmpty() && ItemHandlerHelper.canItemStacksStack(item, stack)) {
                 return i;
             }
@@ -110,11 +110,11 @@ public class Tools {
         if (s.getItem() == null) {
             return new StringTextComponent("<null>");
         }
-        return s.getDisplayName();
+        return s.getHoverName();
     }
 
     public static int getPlayerXP(PlayerEntity player) {
-        return (int)(getExperienceForLevel(player.experienceLevel) + (player.experience * player.xpBarCap()));
+        return (int)(getExperienceForLevel(player.experienceLevel) + (player.experienceProgress * player.getXpNeededForNextLevel()));
     }
 
     public static boolean addPlayerXP(PlayerEntity player, int amount) {
@@ -122,10 +122,10 @@ public class Tools {
         if (experience < 0) {
             return false;
         }
-        player.experienceTotal = experience;
+        player.totalExperience = experience;
         player.experienceLevel = getLevelForExperience(experience);
         int expForLevel = getExperienceForLevel(player.experienceLevel);
-        player.experience = (experience - expForLevel) / (float)player.xpBarCap();
+        player.experienceProgress = (experience - expForLevel) / (float)player.getXpNeededForNextLevel();
         return true;
     }
 

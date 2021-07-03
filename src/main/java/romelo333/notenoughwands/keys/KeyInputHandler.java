@@ -10,9 +10,9 @@ public class KeyInputHandler {
 
     @SubscribeEvent
     public void onKeyInput(InputEvent.KeyInputEvent event) {
-        if (KeyBindings.wandModifier.isPressed()) {
+        if (KeyBindings.wandModifier.consumeClick()) {
             NEWPacketHandler.INSTANCE.sendToServer(new PacketToggleMode());
-        } else if (KeyBindings.wandSubMode.isPressed()) {
+        } else if (KeyBindings.wandSubMode.consumeClick()) {
             NEWPacketHandler.INSTANCE.sendToServer(new PacketToggleSubMode());
         }
     }

@@ -24,15 +24,15 @@ public class FreezingWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> list, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, list, flagIn);
+    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> list, ITooltipFlag flagIn) {
+        super.appendHoverText(stack, worldIn, list, flagIn);
         list.add(new StringTextComponent("Right click on creature to freeze creature."));
     }
 
     @Override
-    public ActionResultType onItemUse(ItemUseContext context) {
-        World world = context.getWorld();
-        if (!world.isRemote) {
+    public ActionResultType useOn(ItemUseContext context) {
+        World world = context.getLevel();
+        if (!world.isClientSide) {
 
         }
         return ActionResultType.FAIL;
@@ -44,7 +44,7 @@ public class FreezingWand extends GenericWand {
 
     @Override
     public boolean onLeftClickEntity(ItemStack stack, PlayerEntity player, Entity entity) {
-        if (!player.getEntityWorld().isRemote) {
+        if (!player.getCommandSenderWorld().isClientSide) {
             if (entity instanceof LivingEntity) {
                 LivingEntity entityLivingBase = (LivingEntity) entity;
                 if (entityLivingBase instanceof PlayerEntity) {

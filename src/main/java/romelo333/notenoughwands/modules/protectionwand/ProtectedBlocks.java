@@ -223,7 +223,7 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
     }
 
     @Override
-    public void read(CompoundNBT tagCompound) {
+    public void load(CompoundNBT tagCompound) {
         lastId = tagCompound.getInt("lastId");
         blocks.clear();
         perDimPerChunkCache.clear();;
@@ -240,7 +240,7 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT tagCompound) {
+    public CompoundNBT save(CompoundNBT tagCompound) {
         tagCompound.putInt("lastId", lastId);
         ListNBT list = new ListNBT();
         for (Map.Entry<GlobalCoordinate, Integer> entry : blocks.entrySet()) {

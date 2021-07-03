@@ -19,6 +19,23 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.World;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.items.ItemHandlerHelper;
+import romelo333.notenoughwands.modules.wands.Items.GenericWand;
+import romelo333.notenoughwands.varia.Tools;
+
 ;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
@@ -73,8 +90,8 @@ public class BuildingWand extends GenericWand {
     }
 
     @Override
-    public void addInformation(ItemStack itemStack, World world, List<ITextComponent> list, ITooltipFlag flags) {
-        super.addInformation(itemStack, world, list, flags);
+    public void appendHoverText(ItemStack itemStack, World world, List<ITextComponent> list, ITooltipFlag flags) {
+        super.appendHoverText(itemStack, world, list, flags);
         tooltipBuilder.makeTooltip(getRegistryName(), itemStack, list, flags);
 
         showModeKeyDescription(list, "switch mode");
@@ -109,15 +126,15 @@ public class BuildingWand extends GenericWand {
     }
 
     @Override
-    public ActionResultType onItemUse(ItemUseContext context) {
+    public ActionResultType useOn(ItemUseContext context) {
         PlayerEntity player = context.getPlayer();
         Hand hand = context.getHand();
-        World world = context.getWorld();
-        BlockPos pos = context.getPos();
-        Direction side = context.getFace();
-        ItemStack wandStack = player.getHeldItem(hand);
-        if (!world.isRemote) {
-            if (player.isSneaking()) {
+        World world = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+        Direction side = context.getClickedFace();
+        ItemStack wandStack = player.getItemInHand(hand);
+        if (!world.isClientSide) {
+            if (player.isShiftKeyDown()) {
                 undoPlaceBlock(wandStack, player, world, pos);
             } else {
                 placeBlock(wandStack, player, world, pos, side);
@@ -146,15 +163,15 @@ public class BuildingWand extends GenericWand {
                 SoundTools.playSound(world, blockState.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
                 //                IBlockState state = block.getStateFromMeta(meta);
 //                world.setBlockState(coordinate, state, 2);
-                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.create(world.getDimensionKey(), world, coordinate);
+                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.create(world.dimension(), world, coordinate);
                 Tools.placeStackAt(player, consumed, world, coordinate, null);
                 if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
                     blocksnapshot.restore(true, false);
-                    if (!player.abilities.isCreativeMode) {
+                    if (!player.abilities.instabuild) {
                         Tools.giveItem(player, consumed);
                     }
                 }
-                player.openContainer.detectAndSendChanges();
+                player.containerMenu.broadcastChanges();
                 registerUsage(wandStack, player, 1.0f);
                 undo.add(coordinate);
             } else {
@@ -234,8 +251,8 @@ public class BuildingWand extends GenericWand {
             if (testState == state) {
                 SoundTools.playSound(world, state.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
 
-                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.create(world.getDimensionKey(), world, coordinate);
-                world.setBlockState(coordinate, Blocks.AIR.getDefaultState());
+                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.create(world.dimension(), world, coordinate);
+                world.setBlockAndUpdate(coordinate, Blocks.AIR.defaultBlockState());
                 if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
                     blocksnapshot.restore(true, false);
                 } else {
@@ -244,12 +261,12 @@ public class BuildingWand extends GenericWand {
             }
         }
         if (cnt > 0) {
-            if (!player.abilities.isCreativeMode) {
+            if (!player.abilities.instabuild) {
                 RayTraceResult result = new BlockRayTraceResult(new Vector3d(0, 0, 0), Direction.UP, pos, false);
                 ItemStack itemStack = state.getPickBlock(result, world, pos, player);
                 itemStack.setCount(cnt);
                 ItemHandlerHelper.giveItemToPlayer(player, itemStack);
-                player.openContainer.detectAndSendChanges();
+                player.containerMenu.broadcastChanges();
             }
         }
     }
@@ -278,16 +295,16 @@ public class BuildingWand extends GenericWand {
 
     @Override
     public void renderOverlay(RenderWorldLastEvent evt, PlayerEntity player, ItemStack wand) {
-        RayTraceResult mouseOver = Minecraft.getInstance().objectMouseOver;
+        RayTraceResult mouseOver = Minecraft.getInstance().hitResult;
         if (!(mouseOver instanceof BlockRayTraceResult)) {
             return;
         }
 
         BlockRayTraceResult btrace = (BlockRayTraceResult) mouseOver;
 
-        if (btrace.getFace() != null && btrace.getPos() != null) {
-            World world = player.getEntityWorld();
-            BlockPos blockPos = btrace.getPos();
+        if (btrace.getDirection() != null && btrace.getBlockPos() != null) {
+            World world = player.getCommandSenderWorld();
+            BlockPos blockPos = btrace.getBlockPos();
             if (blockPos == null) {
                 return;
             }
@@ -296,7 +313,7 @@ public class BuildingWand extends GenericWand {
             if (block != null && blockState.getMaterial() != Material.AIR) {
                 Set<BlockPos> coordinates;
 
-                if (player.isSneaking()) {
+                if (player.isShiftKeyDown()) {
                     CompoundNBT wandTag = wand.getOrCreateTag();
                     CompoundNBT undoTag1 = (CompoundNBT) wandTag.get("undo1");
                     CompoundNBT undoTag2 = (CompoundNBT) wandTag.get("undo2");
@@ -315,7 +332,7 @@ public class BuildingWand extends GenericWand {
                         renderOutlines(evt, player, coordinates, 240, 30, 0);
                     }
                 } else {
-                    coordinates = findSuitableBlocks(wand, world, btrace.getFace(), blockPos, blockState);
+                    coordinates = findSuitableBlocks(wand, world, btrace.getDirection(), blockPos, blockState);
                     renderOutlines(evt, player, coordinates, 50, 250, 180);
                 }
             }
@@ -340,15 +357,15 @@ public class BuildingWand extends GenericWand {
         Direction dirB = null;
         if (rowMode) {
             BlockPos base = todo.getFirst();
-            BlockPos offset = base.offset(direction);
+            BlockPos offset = base.relative(direction);
             dirA = rotated == 1 ? dir2(direction) : dir1(direction);
             dirB = dirA.getOpposite();
-            if (!isSuitable(world, state, base.offset(dirA), offset.offset(dirA)) ||
-                !isSuitable(world, state, base.offset(dirB), offset.offset(dirB))) {
+            if (!isSuitable(world, state, base.relative(dirA), offset.relative(dirA)) ||
+                !isSuitable(world, state, base.relative(dirB), offset.relative(dirB))) {
                 dirA = rotated == 1 ? dir3(direction) : dir2(direction);
                 dirB = dirA.getOpposite();
-                if (!isSuitable(world, state, base.offset(dirA), offset.offset(dirA)) ||
-                        !isSuitable(world, state, base.offset(dirB), offset.offset(dirB))) {
+                if (!isSuitable(world, state, base.relative(dirA), offset.relative(dirA)) ||
+                        !isSuitable(world, state, base.relative(dirB), offset.relative(dirB))) {
                     dirA = rotated == 1 ? dir1(direction) : dir3(direction);
                     dirB = dirA.getOpposite();
                 }
@@ -359,21 +376,21 @@ public class BuildingWand extends GenericWand {
             BlockPos base = todo.pollFirst();
             if (!done.contains(base)) {
                 done.add(base);
-                BlockPos offset = base.offset(direction);
+                BlockPos offset = base.relative(direction);
                 if (isSuitable(world, state, base, offset)) {
                     coordinates.add(offset);
                     if (rowMode) {
-                        todo.addLast(base.offset(dirA));
-                        todo.addLast(base.offset(dirB));
+                        todo.addLast(base.relative(dirA));
+                        todo.addLast(base.relative(dirB));
                     } else {
-                        todo.addLast(base.offset(dir1(direction)));
-                        todo.addLast(base.offset(dir1(direction).getOpposite()));
-                        todo.addLast(base.offset(dir2(direction)));
-                        todo.addLast(base.offset(dir2(direction).getOpposite()));
-                        todo.addLast(base.offset(dir1(direction)).offset(dir2(direction)));
-                        todo.addLast(base.offset(dir1(direction)).offset(dir2(direction).getOpposite()));
-                        todo.addLast(base.offset(dir1(direction).getOpposite()).offset(dir2(direction)));
-                        todo.addLast(base.offset(dir1(direction).getOpposite()).offset(dir2(direction).getOpposite()));
+                        todo.addLast(base.relative(dir1(direction)));
+                        todo.addLast(base.relative(dir1(direction).getOpposite()));
+                        todo.addLast(base.relative(dir2(direction)));
+                        todo.addLast(base.relative(dir2(direction).getOpposite()));
+                        todo.addLast(base.relative(dir1(direction)).relative(dir2(direction)));
+                        todo.addLast(base.relative(dir1(direction)).relative(dir2(direction).getOpposite()));
+                        todo.addLast(base.relative(dir1(direction).getOpposite()).relative(dir2(direction)));
+                        todo.addLast(base.relative(dir1(direction).getOpposite()).relative(dir2(direction).getOpposite()));
                     }
                 }
             }
