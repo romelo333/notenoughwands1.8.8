@@ -60,7 +60,7 @@ public class MovingWand extends GenericWand {
         } else {
             BlockState state = NBTUtil.readBlockState(compound.getCompound("block"));
             ITextComponent name = Tools.getBlockName(state.getBlock());
-            return new StringTextComponent("Block: ").append(name).mergeStyle(TextFormatting.GREEN);
+            return new StringTextComponent("Block: ").appendSibling(name).mergeStyle(TextFormatting.GREEN);
         }
     }
 
@@ -191,7 +191,7 @@ public class MovingWand extends GenericWand {
             }
             world.setBlockState(pos, Blocks.AIR.getDefaultState());
 
-            Tools.notify(player, new StringTextComponent("You took: ").append(name));
+            Tools.notify(player, new StringTextComponent("You took: ").appendSibling(name));
             registerUsage(stack, player, (float) cost);
         }
     }

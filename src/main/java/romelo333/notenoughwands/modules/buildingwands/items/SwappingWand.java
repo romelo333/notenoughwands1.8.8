@@ -93,7 +93,7 @@ public class SwappingWand extends GenericWand {
             } else {
                 BlockState state = NBTUtil.readBlockState(compound.getCompound("block"));
                 ITextComponent name = Tools.getBlockName(state.getBlock());
-                return new StringTextComponent("Block: ").append(name).mergeStyle(TextFormatting.GREEN);
+                return new StringTextComponent("Block: ").appendSibling(name).mergeStyle(TextFormatting.GREEN);
             }
         }
     }
@@ -275,7 +275,7 @@ public class SwappingWand extends GenericWand {
             tagCompound.put("block", NBTUtil.writeBlockState(state));
             float hardness = state.getBlockHardness(world, pos);
             tagCompound.putFloat("hardness", hardness);
-            Tools.notify(player, new StringTextComponent("Selected block: ").append(name));
+            Tools.notify(player, new StringTextComponent("Selected block: ").appendSibling(name));
         }
     }
 

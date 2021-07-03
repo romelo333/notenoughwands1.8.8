@@ -54,7 +54,7 @@ public class CapturingWand extends GenericWand {
                 if (!type.isEmpty()) {
                     EntityType<?> entityType = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(type));
                     if (entityType != null) {
-                        list.add(new StringTextComponent(TextFormatting.GREEN + "Captured mob: ").append(entityType.getName()));
+                        list.add(new StringTextComponent(TextFormatting.GREEN + "Captured mob: ").appendSibling(entityType.getName()));
                     }
                 }
             }
