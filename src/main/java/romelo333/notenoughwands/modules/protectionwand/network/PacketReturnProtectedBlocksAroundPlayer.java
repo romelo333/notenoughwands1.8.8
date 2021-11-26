@@ -1,7 +1,6 @@
 package romelo333.notenoughwands.modules.protectionwand.network;
 
 import mcjty.lib.McJtyLib;
-import mcjty.lib.varia.DimensionId;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -65,7 +64,7 @@ public class PacketReturnProtectedBlocksAroundPlayer {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
             ReturnProtectedBlocksAroundPlayerHelper.setProtectedBlocks(
-                    DimensionId.fromWorld(McJtyLib.proxy.getClientWorld()), this); // @todo 1.15 no need for proxy here!
+                    McJtyLib.proxy.getClientWorld().dimension(), this); // @todo 1.15 no need for proxy here!
         });
         ctx.setPacketHandled(true);
     }

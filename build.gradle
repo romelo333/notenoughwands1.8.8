@@ -2,18 +2,21 @@
 // For those who want the bleeding edge
 buildscript {
     repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = 'https://maven.minecraftforge.net' }
+        maven { url = 'https://maven.parchmentmc.org' }
         maven { url 'https://plugins.gradle.org/m2/' }
         jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath 'org.parchmentmc:librarian:1.+'
         classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.4.0'
     }
 }
 
 apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'eclipse'
 apply plugin: 'com.matthewprenger.cursegradle'
 apply plugin: 'maven-publish'
@@ -25,16 +28,12 @@ repositories {
     maven { // Patchouli
         url "https://maven.blamejared.com"
     }
-    maven {
-        name 'OC Repo'
-        url "http://maven.cil.li/"
-    }
     maven { // TOP
         name 'tterrag maven'
-        url "http://maven.tterrag.com/"
+        url "https://maven.tterrag.com/"
     }
     maven { // McJtyLib
-        url "http://maven.k-4u.nl"
+        url "https://maven.k-4u.nl"
     }
     maven {
         name = "sonatype"
@@ -42,11 +41,7 @@ repositories {
     }
     maven {
         name = "CoFH Maven"
-        url = "http://maven.covers1624.net"
-    }
-    maven {
-        name = "TESLA"
-        url = "https://maven.mcmoddev.com"
+        url = "https://maven.covers1624.net"
     }
 }
 
@@ -61,7 +56,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 minecraft {
-    mappings channel: 'official', version: "1.16.5"
+    mappings channel: 'parchment', version: "2021.10.03-1.16.5"
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
@@ -113,14 +108,14 @@ dependencies {
     if (findProject(':TheOneProbe') != null) {
         compile project(':TheOneProbe')
     } else {
-        compile fg.deobf(project.dependencies.create("mcjty.theoneprobe:TheOneProbe-${top_version}") {
+        implementation fg.deobf(project.dependencies.create("mcjty.theoneprobe:TheOneProbe-${top_version}") {
             transitive = false
         })
     }
     if (findProject(':McJtyLib') != null) {
         compile project(':McJtyLib')
     } else {
-        compile fg.deobf (project.dependencies.create("com.github.mcjty:mcjtylib:${mcjtylib_version}") {
+        implementation fg.deobf (project.dependencies.create("com.github.mcjty:mcjtylib:${mcjtylib_version}") {
             transitive = false
         })
     }

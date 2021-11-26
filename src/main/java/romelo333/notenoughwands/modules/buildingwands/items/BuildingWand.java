@@ -2,7 +2,7 @@ package romelo333.notenoughwands.modules.buildingwands.items;
 
 
 import mcjty.lib.builder.TooltipBuilder;
-import mcjty.lib.varia.DimensionId;
+import mcjty.lib.varia.LevelTools;
 import mcjty.lib.varia.SoundTools;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -189,7 +189,7 @@ public class BuildingWand extends GenericWand {
         CompoundNBT undoTag = new CompoundNBT();
 
         undoTag.put("block", NBTUtil.writeBlockState(state));
-        undoTag.putString("dimension", DimensionId.fromWorld(world).getRegistryName().toString());
+        undoTag.putString("dimension", world.dimension().location().toString());
         int[] undoX = new int[undo.size()];
         int[] undoY = new int[undo.size()];
         int[] undoZ = new int[undo.size()];
@@ -276,8 +276,8 @@ public class BuildingWand extends GenericWand {
             return null;
         }
         String dimension = undoTag.getString("dimension");
-        DimensionId dim = DimensionId.fromResourceLocation(new ResourceLocation(dimension));
-        if (!Objects.equals(dim, DimensionId.fromWorld(world))) {
+        RegistryKey<World> dim = LevelTools.getId(new ResourceLocation(dimension));
+        if (!Objects.equals(dim, world.dimension())) {
             Tools.error(player, "Select at least one block of the area you want to undo!");
             return null;
         }
