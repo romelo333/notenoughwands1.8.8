@@ -1,3 +1,6 @@
+Upcoming:
+- Update to latest McJtyLib
+
 3.0.2:
 - Update to latest McJtyLib
 
