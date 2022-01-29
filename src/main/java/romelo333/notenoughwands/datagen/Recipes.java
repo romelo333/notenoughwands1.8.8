@@ -2,9 +2,9 @@ package romelo333.notenoughwands.datagen;
 
 import mcjty.lib.datagen.BaseRecipeProvider;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.data.ShapedRecipeBuilder;
-import net.minecraft.item.Items;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.world.item.Items;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsModule;
 import romelo333.notenoughwands.modules.lightwand.LightModule;
 import romelo333.notenoughwands.modules.protectionwand.ProtectionWandModule;
@@ -19,7 +19,7 @@ public class Recipes extends BaseRecipeProvider {
     }
 
     @Override
-    protected void buildShapelessRecipes(Consumer<IFinishedRecipe> consumer) {
+    protected void buildCraftingRecipes(Consumer<FinishedRecipe> consumer) {
         build(consumer, ShapedRecipeBuilder.shaped(WandsModule.WAND_CORE.get())
                         .define('X', Items.BLAZE_ROD)
                         .define('n', Items.GOLD_NUGGET)

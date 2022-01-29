@@ -5,7 +5,6 @@ buildscript {
         maven { url = 'https://maven.minecraftforge.net' }
         maven { url = 'https://maven.parchmentmc.org' }
         maven { url 'https://plugins.gradle.org/m2/' }
-        jcenter()
         mavenCentral()
     }
     dependencies {
@@ -28,10 +27,6 @@ repositories {
     maven { // Patchouli
         url "https://maven.blamejared.com"
     }
-    maven { // TOP
-        name 'tterrag maven'
-        url "https://maven.tterrag.com/"
-    }
     maven { // McJtyLib
         url "https://maven.k-4u.nl"
     }
@@ -52,11 +47,10 @@ if (System.getenv('BUILD_NUMBER') != null) {
     version += "-${System.getenv('BUILD_NUMBER')}"
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft {
-    mappings channel: 'parchment', version: "2021.10.03-1.16.5"
+    mappings channel: 'parchment', version: "2022.01.23-1.18.1"
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
@@ -108,7 +102,7 @@ dependencies {
     if (findProject(':TheOneProbe') != null) {
         compile project(':TheOneProbe')
     } else {
-        implementation fg.deobf(project.dependencies.create("mcjty.theoneprobe:TheOneProbe-${top_version}") {
+        implementation fg.deobf(project.dependencies.create("mcjty.theoneprobe:theoneprobe:${top_version}") {
             transitive = false
         })
     }

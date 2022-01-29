@@ -1,26 +1,26 @@
 package romelo333.notenoughwands.varia;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import mcjty.lib.client.CustomRenderTypes;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.core.BlockPos;
+import com.mojang.math.Matrix4f;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Set;
 
 public class ClientTools {
 
-    public static void renderOutlines(MatrixStack matrixStack, IRenderTypeBuffer.Impl buffer, Set<BlockPos> coordinates, int r, int g, int b) {
+    public static void renderOutlines(PoseStack matrixStack, MultiBufferSource.BufferSource buffer, Set<BlockPos> coordinates, int r, int g, int b) {
 
-        IVertexBuilder builder = buffer.getBuffer(CustomRenderTypes.OVERLAY_LINES);
+        VertexConsumer builder = buffer.getBuffer(CustomRenderTypes.OVERLAY_LINES);
 
         matrixStack.pushPose();
 
-        Vector3d projectedView = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+        Vec3 projectedView = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         matrixStack.translate(-projectedView.x, -projectedView.y, -projectedView.z);
 
         Matrix4f positionMatrix = matrixStack.last().pose();

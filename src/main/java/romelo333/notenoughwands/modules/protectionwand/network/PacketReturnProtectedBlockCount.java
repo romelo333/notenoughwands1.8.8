@@ -1,19 +1,19 @@
 package romelo333.notenoughwands.modules.protectionwand.network;
 
 
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
 public class PacketReturnProtectedBlockCount {
     private int count;
 
-    public void fromBytes(PacketBuffer buf) {
+    public void fromBytes(FriendlyByteBuf buf) {
         count = buf.readInt();
     }
 
-    public void toBytes(PacketBuffer buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         buf.writeInt(count);
     }
 
@@ -24,7 +24,7 @@ public class PacketReturnProtectedBlockCount {
     public PacketReturnProtectedBlockCount() {
     }
 
-    public PacketReturnProtectedBlockCount(PacketBuffer buf) {
+    public PacketReturnProtectedBlockCount(FriendlyByteBuf buf) {
         fromBytes(buf);
     }
 

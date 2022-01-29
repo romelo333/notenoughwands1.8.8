@@ -1,12 +1,12 @@
 package romelo333.notenoughwands.modules.wands;
 
 import mcjty.lib.modules.IModule;
-import net.minecraft.item.Item;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.world.item.Item;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.registries.RegistryObject;
 import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.modules.wands.Items.*;
 import romelo333.notenoughwands.setup.Config;

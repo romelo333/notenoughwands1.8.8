@@ -2,22 +2,22 @@ package romelo333.notenoughwands.modules.wands.Items;
 
 
 import mcjty.lib.builder.TooltipBuilder;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.util.FakePlayer;
 import romelo333.notenoughwands.modules.wands.WandsConfiguration;
 import romelo333.notenoughwands.varia.Tools;
@@ -56,7 +56,7 @@ public class AccelerationWand extends GenericWand {
     private Random random = new Random();
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flagIn) {
+    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> list, TooltipFlag flagIn) {
         super.appendHoverText(stack, world, list, flagIn);
         tooltipBuilder.makeTooltip(getRegistryName(), stack, list, flagIn);
 
@@ -64,21 +64,21 @@ public class AccelerationWand extends GenericWand {
 
         if (Math.abs(WandsConfiguration.fakePlayerFactor.get() -1.0f) >= 0.01) {
             if (WandsConfiguration.fakePlayerFactor.get() < 0) {
-                list.add(new StringTextComponent(TextFormatting.RED + "Usage in a machine has been disabled in config!"));
+                list.add(new TextComponent(ChatFormatting.RED + "Usage in a machine has been disabled in config!"));
             } else if (WandsConfiguration.fakePlayerFactor.get() > 1) {
-                list.add(new StringTextComponent(TextFormatting.YELLOW + "Usage in a machine will cost more!"));
+                list.add(new TextComponent(ChatFormatting.YELLOW + "Usage in a machine will cost more!"));
             }
         }
         if (WandsConfiguration.fakePlayerFactor.get() >= 0.0 && WandsConfiguration.lessEffectiveForFakePlayer.get()) {
-            list.add(new StringTextComponent(TextFormatting.YELLOW + "Usage in a machine will be less effective!"));
+            list.add(new TextComponent(ChatFormatting.YELLOW + "Usage in a machine will be less effective!"));
         }
     }
 
     @Override
-    public ActionResultType useOn(ItemUseContext context) {
-        PlayerEntity player = context.getPlayer();
-        Hand hand = context.getHand();
-        World world = context.getLevel();
+    public InteractionResult useOn(UseOnContext context) {
+        Player player = context.getPlayer();
+        InteractionHand hand = context.getHand();
+        Level world = context.getLevel();
         BlockPos pos = context.getClickedPos();
         ItemStack stack = player.getItemInHand(hand);
         if (!world.isClientSide) {
@@ -92,7 +92,7 @@ public class AccelerationWand extends GenericWand {
             if (player instanceof FakePlayer) {
                 if (WandsConfiguration.fakePlayerFactor.get() < 0) {
                     // Blocked by usage in a machine
-                    return ActionResultType.FAIL;
+                    return InteractionResult.FAIL;
                 }
                 cost *= WandsConfiguration.fakePlayerFactor.get();
 
@@ -102,31 +102,31 @@ public class AccelerationWand extends GenericWand {
             }
 
             if (!checkUsage(stack, player, cost)) {
-                return ActionResultType.FAIL;
+                return InteractionResult.FAIL;
             }
-            TileEntity tileEntity = world.getBlockEntity(pos);
+            BlockEntity tileEntity = world.getBlockEntity(pos);
             for (int i = 0; i < amount /(tileEntity == null ? 5 : 1); i ++){
                 if (tileEntity == null){
-                    block.tick(state, (ServerWorld) world, pos, random);
-                } else if (tileEntity instanceof ITickableTileEntity) {
-                    ((ITickableTileEntity)tileEntity).tick();
+                    block.tick(state, (ServerLevel) world, pos, random);
+                } else if (tileEntity instanceof EntityBlock) {
+                    //TODO ((EntityBlock)tileEntity).tick();
                 }
 
             }
 
             registerUsage(stack, player, cost);
         }
-        return ActionResultType.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void toggleMode(PlayerEntity player, ItemStack stack) {
+    public void toggleMode(Player player, ItemStack stack) {
         int mode = getMode(stack);
         mode++;
         if (mode > MODE_LAST) {
             mode = MODE_FIRST;
         }
-        Tools.notify(player, new StringTextComponent("Switched to " + DESCRIPTIONS[mode] + " mode"));
+        Tools.notify(player, new TextComponent("Switched to " + DESCRIPTIONS[mode] + " mode"));
         stack.getOrCreateTag().putInt("mode", mode);
     }
 

@@ -1,7 +1,7 @@
 package romelo333.notenoughwands.setup;
 
 import mcjty.lib.setup.DefaultModSetup;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import romelo333.notenoughwands.ForgeEventHandlers;

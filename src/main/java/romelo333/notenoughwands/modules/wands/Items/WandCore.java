@@ -1,10 +1,10 @@
 package romelo333.notenoughwands.modules.wands.Items;
 
 
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 import romelo333.notenoughwands.NotEnoughWands;
 
-import net.minecraft.item.Item.Properties;
+import net.minecraft.world.item.Item.Properties;
 
 public class WandCore extends Item {
     public WandCore () {

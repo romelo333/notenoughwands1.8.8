@@ -1,9 +1,9 @@
 package romelo333.notenoughwands.modules.protectionwand;
 
 import mcjty.lib.modules.IModule;
-import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.registries.RegistryObject;
 import romelo333.notenoughwands.modules.protectionwand.items.ProtectionWand;
 import romelo333.notenoughwands.setup.Config;
 

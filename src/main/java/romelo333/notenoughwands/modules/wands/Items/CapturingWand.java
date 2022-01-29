@@ -2,25 +2,25 @@ package romelo333.notenoughwands.modules.wands.Items;
 
 
 import mcjty.lib.builder.TooltipBuilder;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.monster.IMob;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.registries.ForgeRegistries;
 import romelo333.notenoughwands.modules.wands.WandsConfiguration;
 import romelo333.notenoughwands.varia.Tools;
@@ -43,18 +43,18 @@ public class CapturingWand extends GenericWand {
 
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> list, ITooltipFlag flagIn) {
+    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> list, TooltipFlag flagIn) {
         super.appendHoverText(stack, worldIn, list, flagIn);
         tooltipBuilder.makeTooltip(getRegistryName(), stack, list, flagIn);
 
-        CompoundNBT tagCompound = stack.getTag();
+        CompoundTag tagCompound = stack.getTag();
         if (tagCompound != null) {
             if (tagCompound.contains("mob")) {
                 String type = tagCompound.getString("type");
                 if (!type.isEmpty()) {
                     EntityType<?> entityType = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(type));
                     if (entityType != null) {
-                        list.add(new StringTextComponent(TextFormatting.GREEN + "Captured mob: ").append(entityType.getDescription()));
+                        list.add(new TextComponent(ChatFormatting.GREEN + "Captured mob: ").append(entityType.getDescription()));
                     }
                 }
             }
@@ -62,23 +62,23 @@ public class CapturingWand extends GenericWand {
     }
 
     @Override
-    public ActionResultType useOn(ItemUseContext context) {
-        PlayerEntity player = context.getPlayer();
-        Hand hand = context.getHand();
-        World world = context.getLevel();
+    public InteractionResult useOn(UseOnContext context) {
+        Player player = context.getPlayer();
+        InteractionHand hand = context.getHand();
+        Level world = context.getLevel();
         ItemStack stack = player.getItemInHand(hand);
         BlockPos pos = context.getClickedPos();
         if (!world.isClientSide) {
-            CompoundNBT tagCompound = stack.getOrCreateTag();
+            CompoundTag tagCompound = stack.getOrCreateTag();
             if (tagCompound.contains("mob")) {
-                INBT mobCompound = tagCompound.get("mob");
+                Tag mobCompound = tagCompound.get("mob");
                 String type = tagCompound.getString("type");
                 LivingEntity entityLivingBase = createEntity(player, world, type);
                 if (entityLivingBase == null) {
                     Tools.error(player, "Something went wrong trying to spawn creature!");
-                    return ActionResultType.FAIL;
+                    return InteractionResult.FAIL;
                 }
-                entityLivingBase.load((CompoundNBT) mobCompound);
+                entityLivingBase.load((CompoundTag) mobCompound);
                 entityLivingBase.moveTo(pos.getX()+.5, pos.getY()+1, pos.getZ()+.5, 0, 0);
                 tagCompound.remove("mob");
                 tagCompound.remove("type");
@@ -87,10 +87,10 @@ public class CapturingWand extends GenericWand {
                 Tools.error(player, "There is no mob captured in this wand!");
             }
         }
-        return ActionResultType.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
-    private LivingEntity createEntity(PlayerEntity player, World world, String type) {
+    private LivingEntity createEntity(Player player, Level world, String type) {
         EntityType<?> entityType = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(type));
         if (entityType != null) {
             return (LivingEntity) entityType.create(world);
@@ -99,7 +99,7 @@ public class CapturingWand extends GenericWand {
     }
 
     @Override
-    public boolean onLeftClickEntity(ItemStack stack, PlayerEntity player, Entity entity) {
+    public boolean onLeftClickEntity(ItemStack stack, Player player, Entity entity) {
         if (!player.getCommandSenderWorld().isClientSide) {
             if (entity instanceof LivingEntity) {
                 if (stack.getOrCreateTag().contains("mob")) {
@@ -107,16 +107,16 @@ public class CapturingWand extends GenericWand {
                     return true;
                 }
                 LivingEntity entityLivingBase = (LivingEntity) entity;
-                if (entityLivingBase instanceof PlayerEntity) {
+                if (entityLivingBase instanceof Player) {
                     Tools.error(player, "I don't think that player would appreciate being captured!");
                     return true;
                 }
 
-                if ((!WandsConfiguration.allowHostile.get()) && entityLivingBase instanceof IMob) {
+                if ((!WandsConfiguration.allowHostile.get()) && entityLivingBase instanceof Enemy) {
                     Tools.error(player, "It is not possible to capture hostile mobs with this wand!");
                     return true;
                 }
-                if ((!WandsConfiguration.allowPassive.get()) && !(entityLivingBase instanceof IMob)) {
+                if ((!WandsConfiguration.allowPassive.get()) && !(entityLivingBase instanceof Enemy)) {
                     Tools.error(player, "It is not possible to capture passive mobs with this wand!");
                     return true;
                 }
@@ -131,11 +131,11 @@ public class CapturingWand extends GenericWand {
                     return true;
                 }
 
-                CompoundNBT tagCompound = new CompoundNBT();
+                CompoundTag tagCompound = new CompoundTag();
                 entityLivingBase.addAdditionalSaveData(tagCompound);  // @todo 1.15 is this right?
                 stack.getOrCreateTag().put("mob", tagCompound);
                 stack.getOrCreateTag().putString("type", entity.getType().getRegistryName().toString());
-                ((ServerWorld)player.getCommandSenderWorld()).despawn(entity);
+                ((ServerLevel)player.getCommandSenderWorld()).removeEntity(entity);
 
                 registerUsage(stack, player, difficultyScale);
             } else {
