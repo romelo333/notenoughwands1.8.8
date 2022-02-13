@@ -3,9 +3,11 @@ package romelo333.notenoughwands.modules.lightwand.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.client.CustomRenderTypes;
+import mcjty.lib.client.DelayedRenderer;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.client.RenderSettings;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -25,11 +27,13 @@ public class LightRenderer implements BlockEntityRenderer<LightTE> {
 
     @Override
     public void render(LightTE tileEntity, float partialTicks, PoseStack matrixStack, MultiBufferSource buffer, int combinedLightIn, int combinedOverlayIn) {
-        RenderHelper.renderBillboardQuadBright(matrixStack, buffer, 0.5f, LIGHT, RenderSettings.builder()
-                .color(255, 255, 255)
-                .renderType(CustomRenderTypes.TRANSLUCENT_LIGHTNING_NOLIGHTMAPS)
-                .alpha(128)
-                .build());
+        DelayedRenderer.addRender(RenderType.translucent(), tileEntity.getBlockPos(), (poseStack, vertexConsumer) -> {
+            RenderHelper.renderBillboardQuadBright(poseStack, vertexConsumer, 0.5f, LIGHT, RenderSettings.builder()
+                    .color(255, 255, 255)
+                    .renderType(CustomRenderTypes.translucent())
+                    .alpha(128)
+                    .build());
+        });
     }
 
     public static void register() {

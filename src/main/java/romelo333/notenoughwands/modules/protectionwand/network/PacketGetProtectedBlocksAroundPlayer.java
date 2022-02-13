@@ -17,9 +17,6 @@ import java.util.function.Supplier;
 
 public class PacketGetProtectedBlocksAroundPlayer {
 
-    public void fromBytes(FriendlyByteBuf buf) {
-    }
-
     public void toBytes(FriendlyByteBuf buf) {
     }
 

@@ -98,24 +98,15 @@ public class TeleportationWand extends GenericWand {
                     player.teleportTo(x+.5, y + 1, z+.5);
                 } else {
                     switch (result.getDirection()) {
-                        case DOWN:
-                            player.teleportTo(x+.5, y - 2, z+.5);
-                            break;
-                        case UP:
+                        case DOWN -> player.teleportTo(x + .5, y - 2, z + .5);
+                        case UP -> {
                             Tools.error(player, "You will suffocate if you teleport there!");
                             return InteractionResultHolder.pass(stack);
-                        case NORTH:
-                            player.teleportTo(x+.5, y, z - 1 + .5);
-                            break;
-                        case SOUTH:
-                            player.teleportTo(x+.5, y, z + 1+.5);
-                            break;
-                        case WEST:
-                            player.teleportTo(x - 1+.5, y, z+.5);
-                            break;
-                        case EAST:
-                            player.teleportTo(x + 1+.5, y, z+.5);
-                            break;
+                        }
+                        case NORTH -> player.teleportTo(x + .5, y, z - 1 + .5);
+                        case SOUTH -> player.teleportTo(x + .5, y, z + 1 + .5);
+                        case WEST -> player.teleportTo(x - 1 + .5, y, z + .5);
+                        case EAST -> player.teleportTo(x + 1 + .5, y, z + .5);
                     }
                 }
             }

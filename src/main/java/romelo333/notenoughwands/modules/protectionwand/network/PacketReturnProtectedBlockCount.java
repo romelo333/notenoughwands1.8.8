@@ -21,9 +21,6 @@ public class PacketReturnProtectedBlockCount {
         return count;
     }
 
-    public PacketReturnProtectedBlockCount() {
-    }
-
     public PacketReturnProtectedBlockCount(FriendlyByteBuf buf) {
         fromBytes(buf);
     }

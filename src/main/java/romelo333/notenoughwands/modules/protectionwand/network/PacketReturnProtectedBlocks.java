@@ -14,12 +14,12 @@ public class PacketReturnProtectedBlocks {
 
     public void fromBytes(FriendlyByteBuf buf) {
         int size = buf.readInt();
-        blocks = new HashSet<BlockPos>(size);
+        blocks = new HashSet<>(size);
         for (int i = 0 ; i < size ; i++) {
             blocks.add(new BlockPos(buf.readInt(), buf.readInt(), buf.readInt()));
         }
         size = buf.readInt();
-        childBlocks = new HashSet<BlockPos>(size);
+        childBlocks = new HashSet<>(size);
         for (int i = 0 ; i < size ; i++) {
             childBlocks.add(new BlockPos(buf.readInt(), buf.readInt(), buf.readInt()));
         }
@@ -47,9 +47,6 @@ public class PacketReturnProtectedBlocks {
 
     public Set<BlockPos> getChildBlocks() {
         return childBlocks;
-    }
-
-    public PacketReturnProtectedBlocks() {
     }
 
     public PacketReturnProtectedBlocks(FriendlyByteBuf buf) {

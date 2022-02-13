@@ -178,11 +178,10 @@ public class SwappingWand extends GenericWand {
                 Tools.error(player, "You need to hold a block in your offhand!");
                 return;
             }
-            if (!(off.getItem() instanceof BlockItem)) {
+            if (!(off.getItem() instanceof BlockItem itemBlock)) {
                 Tools.error(player, "The item in your offhand cannot be placed!");
                 return;
             }
-            BlockItem itemBlock = (BlockItem) off.getItem();
             blockState = itemBlock.getBlock().defaultBlockState();    // @todo 1.15 is this right?
             hardness = blockState.getDestroySpeed(world, pos);
         } else {
@@ -285,8 +284,7 @@ public class SwappingWand extends GenericWand {
     public void renderOverlay(RenderLevelLastEvent evt, Player player, ItemStack wand) {
         HitResult mouseOver = Minecraft.getInstance().hitResult;
 
-        if (mouseOver instanceof BlockHitResult) {
-            BlockHitResult br = (BlockHitResult) mouseOver;
+        if (mouseOver instanceof BlockHitResult br) {
 
             Level world = player.getCommandSenderWorld();
             BlockPos blockPos = br.getBlockPos();
@@ -307,18 +305,13 @@ public class SwappingWand extends GenericWand {
         int mode = getMode(stack);
         int dim = 0;
         switch (mode) {
-            case MODE_SINGLE:
+            case MODE_SINGLE -> {
                 coordinates.add(pos);
                 return coordinates;
-            case MODE_3X3:
-                dim = 1;
-                break;
-            case MODE_5X5:
-                dim = 2;
-                break;
-            case MODE_7X7:
-                dim = 3;
-                break;
+            }
+            case MODE_3X3 -> dim = 1;
+            case MODE_5X5 -> dim = 2;
+            case MODE_7X7 -> dim = 3;
         }
         int x = pos.getX();
         int y = pos.getY();

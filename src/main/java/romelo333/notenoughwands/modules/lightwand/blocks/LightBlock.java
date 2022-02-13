@@ -32,18 +32,6 @@ public class LightBlock extends Block implements EntityBlock {
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.INVISIBLE;
     }
-    //TODO those 2 functions don't exist
-    /*
-    @Override
-    public boolean addHitEffects(BlockState state, Level worldObj, HitResult target, ParticleEngine manager) {
-        return true;
-    }
-
-    @Override
-    public boolean addDestroyEffects(BlockState state, Level world, BlockPos pos, ParticleEngine manager) {
-        return true;
-    }
- */
 
     @Nullable
     @Override

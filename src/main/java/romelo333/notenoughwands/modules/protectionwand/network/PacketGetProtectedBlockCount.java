@@ -22,9 +22,6 @@ public class PacketGetProtectedBlockCount {
         buf.writeInt(id);
     }
 
-    public PacketGetProtectedBlockCount() {
-    }
-
     public PacketGetProtectedBlockCount(FriendlyByteBuf buf) {
         fromBytes(buf);
     }

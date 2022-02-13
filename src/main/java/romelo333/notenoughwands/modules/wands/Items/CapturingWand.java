@@ -101,12 +101,11 @@ public class CapturingWand extends GenericWand {
     @Override
     public boolean onLeftClickEntity(ItemStack stack, Player player, Entity entity) {
         if (!player.getCommandSenderWorld().isClientSide) {
-            if (entity instanceof LivingEntity) {
+            if (entity instanceof LivingEntity entityLivingBase) {
                 if (stack.getOrCreateTag().contains("mob")) {
                     Tools.error(player, "There is already a mob in this wand!");
                     return true;
                 }
-                LivingEntity entityLivingBase = (LivingEntity) entity;
                 if (entityLivingBase instanceof Player) {
                     Tools.error(player, "I don't think that player would appreciate being captured!");
                     return true;

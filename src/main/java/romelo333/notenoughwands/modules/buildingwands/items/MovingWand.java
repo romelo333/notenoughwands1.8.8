@@ -127,7 +127,7 @@ public class MovingWand extends GenericWand {
 
         BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.create(world.dimension(), world, pp);
 
-        world.setBlock(pp, blockState, 0);//TODO flags
+        world.setBlock(pp, blockState, 0);
         // Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
         if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
             blocksnapshot.restore(true, false);
@@ -136,13 +136,13 @@ public class MovingWand extends GenericWand {
 
         if (tagCompound.contains("tedata")) {
             CompoundTag tc = (CompoundTag) tagCompound.get("tedata");
-            tc.putInt("x", pp.getX());
-            tc.putInt("y", pp.getY());
-            tc.putInt("z", pp.getZ());
+
             //TODO moved pp from setBlockEntity to loadStatic
-            BlockEntity tileEntity = BlockEntity.loadStatic(pp, blockState, tc);
+//            BlockEntity tileEntity = BlockEntity.loadStatic(pp, blockState, tc);
+            BlockEntity tileEntity = world.getBlockEntity(pp);
             if (tileEntity != null) {
-                world.getChunk(pp).setBlockEntity(tileEntity);
+                tileEntity.load(tc);
+//                world.getChunk(pp).setBlockEntity(tileEntity);
                 tileEntity.setChanged();
                 world.sendBlockUpdated(pp, blockState, blockState, 3);
             }
@@ -180,13 +180,8 @@ public class MovingWand extends GenericWand {
 
             BlockEntity tileEntity = world.getBlockEntity(pos);
             if (tileEntity != null) {
-                CompoundTag tc = new CompoundTag();
-                //TODO commented save as it doesn't exist?
-                //tileEntity.save(tc);
+                CompoundTag tc = tileEntity.saveWithoutMetadata();
                 world.removeBlockEntity(pos);
-                tc.remove("x");
-                tc.remove("y");
-                tc.remove("z");
                 tagCompound.put("tedata", tc);
             }
             world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());

@@ -1,5 +1,5 @@
-Upcoming:
-- Update to latest McJtyLib
+4.0.0:
+- Port to 1.18 (with the big help of remplerus!)
 
 3.0.2:
 - Update to latest McJtyLib

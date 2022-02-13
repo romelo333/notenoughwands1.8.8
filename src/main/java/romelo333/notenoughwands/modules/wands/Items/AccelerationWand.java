@@ -4,6 +4,8 @@ package romelo333.notenoughwands.modules.wands.Items;
 import mcjty.lib.builder.TooltipBuilder;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.entity.player.Player;
@@ -53,7 +55,7 @@ public class AccelerationWand extends GenericWand {
         this.usageFactor(3.0f);
     }
 
-    private Random random = new Random();
+    private final Random random = new Random();
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> list, TooltipFlag flagIn) {
@@ -108,8 +110,11 @@ public class AccelerationWand extends GenericWand {
             for (int i = 0; i < amount /(tileEntity == null ? 5 : 1); i ++){
                 if (tileEntity == null){
                     block.tick(state, (ServerLevel) world, pos, random);
-                } else if (tileEntity instanceof EntityBlock) {
-                    //TODO ((EntityBlock)tileEntity).tick();
+                } else if (state.getBlock() instanceof EntityBlock entityBlock) {
+                    BlockEntityTicker<BlockEntity> ticker = entityBlock.getTicker(world, state, (BlockEntityType<BlockEntity>) tileEntity.getType());
+                    if (ticker != null) {
+                        ticker.tick(world, pos, state, tileEntity);
+                    }
                 }
 
             }

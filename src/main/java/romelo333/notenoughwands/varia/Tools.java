@@ -40,8 +40,7 @@ public class Tools {
 
         BlockHitResult trace = new BlockHitResult(new Vec3(0, 0, 0), Direction.UP, pos, false);
         BlockPlaceContext context = new BlockPlaceContext(new UseOnContext(player, InteractionHand.MAIN_HAND, trace));
-        if (blockStack.getItem() instanceof BlockItem) {
-            BlockItem itemBlock = (BlockItem) blockStack.getItem();
+        if (blockStack.getItem() instanceof BlockItem itemBlock) {
             if (origState == null) {
                 origState = itemBlock.getBlock().getStateForPlacement(context);
                 if (origState == null) {

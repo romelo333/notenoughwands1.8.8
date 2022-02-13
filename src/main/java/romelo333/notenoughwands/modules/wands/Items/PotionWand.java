@@ -115,8 +115,7 @@ public class PotionWand extends GenericWand {
     @Override
     public boolean onLeftClickEntity(ItemStack stack, Player player, Entity entity) {
         if (!player.getCommandSenderWorld().isClientSide) {
-            if (entity instanceof LivingEntity) {
-                LivingEntity entityLivingBase = (LivingEntity) entity;
+            if (entity instanceof LivingEntity entityLivingBase) {
                 if ((!WandsConfiguration.potionAllowHostile.get()) && entityLivingBase instanceof Enemy) {
                     Tools.error(player, "It is not possible to add effects to hostile mobs with this wand!");
                     return true;

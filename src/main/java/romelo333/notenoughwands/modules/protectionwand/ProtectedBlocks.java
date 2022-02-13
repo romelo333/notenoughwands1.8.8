@@ -41,6 +41,23 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
         super();
     }
 
+    public ProtectedBlocks(CompoundTag tag) {
+        lastId = tag.getInt("lastId");
+        blocks.clear();
+        perDimPerChunkCache.clear();;
+        counter.clear();
+        ListTag list = tag.getList("blocks", Tag.TAG_COMPOUND);
+        for (int i = 0; i<list.size();i++){
+            CompoundTag tc = list.getCompound(i);
+            String dim = tc.getString("dim");
+            GlobalPos block = GlobalPos.of(LevelTools.getId(new ResourceLocation(dim)), new BlockPos(tc.getInt("x"),tc.getInt("y"),tc.getInt("z")));
+            int id = tc.getInt("id");
+            blocks.put(block, id);
+            incrementProtection(id);
+        }
+    }
+
+
 //    @Override
 //    public void clear() {
 //        blocks.clear();
@@ -50,8 +67,7 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
 //    }
 
     public static ProtectedBlocks getProtectedBlocks(Level world){
-        return new ProtectedBlocks();
-        //TODO getData(world, () -> new ProtectedBlocks(), NAME);
+        return getData(world, ProtectedBlocks::new, ProtectedBlocks::new, NAME);
     }
 
     public static boolean isProtectedClientSide(Level world, BlockPos pos){
@@ -226,21 +242,6 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
 
     //TODO load doesn't exist in McjtyLib
     //@Override
-    public void load(CompoundTag tagCompound) {
-        lastId = tagCompound.getInt("lastId");
-        blocks.clear();
-        perDimPerChunkCache.clear();;
-        counter.clear();
-        ListTag list = tagCompound.getList("blocks", Tag.TAG_COMPOUND);
-        for (int i = 0; i<list.size();i++){
-            CompoundTag tc = list.getCompound(i);
-            String dim = tc.getString("dim");
-            GlobalPos block = GlobalPos.of(LevelTools.getId(new ResourceLocation(dim)), new BlockPos(tc.getInt("x"),tc.getInt("y"),tc.getInt("z")));
-            int id = tc.getInt("id");
-            blocks.put(block, id);
-            incrementProtection(id);
-        }
-    }
 
     @Override
     public CompoundTag save(CompoundTag tagCompound) {

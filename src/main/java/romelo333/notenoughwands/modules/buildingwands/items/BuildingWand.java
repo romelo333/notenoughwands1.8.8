@@ -395,48 +395,27 @@ public class BuildingWand extends GenericWand {
     }
 
     private Direction dir1(Direction direction) {
-        switch (direction) {
-            case DOWN:
-            case UP:
-                return Direction.EAST;
-            case NORTH:
-            case SOUTH:
-                return Direction.EAST;
-            case WEST:
-            case EAST:
-                return Direction.DOWN;
-        }
-        return null;
+        return switch (direction) {
+            case DOWN, UP -> Direction.EAST;
+            case NORTH, SOUTH -> Direction.EAST;
+            case WEST, EAST -> Direction.DOWN;
+        };
     }
 
     private Direction dir2(Direction direction) {
-        switch (direction) {
-            case DOWN:
-            case UP:
-                return Direction.SOUTH;
-            case NORTH:
-            case SOUTH:
-                return Direction.DOWN;
-            case WEST:
-            case EAST:
-                return Direction.SOUTH;
-        }
-        return null;
+        return switch (direction) {
+            case DOWN, UP -> Direction.SOUTH;
+            case NORTH, SOUTH -> Direction.DOWN;
+            case WEST, EAST -> Direction.SOUTH;
+        };
     }
 
     private Direction dir3(Direction direction) {
-        switch (direction) {
-            case DOWN:
-            case UP:
-                return Direction.SOUTH;
-            case NORTH:
-            case SOUTH:
-                return Direction.WEST;
-            case WEST:
-            case EAST:
-                return Direction.SOUTH;
-        }
-        return null;
+        return switch (direction) {
+            case DOWN, UP -> Direction.SOUTH;
+            case NORTH, SOUTH -> Direction.WEST;
+            case WEST, EAST -> Direction.SOUTH;
+        };
     }
 
 }

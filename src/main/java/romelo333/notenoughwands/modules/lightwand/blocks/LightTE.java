@@ -10,10 +10,4 @@ public class LightTE extends BlockEntity {
     public LightTE(BlockPos pos, BlockState state) {
         super(LightModule.TYPE_LIGHT.get(), pos, state);
     }
-
-//
-//    @Override
-//    public boolean shouldRenderInPass(int pass) {
-//        return pass == 1;
-//    }
 }

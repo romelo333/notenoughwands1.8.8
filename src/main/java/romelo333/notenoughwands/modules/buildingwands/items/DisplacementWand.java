@@ -3,24 +3,24 @@ package romelo333.notenoughwands.modules.buildingwands.items;
 
 import mcjty.lib.builder.TooltipBuilder;
 import mcjty.lib.varia.SoundTools;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.client.event.RenderLevelLastEvent;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -135,13 +135,11 @@ public class DisplacementWand extends GenericWand {
                     BlockEntity tileEntity = world.getBlockEntity(coordinate);
                     CompoundTag tc = null;
                     if (tileEntity != null) {
-                        tc = new CompoundTag();
-                        //TODO commented save as it doesn't exist?
-                        //tileEntity.save(tc);
+                        tc = tileEntity.saveWithoutMetadata();
                         world.removeBlockEntity(coordinate);
                     }
 
-                    world.setBlockAndUpdate(coordinate, Blocks.AIR.defaultBlockState());
+                    world.setBlock(coordinate, Blocks.AIR.defaultBlockState(), 0);
 
                     BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.create(world.dimension(), world, otherC);
                     BlockState blockState = block.defaultBlockState();    // @todo 1.15 blockstate
@@ -154,26 +152,13 @@ public class DisplacementWand extends GenericWand {
                     }
 
                     if (tc != null) {
-                        tc.putInt("x", otherC.getX());
-                        tc.putInt("y", otherC.getY());
-                        tc.putInt("z", otherC.getZ());
                         //TODO otherC moved from setBlockEntity to loadStatic
-                        tileEntity = BlockEntity.loadStatic(otherC, blockState, tc);
+                        tileEntity = world.getBlockEntity(otherC);
                         if (tileEntity != null) {
-                            world.getChunk(otherC).setBlockEntity(tileEntity);
+                            tileEntity.load(tc);
                             tileEntity.setChanged();
                             world.sendBlockUpdated(otherC, blockState, blockState, 3); // @todo 1.15 constants
                         }
-
-//                        tileEntity = world.getTileEntity(otherC);
-//                        if (tileEntity != null) {
-//                            tc.putInt("x", otherC.getX());
-//                            tc.putInt("y", otherC.getY());
-//                            tc.putInt("z", otherC.getZ());
-//                            tileEntity.readFromNBT(tc);
-//                            tileEntity.markDirty();
-//                            world.notifyBlockUpdate(otherC, blockState, blockState, 3);
-//                        }
                     }
                 }
             }
@@ -185,8 +170,7 @@ public class DisplacementWand extends GenericWand {
     public void renderOverlay(RenderLevelLastEvent evt, Player player, ItemStack wand) {
         HitResult mouseOver = Minecraft.getInstance().hitResult;
 
-        if (mouseOver instanceof BlockHitResult) {
-            BlockHitResult br = (BlockHitResult) mouseOver;
+        if (mouseOver instanceof BlockHitResult br) {
 
             Level world = player.getCommandSenderWorld();
             BlockPos blockPos = br.getBlockPos();
@@ -203,18 +187,13 @@ public class DisplacementWand extends GenericWand {
         int mode = getMode(stack);
         int dim = 0;
         switch (mode) {
-            case MODE_SINGLE:
+            case MODE_SINGLE -> {
                 coordinates.add(pos);
                 return coordinates;
-            case MODE_3X3:
-                dim = 1;
-                break;
-            case MODE_5X5:
-                dim = 2;
-                break;
-            case MODE_7X7:
-                dim = 3;
-                break;
+            }
+            case MODE_3X3 -> dim = 1;
+            case MODE_5X5 -> dim = 2;
+            case MODE_7X7 -> dim = 3;
         }
         int x = pos.getX();
         int y = pos.getY();

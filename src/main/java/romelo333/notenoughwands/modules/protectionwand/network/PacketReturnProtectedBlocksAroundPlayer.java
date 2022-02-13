@@ -1,8 +1,7 @@
 package romelo333.notenoughwands.modules.protectionwand.network;
 
-import mcjty.lib.McJtyLib;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.network.NetworkEvent;
@@ -18,7 +17,7 @@ public class PacketReturnProtectedBlocksAroundPlayer {
 
     public void fromBytes(FriendlyByteBuf buf) {
         int size = buf.readInt();
-        blocks = new HashMap<ChunkPos, Set<BlockPos>> (size);
+        blocks = new HashMap<>(size);
         for (int i = 0 ; i < size ; i++) {
             ChunkPos chunkpos = new ChunkPos(buf.readInt(), buf.readInt());
 
@@ -48,9 +47,6 @@ public class PacketReturnProtectedBlocksAroundPlayer {
 
     public Map<ChunkPos, Set<BlockPos>> getBlocks() {
         return blocks;
-    }
-
-    public PacketReturnProtectedBlocksAroundPlayer() {
     }
 
     public PacketReturnProtectedBlocksAroundPlayer(FriendlyByteBuf buf) {
