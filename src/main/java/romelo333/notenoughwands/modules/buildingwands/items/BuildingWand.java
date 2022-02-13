@@ -4,51 +4,43 @@ package romelo333.notenoughwands.modules.buildingwands.items;
 import mcjty.lib.builder.TooltipBuilder;
 import mcjty.lib.varia.LevelTools;
 import mcjty.lib.varia.SoundTools;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.material.Material;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.Material;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.util.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.client.event.RenderLevelLastEvent;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.items.ItemHandlerHelper;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 import romelo333.notenoughwands.varia.Tools;
 
-;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.items.ItemHandlerHelper;
-import romelo333.notenoughwands.modules.wands.Items.GenericWand;
-import romelo333.notenoughwands.varia.Tools;
-
-import java.util.*;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 
 import static mcjty.lib.builder.TooltipBuilder.*;
 
@@ -82,7 +74,7 @@ public class BuildingWand extends GenericWand {
 
     private int countUndoStates(ItemStack stack) {
         if (stack.hasTag()) {
-            CompoundNBT compound = stack.getTag();
+            CompoundTag compound = stack.getTag();
             return (compound.contains("undo1") ? 1 : 0) + (compound.contains("undo2") ? 1 : 0);
         } else {
             return 0;
@@ -90,7 +82,7 @@ public class BuildingWand extends GenericWand {
     }
 
     @Override
-    public void appendHoverText(ItemStack itemStack, World world, List<ITextComponent> list, ITooltipFlag flags) {
+    public void appendHoverText(ItemStack itemStack, Level world, List<Component> list, TooltipFlag flags) {
         super.appendHoverText(itemStack, world, list, flags);
         tooltipBuilder.makeTooltip(getRegistryName(), itemStack, list, flags);
 
@@ -99,21 +91,21 @@ public class BuildingWand extends GenericWand {
     }
 
     @Override
-    public void toggleMode(PlayerEntity player, ItemStack stack) {
+    public void toggleMode(Player player, ItemStack stack) {
         int mode = getMode(stack);
         mode++;
         if (mode > MODE_LAST) {
             mode = MODE_FIRST;
         }
-        Tools.notify(player, new StringTextComponent("Switched to " + DESCRIPTIONS[mode] + " mode"));
+        Tools.notify(player, new TextComponent("Switched to " + DESCRIPTIONS[mode] + " mode"));
         stack.getOrCreateTag().putInt("mode", mode);
     }
 
     @Override
-    public void toggleSubMode(PlayerEntity player, ItemStack stack) {
+    public void toggleSubMode(Player player, ItemStack stack) {
         int submode = getSubMode(stack);
         submode = submode == 1 ? 0 : 1;
-        Tools.notify(player, new StringTextComponent("Switched orientation"));
+        Tools.notify(player, new TextComponent("Switched orientation"));
         stack.getOrCreateTag().putInt("submode", submode);
     }
 
@@ -126,10 +118,10 @@ public class BuildingWand extends GenericWand {
     }
 
     @Override
-    public ActionResultType useOn(ItemUseContext context) {
-        PlayerEntity player = context.getPlayer();
-        Hand hand = context.getHand();
-        World world = context.getLevel();
+    public InteractionResult useOn(UseOnContext context) {
+        Player player = context.getPlayer();
+        InteractionHand hand = context.getHand();
+        Level world = context.getLevel();
         BlockPos pos = context.getClickedPos();
         Direction side = context.getClickedFace();
         ItemStack wandStack = player.getItemInHand(hand);
@@ -140,10 +132,10 @@ public class BuildingWand extends GenericWand {
                 placeBlock(wandStack, player, world, pos, side);
             }
         }
-        return ActionResultType.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
-    private void placeBlock(ItemStack wandStack, PlayerEntity player, World world, BlockPos pos, Direction side) {
+    private void placeBlock(ItemStack wandStack, Player player, Level world, BlockPos pos, Direction side) {
         if (!checkUsage(wandStack, player, 1.0f)) {
             return;
         }
@@ -156,9 +148,9 @@ public class BuildingWand extends GenericWand {
             if (!checkUsage(wandStack, player, 1.0f)) {
                 break;
             }
-            RayTraceResult result = new BlockRayTraceResult(new Vector3d(0, 0, 0), Direction.UP, coordinate, false);
-            ItemStack pickBlock = blockState.getPickBlock(result, world, coordinate, player);
-            ItemStack consumed = Tools.consumeInventoryItem(pickBlock, player.inventory, player);
+            HitResult result = new BlockHitResult(new Vec3(0, 0, 0), Direction.UP, coordinate, false);
+            ItemStack pickBlock = blockState.getCloneItemStack(result, world, coordinate, player);
+            ItemStack consumed = Tools.consumeInventoryItem(pickBlock, player.getInventory(), player);
             if (!consumed.isEmpty()) {
                 SoundTools.playSound(world, blockState.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
                 //                IBlockState state = block.getStateFromMeta(meta);
@@ -167,7 +159,7 @@ public class BuildingWand extends GenericWand {
                 Tools.placeStackAt(player, consumed, world, coordinate, null);
                 if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
                     blocksnapshot.restore(true, false);
-                    if (!player.abilities.instabuild) {
+                    if (!player.isCreative()) {
                         Tools.giveItem(player, consumed);
                     }
                 }
@@ -185,10 +177,10 @@ public class BuildingWand extends GenericWand {
         registerUndo(wandStack, blockState, world, undo);
     }
 
-    private void registerUndo(ItemStack stack, BlockState state, World world, Set<BlockPos> undo) {
-        CompoundNBT undoTag = new CompoundNBT();
+    private void registerUndo(ItemStack stack, BlockState state, Level world, Set<BlockPos> undo) {
+        CompoundTag undoTag = new CompoundTag();
 
-        undoTag.put("block", NBTUtil.writeBlockState(state));
+        undoTag.put("block", NbtUtils.writeBlockState(state));
         undoTag.putString("dimension", world.dimension().location().toString());
         int[] undoX = new int[undo.size()];
         int[] undoY = new int[undo.size()];
@@ -204,17 +196,17 @@ public class BuildingWand extends GenericWand {
         undoTag.putIntArray("x", undoX);
         undoTag.putIntArray("y", undoY);
         undoTag.putIntArray("z", undoZ);
-        CompoundNBT wandTag = stack.getOrCreateTag();
+        CompoundTag wandTag = stack.getOrCreateTag();
         if (wandTag.contains("undo1")) {
             wandTag.put("undo2", wandTag.get("undo1"));
         }
         wandTag.put("undo1", undoTag);
     }
 
-    private void undoPlaceBlock(ItemStack stack, PlayerEntity player, World world, BlockPos pos) {
-        CompoundNBT wandTag = stack.getOrCreateTag();
-        CompoundNBT undoTag1 = (CompoundNBT) wandTag.get("undo1");
-        CompoundNBT undoTag2 = (CompoundNBT) wandTag.get("undo2");
+    private void undoPlaceBlock(ItemStack stack, Player player, Level world, BlockPos pos) {
+        CompoundTag wandTag = stack.getOrCreateTag();
+        CompoundTag undoTag1 = (CompoundTag) wandTag.get("undo1");
+        CompoundTag undoTag2 = (CompoundTag) wandTag.get("undo2");
 
         Set<BlockPos> undo1 = checkUndo(player, world, undoTag1);
         Set<BlockPos> undo2 = checkUndo(player, world, undoTag2);
@@ -242,8 +234,8 @@ public class BuildingWand extends GenericWand {
         Tools.error(player, "Select at least one block of the area you want to undo!");
     }
 
-    private void performUndo(ItemStack stack, PlayerEntity player, World world, BlockPos pos, CompoundNBT undoTag, Set<BlockPos> undo) {
-        BlockState state = NBTUtil.readBlockState(undoTag.getCompound("block"));
+    private void performUndo(ItemStack stack, Player player, Level world, BlockPos pos, CompoundTag undoTag, Set<BlockPos> undo) {
+        BlockState state = NbtUtils.readBlockState(undoTag.getCompound("block"));
 
         int cnt = 0;
         for (BlockPos coordinate : undo) {
@@ -261,9 +253,9 @@ public class BuildingWand extends GenericWand {
             }
         }
         if (cnt > 0) {
-            if (!player.abilities.instabuild) {
-                RayTraceResult result = new BlockRayTraceResult(new Vector3d(0, 0, 0), Direction.UP, pos, false);
-                ItemStack itemStack = state.getPickBlock(result, world, pos, player);
+            if (!player.isCreative()) {
+                HitResult result = new BlockHitResult(new Vec3(0, 0, 0), Direction.UP, pos, false);
+                ItemStack itemStack = state.getCloneItemStack(result, world, pos, player);
                 itemStack.setCount(cnt);
                 ItemHandlerHelper.giveItemToPlayer(player, itemStack);
                 player.containerMenu.broadcastChanges();
@@ -271,12 +263,12 @@ public class BuildingWand extends GenericWand {
         }
     }
 
-    private Set<BlockPos> checkUndo(PlayerEntity player, World world, CompoundNBT undoTag) {
+    private Set<BlockPos> checkUndo(Player player, Level world, CompoundTag undoTag) {
         if (undoTag == null) {
             return null;
         }
         String dimension = undoTag.getString("dimension");
-        RegistryKey<World> dim = LevelTools.getId(new ResourceLocation(dimension));
+        ResourceKey<Level> dim = LevelTools.getId(new ResourceLocation(dimension));
         if (!Objects.equals(dim, world.dimension())) {
             Tools.error(player, "Select at least one block of the area you want to undo!");
             return null;
@@ -292,18 +284,17 @@ public class BuildingWand extends GenericWand {
         return undo;
     }
 
-
     @Override
-    public void renderOverlay(RenderWorldLastEvent evt, PlayerEntity player, ItemStack wand) {
-        RayTraceResult mouseOver = Minecraft.getInstance().hitResult;
-        if (!(mouseOver instanceof BlockRayTraceResult)) {
+    public void renderOverlay(RenderLevelLastEvent evt, Player player, ItemStack wand) {
+        HitResult mouseOver = Minecraft.getInstance().hitResult;
+        if (!(mouseOver instanceof BlockHitResult)) {
             return;
         }
 
-        BlockRayTraceResult btrace = (BlockRayTraceResult) mouseOver;
+        BlockHitResult btrace = (BlockHitResult) mouseOver;
 
         if (btrace.getDirection() != null && btrace.getBlockPos() != null) {
-            World world = player.getCommandSenderWorld();
+            Level world = player.getCommandSenderWorld();
             BlockPos blockPos = btrace.getBlockPos();
             if (blockPos == null) {
                 return;
@@ -314,9 +305,9 @@ public class BuildingWand extends GenericWand {
                 Set<BlockPos> coordinates;
 
                 if (player.isShiftKeyDown()) {
-                    CompoundNBT wandTag = wand.getOrCreateTag();
-                    CompoundNBT undoTag1 = (CompoundNBT) wandTag.get("undo1");
-                    CompoundNBT undoTag2 = (CompoundNBT) wandTag.get("undo2");
+                    CompoundTag wandTag = wand.getOrCreateTag();
+                    CompoundTag undoTag1 = (CompoundTag) wandTag.get("undo1");
+                    CompoundTag undoTag2 = (CompoundTag) wandTag.get("undo2");
 
                     Set<BlockPos> undo1 = checkUndo(player, world, undoTag1);
                     Set<BlockPos> undo2 = checkUndo(player, world, undoTag2);
@@ -339,7 +330,7 @@ public class BuildingWand extends GenericWand {
         }
     }
 
-    private Set<BlockPos> findSuitableBlocks(ItemStack stack, World world, Direction sideHit, BlockPos pos, BlockState state) {
+    private Set<BlockPos> findSuitableBlocks(ItemStack stack, Level world, Direction sideHit, BlockPos pos, BlockState state) {
         Set<BlockPos> coordinates = new HashSet<>();
         Set<BlockPos> done = new HashSet<>();
         Deque<BlockPos> todo = new ArrayDeque<>();
@@ -350,7 +341,7 @@ public class BuildingWand extends GenericWand {
         return coordinates;
     }
 
-    private void findSuitableBlocks(World world, Set<BlockPos> coordinates, Set<BlockPos> done, Deque<BlockPos> todo, Direction direction,
+    private void findSuitableBlocks(Level world, Set<BlockPos> coordinates, Set<BlockPos> done, Deque<BlockPos> todo, Direction direction,
                                     BlockState state, int maxAmount, boolean rowMode, int rotated) {
 
         Direction dirA = null;
@@ -397,7 +388,7 @@ public class BuildingWand extends GenericWand {
         }
     }
 
-    private boolean isSuitable(World world, BlockState state, BlockPos base, BlockPos offset) {
+    private boolean isSuitable(Level world, BlockState state, BlockPos base, BlockPos offset) {
         BlockState destState = world.getBlockState(offset);
         BlockState baseState = world.getBlockState(base);
         return baseState == state && destState.getMaterial().isReplaceable();// @todo 1.15 check replacable?

@@ -1,18 +1,18 @@
 package romelo333.notenoughwands.keys;
 
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.client.util.InputMappings;
+import net.minecraft.client.KeyMapping;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.client.settings.KeyConflictContext;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 public class KeyBindings {
 
-    public static KeyBinding wandModifier;
-    public static KeyBinding wandSubMode;
+    public static KeyMapping wandModifier;
+    public static KeyMapping wandSubMode;
 
     public static void init() {
-        wandModifier = new KeyBinding("key.modifier", KeyConflictContext.IN_GAME, InputMappings.getKey("key.keyboard.equal"), "key.categories.notenoughwands");
-        wandSubMode = new KeyBinding("key.submode", KeyConflictContext.IN_GAME, InputMappings.UNKNOWN, "key.categories.notenoughwands");
+        wandModifier = new KeyMapping("key.modifier", KeyConflictContext.IN_GAME, InputConstants.getKey("key.keyboard.equal"), "key.categories.notenoughwands");
+        wandSubMode = new KeyMapping("key.submode", KeyConflictContext.IN_GAME, InputConstants.UNKNOWN, "key.categories.notenoughwands");
         ClientRegistry.registerKeyBinding(wandModifier);
         ClientRegistry.registerKeyBinding(wandSubMode);
     }

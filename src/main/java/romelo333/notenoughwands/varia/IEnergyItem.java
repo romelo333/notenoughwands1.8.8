@@ -1,6 +1,6 @@
 package romelo333.notenoughwands.varia;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public interface IEnergyItem {
     int receiveEnergy(ItemStack container, int maxReceive, boolean simulate);

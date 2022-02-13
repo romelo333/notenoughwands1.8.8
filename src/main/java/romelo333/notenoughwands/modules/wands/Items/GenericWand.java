@@ -1,20 +1,20 @@
 package romelo333.notenoughwands.modules.wands.Items;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.block.BlockState;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.client.event.RenderLevelLastEvent;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.keys.KeyBindings;
@@ -44,13 +44,13 @@ public class GenericWand extends Item implements IEnergyItem {
 
     @Nullable
     @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT nbt) {
+    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
         return new ItemCapabilityProvider(stack, this);
     }
 
 
     // Check if a given block can be picked up.
-    public static double checkPickup(PlayerEntity player, World world, BlockPos pos, BlockState state, double maxHardness) {
+    public static double checkPickup(Player player, Level world, BlockPos pos, BlockState state, double maxHardness) {
         float hardness = state.getDestroySpeed(world, pos);
         if (hardness < 0 || hardness > maxHardness){
             Tools.error(player, "This block is to hard to take!");
@@ -76,29 +76,31 @@ public class GenericWand extends Item implements IEnergyItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
         super.appendHoverText(stack, worldIn, tooltip, flagIn);
         if (needsPower()) {
-            tooltip.add(new StringTextComponent("Energy: " + getEnergyStored(stack) + " / " + getMaxEnergyStored(stack)).withStyle(TextFormatting.GREEN));
+            tooltip.add(new TextComponent("Energy: " + getEnergyStored(stack) + " / " + getMaxEnergyStored(stack)).withStyle(ChatFormatting.GREEN));
         }
     }
 
+    //TODO? getDurabilityBar(ItemStack)
     @Override
-    public boolean showDurabilityBar(ItemStack stack) {
+    public boolean isBarVisible(ItemStack pStack) {
         if (needsPower() && WandsConfiguration.showDurabilityBarForRF.get()) {
             return true;
         }
-        return super.showDurabilityBar(stack);
+        return super.isBarVisible(pStack);
     }
 
-    @Override
+    //TODO
+    /*@Override
     public double getDurabilityForDisplay(ItemStack stack) {
         if (needsPower() && WandsConfiguration.showDurabilityBarForRF.get()) {
             int max = getMaxEnergyStored(stack);
             return (max - getEnergyStored(stack)) / (double) max;
         }
         return super.getDurabilityForDisplay(stack);
-    }
+    }*/
 
     public GenericWand usageFactor(float usageFactor) {
         this.usageFactor = usageFactor;
@@ -107,8 +109,8 @@ public class GenericWand extends Item implements IEnergyItem {
 
     //------------------------------------------------------------------------------
 
-    protected boolean checkUsage(ItemStack wandStack, PlayerEntity player, float difficultyScale) {
-        if (player.abilities.instabuild) {
+    protected boolean checkUsage(ItemStack wandStack, Player player, float difficultyScale) {
+        if (player.isCreative()) {
             return true;
         }
         if (needsXP()) {
@@ -145,8 +147,8 @@ public class GenericWand extends Item implements IEnergyItem {
         return calculateMaxDamage();
     }
 
-    protected void registerUsage(ItemStack stack, PlayerEntity player, float difficultyScale) {
-        if (player.abilities.instabuild) {
+    protected void registerUsage(ItemStack stack, Player player, float difficultyScale) {
+        if (player.isCreative()) {
             return;
         }
         if (needsXP()) {
@@ -160,32 +162,32 @@ public class GenericWand extends Item implements IEnergyItem {
         }
     }
 
-    public void toggleMode(PlayerEntity player, ItemStack stack) {
+    public void toggleMode(Player player, ItemStack stack) {
     }
 
-    public void toggleSubMode(PlayerEntity player, ItemStack stack) {
+    public void toggleSubMode(Player player, ItemStack stack) {
     }
 
     //------------------------------------------------------------------------------
 
-    public void renderOverlay(RenderWorldLastEvent evt, PlayerEntity player, ItemStack wand) {
+    public void renderOverlay(RenderLevelLastEvent evt, Player player, ItemStack wand) {
 
     }
 
-    protected static void renderOutlines(RenderWorldLastEvent evt, PlayerEntity p, Set<BlockPos> coordinates, int r, int g, int b) {
-        MatrixStack matrixStack = evt.getMatrixStack();
-        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().renderBuffers().bufferSource();
+    protected static void renderOutlines(RenderLevelLastEvent evt, Player p, Set<BlockPos> coordinates, int r, int g, int b) {
+        PoseStack matrixStack = evt.getPoseStack();
+        MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
         ClientTools.renderOutlines(matrixStack, buffer, coordinates, r, g, b);
     }
 
-    protected void showModeKeyDescription(List<ITextComponent> list, String suffix) {
+    protected void showModeKeyDescription(List<Component> list, String suffix) {
         String keyDescription = KeyBindings.wandModifier != null ? KeyBindings.wandModifier.getName() : "unknown";
-        list.add(new StringTextComponent("Mode key (" + keyDescription + ") to " + suffix).withStyle(TextFormatting.YELLOW));
+        list.add(new TextComponent("Mode key (" + keyDescription + ") to " + suffix).withStyle(ChatFormatting.YELLOW));
     }
 
-    protected void showSubModeKeyDescription(List<ITextComponent> list, String suffix) {
+    protected void showSubModeKeyDescription(List<Component> list, String suffix) {
         String keyDescription = KeyBindings.wandSubMode != null ? KeyBindings.wandSubMode.getName() : "unknown";
-        list.add(new StringTextComponent("Sub-mode key (" + keyDescription + ") to " + suffix).withStyle(TextFormatting.YELLOW));
+        list.add(new TextComponent("Sub-mode key (" + keyDescription + ") to " + suffix).withStyle(ChatFormatting.YELLOW));
     }
 
     //------------------------------------------------------------------------------

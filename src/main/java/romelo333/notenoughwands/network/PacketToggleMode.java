@@ -1,34 +1,34 @@
 package romelo333.notenoughwands.network;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.Hand;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.InteractionHand;
+import net.minecraftforge.network.NetworkEvent;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 
 import java.util.function.Supplier;
 
 public class PacketToggleMode {
 
-    public void fromBytes(PacketBuffer buf) {
+    public void fromBytes(FriendlyByteBuf buf) {
     }
 
-    public void toBytes(PacketBuffer buf) {
+    public void toBytes(FriendlyByteBuf buf) {
     }
 
     public PacketToggleMode() {
     }
 
-    public PacketToggleMode(PacketBuffer buf) {
+    public PacketToggleMode(FriendlyByteBuf buf) {
         fromBytes(buf);
     }
 
     public void handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            PlayerEntity playerEntity = ctx.getSender();
-            ItemStack heldItem = playerEntity.getItemInHand(Hand.MAIN_HAND);
+            Player playerEntity = ctx.getSender();
+            ItemStack heldItem = playerEntity.getItemInHand(InteractionHand.MAIN_HAND);
             if (!heldItem.isEmpty() && heldItem.getItem() instanceof GenericWand) {
                 GenericWand genericWand = (GenericWand) (heldItem.getItem());
                 genericWand.toggleMode(playerEntity, heldItem);

@@ -1,8 +1,8 @@
 package romelo333.notenoughwands;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
@@ -16,20 +16,20 @@ public class ForgeEventHandlers {
 
     @SubscribeEvent
     public void onBlockBreakEvent (BlockEvent.BreakEvent event){
-        IWorld world = event.getWorld();
+        LevelAccessor world = event.getWorld();
         if (world.isClientSide()) {
             return;
         }
         BlockPos pos = event.getPos();
-        ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks((World)world);
-        if (protectedBlocks.isProtected((World)world, pos)) {
+        ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks((Level)world);
+        if (protectedBlocks.isProtected((Level)world, pos)) {
             event.setCanceled(true);
         }
     }
 
     @SubscribeEvent
     public void onDetonate(ExplosionEvent.Detonate event) {
-        World world = event.getWorld();
+        Level world = event.getWorld();
         if (world.isClientSide) {
             return;
         }
@@ -70,7 +70,7 @@ public class ForgeEventHandlers {
             return;
         }
 
-        World world = event.getWorld();
+        Level world = event.getWorld();
         BlockPos pos = event.getPos();
 
         if (world.isClientSide) {

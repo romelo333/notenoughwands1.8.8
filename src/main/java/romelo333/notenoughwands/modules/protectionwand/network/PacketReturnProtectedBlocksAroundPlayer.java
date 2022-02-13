@@ -1,10 +1,11 @@
 package romelo333.notenoughwands.modules.protectionwand.network;
 
 import mcjty.lib.McJtyLib;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.network.NetworkEvent;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,7 +16,7 @@ import java.util.function.Supplier;
 public class PacketReturnProtectedBlocksAroundPlayer {
     private Map<ChunkPos, Set<BlockPos>> blocks;
 
-    public void fromBytes(PacketBuffer buf) {
+    public void fromBytes(FriendlyByteBuf buf) {
         int size = buf.readInt();
         blocks = new HashMap<ChunkPos, Set<BlockPos>> (size);
         for (int i = 0 ; i < size ; i++) {
@@ -30,7 +31,7 @@ public class PacketReturnProtectedBlocksAroundPlayer {
         }
     }
 
-    public void toBytes(PacketBuffer buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         buf.writeInt(blocks.size());
         for (Map.Entry<ChunkPos, Set<BlockPos>> entry : blocks.entrySet()) {
             Set<BlockPos> positions = entry.getValue();
@@ -52,7 +53,7 @@ public class PacketReturnProtectedBlocksAroundPlayer {
     public PacketReturnProtectedBlocksAroundPlayer() {
     }
 
-    public PacketReturnProtectedBlocksAroundPlayer(PacketBuffer buf) {
+    public PacketReturnProtectedBlocksAroundPlayer(FriendlyByteBuf buf) {
         fromBytes(buf);
     }
 
@@ -63,8 +64,8 @@ public class PacketReturnProtectedBlocksAroundPlayer {
     public void handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            ReturnProtectedBlocksAroundPlayerHelper.setProtectedBlocks(
-                    McJtyLib.proxy.getClientWorld().dimension(), this); // @todo 1.15 no need for proxy here!
+            ReturnProtectedBlocksAroundPlayerHelper.setProtectedBlocks(Level.OVERWORLD, this);
+                    //McJtyLib.proxy.getClientWorld().dimension(), this); // @todo 1.15 no need for proxy here!
         });
         ctx.setPacketHandled(true);
     }

@@ -1,8 +1,8 @@
 package romelo333.notenoughwands.modules.protectionwand.network;
 
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.BlockPos;
+import net.minecraftforge.network.NetworkEvent;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -12,7 +12,7 @@ public class PacketReturnProtectedBlocks {
     private Set<BlockPos> blocks;
     private Set<BlockPos> childBlocks;
 
-    public void fromBytes(PacketBuffer buf) {
+    public void fromBytes(FriendlyByteBuf buf) {
         int size = buf.readInt();
         blocks = new HashSet<BlockPos>(size);
         for (int i = 0 ; i < size ; i++) {
@@ -25,7 +25,7 @@ public class PacketReturnProtectedBlocks {
         }
     }
 
-    public void toBytes(PacketBuffer buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         buf.writeInt(blocks.size());
         for (BlockPos block : blocks) {
             buf.writeInt(block.getX());
@@ -52,7 +52,7 @@ public class PacketReturnProtectedBlocks {
     public PacketReturnProtectedBlocks() {
     }
 
-    public PacketReturnProtectedBlocks(PacketBuffer buf) {
+    public PacketReturnProtectedBlocks(FriendlyByteBuf buf) {
         fromBytes(buf);
     }
 

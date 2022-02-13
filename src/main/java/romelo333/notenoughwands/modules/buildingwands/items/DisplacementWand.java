@@ -3,25 +3,25 @@ package romelo333.notenoughwands.modules.buildingwands.items;
 
 import mcjty.lib.builder.TooltipBuilder;
 import mcjty.lib.varia.SoundTools;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.client.event.RenderLevelLastEvent;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsConfiguration;
@@ -59,7 +59,7 @@ public class DisplacementWand extends GenericWand {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> list, ITooltipFlag flagIn) {
+    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> list, TooltipFlag flagIn) {
         super.appendHoverText(stack, worldIn, list, flagIn);
         tooltipBuilder.makeTooltip(getRegistryName(), stack, list, flagIn);
 
@@ -67,13 +67,13 @@ public class DisplacementWand extends GenericWand {
     }
 
     @Override
-    public void toggleMode(PlayerEntity player, ItemStack stack) {
+    public void toggleMode(Player player, ItemStack stack) {
         int mode = getMode(stack);
         mode++;
         if (mode > MODE_LAST) {
             mode = MODE_FIRST;
         }
-        Tools.notify(player, new StringTextComponent("Switched to " + DESCRIPTIONS[mode] + " mode"));
+        Tools.notify(player, new TextComponent("Switched to " + DESCRIPTIONS[mode] + " mode"));
         stack.getOrCreateTag().putInt("mode", mode);
     }
 
@@ -82,9 +82,9 @@ public class DisplacementWand extends GenericWand {
     }
 
     @Override
-    public ActionResultType onItemUseFirst(ItemStack stack, ItemUseContext context) {
-        World world = context.getLevel();
-        PlayerEntity player = context.getPlayer();
+    public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
+        Level world = context.getLevel();
+        Player player = context.getPlayer();
         BlockPos pos = context.getClickedPos();
         Direction side = context.getClickedFace();
         if (!world.isClientSide) {
@@ -93,12 +93,12 @@ public class DisplacementWand extends GenericWand {
             } else {
                 pushBlocks(stack, player, world, pos, side);
             }
-            return ActionResultType.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
-        return ActionResultType.PASS;
+        return InteractionResult.PASS;
     }
 
-    private void pullBlocks(ItemStack stack, PlayerEntity player, World world, BlockPos pos, Direction side) {
+    private void pullBlocks(ItemStack stack, Player player, Level world, BlockPos pos, Direction side) {
         if (!checkUsage(stack, player, 1.0f)) {
             return;
         }
@@ -109,7 +109,7 @@ public class DisplacementWand extends GenericWand {
         }
     }
 
-    private void pushBlocks(ItemStack stack, PlayerEntity player, World world, BlockPos pos, Direction side) {
+    private void pushBlocks(ItemStack stack, Player player, Level world, BlockPos pos, Direction side) {
         if (!checkUsage(stack, player, 1.0f)) {
             return;
         }
@@ -120,7 +120,7 @@ public class DisplacementWand extends GenericWand {
         }
     }
 
-    private int moveBlocks(PlayerEntity player, World world, Set<BlockPos> coordinates, Direction direction) {
+    private int moveBlocks(Player player, Level world, Set<BlockPos> coordinates, Direction direction) {
         int cnt = 0;
         for (BlockPos coordinate : coordinates) {
             BlockState state = world.getBlockState(coordinate);
@@ -132,11 +132,12 @@ public class DisplacementWand extends GenericWand {
                 if (cost >= 0.0) {
                     cnt++;
                     SoundTools.playSound(world, block.getSoundType(state).getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
-                    TileEntity tileEntity = world.getBlockEntity(coordinate);
-                    CompoundNBT tc = null;
+                    BlockEntity tileEntity = world.getBlockEntity(coordinate);
+                    CompoundTag tc = null;
                     if (tileEntity != null) {
-                        tc = new CompoundNBT();
-                        tileEntity.save(tc);
+                        tc = new CompoundTag();
+                        //TODO commented save as it doesn't exist?
+                        //tileEntity.save(tc);
                         world.removeBlockEntity(coordinate);
                     }
 
@@ -156,9 +157,10 @@ public class DisplacementWand extends GenericWand {
                         tc.putInt("x", otherC.getX());
                         tc.putInt("y", otherC.getY());
                         tc.putInt("z", otherC.getZ());
-                        tileEntity = TileEntity.loadStatic(blockState, tc);
+                        //TODO otherC moved from setBlockEntity to loadStatic
+                        tileEntity = BlockEntity.loadStatic(otherC, blockState, tc);
                         if (tileEntity != null) {
-                            world.getChunk(otherC).setBlockEntity(otherC, tileEntity);
+                            world.getChunk(otherC).setBlockEntity(tileEntity);
                             tileEntity.setChanged();
                             world.sendBlockUpdated(otherC, blockState, blockState, 3); // @todo 1.15 constants
                         }
@@ -180,23 +182,23 @@ public class DisplacementWand extends GenericWand {
     }
 
     @Override
-    public void renderOverlay(RenderWorldLastEvent evt, PlayerEntity player, ItemStack wand) {
-        RayTraceResult mouseOver = Minecraft.getInstance().hitResult;
+    public void renderOverlay(RenderLevelLastEvent evt, Player player, ItemStack wand) {
+        HitResult mouseOver = Minecraft.getInstance().hitResult;
 
-        if (mouseOver instanceof BlockRayTraceResult) {
-            BlockRayTraceResult br = (BlockRayTraceResult) mouseOver;
+        if (mouseOver instanceof BlockHitResult) {
+            BlockHitResult br = (BlockHitResult) mouseOver;
 
-            World world = player.getCommandSenderWorld();
+            Level world = player.getCommandSenderWorld();
             BlockPos blockPos = br.getBlockPos();
             BlockState state = world.getBlockState(blockPos);
-            if (!state.isAir(world, blockPos)) {
+            if (!state.isAir()) {
                 Set<BlockPos> coordinates = findSuitableBlocks(wand, world, br.getDirection(), blockPos);
                 renderOutlines(evt, player, coordinates, 200, 230, 180);
             }
         }
     }
 
-    private Set<BlockPos> findSuitableBlocks(ItemStack stack, World world, Direction sideHit, BlockPos pos) {
+    private Set<BlockPos> findSuitableBlocks(ItemStack stack, Level world, Direction sideHit, BlockPos pos) {
         Set<BlockPos> coordinates = new HashSet<>();
         int mode = getMode(stack);
         int dim = 0;
@@ -247,7 +249,7 @@ public class DisplacementWand extends GenericWand {
         return coordinates;
     }
 
-    private void checkAndAddBlock(World world, int x, int y, int z, Set<BlockPos> coordinates) {
+    private void checkAndAddBlock(Level world, int x, int y, int z, Set<BlockPos> coordinates) {
         BlockPos pos = new BlockPos(x, y, z);
         if (!world.isEmptyBlock(pos)) {
             coordinates.add(pos);

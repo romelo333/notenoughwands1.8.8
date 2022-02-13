@@ -3,31 +3,30 @@ package romelo333.notenoughwands.modules.buildingwands.items;
 
 import mcjty.lib.builder.TooltipBuilder;
 import mcjty.lib.varia.SoundTools;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.client.event.RenderLevelLastEvent;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -36,25 +35,10 @@ import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 import romelo333.notenoughwands.varia.Tools;
 
-;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.items.ItemHandlerHelper;
-import romelo333.notenoughwands.modules.buildingwands.BuildingWandsConfiguration;
-import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
-import romelo333.notenoughwands.modules.wands.Items.GenericWand;
-import romelo333.notenoughwands.varia.Tools;
-
-import javax.annotation.Nullable;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
 
 import static mcjty.lib.builder.TooltipBuilder.*;
 
@@ -82,18 +66,18 @@ public class SwappingWand extends GenericWand {
     }
 
     @Override
-    public void toggleMode(PlayerEntity player, ItemStack stack) {
+    public void toggleMode(Player player, ItemStack stack) {
         int mode = getMode(stack);
         mode++;
         if (mode > MODE_LAST) {
             mode = MODE_FIRST;
         }
-        Tools.notify(player, new StringTextComponent("Switched to " + DESCRIPTIONS[mode] + " mode"));
+        Tools.notify(player, new TextComponent("Switched to " + DESCRIPTIONS[mode] + " mode"));
         stack.getOrCreateTag().putInt("mode", mode);
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flagIn) {
+    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> list, TooltipFlag flagIn) {
         super.appendHoverText(stack, world, list, flagIn);
         tooltipBuilder.makeTooltip(getRegistryName(), stack, list, flagIn);
         list.add(getBlockDescription(stack));
@@ -101,23 +85,23 @@ public class SwappingWand extends GenericWand {
         showModeKeyDescription(list, "switch mode");
     }
 
-    private ITextComponent getBlockDescription(ItemStack stack) {
-        CompoundNBT compound = stack.getTag();
+    private Component getBlockDescription(ItemStack stack) {
+        CompoundTag compound = stack.getTag();
         if (compound == null) {
-            return new StringTextComponent("No selected block").withStyle(TextFormatting.RED);
+            return new TextComponent("No selected block").withStyle(ChatFormatting.RED);
         } else {
             if (isSwappingWithOffHand(stack)) {
-                return new StringTextComponent("Will swap with block in offhand").withStyle(TextFormatting.GREEN);
+                return new TextComponent("Will swap with block in offhand").withStyle(ChatFormatting.GREEN);
             } else {
-                BlockState state = NBTUtil.readBlockState(compound.getCompound("block"));
-                ITextComponent name = Tools.getBlockName(state.getBlock());
-                return new StringTextComponent("Block: ").append(name).withStyle(TextFormatting.GREEN);
+                BlockState state = NbtUtils.readBlockState(compound.getCompound("block"));
+                Component name = Tools.getBlockName(state.getBlock());
+                return new TextComponent("Block: ").append(name).withStyle(ChatFormatting.GREEN);
             }
         }
     }
 
     private static boolean isSwappingWithOffHand(ItemStack stack) {
-        CompoundNBT compound = stack.getTag();
+        CompoundTag compound = stack.getTag();
         if (compound == null) {
             return false;
         }
@@ -125,12 +109,12 @@ public class SwappingWand extends GenericWand {
     }
 
     private static void enableSwappingWithOffHand(ItemStack stack) {
-        CompoundNBT compound = stack.getOrCreateTag();
+        CompoundTag compound = stack.getOrCreateTag();
         compound.putBoolean("offhand", true);
     }
 
     private static void disableSwappingWithOffHand(ItemStack stack) {
-        CompoundNBT compound = stack.getTag();
+        CompoundTag compound = stack.getTag();
         if (compound == null) {
             return;
         }
@@ -138,18 +122,18 @@ public class SwappingWand extends GenericWand {
     }
 
     @Override
-    public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
         ItemStack heldItem = player.getItemInHand(hand);
         if (!heldItem.isEmpty()) {
             if (isSwappingWithOffHand(heldItem)) {
                 disableSwappingWithOffHand(heldItem);
                 if (world.isClientSide) {
-                    Tools.notify(player, new StringTextComponent("Switched to swapping with selected block"));
+                    Tools.notify(player, new TextComponent("Switched to swapping with selected block"));
                 }
             } else {
                 enableSwappingWithOffHand(heldItem);
                 if (world.isClientSide) {
-                    Tools.notify(player, new StringTextComponent("Switched to swapping with block in offhand"));
+                    Tools.notify(player, new TextComponent("Switched to swapping with block in offhand"));
                 }
             }
         }
@@ -157,10 +141,10 @@ public class SwappingWand extends GenericWand {
     }
 
     @Override
-    public ActionResultType useOn(ItemUseContext context) {
-        PlayerEntity player = context.getPlayer();
-        Hand hand = context.getHand();
-        World world = context.getLevel();
+    public InteractionResult useOn(UseOnContext context) {
+        Player player = context.getPlayer();
+        InteractionHand hand = context.getHand();
+        Level world = context.getLevel();
         BlockPos pos = context.getClickedPos();
         Direction side = context.getClickedFace();
         ItemStack stack = player.getItemInHand(hand);
@@ -171,15 +155,15 @@ public class SwappingWand extends GenericWand {
                 placeBlock(stack, player, world, pos, side);
             }
         }
-        return ActionResultType.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
-    private void placeBlock(ItemStack stack, PlayerEntity player, World world, BlockPos pos, Direction side) {
+    private void placeBlock(ItemStack stack, Player player, Level world, BlockPos pos, Direction side) {
         if (!checkUsage(stack, player, 1.0f)) {
             return;
         }
 
-        CompoundNBT tagCompound = stack.getTag();
+        CompoundTag tagCompound = stack.getTag();
         if (tagCompound == null) {
             Tools.error(player, "First select a block by sneaking");
             return;
@@ -202,7 +186,7 @@ public class SwappingWand extends GenericWand {
             blockState = itemBlock.getBlock().defaultBlockState();    // @todo 1.15 is this right?
             hardness = blockState.getDestroySpeed(world, pos);
         } else {
-            blockState = NBTUtil.readBlockState(tagCompound.getCompound("block"));
+            blockState = NbtUtils.readBlockState(tagCompound.getCompound("block"));
             hardness = tagCompound.getFloat("hardness");
         }
 
@@ -244,12 +228,12 @@ public class SwappingWand extends GenericWand {
             if (!checkUsage(stack, player, 1.0f)) {
                 return;
             }
-            RayTraceResult result = new BlockRayTraceResult(new Vector3d(0, 0, 0), Direction.UP, coordinate, false);
-            ItemStack pickBlock = blockState.getPickBlock(result, world, coordinate, player);
-            ItemStack consumed = Tools.consumeInventoryItem(pickBlock, player.inventory, player);
+            HitResult result = new BlockHitResult(new Vec3(0, 0, 0), Direction.UP, coordinate, false);
+            ItemStack pickBlock = blockState.getCloneItemStack(result, world, coordinate, player);
+            ItemStack consumed = Tools.consumeInventoryItem(pickBlock, player.getInventory(), player);
             if (!consumed.isEmpty()) {
-                if (!player.abilities.instabuild) {
-                    ItemStack oldblockItem = oldblock.getPickBlock(oldState, null, world, pos, player);
+                if (!player.isCreative()) {
+                    ItemStack oldblockItem = oldblock.getCloneItemStack(oldState, null, world, pos, player);
                     ItemHandlerHelper.giveItemToPlayer(player, oldblockItem);
                 }
                 SoundTools.playSound(world, blockState.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
@@ -259,7 +243,7 @@ public class SwappingWand extends GenericWand {
 
                 if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
                     blocksnapshot.restore(true, false);
-                    if (!player.abilities.instabuild) {
+                    if (!player.isCreative()) {
                         ItemHandlerHelper.giveItemToPlayer(player, consumed);
                     }
                 }
@@ -275,12 +259,12 @@ public class SwappingWand extends GenericWand {
         }
     }
 
-    private void selectBlock(ItemStack stack, PlayerEntity player, World world, BlockPos pos) {
+    private void selectBlock(ItemStack stack, Player player, Level world, BlockPos pos) {
         BlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
-        ItemStack item = block.getPickBlock(state, null, world, pos, player);   // @todo 1.15 check?
-        CompoundNBT tagCompound = stack.getOrCreateTag();
-        ITextComponent name = Tools.getBlockName(block);
+        ItemStack item = block.getCloneItemStack(state, null, world, pos, player);   // @todo 1.15 check?
+        CompoundTag tagCompound = stack.getOrCreateTag();
+        Component name = Tools.getBlockName(block);
         if (name == null) {
             Tools.error(player, "You cannot select this block!");
         } else {
@@ -290,25 +274,25 @@ public class SwappingWand extends GenericWand {
                 return;
             }
 
-            tagCompound.put("block", NBTUtil.writeBlockState(state));
+            tagCompound.put("block", NbtUtils.writeBlockState(state));
             float hardness = state.getDestroySpeed(world, pos);
             tagCompound.putFloat("hardness", hardness);
-            Tools.notify(player, new StringTextComponent("Selected block: ").append(name));
+            Tools.notify(player, new TextComponent("Selected block: ").append(name));
         }
     }
 
     @Override
-    public void renderOverlay(RenderWorldLastEvent evt, PlayerEntity player, ItemStack wand) {
-        RayTraceResult mouseOver = Minecraft.getInstance().hitResult;
+    public void renderOverlay(RenderLevelLastEvent evt, Player player, ItemStack wand) {
+        HitResult mouseOver = Minecraft.getInstance().hitResult;
 
-        if (mouseOver instanceof BlockRayTraceResult) {
-            BlockRayTraceResult br = (BlockRayTraceResult) mouseOver;
+        if (mouseOver instanceof BlockHitResult) {
+            BlockHitResult br = (BlockHitResult) mouseOver;
 
-            World world = player.getCommandSenderWorld();
+            Level world = player.getCommandSenderWorld();
             BlockPos blockPos = br.getBlockPos();
             BlockState state = world.getBlockState(blockPos);
-            if (!state.isAir(world, blockPos) && wand.hasTag()) {
-                BlockState wandState = NBTUtil.readBlockState(wand.getTag().getCompound("block"));
+            if (!state.isAir() && wand.hasTag()) {
+                BlockState wandState = NbtUtils.readBlockState(wand.getTag().getCompound("block"));
                 if (wandState == state) {
                     return;
                 }
@@ -318,7 +302,7 @@ public class SwappingWand extends GenericWand {
         }
     }
 
-    private Set<BlockPos> findSuitableBlocks(ItemStack stack, World world, Direction sideHit, BlockPos pos, BlockState centerState) {
+    private Set<BlockPos> findSuitableBlocks(ItemStack stack, Level world, Direction sideHit, BlockPos pos, BlockState centerState) {
         Set<BlockPos> coordinates = new HashSet<BlockPos>();
         int mode = getMode(stack);
         int dim = 0;
@@ -369,7 +353,7 @@ public class SwappingWand extends GenericWand {
         return coordinates;
     }
 
-    private void checkAndAddBlock(World world, int x, int y, int z, BlockState centerBlock, Set<BlockPos> coordinates) {
+    private void checkAndAddBlock(Level world, int x, int y, int z, BlockState centerBlock, Set<BlockPos> coordinates) {
         BlockPos pos = new BlockPos(x, y, z);
         BlockState state = world.getBlockState(pos);
         if (state == centerBlock) {

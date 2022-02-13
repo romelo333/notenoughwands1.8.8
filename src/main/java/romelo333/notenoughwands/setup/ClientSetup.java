@@ -1,10 +1,10 @@
 package romelo333.notenoughwands.setup;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.InteractionHand;
+import net.minecraftforge.client.event.RenderLevelLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -26,10 +26,10 @@ public class ClientSetup {
 
 
     @SubscribeEvent
-    public void renderWorldLastEvent(RenderWorldLastEvent evt) {
+    public void renderWorldLastEvent(RenderLevelLastEvent evt) {
         Minecraft mc = Minecraft.getInstance();
-        PlayerEntity p = mc.player;
-        ItemStack heldItem = p.getItemInHand(Hand.MAIN_HAND);
+        Player p = mc.player;
+        ItemStack heldItem = p.getItemInHand(InteractionHand.MAIN_HAND);
         if (heldItem.isEmpty()) {
             return;
         }

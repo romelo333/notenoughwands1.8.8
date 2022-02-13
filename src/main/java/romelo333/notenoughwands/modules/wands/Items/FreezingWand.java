@@ -1,17 +1,17 @@
 package romelo333.notenoughwands.modules.wands.Items;
 
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.monster.IMob;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.Level;
 import romelo333.notenoughwands.modules.wands.WandsConfiguration;
 import romelo333.notenoughwands.varia.Tools;
 
@@ -24,18 +24,18 @@ public class FreezingWand extends GenericWand {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> list, ITooltipFlag flagIn) {
+    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> list, TooltipFlag flagIn) {
         super.appendHoverText(stack, worldIn, list, flagIn);
-        list.add(new StringTextComponent("Right click on creature to freeze creature."));
+        list.add(new TextComponent("Right click on creature to freeze creature."));
     }
 
     @Override
-    public ActionResultType useOn(ItemUseContext context) {
-        World world = context.getLevel();
+    public InteractionResult useOn(UseOnContext context) {
+        Level world = context.getLevel();
         if (!world.isClientSide) {
 
         }
-        return ActionResultType.FAIL;
+        return InteractionResult.FAIL;
     }
 
     private void freezeMob(LivingEntity mob){
@@ -43,19 +43,19 @@ public class FreezingWand extends GenericWand {
     }
 
     @Override
-    public boolean onLeftClickEntity(ItemStack stack, PlayerEntity player, Entity entity) {
+    public boolean onLeftClickEntity(ItemStack stack, Player player, Entity entity) {
         if (!player.getCommandSenderWorld().isClientSide) {
             if (entity instanceof LivingEntity) {
                 LivingEntity entityLivingBase = (LivingEntity) entity;
-                if (entityLivingBase instanceof PlayerEntity) {
+                if (entityLivingBase instanceof Player) {
                     Tools.error(player, "You cannot use this on players!");
                     return true;
                 }
-                if ((!WandsConfiguration.freezeAllowHostile.get()) && entityLivingBase instanceof IMob) {
+                if ((!WandsConfiguration.freezeAllowHostile.get()) && entityLivingBase instanceof Enemy) {
                     Tools.error(player, "It is not possible to freeze hostile mobs with this wand!");
                     return true;
                 }
-                if ((!WandsConfiguration.freezeAllowPassive.get()) && !(entityLivingBase instanceof IMob)) {
+                if ((!WandsConfiguration.freezeAllowPassive.get()) && !(entityLivingBase instanceof Enemy)) {
                     Tools.error(player, "It is not possible to freeze passive mobs with this wand!");
                     return true;
                 }

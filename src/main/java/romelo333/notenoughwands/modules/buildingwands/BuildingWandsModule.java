@@ -1,10 +1,10 @@
 package romelo333.notenoughwands.modules.buildingwands;
 
 import mcjty.lib.modules.IModule;
-import net.minecraft.item.Item;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.registries.RegistryObject;
 import romelo333.notenoughwands.modules.buildingwands.items.BuildingWand;
 import romelo333.notenoughwands.modules.buildingwands.items.DisplacementWand;
 import romelo333.notenoughwands.modules.buildingwands.items.MovingWand;

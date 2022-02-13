@@ -1,9 +1,9 @@
 package romelo333.notenoughwands.network;
 
 
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.network.NetworkRegistry;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.simple.SimpleChannel;
 import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.modules.protectionwand.network.*;
 

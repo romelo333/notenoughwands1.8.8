@@ -1,6 +1,6 @@
 package romelo333.notenoughwands.varia;
 
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 import org.apache.logging.log4j.Level;
 import romelo333.notenoughwands.NotEnoughWands;
 

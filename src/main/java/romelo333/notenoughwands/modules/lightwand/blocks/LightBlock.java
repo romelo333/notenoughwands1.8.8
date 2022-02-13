@@ -1,22 +1,24 @@
 package romelo333.notenoughwands.modules.lightwand.blocks;
 
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.particle.ParticleManager;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.block.AbstractBlock.Properties;
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
-public class LightBlock extends Block {
+public class LightBlock extends Block implements EntityBlock {
     public LightBlock() {
         super(Properties.of(Material.PORTAL)
                 .strength(0.0f, 1.0f)
@@ -27,28 +29,25 @@ public class LightBlock extends Block {
     }
 
     @Override
-    public boolean hasTileEntity(BlockState state) {
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.INVISIBLE;
+    }
+    //TODO those 2 functions don't exist
+    /*
+    @Override
+    public boolean addHitEffects(BlockState state, Level worldObj, HitResult target, ParticleEngine manager) {
         return true;
     }
+
+    @Override
+    public boolean addDestroyEffects(BlockState state, Level world, BlockPos pos, ParticleEngine manager) {
+        return true;
+    }
+ */
 
     @Nullable
     @Override
-    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new LightTE();
-    }
-
-    @Override
-    public BlockRenderType getRenderShape(BlockState state) {
-        return BlockRenderType.INVISIBLE;
-    }
-
-    @Override
-    public boolean addHitEffects(BlockState state, World worldObj, RayTraceResult target, ParticleManager manager) {
-        return true;
-    }
-
-    @Override
-    public boolean addDestroyEffects(BlockState state, World world, BlockPos pos, ParticleManager manager) {
-        return true;
+    public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
+        return new LightTE(pPos, pState);
     }
 }

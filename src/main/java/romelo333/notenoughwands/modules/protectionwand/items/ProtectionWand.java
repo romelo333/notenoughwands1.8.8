@@ -1,18 +1,18 @@
 package romelo333.notenoughwands.modules.protectionwand.items;
 
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.client.event.RenderLevelLastEvent;
 import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
 import romelo333.notenoughwands.modules.protectionwand.network.PacketGetProtectedBlockCount;
 import romelo333.notenoughwands.modules.protectionwand.network.PacketGetProtectedBlocks;
@@ -52,7 +52,7 @@ public class ProtectionWand extends GenericWand {
     private static long tooltipLastTime = 0;
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flagIn) {
+    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> list, TooltipFlag flagIn) {
         super.appendHoverText(stack, world, list, flagIn);
         boolean hasid = stack.getTag() != null && stack.getTag().contains("id");
         int mode = getMode(stack);
@@ -64,29 +64,29 @@ public class ProtectionWand extends GenericWand {
             }
         }
         // @todo 1.15 better tooltips
-        list.add(new StringTextComponent(TextFormatting.GREEN + "Mode: " + descriptions[mode]));
+        list.add(new TextComponent(ChatFormatting.GREEN + "Mode: " + descriptions[mode]));
         if (master) {
-            list.add(new StringTextComponent(TextFormatting.YELLOW + "Master wand"));
+            list.add(new TextComponent(ChatFormatting.YELLOW + "Master wand"));
         } else {
             if (id != 0) {
-                list.add(new StringTextComponent(TextFormatting.GREEN + "Id: " + id));
+                list.add(new TextComponent(ChatFormatting.GREEN + "Id: " + id));
             }
         }
         if (hasid) {
-            list.add(new StringTextComponent(TextFormatting.GREEN + "Number of protected blocks: " + ReturnProtectedBlockCountHelper.count));
+            list.add(new TextComponent(ChatFormatting.GREEN + "Number of protected blocks: " + ReturnProtectedBlockCountHelper.count));
         }
-        list.add(new StringTextComponent("Right click to protect or unprotect a block."));
+        list.add(new TextComponent("Right click to protect or unprotect a block."));
         showModeKeyDescription(list, "switch mode");
     }
 
     @Override
-    public void toggleMode(PlayerEntity player, ItemStack stack) {
+    public void toggleMode(Player player, ItemStack stack) {
         int mode = getMode(stack);
         mode++;
         if (mode > MODE_LAST) {
             mode = MODE_FIRST;
         }
-        Tools.notify(player, new StringTextComponent("Switched to " + descriptions[mode] + " mode"));
+        Tools.notify(player, new TextComponent("Switched to " + descriptions[mode] + " mode"));
         stack.getOrCreateTag().putInt("mode", mode);
     }
 
@@ -104,7 +104,7 @@ public class ProtectionWand extends GenericWand {
     private static long lastTime = 0;
 
     @Override
-    public void renderOverlay(RenderWorldLastEvent evt, PlayerEntity player, ItemStack wand) {
+    public void renderOverlay(RenderLevelLastEvent evt, Player player, ItemStack wand) {
         if ((System.currentTimeMillis() - lastTime) > 250) {
             lastTime = System.currentTimeMillis();
             NEWPacketHandler.INSTANCE.sendToServer(new PacketGetProtectedBlocks());
@@ -116,10 +116,10 @@ public class ProtectionWand extends GenericWand {
     }
 
     @Override
-    public ActionResultType useOn(ItemUseContext context) {
-        PlayerEntity player = context.getPlayer();
-        Hand hand = context.getHand();
-        World world = context.getLevel();
+    public InteractionResult useOn(UseOnContext context) {
+        Player player = context.getPlayer();
+        InteractionHand hand = context.getHand();
+        Level world = context.getLevel();
         BlockPos pos = context.getClickedPos();
         ItemStack stack = player.getItemInHand(hand);
         if (!world.isClientSide) {
@@ -128,25 +128,25 @@ public class ProtectionWand extends GenericWand {
             int mode = getMode(stack);
             if (mode == MODE_PROTECT) {
                 if (!checkUsage(stack, player, 1.0f)) {
-                    return ActionResultType.FAIL;
+                    return InteractionResult.FAIL;
                 }
                 if (!protectedBlocks.protect(player, world, pos, id)) {
-                    return ActionResultType.FAIL;
+                    return InteractionResult.FAIL;
                 }
                 registerUsage(stack, player, 1.0f);
             } else if (mode == MODE_UNPROTECT) {
                 if (!protectedBlocks.unprotect(player, world, pos, id)) {
-                    return ActionResultType.FAIL;
+                    return InteractionResult.FAIL;
                 }
             } else {
                 int cnt = protectedBlocks.clearProtections(world, id);
-                Tools.notify(player, new StringTextComponent("Cleared " + cnt + " protected blocks"));
+                Tools.notify(player, new TextComponent("Cleared " + cnt + " protected blocks"));
             }
         }
-        return ActionResultType.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
-    private int getOrCreateId(ItemStack stack, World world, ProtectedBlocks protectedBlocks) {
+    private int getOrCreateId(ItemStack stack, Level world, ProtectedBlocks protectedBlocks) {
         int id = getId(stack);
         if (id == 0) {
             id = protectedBlocks.getNewId();

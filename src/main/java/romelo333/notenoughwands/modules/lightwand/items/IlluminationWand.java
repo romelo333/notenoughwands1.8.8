@@ -2,18 +2,18 @@ package romelo333.notenoughwands.modules.lightwand.items;
 
 
 import mcjty.lib.builder.TooltipBuilder;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import romelo333.notenoughwands.modules.lightwand.LightModule;
@@ -36,16 +36,16 @@ public class IlluminationWand extends GenericWand {
 
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> list, ITooltipFlag flagIn) {
+    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> list, TooltipFlag flagIn) {
         super.appendHoverText(stack, worldIn, list, flagIn);
         tooltipBuilder.makeTooltip(getRegistryName(), stack, list, flagIn);
     }
 
     @Override
-    public ActionResultType useOn(ItemUseContext context) {
-        PlayerEntity player = context.getPlayer();
-        Hand hand = context.getHand();
-        World world = context.getLevel();
+    public InteractionResult useOn(UseOnContext context) {
+        Player player = context.getPlayer();
+        InteractionHand hand = context.getHand();
+        Level world = context.getLevel();
         BlockPos pos = context.getClickedPos();
         Direction side = context.getClickedFace();
         ItemStack stack = player.getItemInHand(hand);
@@ -57,16 +57,16 @@ public class IlluminationWand extends GenericWand {
                 if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
                     blocksnapshot.restore(true, false);
                 }
-                return ActionResultType.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
 
             BlockPos offset = pos.relative(side);
             if (!world.isEmptyBlock(offset)) {
-                return ActionResultType.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
 
             if (!checkUsage(stack, player, 1.0f)) {
-                return ActionResultType.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
 
             BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.create(world.dimension(), world, offset);
@@ -77,6 +77,6 @@ public class IlluminationWand extends GenericWand {
                 registerUsage(stack, player, 1.0f);
             }
         }
-        return ActionResultType.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 }
