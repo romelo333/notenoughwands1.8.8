@@ -2,25 +2,24 @@ package romelo333.notenoughwands.modules.wands.Items;
 
 
 import mcjty.lib.builder.TooltipBuilder;
-import net.minecraft.world.item.TooltipFlag;
+import mcjty.lib.varia.ComponentFactory;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.ChatFormatting;
 import net.minecraft.world.level.Level;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.registries.ForgeRegistries;
 import romelo333.notenoughwands.modules.wands.WandsConfiguration;
 import romelo333.notenoughwands.varia.Tools;
@@ -45,16 +44,16 @@ public class CapturingWand extends GenericWand {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> list, TooltipFlag flagIn) {
         super.appendHoverText(stack, worldIn, list, flagIn);
-        tooltipBuilder.makeTooltip(getRegistryName(), stack, list, flagIn);
+        tooltipBuilder.makeTooltip(mcjty.lib.varia.Tools.getId(this), stack, list, flagIn);
 
         CompoundTag tagCompound = stack.getTag();
         if (tagCompound != null) {
             if (tagCompound.contains("mob")) {
                 String type = tagCompound.getString("type");
                 if (!type.isEmpty()) {
-                    EntityType<?> entityType = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(type));
+                    EntityType<?> entityType = ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(type));
                     if (entityType != null) {
-                        list.add(new TextComponent(ChatFormatting.GREEN + "Captured mob: ").append(entityType.getDescription()));
+                        list.add(ComponentFactory.literal(ChatFormatting.GREEN + "Captured mob: ").append(entityType.getDescription()));
                     }
                 }
             }
@@ -91,7 +90,7 @@ public class CapturingWand extends GenericWand {
     }
 
     private LivingEntity createEntity(Player player, Level world, String type) {
-        EntityType<?> entityType = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(type));
+        EntityType<?> entityType = ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(type));
         if (entityType != null) {
             return (LivingEntity) entityType.create(world);
         }
@@ -133,8 +132,9 @@ public class CapturingWand extends GenericWand {
                 CompoundTag tagCompound = new CompoundTag();
                 entityLivingBase.addAdditionalSaveData(tagCompound);  // @todo 1.15 is this right?
                 stack.getOrCreateTag().put("mob", tagCompound);
-                stack.getOrCreateTag().putString("type", entity.getType().getRegistryName().toString());
-                ((ServerLevel)player.getCommandSenderWorld()).removeEntity(entity);
+                stack.getOrCreateTag().putString("type", mcjty.lib.varia.Tools.getId(entity.getType()).toString());
+                entity.remove(Entity.RemovalReason.DISCARDED);
+//                ((ServerLevel)player.getCommandSenderWorld()).removeEntity(entity);
 
                 registerUsage(stack, player, difficultyScale);
             } else {

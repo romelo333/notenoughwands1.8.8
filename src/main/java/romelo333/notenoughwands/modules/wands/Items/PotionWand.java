@@ -1,6 +1,7 @@
 package romelo333.notenoughwands.modules.wands.Items;
 
 
+import mcjty.lib.varia.ComponentFactory;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.entity.Entity;
@@ -12,7 +13,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.level.Level;
 import romelo333.notenoughwands.modules.wands.WandsConfiguration;
@@ -43,29 +43,29 @@ public class PotionWand extends GenericWand {
     public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> list, TooltipFlag flagIn) {
         super.appendHoverText(stack, world, list, flagIn);
         // @todo 1.15 better tooltips
-        list.add(new TextComponent("Left click on creature to apply effect"));
+        list.add(ComponentFactory.literal("Left click on creature to apply effect"));
         CompoundTag tagCompound = stack.getTag();
         if (tagCompound==null){
-            list.add(new TextComponent(ChatFormatting.YELLOW+"No effects. Combine with potion"));
-            list.add(new TextComponent(ChatFormatting.YELLOW+"in crafting table to add effect"));
+            list.add(ComponentFactory.literal(ChatFormatting.YELLOW+"No effects. Combine with potion"));
+            list.add(ComponentFactory.literal(ChatFormatting.YELLOW+"in crafting table to add effect"));
             return;
         }
         ListTag effects = (ListTag) tagCompound.get("effects");
         if (effects == null || effects.isEmpty()){
-            list.add(new TextComponent(ChatFormatting.YELLOW+"No effects. Combine with potion"));
-            list.add(new TextComponent(ChatFormatting.YELLOW+"in crafting table to add effect"));
+            list.add(ComponentFactory.literal(ChatFormatting.YELLOW+"No effects. Combine with potion"));
+            list.add(ComponentFactory.literal(ChatFormatting.YELLOW+"in crafting table to add effect"));
             return;
         }
-        list.add(new TextComponent(ChatFormatting.YELLOW+"Combine with empty bottle"));
-        list.add(new TextComponent(ChatFormatting.YELLOW+"to clear effects"));
+        list.add(ComponentFactory.literal(ChatFormatting.YELLOW+"Combine with empty bottle"));
+        list.add(ComponentFactory.literal(ChatFormatting.YELLOW+"to clear effects"));
         int mode = getMode(stack);
         for (int i=0;i<effects.size();i++) {
             CompoundTag effecttag = effects.getCompound(i);
             MobEffectInstance effect = MobEffectInstance.load(effecttag);
             if (i==mode){
-                list.add(new TextComponent("    + " + ChatFormatting.GREEN + getEffectName(effect)));
+                list.add(ComponentFactory.literal("    + " + ChatFormatting.GREEN + getEffectName(effect)));
             } else {
-                list.add(new TextComponent("    " + ChatFormatting.GRAY+getEffectName(effect)));
+                list.add(ComponentFactory.literal("    " + ChatFormatting.GRAY+getEffectName(effect)));
             }
         }
     }
@@ -87,7 +87,7 @@ public class PotionWand extends GenericWand {
         }
         CompoundTag effecttag = effects.getCompound(mode);
         MobEffectInstance effect = MobEffectInstance.load(effecttag);
-        Tools.notify(player, new TextComponent("Switched to " + getEffectName(effect) + " mode"));
+        Tools.notify(player, ComponentFactory.literal("Switched to " + getEffectName(effect) + " mode"));
         stack.getOrCreateTag().putInt("mode", mode);
     }
 

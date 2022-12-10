@@ -4,8 +4,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.event.world.ExplosionEvent;
+import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.level.ExplosionEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
 import romelo333.notenoughwands.modules.protectionwand.ProtectionWandConfiguration;
@@ -16,7 +16,7 @@ public class ForgeEventHandlers {
 
     @SubscribeEvent
     public void onBlockBreakEvent (BlockEvent.BreakEvent event){
-        LevelAccessor world = event.getWorld();
+        LevelAccessor world = event.getLevel();
         if (world.isClientSide()) {
             return;
         }
@@ -29,7 +29,7 @@ public class ForgeEventHandlers {
 
     @SubscribeEvent
     public void onDetonate(ExplosionEvent.Detonate event) {
-        Level world = event.getWorld();
+        Level world = event.getLevel();
         if (world.isClientSide) {
             return;
         }
@@ -56,9 +56,9 @@ public class ForgeEventHandlers {
 //    public void onPlayerLeftClickEvent(PlayerInteractEvent.LeftClickBlock event) {
 //        if (!Config.interactionProtection) {
 //            // If full protection is enabled we check in the normal onPlayerInteractEvent
-//            ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(event.getWorld());
+//            ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(event.getLevel());
 //            BlockPos pos = event.getPos();
-//            if (protectedBlocks != null && protectedBlocks.isProtected(event.getWorld(), pos)) {
+//            if (protectedBlocks != null && protectedBlocks.isProtected(event.getLevel(), pos)) {
 //                event.setCanceled(true);
 //            }
 //        }
@@ -70,7 +70,7 @@ public class ForgeEventHandlers {
             return;
         }
 
-        Level world = event.getWorld();
+        Level world = event.getLevel();
         BlockPos pos = event.getPos();
 
         if (world.isClientSide) {
@@ -99,7 +99,7 @@ public class ForgeEventHandlers {
 //            }
 //            if (event.getEntityPlayer().isSneaking() && WrenchChecker.isAWrench(heldItem.getItem())) {
 //                // If the block is protected we prevent sneak-wrenching it.
-////            ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(event.getWorld());
+////            ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(event.getLevel());
 ////            BlockPos pos = event.getPos();
 //                if (protectedBlocks != null && protectedBlocks.isProtected(world, pos)) {
 //                    event.setCanceled(true);

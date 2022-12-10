@@ -2,24 +2,25 @@ package romelo333.notenoughwands.modules.wands.Items;
 
 
 import mcjty.lib.builder.TooltipBuilder;
+import mcjty.lib.varia.ComponentFactory;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.ChatFormatting;
-import net.minecraft.world.level.Level;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.util.FakePlayer;
 import romelo333.notenoughwands.modules.wands.WandsConfiguration;
 import romelo333.notenoughwands.varia.Tools;
@@ -55,24 +56,24 @@ public class AccelerationWand extends GenericWand {
         this.usageFactor(3.0f);
     }
 
-    private final Random random = new Random();
+    private final RandomSource random = RandomSource.create();
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> list, TooltipFlag flagIn) {
         super.appendHoverText(stack, world, list, flagIn);
-        tooltipBuilder.makeTooltip(getRegistryName(), stack, list, flagIn);
+        tooltipBuilder.makeTooltip(mcjty.lib.varia.Tools.getId(this), stack, list, flagIn);
 
         showModeKeyDescription(list, "change speed");
 
         if (Math.abs(WandsConfiguration.fakePlayerFactor.get() -1.0f) >= 0.01) {
             if (WandsConfiguration.fakePlayerFactor.get() < 0) {
-                list.add(new TextComponent(ChatFormatting.RED + "Usage in a machine has been disabled in config!"));
+                list.add(ComponentFactory.literal(ChatFormatting.RED + "Usage in a machine has been disabled in config!"));
             } else if (WandsConfiguration.fakePlayerFactor.get() > 1) {
-                list.add(new TextComponent(ChatFormatting.YELLOW + "Usage in a machine will cost more!"));
+                list.add(ComponentFactory.literal(ChatFormatting.YELLOW + "Usage in a machine will cost more!"));
             }
         }
         if (WandsConfiguration.fakePlayerFactor.get() >= 0.0 && WandsConfiguration.lessEffectiveForFakePlayer.get()) {
-            list.add(new TextComponent(ChatFormatting.YELLOW + "Usage in a machine will be less effective!"));
+            list.add(ComponentFactory.literal(ChatFormatting.YELLOW + "Usage in a machine will be less effective!"));
         }
     }
 
@@ -131,7 +132,7 @@ public class AccelerationWand extends GenericWand {
         if (mode > MODE_LAST) {
             mode = MODE_FIRST;
         }
-        Tools.notify(player, new TextComponent("Switched to " + DESCRIPTIONS[mode] + " mode"));
+        Tools.notify(player, ComponentFactory.literal("Switched to " + DESCRIPTIONS[mode] + " mode"));
         stack.getOrCreateTag().putInt("mode", mode);
     }
 

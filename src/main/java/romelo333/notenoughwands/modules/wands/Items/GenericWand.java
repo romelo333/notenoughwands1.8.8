@@ -1,19 +1,19 @@
 package romelo333.notenoughwands.modules.wands.Items;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.world.level.block.state.BlockState;
+import mcjty.lib.varia.ComponentFactory;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.ChatFormatting;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.event.RenderLevelLastEvent;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import romelo333.notenoughwands.NotEnoughWands;
@@ -79,7 +79,7 @@ public class GenericWand extends Item implements IEnergyItem {
     public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
         super.appendHoverText(stack, worldIn, tooltip, flagIn);
         if (needsPower()) {
-            tooltip.add(new TextComponent("Energy: " + getEnergyStored(stack) + " / " + getMaxEnergyStored(stack)).withStyle(ChatFormatting.GREEN));
+            tooltip.add(ComponentFactory.literal("Energy: " + getEnergyStored(stack) + " / " + getMaxEnergyStored(stack)).withStyle(ChatFormatting.GREEN));
         }
     }
 
@@ -182,12 +182,12 @@ public class GenericWand extends Item implements IEnergyItem {
 
     protected void showModeKeyDescription(List<Component> list, String suffix) {
         String keyDescription = KeyBindings.wandModifier != null ? KeyBindings.wandModifier.getName() : "unknown";
-        list.add(new TextComponent("Mode key (" + keyDescription + ") to " + suffix).withStyle(ChatFormatting.YELLOW));
+        list.add(ComponentFactory.literal("Mode key (" + keyDescription + ") to " + suffix).withStyle(ChatFormatting.YELLOW));
     }
 
     protected void showSubModeKeyDescription(List<Component> list, String suffix) {
         String keyDescription = KeyBindings.wandSubMode != null ? KeyBindings.wandSubMode.getName() : "unknown";
-        list.add(new TextComponent("Sub-mode key (" + keyDescription + ") to " + suffix).withStyle(ChatFormatting.YELLOW));
+        list.add(ComponentFactory.literal("Sub-mode key (" + keyDescription + ") to " + suffix).withStyle(ChatFormatting.YELLOW));
     }
 
     //------------------------------------------------------------------------------
@@ -259,15 +259,15 @@ public class GenericWand extends Item implements IEnergyItem {
     }
 
     private boolean needsPower() {
-        return WandsConfiguration.wandUsage.get().needsPower();
+        return WandsConfiguration.cachedWandUsage.needsPower();
     }
 
     private boolean needsDamage() {
-        return WandsConfiguration.wandUsage.get() == WandUsage.DURABILITY;
+        return WandsConfiguration.cachedWandUsage == WandUsage.DURABILITY;
     }
 
     private boolean needsXP() {
-        return WandsConfiguration.wandUsage.get() == WandUsage.XP;
+        return WandsConfiguration.cachedWandUsage == WandUsage.XP;
     }
 
 }

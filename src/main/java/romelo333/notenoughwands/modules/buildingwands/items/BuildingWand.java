@@ -4,31 +4,28 @@ package romelo333.notenoughwands.modules.buildingwands.items;
 import mcjty.lib.builder.TooltipBuilder;
 import mcjty.lib.varia.LevelTools;
 import mcjty.lib.varia.SoundTools;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.util.*;
-import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.client.event.RenderLevelLastEvent;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -36,11 +33,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 import romelo333.notenoughwands.varia.Tools;
 
-import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import java.util.*;
 
 import static mcjty.lib.builder.TooltipBuilder.*;
 
@@ -84,7 +77,7 @@ public class BuildingWand extends GenericWand {
     @Override
     public void appendHoverText(ItemStack itemStack, Level world, List<Component> list, TooltipFlag flags) {
         super.appendHoverText(itemStack, world, list, flags);
-        tooltipBuilder.makeTooltip(getRegistryName(), itemStack, list, flags);
+        tooltipBuilder.makeTooltip(mcjty.lib.varia.Tools.getId(this), itemStack, list, flags);
 
         showModeKeyDescription(list, "switch mode");
         showSubModeKeyDescription(list, "change orientation");
@@ -97,7 +90,7 @@ public class BuildingWand extends GenericWand {
         if (mode > MODE_LAST) {
             mode = MODE_FIRST;
         }
-        Tools.notify(player, new TextComponent("Switched to " + DESCRIPTIONS[mode] + " mode"));
+        Tools.notify(player, Component.literal("Switched to " + DESCRIPTIONS[mode] + " mode"));
         stack.getOrCreateTag().putInt("mode", mode);
     }
 
@@ -105,7 +98,7 @@ public class BuildingWand extends GenericWand {
     public void toggleSubMode(Player player, ItemStack stack) {
         int submode = getSubMode(stack);
         submode = submode == 1 ? 0 : 1;
-        Tools.notify(player, new TextComponent("Switched orientation"));
+        Tools.notify(player, Component.literal("Switched orientation"));
         stack.getOrCreateTag().putInt("submode", submode);
     }
 

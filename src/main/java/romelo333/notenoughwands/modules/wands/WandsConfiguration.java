@@ -1,8 +1,9 @@
 package romelo333.notenoughwands.modules.wands;
 
 import com.google.common.collect.Lists;
-import net.minecraft.world.entity.Entity;
+import mcjty.lib.varia.Tools;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.util.HashMap;
@@ -14,6 +15,7 @@ public class WandsConfiguration {
     public static String CATEGORY_WANDS = "wandsettings";
 
     public static ForgeConfigSpec.BooleanValue showDurabilityBarForRF;
+    public static WandUsage cachedWandUsage;
     public static ForgeConfigSpec.EnumValue<WandUsage> wandUsage;
 
     public static ForgeConfigSpec.DoubleValue fakePlayerFactor;
@@ -40,6 +42,7 @@ public class WandsConfiguration {
 
     private static ForgeConfigSpec.ConfigValue<List<? extends String>> entityBlackList;
     public static Map<ResourceLocation,Double> blacklistedEntities = new HashMap<>();
+    private static boolean blacklistedEntitiesLoaded = false;
 
     public static void init(ForgeConfigSpec.Builder SERVER_BUILDER, ForgeConfigSpec.Builder CLIENT_BUILDER) {
         SERVER_BUILDER.comment("Settings for the wands").push(CATEGORY_WANDS);
@@ -129,6 +132,9 @@ public class WandsConfiguration {
     }
 
     public static void reloadConfig() {
+        if (blacklistedEntitiesLoaded) {
+            return;
+        }
         blacklistedEntities.clear();
         for (String s : entityBlackList.get()) {
             String[] split = s.split(",");
@@ -142,7 +148,8 @@ public class WandsConfiguration {
     }
 
     public static double getEntityCost(Entity entity) {
-        ResourceLocation registryName = entity.getType().getRegistryName();
+        reloadConfig();
+        ResourceLocation registryName = Tools.getId(entity.getType());
         return blacklistedEntities.getOrDefault(registryName, 1.0);
     }
 }

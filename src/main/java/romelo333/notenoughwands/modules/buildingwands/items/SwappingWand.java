@@ -2,30 +2,30 @@ package romelo333.notenoughwands.modules.buildingwands.items;
 
 
 import mcjty.lib.builder.TooltipBuilder;
+import mcjty.lib.varia.ComponentFactory;
 import mcjty.lib.varia.SoundTools;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
-import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import javax.annotation.Nullable;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.ChatFormatting;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.client.event.RenderLevelLastEvent;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -35,10 +35,10 @@ import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 import romelo333.notenoughwands.varia.Tools;
 
-import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
+import javax.annotation.Nullable;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static mcjty.lib.builder.TooltipBuilder.*;
 
@@ -72,14 +72,14 @@ public class SwappingWand extends GenericWand {
         if (mode > MODE_LAST) {
             mode = MODE_FIRST;
         }
-        Tools.notify(player, new TextComponent("Switched to " + DESCRIPTIONS[mode] + " mode"));
+        Tools.notify(player, ComponentFactory.literal("Switched to " + DESCRIPTIONS[mode] + " mode"));
         stack.getOrCreateTag().putInt("mode", mode);
     }
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> list, TooltipFlag flagIn) {
         super.appendHoverText(stack, world, list, flagIn);
-        tooltipBuilder.makeTooltip(getRegistryName(), stack, list, flagIn);
+        tooltipBuilder.makeTooltip(mcjty.lib.varia.Tools.getId(this), stack, list, flagIn);
         list.add(getBlockDescription(stack));
 
         showModeKeyDescription(list, "switch mode");
@@ -88,14 +88,14 @@ public class SwappingWand extends GenericWand {
     private Component getBlockDescription(ItemStack stack) {
         CompoundTag compound = stack.getTag();
         if (compound == null) {
-            return new TextComponent("No selected block").withStyle(ChatFormatting.RED);
+            return ComponentFactory.literal("No selected block").withStyle(ChatFormatting.RED);
         } else {
             if (isSwappingWithOffHand(stack)) {
-                return new TextComponent("Will swap with block in offhand").withStyle(ChatFormatting.GREEN);
+                return ComponentFactory.literal("Will swap with block in offhand").withStyle(ChatFormatting.GREEN);
             } else {
                 BlockState state = NbtUtils.readBlockState(compound.getCompound("block"));
                 Component name = Tools.getBlockName(state.getBlock());
-                return new TextComponent("Block: ").append(name).withStyle(ChatFormatting.GREEN);
+                return ComponentFactory.literal("Block: ").append(name).withStyle(ChatFormatting.GREEN);
             }
         }
     }
@@ -128,12 +128,12 @@ public class SwappingWand extends GenericWand {
             if (isSwappingWithOffHand(heldItem)) {
                 disableSwappingWithOffHand(heldItem);
                 if (world.isClientSide) {
-                    Tools.notify(player, new TextComponent("Switched to swapping with selected block"));
+                    Tools.notify(player, ComponentFactory.literal("Switched to swapping with selected block"));
                 }
             } else {
                 enableSwappingWithOffHand(heldItem);
                 if (world.isClientSide) {
-                    Tools.notify(player, new TextComponent("Switched to swapping with block in offhand"));
+                    Tools.notify(player, ComponentFactory.literal("Switched to swapping with block in offhand"));
                 }
             }
         }
@@ -276,7 +276,7 @@ public class SwappingWand extends GenericWand {
             tagCompound.put("block", NbtUtils.writeBlockState(state));
             float hardness = state.getDestroySpeed(world, pos);
             tagCompound.putFloat("hardness", hardness);
-            Tools.notify(player, new TextComponent("Selected block: ").append(name));
+            Tools.notify(player, ComponentFactory.literal("Selected block: ").append(name));
         }
     }
 

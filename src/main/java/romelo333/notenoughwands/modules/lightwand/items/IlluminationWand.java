@@ -2,6 +2,7 @@ package romelo333.notenoughwands.modules.lightwand.items;
 
 
 import mcjty.lib.builder.TooltipBuilder;
+import mcjty.lib.varia.Tools;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.item.TooltipFlag;
@@ -38,7 +39,7 @@ public class IlluminationWand extends GenericWand {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> list, TooltipFlag flagIn) {
         super.appendHoverText(stack, worldIn, list, flagIn);
-        tooltipBuilder.makeTooltip(getRegistryName(), stack, list, flagIn);
+        tooltipBuilder.makeTooltip(Tools.getId(this), stack, list, flagIn);
     }
 
     @Override

@@ -1,16 +1,16 @@
 package romelo333.notenoughwands.modules.protectionwand.items;
 
 
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionHand;
+import mcjty.lib.varia.ComponentFactory;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.ChatFormatting;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.client.event.RenderLevelLastEvent;
 import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
@@ -64,18 +64,18 @@ public class ProtectionWand extends GenericWand {
             }
         }
         // @todo 1.15 better tooltips
-        list.add(new TextComponent(ChatFormatting.GREEN + "Mode: " + descriptions[mode]));
+        list.add(ComponentFactory.literal(ChatFormatting.GREEN + "Mode: " + descriptions[mode]));
         if (master) {
-            list.add(new TextComponent(ChatFormatting.YELLOW + "Master wand"));
+            list.add(ComponentFactory.literal(ChatFormatting.YELLOW + "Master wand"));
         } else {
             if (id != 0) {
-                list.add(new TextComponent(ChatFormatting.GREEN + "Id: " + id));
+                list.add(ComponentFactory.literal(ChatFormatting.GREEN + "Id: " + id));
             }
         }
         if (hasid) {
-            list.add(new TextComponent(ChatFormatting.GREEN + "Number of protected blocks: " + ReturnProtectedBlockCountHelper.count));
+            list.add(ComponentFactory.literal(ChatFormatting.GREEN + "Number of protected blocks: " + ReturnProtectedBlockCountHelper.count));
         }
-        list.add(new TextComponent("Right click to protect or unprotect a block."));
+        list.add(ComponentFactory.literal("Right click to protect or unprotect a block."));
         showModeKeyDescription(list, "switch mode");
     }
 
@@ -86,7 +86,7 @@ public class ProtectionWand extends GenericWand {
         if (mode > MODE_LAST) {
             mode = MODE_FIRST;
         }
-        Tools.notify(player, new TextComponent("Switched to " + descriptions[mode] + " mode"));
+        Tools.notify(player, ComponentFactory.literal("Switched to " + descriptions[mode] + " mode"));
         stack.getOrCreateTag().putInt("mode", mode);
     }
 
@@ -140,7 +140,7 @@ public class ProtectionWand extends GenericWand {
                 }
             } else {
                 int cnt = protectedBlocks.clearProtections(world, id);
-                Tools.notify(player, new TextComponent("Cleared " + cnt + " protected blocks"));
+                Tools.notify(player, ComponentFactory.literal("Cleared " + cnt + " protected blocks"));
             }
         }
         return InteractionResult.SUCCESS;
@@ -156,7 +156,7 @@ public class ProtectionWand extends GenericWand {
     }
 
     @Override
-    public boolean hasContainerItem(ItemStack stack) {
+    public boolean hasCraftingRemainingItem() {
         return !master;
     }
 
@@ -167,9 +167,10 @@ public class ProtectionWand extends GenericWand {
 //        return this;
 //    }
 
+
     @Override
-    public ItemStack getContainerItem(ItemStack stack) {
-        if (hasContainerItem(stack) && stack.hasTag()) {
+    public ItemStack getCraftingRemainingItem(ItemStack stack) {
+        if (hasCraftingRemainingItem(stack) && stack.hasTag()) {
             ItemStack container = new ItemStack(getCraftingRemainingItem());
             container.setTag(stack.getTag().copy());
             return container;

@@ -9,7 +9,7 @@ import romelo333.notenoughwands.network.PacketToggleSubMode;
 public class KeyInputHandler {
 
     @SubscribeEvent
-    public void onKeyInput(InputEvent.KeyInputEvent event) {
+    public void onKeyInput(InputEvent.Key event) {
         if (KeyBindings.wandModifier.consumeClick()) {
             NEWPacketHandler.INSTANCE.sendToServer(new PacketToggleMode());
         } else if (KeyBindings.wandSubMode.consumeClick()) {

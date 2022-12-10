@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsConfiguration;
+import romelo333.notenoughwands.modules.protectionwand.ProtectionWandConfiguration;
 import romelo333.notenoughwands.modules.wands.WandsConfiguration;
 
 public class Config {
@@ -36,16 +37,10 @@ public class Config {
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, SERVER_CONFIG);
     }
 
-    public static void onLoad(final ModConfigEvent.Loading configEvent) {
-        System.out.println("@@@@@@@@@@@@@@@@@@ Config.onLoad");
-        BuildingWandsConfiguration.reloadConfig();
-        WandsConfiguration.reloadConfig();
+    public static void onLoad(final ModConfigEvent configEvent) {
+        if (configEvent.getConfig().getSpec() == SERVER_CONFIG) {
+            ProtectionWandConfiguration.cachedClientSideProtection = ProtectionWandConfiguration.clientSideProtection.get();
+            WandsConfiguration.cachedWandUsage = WandsConfiguration.wandUsage.get();
+        }
     }
-
-    public static void onReload(final ModConfigEvent.Reloading configEvent) {
-        System.out.println("@@@@@@@@@@@@@@@@@@ Config.onReload");
-        BuildingWandsConfiguration.reloadConfig();
-        WandsConfiguration.reloadConfig();
-    }
-
 }

@@ -1,8 +1,9 @@
 package romelo333.notenoughwands.modules.buildingwands;
 
 import com.google.common.collect.Lists;
-import net.minecraft.world.level.block.state.BlockState;
+import mcjty.lib.varia.Tools;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.util.HashMap;
@@ -18,7 +19,8 @@ public class BuildingWandsConfiguration {
     public static ForgeConfigSpec.DoubleValue hardnessDistance;
 
     private static ForgeConfigSpec.ConfigValue<List<? extends String>> blockBlackList;
-    public static Map<ResourceLocation,Double> blacklistedBlocks = new HashMap<>();
+    private static boolean blacklistedBlocksLoaded = false;
+    private static Map<ResourceLocation,Double> blacklistedBlocks = new HashMap<>();
 
     public static void init(ForgeConfigSpec.Builder SERVER_BUILDER, ForgeConfigSpec.Builder CLIENT_BUILDER) {
         SERVER_BUILDER.comment("Settings for the wands").push(CATEGORY_BUILDINGWANDS);
@@ -52,6 +54,9 @@ public class BuildingWandsConfiguration {
     }
 
     public static void reloadConfig() {
+        if (blacklistedBlocksLoaded) {
+            return;
+        }
         blacklistedBlocks.clear();
         for (String s : blockBlackList.get()) {
             String[] split = s.split(",");
@@ -61,11 +66,12 @@ public class BuildingWandsConfiguration {
             }
             blacklistedBlocks.put(new ResourceLocation(split[0]), cost);
         }
-
+        blacklistedBlocksLoaded = true;
     }
 
     public static double getBlockCost(BlockState state) {
-        ResourceLocation registryName = state.getBlock().getRegistryName();
+        reloadConfig();
+        ResourceLocation registryName = Tools.getId(state.getBlock());
         return blacklistedBlocks.getOrDefault(registryName, 1.0);
     }
 }

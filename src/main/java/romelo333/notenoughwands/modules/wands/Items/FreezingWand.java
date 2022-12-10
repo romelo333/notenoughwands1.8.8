@@ -10,7 +10,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.level.Level;
 import romelo333.notenoughwands.modules.wands.WandsConfiguration;
 import romelo333.notenoughwands.varia.Tools;
@@ -26,7 +25,7 @@ public class FreezingWand extends GenericWand {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> list, TooltipFlag flagIn) {
         super.appendHoverText(stack, worldIn, list, flagIn);
-        list.add(new TextComponent("Right click on creature to freeze creature."));
+        list.add(Component.literal("Right click on creature to freeze creature."));
     }
 
     @Override

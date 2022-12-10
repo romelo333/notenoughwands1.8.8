@@ -1,9 +1,10 @@
 package romelo333.notenoughwands.setup;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.InteractionHand;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.RenderLevelLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
@@ -21,9 +22,13 @@ public class ClientSetup {
     public static void init(FMLClientSetupEvent event) {
         MinecraftForge.EVENT_BUS.register(new ClientSetup());
         MinecraftForge.EVENT_BUS.register(new KeyInputHandler());
-        KeyBindings.init();
     }
 
+    public static void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
+        KeyBindings.init();
+        event.register(KeyBindings.wandModifier);
+        event.register(KeyBindings.wandSubMode);
+    }
 
     @SubscribeEvent
     public void renderWorldLastEvent(RenderLevelLastEvent evt) {
@@ -43,7 +48,7 @@ public class ClientSetup {
 
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
-        if (ProtectionWandConfiguration.clientSideProtection.get() < 0) {
+        if (ProtectionWandConfiguration.cachedClientSideProtection < 0) {
             return;
         }
 
@@ -51,7 +56,7 @@ public class ClientSetup {
         if (timer > 0) {
             return;
         }
-        timer = ProtectionWandConfiguration.clientSideProtection.get();
+        timer = ProtectionWandConfiguration.cachedClientSideProtection;
         if (Minecraft.getInstance().player != null) {
             NEWPacketHandler.INSTANCE.sendToServer(new PacketGetProtectedBlocksAroundPlayer());
         }

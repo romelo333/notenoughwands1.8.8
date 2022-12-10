@@ -1,5 +1,3 @@
-
-// For those who want the bleeding edge
 buildscript {
     repositories {
         maven { url = 'https://maven.minecraftforge.net' }
@@ -34,10 +32,6 @@ repositories {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/repositories/snapshots/"
     }
-    maven {
-        name = "CoFH Maven"
-        url = "https://maven.covers1624.net"
-    }
 }
 
 group= "romelo333.notenoughwands"
@@ -50,7 +44,7 @@ if (System.getenv('BUILD_NUMBER') != null) {
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft {
-    mappings channel: 'parchment', version: "2022.03.13-1.18.2"
+    mappings channel: 'parchment', version: "2022.11.20-1.19.2"
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
@@ -74,7 +68,7 @@ minecraft {
             workingDirectory project.file('run').canonicalPath
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
-            args '--mod', 'rftoolsbuilder', '--all', '--output', file('src/generated/resources/'), '--existing', sourceSets.main.resources.srcDirs[0]
+            args '--mod', 'notenoughwands', '--all', '--output', file('src/generated/resources/'), '--existing', sourceSets.main.resources.srcDirs[0]
             source sourceSets.main
         }
     }
@@ -99,8 +93,15 @@ sourceSets.main.resources {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+    // compile against the JEI API but do not include it at runtime
+    compileOnly fg.deobf("mezz.jei:jei-1.19-common-api:${jei_version}")
+    compileOnly fg.deobf("mezz.jei:jei-1.19-forge-api:${jei_version}")
+    // at runtime, use the full JEI jar for Forge
+    runtimeOnly fg.deobf("mezz.jei:jei-1.19-forge:${jei_version}")
+
     if (findProject(':TheOneProbe') != null) {
-        compile project(':TheOneProbe')
+        implementation project(':TheOneProbe')
     } else {
         implementation fg.deobf(project.dependencies.create("mcjty.theoneprobe:theoneprobe:${top_version}") {
             transitive = false

@@ -2,13 +2,13 @@ package romelo333.notenoughwands.modules.buildingwands.items;
 
 
 import mcjty.lib.builder.TooltipBuilder;
+import mcjty.lib.varia.ComponentFactory;
 import mcjty.lib.varia.SoundTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -61,7 +61,7 @@ public class DisplacementWand extends GenericWand {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> list, TooltipFlag flagIn) {
         super.appendHoverText(stack, worldIn, list, flagIn);
-        tooltipBuilder.makeTooltip(getRegistryName(), stack, list, flagIn);
+        tooltipBuilder.makeTooltip(mcjty.lib.varia.Tools.getId(this), stack, list, flagIn);
 
         showModeKeyDescription(list, "switch mode");
     }
@@ -73,7 +73,7 @@ public class DisplacementWand extends GenericWand {
         if (mode > MODE_LAST) {
             mode = MODE_FIRST;
         }
-        Tools.notify(player, new TextComponent("Switched to " + DESCRIPTIONS[mode] + " mode"));
+        Tools.notify(player, ComponentFactory.literal("Switched to " + DESCRIPTIONS[mode] + " mode"));
         stack.getOrCreateTag().putInt("mode", mode);
     }
 

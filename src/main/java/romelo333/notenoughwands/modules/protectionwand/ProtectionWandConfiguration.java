@@ -7,6 +7,7 @@ public class ProtectionWandConfiguration {
     public static String CATEGORY_PROTECTION_WAND = "protectionwand";
 
     public static ForgeConfigSpec.BooleanValue interactionProtection;
+    public static int cachedClientSideProtection = -1;
     public static ForgeConfigSpec.IntValue clientSideProtection;
 
     public static ForgeConfigSpec.IntValue blockShowRadius;

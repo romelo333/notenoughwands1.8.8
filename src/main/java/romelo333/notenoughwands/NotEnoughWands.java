@@ -2,6 +2,7 @@ package romelo333.notenoughwands;
 
 import mcjty.lib.modules.Modules;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -29,16 +30,18 @@ public class NotEnoughWands {
 
         Registration.register();
 
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(setup::init);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(modules::init);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(Config::onLoad);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(Config::onReload);
+        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+        bus.addListener(setup::init);
+        bus.addListener(modules::init);
+        bus.addListener(Config::onLoad);
 
 //        MinecraftForge.EVENT_BUS.addListener(Config::onLoad);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-            FMLJavaModLoadingContext.get().getModEventBus().addListener(modules::initClient);
-            FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientSetup::init);
-            FMLJavaModLoadingContext.get().getModEventBus().addListener(LightModule::onTextureStitch);
+            bus.addListener(modules::initClient);
+            bus.addListener(ClientSetup::init);
+            bus.addListener(LightModule::onTextureStitch);
+            bus.addListener(ClientSetup::onRegisterKeyMappings);
+
         });
     }
 
