@@ -1,7 +1,10 @@
 package romelo333.notenoughwands;
 
+import mcjty.lib.datagen.DataGen;
 import mcjty.lib.modules.Modules;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
@@ -15,6 +18,8 @@ import romelo333.notenoughwands.setup.Config;
 import romelo333.notenoughwands.setup.ModSetup;
 import romelo333.notenoughwands.setup.Registration;
 
+import java.util.function.Supplier;
+
 @Mod(NotEnoughWands.MODID)
 public class NotEnoughWands {
     public static final String MODID = "notenoughwands";
@@ -22,8 +27,10 @@ public class NotEnoughWands {
     @SuppressWarnings("PublicField")
     public static ModSetup setup = new ModSetup();
     private Modules modules = new Modules();
+    public static NotEnoughWands instance;
 
     public NotEnoughWands() {
+        instance = this;
         setupModules();
 
         Config.register(modules);
@@ -34,15 +41,24 @@ public class NotEnoughWands {
         bus.addListener(setup::init);
         bus.addListener(modules::init);
         bus.addListener(Config::onLoad);
+        bus.addListener(this::onDataGen);
 
-//        MinecraftForge.EVENT_BUS.addListener(Config::onLoad);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             bus.addListener(modules::initClient);
             bus.addListener(ClientSetup::init);
             bus.addListener(LightModule::onTextureStitch);
             bus.addListener(ClientSetup::onRegisterKeyMappings);
-
         });
+    }
+
+    public static <T extends Item> Supplier<T> tab(Supplier<T> supplier) {
+        return instance.setup.tab(supplier);
+    }
+
+    private void onDataGen(GatherDataEvent event) {
+        DataGen datagen = new DataGen(MODID, event);
+        modules.datagen(datagen);
+        datagen.generate();
     }
 
     private void setupModules() {

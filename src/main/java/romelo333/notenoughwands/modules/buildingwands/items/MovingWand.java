@@ -37,6 +37,7 @@ import static mcjty.lib.builder.TooltipBuilder.*;
 public class MovingWand extends GenericWand {
 
     public MovingWand() {
+        super();
         this.usageFactor(1.5f);
     }
 

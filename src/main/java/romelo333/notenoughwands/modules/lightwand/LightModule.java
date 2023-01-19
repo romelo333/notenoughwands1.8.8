@@ -1,6 +1,10 @@
 package romelo333.notenoughwands.modules.lightwand;
 
+import mcjty.lib.datagen.DataGen;
+import mcjty.lib.datagen.Dob;
 import mcjty.lib.modules.IModule;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.world.item.BlockItem;
@@ -14,17 +18,21 @@ import romelo333.notenoughwands.modules.lightwand.blocks.LightBlock;
 import romelo333.notenoughwands.modules.lightwand.blocks.LightTE;
 import romelo333.notenoughwands.modules.lightwand.client.LightRenderer;
 import romelo333.notenoughwands.modules.lightwand.items.IlluminationWand;
+import romelo333.notenoughwands.modules.wands.WandsModule;
 import romelo333.notenoughwands.setup.Registration;
 
+import static mcjty.lib.datagen.DataGen.has;
+import static net.minecraftforge.client.model.generators.ModelProvider.BLOCK_FOLDER;
+import static romelo333.notenoughwands.NotEnoughWands.tab;
 import static romelo333.notenoughwands.setup.Registration.*;
 
 public class LightModule implements IModule {
 
     public static final RegistryObject<Block> LIGHT = BLOCKS.register("light", LightBlock::new);
-    public static final RegistryObject<Item> LIGHT_ITEM = ITEMS.register("light", () -> new BlockItem(LIGHT.get(), Registration.createStandardProperties()));
+    public static final RegistryObject<Item> LIGHT_ITEM = ITEMS.register("light", tab(() -> new BlockItem(LIGHT.get(), Registration.createStandardProperties())));
     public static final RegistryObject<BlockEntityType<LightTE>> TYPE_LIGHT = TILES.register("light", () -> BlockEntityType.Builder.of(LightTE::new, LIGHT.get()).build(null));
 
-    public static final RegistryObject<Item> ILLUMINATION_WAND = ITEMS.register("illumination_wand", IlluminationWand::new);
+    public static final RegistryObject<Item> ILLUMINATION_WAND = ITEMS.register("illumination_wand", tab(IlluminationWand::new));
 
     public static void onTextureStitch(TextureStitchEvent.Pre event) {
         if (!event.getAtlas().location().equals(TextureAtlas.LOCATION_BLOCKS)) {
@@ -45,5 +53,22 @@ public class LightModule implements IModule {
 
     @Override
     public void initConfig() {
+    }
+
+    @Override
+    public void initDatagen(DataGen dataGen) {
+        dataGen.add(
+                Dob.blockBuilder(LIGHT)
+                        .generatedItem("block/light")
+                        .blockState(p -> p.singleTextureBlock(LIGHT.get(), BLOCK_FOLDER + "/light", "block/empty")),
+                Dob.itemBuilder(ILLUMINATION_WAND)
+                        .handheldItem("item/illumination_wand")
+                        .shaped(builder -> builder.shaped(ILLUMINATION_WAND.get())
+                                        .define('x', Items.GLOWSTONE_DUST)
+                                        .define('w', WandsModule.WAND_CORE.get())
+                                        .unlockedBy("core", has(WandsModule.WAND_CORE.get())),
+                                "xx ", "xw ", "  w"
+                        )
+        );
     }
 }

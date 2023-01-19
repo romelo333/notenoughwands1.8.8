@@ -22,6 +22,7 @@ import romelo333.notenoughwands.modules.buildingwands.BuildingWandsConfiguration
 import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
 import romelo333.notenoughwands.modules.wands.WandUsage;
 import romelo333.notenoughwands.modules.wands.WandsConfiguration;
+import romelo333.notenoughwands.setup.Registration;
 import romelo333.notenoughwands.varia.ClientTools;
 import romelo333.notenoughwands.varia.IEnergyItem;
 import romelo333.notenoughwands.varia.ItemCapabilityProvider;
@@ -36,7 +37,7 @@ public class GenericWand extends Item implements IEnergyItem {
     protected float usageFactor = 1.0f;
 
     public GenericWand() {
-        super(new Item.Properties().tab(NotEnoughWands.setup.getTab())
+        super(Registration.createStandardProperties()
                 .setNoRepair()
                 .stacksTo(1)
         );

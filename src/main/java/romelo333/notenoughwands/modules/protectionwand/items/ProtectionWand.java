@@ -41,6 +41,7 @@ public class ProtectionWand extends GenericWand {
     };
 
     public ProtectionWand(boolean master) {
+        super();
         if (master) {
             this.usageFactor(3.0f);
         } else {

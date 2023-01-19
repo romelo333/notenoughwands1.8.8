@@ -5,13 +5,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import romelo333.notenoughwands.ForgeEventHandlers;
+import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.modules.wands.WandsModule;
 import romelo333.notenoughwands.network.NEWPacketHandler;
 
 public class ModSetup extends DefaultModSetup {
 
     public ModSetup() {
-        createTab("notenoughwands", () -> new ItemStack(WandsModule.WAND_CORE.get()));
+        createTab(NotEnoughWands.MODID, "notenoughwands", () -> new ItemStack(WandsModule.WAND_CORE.get()));
     }
 
     @Override

@@ -62,6 +62,7 @@ public class BuildingWand extends GenericWand {
     public static final int[] amount = new int[] { 9, 9, 25, 25, 1 };
 
     public BuildingWand() {
+        super();
         this.usageFactor(1.0f);
     }
 

@@ -62,6 +62,7 @@ public class SwappingWand extends GenericWand {
 
 
     public SwappingWand() {
+        super();
         this.usageFactor(1.0f);
     }
 

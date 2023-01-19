@@ -28,6 +28,7 @@ import static mcjty.lib.builder.TooltipBuilder.*;
 public class IlluminationWand extends GenericWand {
 
     public IlluminationWand() {
+        super();
         this.usageFactor(1);
     }
 
