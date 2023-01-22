@@ -46,7 +46,6 @@ public class NotEnoughWands {
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             bus.addListener(modules::initClient);
             bus.addListener(ClientSetup::init);
-            bus.addListener(LightModule::onTextureStitch);
             bus.addListener(ClientSetup::onRegisterKeyMappings);
         });
     }

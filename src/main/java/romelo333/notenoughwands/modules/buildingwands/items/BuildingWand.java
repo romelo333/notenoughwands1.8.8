@@ -3,6 +3,7 @@ package romelo333.notenoughwands.modules.buildingwands.items;
 
 import mcjty.lib.builder.TooltipBuilder;
 import mcjty.lib.varia.LevelTools;
+import mcjty.lib.varia.NBTTools;
 import mcjty.lib.varia.SoundTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -229,7 +230,7 @@ public class BuildingWand extends GenericWand {
     }
 
     private void performUndo(ItemStack stack, Player player, Level world, BlockPos pos, CompoundTag undoTag, Set<BlockPos> undo) {
-        BlockState state = NbtUtils.readBlockState(undoTag.getCompound("block"));
+        BlockState state = NBTTools.readBlockState(world, undoTag.getCompound("block"));
 
         int cnt = 0;
         for (BlockPos coordinate : undo) {

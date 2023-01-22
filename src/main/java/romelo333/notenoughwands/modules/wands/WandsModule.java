@@ -3,10 +3,9 @@ package romelo333.notenoughwands.modules.wands;
 import mcjty.lib.datagen.DataGen;
 import mcjty.lib.datagen.Dob;
 import mcjty.lib.modules.IModule;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.world.item.Item;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -31,7 +30,7 @@ public class WandsModule implements IModule {
     //    public static final RegistryObject<Item> FREEZING_WAND = ITEMS.register("freezing_wand", FreezingWand::new);
     //    public static final RegistryObject<Item> POTION_WAND = ITEMS.register("potion_wand", PotionWand::new);
 
-    public static final RegistryObject<SoundEvent> TELEPORT_SOUND = SOUNDS.register("teleport", () -> new SoundEvent(new ResourceLocation(NotEnoughWands.MODID, "teleport")));
+    public static final RegistryObject<SoundEvent> TELEPORT_SOUND = SOUNDS.register("teleport", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(NotEnoughWands.MODID, "teleport")));
 
     @Override
     public void init(FMLCommonSetupEvent event) {
@@ -53,7 +52,7 @@ public class WandsModule implements IModule {
         dataGen.add(
                 Dob.itemBuilder(WAND_CORE)
                         .handheldItem("item/wand_core")
-                        .shaped(builder -> builder.shaped(WAND_CORE.get())
+                        .shaped(builder -> builder
                                         .define('X', Items.BLAZE_ROD)
                                         .define('n', Items.GOLD_NUGGET)
                                         .unlockedBy("rod", has(Items.BLAZE_ROD)),
@@ -61,7 +60,7 @@ public class WandsModule implements IModule {
                         ),
                 Dob.itemBuilder(ADVANCED_WAND_CORE)
                         .handheldItem("item/advanced_wand_core")
-                        .shaped(builder -> builder.shaped(ADVANCED_WAND_CORE.get())
+                        .shaped(builder -> builder
                                         .define('t', Items.GHAST_TEAR)
                                         .define('x', Items.NETHER_STAR)
                                         .define('w', WAND_CORE.get())
@@ -70,7 +69,7 @@ public class WandsModule implements IModule {
                         ),
                 Dob.itemBuilder(ACCELERATION_WAND)
                         .handheldItem("item/acceleration_wand")
-                        .shaped(builder -> builder.shaped(ACCELERATION_WAND.get())
+                        .shaped(builder -> builder
                                         .define('x', Items.CLOCK)
                                         .define('w', ADVANCED_WAND_CORE.get())
                                         .unlockedBy("core", has(WAND_CORE.get())),
@@ -78,7 +77,7 @@ public class WandsModule implements IModule {
                         ),
                 Dob.itemBuilder(CAPTURING_WAND)
                         .handheldItem("item/capturing_wand")
-                        .shaped(builder -> builder.shaped(CAPTURING_WAND.get())
+                        .shaped(builder -> builder
                                         .define('x', Items.ROTTEN_FLESH)
                                         .define('w', ADVANCED_WAND_CORE.get())
                                         .unlockedBy("core", has(WAND_CORE.get())),
@@ -86,7 +85,7 @@ public class WandsModule implements IModule {
                         ),
                 Dob.itemBuilder(TELEPORTATION_WAND)
                         .handheldItem("item/teleportation_wand")
-                        .shaped(builder -> builder.shaped(TELEPORTATION_WAND.get())
+                        .shaped(builder -> builder
                                         .define('w', WAND_CORE.get())
                                         .unlockedBy("core", has(WAND_CORE.get())),
                                 "oo ", "ow ", "  w"

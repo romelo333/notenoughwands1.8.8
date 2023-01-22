@@ -41,7 +41,7 @@ public class ProtectionWandModule implements IModule {
         dataGen.add(
                 Dob.itemBuilder(PROTECTION_WAND)
                         .handheldItem("item/protection_wand")
-                        .shaped(builder -> builder.shaped(PROTECTION_WAND.get())
+                        .shaped(builder -> builder
                                         .define('x', Items.COMPARATOR)
                                         .define('w', WandsModule.ADVANCED_WAND_CORE.get())
                                         .unlockedBy("core", has(WandsModule.WAND_CORE.get())),

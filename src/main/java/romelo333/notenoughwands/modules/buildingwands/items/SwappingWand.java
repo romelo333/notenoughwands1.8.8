@@ -3,6 +3,7 @@ package romelo333.notenoughwands.modules.buildingwands.items;
 
 import mcjty.lib.builder.TooltipBuilder;
 import mcjty.lib.varia.ComponentFactory;
+import mcjty.lib.varia.NBTTools;
 import mcjty.lib.varia.SoundTools;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -94,7 +95,7 @@ public class SwappingWand extends GenericWand {
             if (isSwappingWithOffHand(stack)) {
                 return ComponentFactory.literal("Will swap with block in offhand").withStyle(ChatFormatting.GREEN);
             } else {
-                BlockState state = NbtUtils.readBlockState(compound.getCompound("block"));
+                BlockState state = NBTTools.readBlockState(compound.getCompound("block"));
                 Component name = Tools.getBlockName(state.getBlock());
                 return ComponentFactory.literal("Block: ").append(name).withStyle(ChatFormatting.GREEN);
             }
@@ -186,7 +187,7 @@ public class SwappingWand extends GenericWand {
             blockState = itemBlock.getBlock().defaultBlockState();    // @todo 1.15 is this right?
             hardness = blockState.getDestroySpeed(world, pos);
         } else {
-            blockState = NbtUtils.readBlockState(tagCompound.getCompound("block"));
+            blockState = NBTTools.readBlockState(world, tagCompound.getCompound("block"));
             hardness = tagCompound.getFloat("hardness");
         }
 
@@ -291,7 +292,7 @@ public class SwappingWand extends GenericWand {
             BlockPos blockPos = br.getBlockPos();
             BlockState state = world.getBlockState(blockPos);
             if (!state.isAir() && wand.hasTag()) {
-                BlockState wandState = NbtUtils.readBlockState(wand.getTag().getCompound("block"));
+                BlockState wandState = NBTTools.readBlockState(world, wand.getTag().getCompound("block"));
                 if (wandState == state) {
                     return;
                 }

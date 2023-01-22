@@ -8,7 +8,7 @@ import net.minecraft.world.item.Item.Properties;
 
 public class WandCore extends Item {
     public WandCore () {
-        super(new Properties().tab(NotEnoughWands.setup.getTab())
+        super(NotEnoughWands.setup.defaultProperties()
                 .stacksTo(64)
         );
     }

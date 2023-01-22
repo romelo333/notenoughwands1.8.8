@@ -3,6 +3,7 @@ package romelo333.notenoughwands.modules.buildingwands.items;
 
 import mcjty.lib.builder.TooltipBuilder;
 import mcjty.lib.varia.ComponentFactory;
+import mcjty.lib.varia.NBTTools;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -57,7 +58,7 @@ public class MovingWand extends GenericWand {
         if (!hasBlock(compound)) {
             return ComponentFactory.literal("Wand is empty").withStyle(ChatFormatting.RED);
         } else {
-            BlockState state = NbtUtils.readBlockState(compound.getCompound("block"));
+            BlockState state = NBTTools.readBlockState(compound.getCompound("block"));
             Component name = Tools.getBlockName(state.getBlock());
             return ComponentFactory.literal("Block: ").append(name).withStyle(ChatFormatting.GREEN);
         }
@@ -125,7 +126,7 @@ public class MovingWand extends GenericWand {
         }
 
         CompoundTag tagCompound = stack.getOrCreateTag();
-        BlockState blockState = NbtUtils.readBlockState(tagCompound.getCompound("block"));
+        BlockState blockState = NBTTools.readBlockState(world, tagCompound.getCompound("block"));
 
         BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.create(world.dimension(), world, pp);
 

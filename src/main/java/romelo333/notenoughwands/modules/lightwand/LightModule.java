@@ -3,16 +3,19 @@ package romelo333.notenoughwands.modules.lightwand;
 import mcjty.lib.datagen.DataGen;
 import mcjty.lib.datagen.Dob;
 import mcjty.lib.modules.IModule;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.client.renderer.texture.TextureAtlas;
+import mcjty.lib.varia.ClientTools;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.RegistryObject;
 import romelo333.notenoughwands.modules.lightwand.blocks.LightBlock;
 import romelo333.notenoughwands.modules.lightwand.blocks.LightTE;
@@ -20,6 +23,9 @@ import romelo333.notenoughwands.modules.lightwand.client.LightRenderer;
 import romelo333.notenoughwands.modules.lightwand.items.IlluminationWand;
 import romelo333.notenoughwands.modules.wands.WandsModule;
 import romelo333.notenoughwands.setup.Registration;
+
+import java.util.Collections;
+import java.util.List;
 
 import static mcjty.lib.datagen.DataGen.has;
 import static net.minecraftforge.client.model.generators.ModelProvider.BLOCK_FOLDER;
@@ -34,11 +40,15 @@ public class LightModule implements IModule {
 
     public static final RegistryObject<Item> ILLUMINATION_WAND = ITEMS.register("illumination_wand", tab(IlluminationWand::new));
 
-    public static void onTextureStitch(TextureStitchEvent.Pre event) {
-        if (!event.getAtlas().location().equals(TextureAtlas.LOCATION_BLOCKS)) {
-            return;
-        }
-        event.addSprite(LightRenderer.LIGHT);
+    public LightModule() {
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+            IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+            ClientTools.onTextureStitch(bus, this::onTextureStitch);
+        });
+    }
+
+    private List<ResourceLocation> onTextureStitch() {
+        return Collections.singletonList(LightRenderer.LIGHT);
     }
 
     @Override
@@ -63,7 +73,7 @@ public class LightModule implements IModule {
                         .blockState(p -> p.singleTextureBlock(LIGHT.get(), BLOCK_FOLDER + "/light", "block/empty")),
                 Dob.itemBuilder(ILLUMINATION_WAND)
                         .handheldItem("item/illumination_wand")
-                        .shaped(builder -> builder.shaped(ILLUMINATION_WAND.get())
+                        .shaped(builder -> builder
                                         .define('x', Items.GLOWSTONE_DUST)
                                         .define('w', WandsModule.WAND_CORE.get())
                                         .unlockedBy("core", has(WandsModule.WAND_CORE.get())),

@@ -3,7 +3,6 @@ package romelo333.notenoughwands.modules.buildingwands;
 import mcjty.lib.datagen.DataGen;
 import mcjty.lib.datagen.Dob;
 import mcjty.lib.modules.IModule;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -47,7 +46,7 @@ public class BuildingWandsModule implements IModule {
         dataGen.add(
                 Dob.itemBuilder(BUILDING_WAND)
                         .handheldItem("item/building_wand")
-                        .shaped(builder -> builder.shaped(BUILDING_WAND.get())
+                        .shaped(builder -> builder
                                         .define('x', Items.BRICK)
                                         .define('w', WandsModule.WAND_CORE.get())
                                         .unlockedBy("core", has(WandsModule.WAND_CORE.get())),
@@ -55,7 +54,7 @@ public class BuildingWandsModule implements IModule {
                         ),
                 Dob.itemBuilder(DISPLACEMENT_WAND)
                         .handheldItem("item/displacement_wand")
-                        .shaped(builder -> builder.shaped(DISPLACEMENT_WAND.get())
+                        .shaped(builder -> builder
                                         .define('x', Items.BRICK)
                                         .define('w', WandsModule.WAND_CORE.get())
                                         .unlockedBy("core", has(WandsModule.WAND_CORE.get())),
@@ -63,14 +62,14 @@ public class BuildingWandsModule implements IModule {
                         ),
                 Dob.itemBuilder(MOVING_WAND)
                         .handheldItem("item/moving_wand")
-                        .shaped(builder -> builder.shaped(MOVING_WAND.get())
+                        .shaped(builder -> builder
                                         .define('w', WandsModule.WAND_CORE.get())
                                         .unlockedBy("core", has(WandsModule.WAND_CORE.get())),
                                 "ro ", "ow ", "  w"
                         ),
                 Dob.itemBuilder(SWAPPING_WAND)
                         .handheldItem("item/swapping_wand")
-                        .shaped(builder -> builder.shaped(SWAPPING_WAND.get())
+                        .shaped(builder -> builder
                                         .define('x', Items.GLOWSTONE)
                                         .define('w', WandsModule.WAND_CORE.get())
                                         .unlockedBy("core", has(WandsModule.WAND_CORE.get())),
