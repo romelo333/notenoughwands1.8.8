@@ -3,6 +3,7 @@ package romelo333.notenoughwands.modules.wands;
 import mcjty.lib.datagen.DataGen;
 import mcjty.lib.datagen.Dob;
 import mcjty.lib.modules.IModule;
+import mcjty.lib.varia.SoundTools;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.Item;
@@ -30,7 +31,7 @@ public class WandsModule implements IModule {
     //    public static final RegistryObject<Item> FREEZING_WAND = ITEMS.register("freezing_wand", FreezingWand::new);
     //    public static final RegistryObject<Item> POTION_WAND = ITEMS.register("potion_wand", PotionWand::new);
 
-    public static final RegistryObject<SoundEvent> TELEPORT_SOUND = SOUNDS.register("teleport", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(NotEnoughWands.MODID, "teleport")));
+    public static final RegistryObject<SoundEvent> TELEPORT_SOUND = SOUNDS.register("teleport", () -> SoundTools.createSoundEvent(new ResourceLocation(NotEnoughWands.MODID, "teleport")));
 
     @Override
     public void init(FMLCommonSetupEvent event) {
