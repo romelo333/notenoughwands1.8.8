@@ -82,7 +82,7 @@ public class MovingWand extends GenericWand {
                 ClipContext context = new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null);
                 BlockHitResult position = world.clip(context);
                 if (position == null) {
-                    place(stack, world, new BlockPos(end), null, player);
+                    place(stack, world, new BlockPos((int) end.x, (int) end.y, (int) end.z), null, player);
                 }
             }
         }

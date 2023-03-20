@@ -80,7 +80,7 @@ public class TeleportationWand extends GenericWand {
             if (position == null) {
                 if (gothrough) {
                     // First check if the destination is safe
-                    BlockPos blockPos = new BlockPos(end.x, end.y, end.z);
+                    BlockPos blockPos = new BlockPos((int) end.x, (int) end.y, (int) end.z);
                     if (!(world.isEmptyBlock(blockPos) && world.isEmptyBlock(blockPos.above()))) {
                         Tools.error(player, "You will suffocate if you teleport there!");
                         return InteractionResultHolder.pass(stack);
