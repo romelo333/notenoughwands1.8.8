@@ -21,7 +21,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraftforge.client.event.RenderLevelLastEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsConfiguration;
@@ -128,7 +128,7 @@ public class DisplacementWand extends GenericWand {
             Block block = state.getBlock();
             BlockPos otherC = coordinate.relative(direction);
             BlockState otherState = world.getBlockState(otherC);
-            if (otherState.getMaterial().isReplaceable()) { // @todo 1.15 check if this is right?
+            if (otherState.canBeReplaced()) {
                 double cost = GenericWand.checkPickup(player, world, otherC, state, BuildingWandsConfiguration.maxHardness.get());
                 if (cost >= 0.0) {
                     cnt++;
@@ -167,8 +167,9 @@ public class DisplacementWand extends GenericWand {
         return cnt;
     }
 
+    // @todo 1.20 correct event?
     @Override
-    public void renderOverlay(RenderLevelLastEvent evt, Player player, ItemStack wand) {
+    public void renderOverlay(RenderLevelStageEvent evt, Player player, ItemStack wand) {
         HitResult mouseOver = Minecraft.getInstance().hitResult;
 
         if (mouseOver instanceof BlockHitResult br) {

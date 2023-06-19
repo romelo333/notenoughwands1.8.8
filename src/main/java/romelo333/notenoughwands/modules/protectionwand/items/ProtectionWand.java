@@ -12,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.client.event.RenderLevelLastEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
 import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
 import romelo333.notenoughwands.modules.protectionwand.network.PacketGetProtectedBlockCount;
 import romelo333.notenoughwands.modules.protectionwand.network.PacketGetProtectedBlocks;
@@ -104,8 +104,9 @@ public class ProtectionWand extends GenericWand {
 
     private static long lastTime = 0;
 
+    // @todo 1.20 correct event?
     @Override
-    public void renderOverlay(RenderLevelLastEvent evt, Player player, ItemStack wand) {
+    public void renderOverlay(RenderLevelStageEvent evt, Player player, ItemStack wand) {
         if ((System.currentTimeMillis() - lastTime) > 250) {
             lastTime = System.currentTimeMillis();
             NEWPacketHandler.INSTANCE.sendToServer(new PacketGetProtectedBlocks());

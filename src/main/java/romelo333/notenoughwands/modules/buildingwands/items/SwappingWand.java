@@ -27,7 +27,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.event.RenderLevelLastEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -282,8 +282,9 @@ public class SwappingWand extends GenericWand {
         }
     }
 
+    // @todo 1.20 correct event?
     @Override
-    public void renderOverlay(RenderLevelLastEvent evt, Player player, ItemStack wand) {
+    public void renderOverlay(RenderLevelStageEvent evt, Player player, ItemStack wand) {
         HitResult mouseOver = Minecraft.getInstance().hitResult;
 
         if (mouseOver instanceof BlockHitResult br) {

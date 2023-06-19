@@ -14,9 +14,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.event.RenderLevelLastEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.keys.KeyBindings;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsConfiguration;
 import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
@@ -171,11 +170,11 @@ public class GenericWand extends Item implements IEnergyItem {
 
     //------------------------------------------------------------------------------
 
-    public void renderOverlay(RenderLevelLastEvent evt, Player player, ItemStack wand) {
+    public void renderOverlay(RenderLevelStageEvent evt, Player player, ItemStack wand) {
 
     }
 
-    protected static void renderOutlines(RenderLevelLastEvent evt, Player p, Set<BlockPos> coordinates, int r, int g, int b) {
+    protected static void renderOutlines(RenderLevelStageEvent evt, Player p, Set<BlockPos> coordinates, int r, int g, int b) {
         PoseStack matrixStack = evt.getPoseStack();
         MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
         ClientTools.renderOutlines(matrixStack, buffer, coordinates, r, g, b);

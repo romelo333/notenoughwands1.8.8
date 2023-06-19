@@ -6,13 +6,12 @@ import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 
 import javax.annotation.Nullable;
 
 public class LightBlock extends Block implements EntityBlock {
     public LightBlock() {
-        super(Properties.of(Material.PORTAL)
+        super(Properties.of()
                 .strength(0.0f, 1.0f)
                 .noOcclusion()
                 .noLootTable()

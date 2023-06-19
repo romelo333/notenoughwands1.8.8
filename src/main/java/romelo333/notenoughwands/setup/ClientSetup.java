@@ -5,7 +5,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.client.event.RenderLevelLastEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -30,8 +30,9 @@ public class ClientSetup {
         event.register(KeyBindings.wandSubMode);
     }
 
+    // @todo 1.20 correct event?
     @SubscribeEvent
-    public void renderWorldLastEvent(RenderLevelLastEvent evt) {
+    public void renderWorldLastEvent(RenderLevelStageEvent evt) {
         Minecraft mc = Minecraft.getInstance();
         Player p = mc.player;
         ItemStack heldItem = p.getItemInHand(InteractionHand.MAIN_HAND);

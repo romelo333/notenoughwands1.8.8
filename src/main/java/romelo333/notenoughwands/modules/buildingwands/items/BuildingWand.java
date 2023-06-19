@@ -23,11 +23,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.event.RenderLevelLastEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -279,8 +278,9 @@ public class BuildingWand extends GenericWand {
         return undo;
     }
 
+    // @todo 1.20 is this right event?
     @Override
-    public void renderOverlay(RenderLevelLastEvent evt, Player player, ItemStack wand) {
+    public void renderOverlay(RenderLevelStageEvent evt, Player player, ItemStack wand) {
         HitResult mouseOver = Minecraft.getInstance().hitResult;
         if (!(mouseOver instanceof BlockHitResult)) {
             return;
@@ -296,7 +296,7 @@ public class BuildingWand extends GenericWand {
             }
             BlockState blockState = world.getBlockState(blockPos);
             Block block = blockState.getBlock();
-            if (block != null && blockState.getMaterial() != Material.AIR) {
+            if (block != null && !blockState.isAir()) {
                 Set<BlockPos> coordinates;
 
                 if (player.isShiftKeyDown()) {
@@ -386,7 +386,7 @@ public class BuildingWand extends GenericWand {
     private boolean isSuitable(Level world, BlockState state, BlockPos base, BlockPos offset) {
         BlockState destState = world.getBlockState(offset);
         BlockState baseState = world.getBlockState(base);
-        return baseState == state && destState.getMaterial().isReplaceable();// @todo 1.15 check replacable?
+        return baseState == state && destState.canBeReplaced();
     }
 
     private Direction dir1(Direction direction) {

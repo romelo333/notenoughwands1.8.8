@@ -120,7 +120,7 @@ public class MovingWand extends GenericWand {
 
         // First check what's already there
         BlockState old = world.getBlockState(pp);
-        if (!world.isEmptyBlock(pp) && !old.getMaterial().isReplaceable()) {//@todo 1.15 check
+        if (!world.isEmptyBlock(pp) && !old.canBeReplaced()) {
             Tools.error(player, "Something is in the way!");
             return;
         }
