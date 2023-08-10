@@ -33,6 +33,9 @@ public class ClientSetup {
     // @todo 1.20 correct event?
     @SubscribeEvent
     public void renderWorldLastEvent(RenderLevelStageEvent evt) {
+        if (evt.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) {
+            return;
+        }
         Minecraft mc = Minecraft.getInstance();
         Player p = mc.player;
         ItemStack heldItem = p.getItemInHand(InteractionHand.MAIN_HAND);
