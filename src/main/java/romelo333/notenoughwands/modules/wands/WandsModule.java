@@ -3,6 +3,7 @@ package romelo333.notenoughwands.modules.wands;
 import mcjty.lib.datagen.DataGen;
 import mcjty.lib.datagen.Dob;
 import mcjty.lib.modules.IModule;
+import mcjty.lib.setup.DeferredItem;
 import mcjty.lib.varia.SoundTools;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -15,6 +16,8 @@ import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.modules.wands.Items.*;
 import romelo333.notenoughwands.setup.Config;
 
+import java.util.function.Supplier;
+
 import static mcjty.lib.datagen.DataGen.has;
 import static romelo333.notenoughwands.NotEnoughWands.tab;
 import static romelo333.notenoughwands.setup.Registration.ITEMS;
@@ -22,16 +25,16 @@ import static romelo333.notenoughwands.setup.Registration.SOUNDS;
 
 public class WandsModule implements IModule {
 
-    public static final RegistryObject<Item> WAND_CORE = ITEMS.register("wand_core", WandCore::new);
-    public static final RegistryObject<Item> ADVANCED_WAND_CORE = ITEMS.register("advanced_wand_core", tab(AdvancedWandCore::new));
+    public static final DeferredItem<Item> WAND_CORE = ITEMS.register("wand_core", WandCore::new);
+    public static final DeferredItem<Item> ADVANCED_WAND_CORE = ITEMS.register("advanced_wand_core", tab(AdvancedWandCore::new));
 
-    public static final RegistryObject<Item> ACCELERATION_WAND = ITEMS.register("acceleration_wand", tab(AccelerationWand::new));
-    public static final RegistryObject<Item> CAPTURING_WAND = ITEMS.register("capturing_wand", tab(CapturingWand::new));
-    public static final RegistryObject<Item> TELEPORTATION_WAND = ITEMS.register("teleportation_wand", tab(TeleportationWand::new));
-    //    public static final RegistryObject<Item> FREEZING_WAND = ITEMS.register("freezing_wand", FreezingWand::new);
-    //    public static final RegistryObject<Item> POTION_WAND = ITEMS.register("potion_wand", PotionWand::new);
+    public static final DeferredItem<Item> ACCELERATION_WAND = ITEMS.register("acceleration_wand", tab(AccelerationWand::new));
+    public static final DeferredItem<Item> CAPTURING_WAND = ITEMS.register("capturing_wand", tab(CapturingWand::new));
+    public static final DeferredItem<Item> TELEPORTATION_WAND = ITEMS.register("teleportation_wand", tab(TeleportationWand::new));
+    //    public static final Supplier<Item> FREEZING_WAND = ITEMS.register("freezing_wand", FreezingWand::new);
+    //    public static final Supplier<Item> POTION_WAND = ITEMS.register("potion_wand", PotionWand::new);
 
-    public static final RegistryObject<SoundEvent> TELEPORT_SOUND = SOUNDS.register("teleport", () -> SoundTools.createSoundEvent(new ResourceLocation(NotEnoughWands.MODID, "teleport")));
+    public static final Supplier<SoundEvent> TELEPORT_SOUND = SOUNDS.register("teleport", () -> SoundTools.createSoundEvent(new ResourceLocation(NotEnoughWands.MODID, "teleport")));
 
     @Override
     public void init(FMLCommonSetupEvent event) {

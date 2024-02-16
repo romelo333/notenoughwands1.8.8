@@ -9,6 +9,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsModule;
 import romelo333.notenoughwands.modules.lightwand.LightModule;
 import romelo333.notenoughwands.modules.protectionwand.ProtectionWandModule;
@@ -30,6 +31,9 @@ public class NotEnoughWands {
     public static NotEnoughWands instance;
 
     public NotEnoughWands() {
+        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+        Dist dist = FMLEnvironment.dist;
+
         instance = this;
         setupModules();
 
@@ -37,17 +41,16 @@ public class NotEnoughWands {
 
         Registration.register();
 
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         bus.addListener(setup::init);
         bus.addListener(modules::init);
         bus.addListener(Config::onLoad);
         bus.addListener(this::onDataGen);
 
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+        if (dist.isClient()) {
             bus.addListener(modules::initClient);
             bus.addListener(ClientSetup::init);
             bus.addListener(ClientSetup::onRegisterKeyMappings);
-        });
+        }
     }
 
     public static <T extends Item> Supplier<T> tab(Supplier<T> supplier) {

@@ -3,6 +3,7 @@ package romelo333.notenoughwands.modules.protectionwand;
 import mcjty.lib.datagen.DataGen;
 import mcjty.lib.datagen.Dob;
 import mcjty.lib.modules.IModule;
+import mcjty.lib.setup.DeferredItem;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -18,8 +19,8 @@ import static romelo333.notenoughwands.setup.Registration.ITEMS;
 
 public class ProtectionWandModule implements IModule {
 
-    public static final RegistryObject<ProtectionWand> PROTECTION_WAND = ITEMS.register("protection_wand", tab(() -> new ProtectionWand(false)));
-    public static final RegistryObject<ProtectionWand> MASTER_PROTECTION_WAND = ITEMS.register("master_protection_wand", tab(() -> new ProtectionWand(true)));
+    public static final DeferredItem<ProtectionWand> PROTECTION_WAND = ITEMS.register("protection_wand", tab(() -> new ProtectionWand(false)));
+    public static final DeferredItem<ProtectionWand> MASTER_PROTECTION_WAND = ITEMS.register("master_protection_wand", tab(() -> new ProtectionWand(true)));
 
     @Override
     public void init(FMLCommonSetupEvent event) {

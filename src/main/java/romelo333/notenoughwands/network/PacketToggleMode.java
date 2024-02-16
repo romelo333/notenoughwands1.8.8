@@ -1,39 +1,39 @@
 package romelo333.notenoughwands.network;
 
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
+import mcjty.lib.network.CustomPacketPayload;
+import mcjty.lib.network.PlayPayloadContext;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.world.item.ItemStack;
+import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 
-import java.util.function.Supplier;
+public record PacketToggleMode() implements CustomPacketPayload {
 
-public class PacketToggleMode {
+    public static final ResourceLocation ID = new ResourceLocation(NotEnoughWands.MODID, "togglemode");
 
-    public void fromBytes(FriendlyByteBuf buf) {
+    public static PacketToggleMode create(FriendlyByteBuf buf) {
+        return new PacketToggleMode();
     }
 
-    public void toBytes(FriendlyByteBuf buf) {
+    @Override
+    public void write(FriendlyByteBuf buf) {
     }
 
-    public PacketToggleMode() {
+    @Override
+    public ResourceLocation id() {
+        return ID;
     }
 
-    public PacketToggleMode(FriendlyByteBuf buf) {
-        fromBytes(buf);
-    }
-
-    public void handle(Supplier<NetworkEvent.Context> supplier) {
-        NetworkEvent.Context ctx = supplier.get();
-        ctx.enqueueWork(() -> {
-            Player playerEntity = ctx.getSender();
-            ItemStack heldItem = playerEntity.getItemInHand(InteractionHand.MAIN_HAND);
-            if (!heldItem.isEmpty() && heldItem.getItem() instanceof GenericWand) {
-                GenericWand genericWand = (GenericWand) (heldItem.getItem());
-                genericWand.toggleMode(playerEntity, heldItem);
-            }
+    public void handle(PlayPayloadContext ctx) {
+        ctx.workHandler().submitAsync(() -> {
+            ctx.player().ifPresent(playerEntity -> {
+                ItemStack heldItem = playerEntity.getItemInHand(InteractionHand.MAIN_HAND);
+                if (!heldItem.isEmpty() && heldItem.getItem() instanceof GenericWand genericWand) {
+                    genericWand.toggleMode(playerEntity, heldItem);
+                }
+            });
         });
-        ctx.setPacketHandled(true);
     }
 }

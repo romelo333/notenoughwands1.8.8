@@ -1,45 +1,53 @@
 package romelo333.notenoughwands.modules.protectionwand.network;
 
-import net.minecraft.network.FriendlyByteBuf;
+import mcjty.lib.network.CustomPacketPayload;
+import mcjty.lib.network.PlayPayloadContext;
 import net.minecraft.core.BlockPos;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import romelo333.notenoughwands.NotEnoughWands;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Supplier;
 
-public class PacketReturnProtectedBlocks {
-    private Set<BlockPos> blocks;
-    private Set<BlockPos> childBlocks;
+public record PacketReturnProtectedBlocks(Set<BlockPos> blocks, Set<BlockPos> childBlocks) implements CustomPacketPayload {
 
-    public void fromBytes(FriendlyByteBuf buf) {
+    public static final ResourceLocation ID = new ResourceLocation(NotEnoughWands.MODID, "returnprotectedblocks");
+
+    public static PacketReturnProtectedBlocks create(FriendlyByteBuf buf) {
         int size = buf.readInt();
-        blocks = new HashSet<>(size);
+        Set<BlockPos> blocks = new HashSet<>(size);
         for (int i = 0 ; i < size ; i++) {
-            blocks.add(new BlockPos(buf.readInt(), buf.readInt(), buf.readInt()));
+            blocks.add(buf.readBlockPos());
         }
         size = buf.readInt();
-        childBlocks = new HashSet<>(size);
+        Set<BlockPos> childBlocks = new HashSet<>(size);
         for (int i = 0 ; i < size ; i++) {
-            childBlocks.add(new BlockPos(buf.readInt(), buf.readInt(), buf.readInt()));
+            childBlocks.add(buf.readBlockPos());
         }
+        return new PacketReturnProtectedBlocks(blocks, childBlocks);
     }
 
-    public void toBytes(FriendlyByteBuf buf) {
+    public static PacketReturnProtectedBlocks create(Set<BlockPos> blocks, Set<BlockPos> childBlocks) {
+        return new PacketReturnProtectedBlocks(blocks, childBlocks);
+    }
+
+    @Override
+    public void write(FriendlyByteBuf buf) {
         buf.writeInt(blocks.size());
         for (BlockPos block : blocks) {
-            buf.writeInt(block.getX());
-            buf.writeInt(block.getY());
-            buf.writeInt(block.getZ());
+            buf.writeBlockPos(block);
         }
         buf.writeInt(childBlocks.size());
         for (BlockPos block : childBlocks) {
-            buf.writeInt(block.getX());
-            buf.writeInt(block.getY());
-            buf.writeInt(block.getZ());
+            buf.writeBlockPos(block);
         }
     }
 
+    @Override
+    public ResourceLocation id() {
+        return ID;
+    }
 
     public Set<BlockPos> getBlocks() {
         return blocks;
@@ -49,20 +57,9 @@ public class PacketReturnProtectedBlocks {
         return childBlocks;
     }
 
-    public PacketReturnProtectedBlocks(FriendlyByteBuf buf) {
-        fromBytes(buf);
-    }
-
-    public PacketReturnProtectedBlocks(Set<BlockPos> blocks, Set<BlockPos> childBlocks) {
-        this.blocks = blocks;
-        this.childBlocks = childBlocks;
-    }
-
-    public void handle(Supplier<NetworkEvent.Context> supplier) {
-        NetworkEvent.Context ctx = supplier.get();
-        ctx.enqueueWork(() -> {
+    public void handle(PlayPayloadContext ctx) {
+        ctx.workHandler().submitAsync(() -> {
             ReturnProtectedBlocksHelper.setProtectedBlocks(this);
         });
-        ctx.setPacketHandled(true);
     }
 }

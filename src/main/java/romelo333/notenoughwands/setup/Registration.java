@@ -1,5 +1,7 @@
 package romelo333.notenoughwands.setup;
 
+import mcjty.lib.setup.DeferredBlocks;
+import mcjty.lib.setup.DeferredItems;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
@@ -20,8 +22,8 @@ import static romelo333.notenoughwands.NotEnoughWands.MODID;
 
 public class Registration {
 
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
-    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
+    public static final DeferredItems ITEMS = DeferredItems.create(MODID);
+    public static final DeferredBlocks BLOCKS = DeferredBlocks.create(MODID);
     public static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, MODID);
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, MODID);
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);

@@ -61,7 +61,7 @@ public class ProtectionWand extends GenericWand {
         if (hasid && id != 0) {
             if ((System.currentTimeMillis() - tooltipLastTime) > 250) {
                 tooltipLastTime = System.currentTimeMillis();
-                NEWPacketHandler.INSTANCE.sendToServer(new PacketGetProtectedBlockCount(id));
+                NEWPacketHandler.sendToServer(PacketGetProtectedBlockCount.create(id));
             }
         }
         // @todo 1.15 better tooltips
@@ -109,7 +109,7 @@ public class ProtectionWand extends GenericWand {
     public void renderOverlay(RenderLevelStageEvent evt, Player player, ItemStack wand) {
         if ((System.currentTimeMillis() - lastTime) > 250) {
             lastTime = System.currentTimeMillis();
-            NEWPacketHandler.INSTANCE.sendToServer(new PacketGetProtectedBlocks());
+            NEWPacketHandler.sendToServer(new PacketGetProtectedBlocks());
         }
         if (master) {
             renderOutlines(evt, player, ReturnProtectedBlocksHelper.childBlocks, 30, 30, 200);

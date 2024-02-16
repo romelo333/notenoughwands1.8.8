@@ -62,7 +62,7 @@ public class ClientSetup {
         }
         timer = ProtectionWandConfiguration.cachedClientSideProtection;
         if (Minecraft.getInstance().player != null) {
-            NEWPacketHandler.INSTANCE.sendToServer(new PacketGetProtectedBlocksAroundPlayer());
+            NEWPacketHandler.sendToServer(new PacketGetProtectedBlocksAroundPlayer());
         }
     }
 }

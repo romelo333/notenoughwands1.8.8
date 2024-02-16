@@ -1,45 +1,45 @@
 package romelo333.notenoughwands.modules.protectionwand.network;
 
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.server.level.ServerPlayer;
+import mcjty.lib.network.CustomPacketPayload;
+import mcjty.lib.network.PlayPayloadContext;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkEvent;
+import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
 import romelo333.notenoughwands.network.NEWPacketHandler;
 
-import java.util.function.Supplier;
+public record PacketGetProtectedBlockCount(Integer protectionId) implements CustomPacketPayload {
 
-public class PacketGetProtectedBlockCount {
-    private int id;
+    public static final ResourceLocation ID = new ResourceLocation(NotEnoughWands.MODID, "getprotectedblockcount");
 
-    public void fromBytes(FriendlyByteBuf buf) {
-        id = buf.readInt();
+    public static PacketGetProtectedBlockCount create(FriendlyByteBuf buf) {
+        return new PacketGetProtectedBlockCount(buf.readInt());
     }
 
-    public void toBytes(FriendlyByteBuf buf) {
-        buf.writeInt(id);
+    public static PacketGetProtectedBlockCount create(Integer protectionId) {
+        return new PacketGetProtectedBlockCount(protectionId);
     }
 
-    public PacketGetProtectedBlockCount(FriendlyByteBuf buf) {
-        fromBytes(buf);
+    @Override
+    public void write(FriendlyByteBuf buf) {
+        buf.writeInt(protectionId);
     }
 
-    public PacketGetProtectedBlockCount(int id) {
-        this.id = id;
+    @Override
+    public ResourceLocation id() {
+        return ID;
     }
 
-    public void handle(Supplier<NetworkEvent.Context> supplier) {
-        NetworkEvent.Context ctx = supplier.get();
-        ctx.enqueueWork(() -> {
-            Player player = ctx.getSender();
-            Level world = player.getCommandSenderWorld();
+    public void handle(PlayPayloadContext ctx) {
+        ctx.workHandler().submitAsync(() -> {
+            ctx.player().ifPresent(player -> {
+                Level world = player.getCommandSenderWorld();
 
-            ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
-            PacketReturnProtectedBlockCount msg = new PacketReturnProtectedBlockCount(protectedBlocks.getProtectedBlockCount(id));
-            NEWPacketHandler.INSTANCE.sendTo(msg, ((ServerPlayer) player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+                ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
+                PacketReturnProtectedBlockCount msg = new PacketReturnProtectedBlockCount(protectedBlocks.getProtectedBlockCount(protectionId));
+                NEWPacketHandler.sendToPlayer(msg, player);
+            });
         });
-        ctx.setPacketHandled(true);
     }
 }

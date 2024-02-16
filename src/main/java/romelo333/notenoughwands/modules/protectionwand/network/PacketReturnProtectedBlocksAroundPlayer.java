@@ -1,36 +1,45 @@
 package romelo333.notenoughwands.modules.protectionwand.network;
 
+import mcjty.lib.network.CustomPacketPayload;
+import mcjty.lib.network.PlayPayloadContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.network.NetworkEvent;
+import romelo333.notenoughwands.NotEnoughWands;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
 
-public class PacketReturnProtectedBlocksAroundPlayer {
-    private Map<ChunkPos, Set<BlockPos>> blocks;
+public record PacketReturnProtectedBlocksAroundPlayer(Map<ChunkPos, Set<BlockPos>> blocks) implements CustomPacketPayload {
 
-    public void fromBytes(FriendlyByteBuf buf) {
+    public static final ResourceLocation ID = new ResourceLocation(NotEnoughWands.MODID, "returnprotectedblocksaroundplayer");
+
+    public static PacketReturnProtectedBlocksAroundPlayer create(FriendlyByteBuf buf) {
         int size = buf.readInt();
-        blocks = new HashMap<>(size);
+        Map<ChunkPos, Set<BlockPos>> blocks = new HashMap<>(size);
         for (int i = 0 ; i < size ; i++) {
             ChunkPos chunkpos = new ChunkPos(buf.readInt(), buf.readInt());
 
             int size2 = buf.readInt();
             Set<BlockPos> positions = new HashSet<>(size2);
             for (int j = 0 ; j < size2 ; j++) {
-                positions.add(new BlockPos(buf.readInt(), buf.readInt(), buf.readInt()));
+                positions.add(buf.readBlockPos());
             }
             blocks.put(chunkpos, positions);
         }
+        return new PacketReturnProtectedBlocksAroundPlayer(blocks);
     }
 
-    public void toBytes(FriendlyByteBuf buf) {
+    public static PacketReturnProtectedBlocksAroundPlayer create(Map<ChunkPos, Set<BlockPos>> blocks) {
+        return new PacketReturnProtectedBlocksAroundPlayer(blocks);
+    }
+
+    @Override
+    public void write(FriendlyByteBuf buf) {
         buf.writeInt(blocks.size());
         for (Map.Entry<ChunkPos, Set<BlockPos>> entry : blocks.entrySet()) {
             Set<BlockPos> positions = entry.getValue();
@@ -38,31 +47,24 @@ public class PacketReturnProtectedBlocksAroundPlayer {
             buf.writeInt(entry.getKey().z);
             buf.writeInt(positions.size());
             for (BlockPos block : positions) {
-                buf.writeInt(block.getX());
-                buf.writeInt(block.getY());
-                buf.writeInt(block.getZ());
+                buf.writeBlockPos(block);
             }
         }
+    }
+
+    @Override
+    public ResourceLocation id() {
+        return ID;
     }
 
     public Map<ChunkPos, Set<BlockPos>> getBlocks() {
         return blocks;
     }
 
-    public PacketReturnProtectedBlocksAroundPlayer(FriendlyByteBuf buf) {
-        fromBytes(buf);
-    }
-
-    public PacketReturnProtectedBlocksAroundPlayer(Map<ChunkPos, Set<BlockPos>> blocks) {
-        this.blocks = blocks;
-    }
-
-    public void handle(Supplier<NetworkEvent.Context> supplier) {
-        NetworkEvent.Context ctx = supplier.get();
-        ctx.enqueueWork(() -> {
+    public void handle(PlayPayloadContext ctx) {
+        ctx.workHandler().submitAsync(() -> {
             ReturnProtectedBlocksAroundPlayerHelper.setProtectedBlocks(Level.OVERWORLD, this);
                     //McJtyLib.proxy.getClientWorld().dimension(), this); // @todo 1.15 no need for proxy here!
         });
-        ctx.setPacketHandled(true);
     }
 }

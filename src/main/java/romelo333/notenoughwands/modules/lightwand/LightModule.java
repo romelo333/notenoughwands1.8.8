@@ -3,6 +3,8 @@ package romelo333.notenoughwands.modules.lightwand;
 import mcjty.lib.datagen.DataGen;
 import mcjty.lib.datagen.Dob;
 import mcjty.lib.modules.IModule;
+import mcjty.lib.setup.DeferredBlock;
+import mcjty.lib.setup.DeferredItem;
 import mcjty.lib.varia.ClientTools;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
@@ -26,6 +28,7 @@ import romelo333.notenoughwands.setup.Registration;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static mcjty.lib.datagen.DataGen.has;
 import static net.minecraftforge.client.model.generators.ModelProvider.BLOCK_FOLDER;
@@ -34,11 +37,11 @@ import static romelo333.notenoughwands.setup.Registration.*;
 
 public class LightModule implements IModule {
 
-    public static final RegistryObject<Block> LIGHT = BLOCKS.register("light", LightBlock::new);
-    public static final RegistryObject<Item> LIGHT_ITEM = ITEMS.register("light", tab(() -> new BlockItem(LIGHT.get(), Registration.createStandardProperties())));
-    public static final RegistryObject<BlockEntityType<LightTE>> TYPE_LIGHT = TILES.register("light", () -> BlockEntityType.Builder.of(LightTE::new, LIGHT.get()).build(null));
+    public static final DeferredBlock<Block> LIGHT = BLOCKS.register("light", LightBlock::new);
+    public static final DeferredItem<Item> LIGHT_ITEM = ITEMS.register("light", tab(() -> new BlockItem(LIGHT.get(), Registration.createStandardProperties())));
+    public static final Supplier<BlockEntityType<LightTE>> TYPE_LIGHT = TILES.register("light", () -> BlockEntityType.Builder.of(LightTE::new, LIGHT.get()).build(null));
 
-    public static final RegistryObject<Item> ILLUMINATION_WAND = ITEMS.register("illumination_wand", tab(IlluminationWand::new));
+    public static final DeferredItem<Item> ILLUMINATION_WAND = ITEMS.register("illumination_wand", tab(IlluminationWand::new));
 
     public LightModule() {
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {

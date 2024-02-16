@@ -1,39 +1,41 @@
 package romelo333.notenoughwands.modules.protectionwand.network;
 
 
+import mcjty.lib.network.CustomPacketPayload;
+import mcjty.lib.network.PlayPayloadContext;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.resources.ResourceLocation;
+import romelo333.notenoughwands.NotEnoughWands;
 
-import java.util.function.Supplier;
+public record PacketReturnProtectedBlockCount(int count) implements CustomPacketPayload {
 
-public class PacketReturnProtectedBlockCount {
-    private int count;
+    public static ResourceLocation ID = new ResourceLocation(NotEnoughWands.MODID, "returnprotectedblockcount");
 
-    public void fromBytes(FriendlyByteBuf buf) {
-        count = buf.readInt();
+    public static PacketReturnProtectedBlockCount create(FriendlyByteBuf buf) {
+        return new PacketReturnProtectedBlockCount(buf.readInt());
     }
 
-    public void toBytes(FriendlyByteBuf buf) {
+    public static PacketReturnProtectedBlockCount create(int count) {
+        return new PacketReturnProtectedBlockCount(count);
+    }
+
+    @Override
+    public void write(FriendlyByteBuf buf) {
         buf.writeInt(count);
+    }
+
+    @Override
+    public ResourceLocation id() {
+        return ID;
     }
 
     public int getCount() {
         return count;
     }
 
-    public PacketReturnProtectedBlockCount(FriendlyByteBuf buf) {
-        fromBytes(buf);
-    }
-
-    public PacketReturnProtectedBlockCount(int count) {
-        this.count = count;
-    }
-
-    public void handle(Supplier<NetworkEvent.Context> supplier) {
-        NetworkEvent.Context ctx = supplier.get();
-        ctx.enqueueWork(() -> {
+    public void handle(PlayPayloadContext ctx) {
+        ctx.workHandler().submitAsync(() -> {
             ReturnProtectedBlockCountHelper.setProtectedBlocks(this);
         });
-        ctx.setPacketHandled(true);
     }
 }

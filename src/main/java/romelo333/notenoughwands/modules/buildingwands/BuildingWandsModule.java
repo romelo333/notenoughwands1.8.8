@@ -3,6 +3,7 @@ package romelo333.notenoughwands.modules.buildingwands;
 import mcjty.lib.datagen.DataGen;
 import mcjty.lib.datagen.Dob;
 import mcjty.lib.modules.IModule;
+import mcjty.lib.setup.DeferredItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -21,10 +22,10 @@ import static romelo333.notenoughwands.setup.Registration.ITEMS;
 
 public class BuildingWandsModule implements IModule {
 
-    public static final RegistryObject<Item> BUILDING_WAND = ITEMS.register("building_wand", tab(BuildingWand::new));
-    public static final RegistryObject<Item> DISPLACEMENT_WAND = ITEMS.register("displacement_wand", tab(DisplacementWand::new));
-    public static final RegistryObject<Item> MOVING_WAND = ITEMS.register("moving_wand", tab(MovingWand::new));
-    public static final RegistryObject<Item> SWAPPING_WAND = ITEMS.register("swapping_wand", tab(SwappingWand::new));
+    public static final DeferredItem<Item> BUILDING_WAND = ITEMS.register("building_wand", tab(BuildingWand::new));
+    public static final DeferredItem<Item> DISPLACEMENT_WAND = ITEMS.register("displacement_wand", tab(DisplacementWand::new));
+    public static final DeferredItem<Item> MOVING_WAND = ITEMS.register("moving_wand", tab(MovingWand::new));
+    public static final DeferredItem<Item> SWAPPING_WAND = ITEMS.register("swapping_wand", tab(SwappingWand::new));
 
     @Override
     public void init(FMLCommonSetupEvent event) {
