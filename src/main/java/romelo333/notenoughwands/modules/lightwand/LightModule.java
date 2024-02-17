@@ -5,7 +5,6 @@ import mcjty.lib.datagen.Dob;
 import mcjty.lib.modules.IModule;
 import mcjty.lib.setup.DeferredBlock;
 import mcjty.lib.setup.DeferredItem;
-import mcjty.lib.varia.ClientTools;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -41,9 +40,6 @@ public class LightModule implements IModule {
     public static final DeferredItem<Item> ILLUMINATION_WAND = ITEMS.register("illumination_wand", tab(IlluminationWand::new));
 
     public LightModule(IEventBus bus, Dist dist) {
-        if (dist.isClient()) {
-            ClientTools.onTextureStitch(bus, this::onTextureStitch);
-        }
     }
 
     private List<ResourceLocation> onTextureStitch() {
