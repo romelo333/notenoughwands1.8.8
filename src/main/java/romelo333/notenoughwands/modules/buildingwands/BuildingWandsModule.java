@@ -6,9 +6,9 @@ import mcjty.lib.modules.IModule;
 import mcjty.lib.setup.DeferredItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.registries.RegistryObject;
 import romelo333.notenoughwands.modules.buildingwands.items.BuildingWand;
 import romelo333.notenoughwands.modules.buildingwands.items.DisplacementWand;
 import romelo333.notenoughwands.modules.buildingwands.items.MovingWand;
@@ -38,7 +38,7 @@ public class BuildingWandsModule implements IModule {
     }
 
     @Override
-    public void initConfig() {
+    public void initConfig(IEventBus bus) {
         BuildingWandsConfiguration.init(Config.SERVER_BUILDER, Config.CLIENT_BUILDER);
     }
 

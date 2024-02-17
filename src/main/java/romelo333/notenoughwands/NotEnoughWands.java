@@ -6,7 +6,6 @@ import net.minecraft.world.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
@@ -35,11 +34,11 @@ public class NotEnoughWands {
         Dist dist = FMLEnvironment.dist;
 
         instance = this;
-        setupModules();
+        setupModules(bus, dist);
 
-        Config.register(modules);
+        Config.register(bus, modules);
 
-        Registration.register();
+        Registration.register(bus);
 
         bus.addListener(setup::init);
         bus.addListener(modules::init);
@@ -63,8 +62,8 @@ public class NotEnoughWands {
         datagen.generate();
     }
 
-    private void setupModules() {
-        modules.register(new LightModule());
+    private void setupModules(IEventBus bus, Dist dist) {
+        modules.register(new LightModule(bus, dist));
         modules.register(new WandsModule());
         modules.register(new ProtectionWandModule());
         modules.register(new BuildingWandsModule());

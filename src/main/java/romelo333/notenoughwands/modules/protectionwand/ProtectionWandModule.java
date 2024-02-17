@@ -4,11 +4,10 @@ import mcjty.lib.datagen.DataGen;
 import mcjty.lib.datagen.Dob;
 import mcjty.lib.modules.IModule;
 import mcjty.lib.setup.DeferredItem;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.world.item.Items;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.registries.RegistryObject;
 import romelo333.notenoughwands.modules.protectionwand.items.ProtectionWand;
 import romelo333.notenoughwands.modules.wands.WandsModule;
 import romelo333.notenoughwands.setup.Config;
@@ -33,7 +32,7 @@ public class ProtectionWandModule implements IModule {
     }
 
     @Override
-    public void initConfig() {
+    public void initConfig(IEventBus bus) {
         ProtectionWandConfiguration.init(Config.SERVER_BUILDER, Config.CLIENT_BUILDER);
     }
 

@@ -14,11 +14,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.RegistryObject;
 import romelo333.notenoughwands.modules.lightwand.blocks.LightBlock;
 import romelo333.notenoughwands.modules.lightwand.blocks.LightTE;
 import romelo333.notenoughwands.modules.lightwand.client.LightRenderer;
@@ -43,11 +40,10 @@ public class LightModule implements IModule {
 
     public static final DeferredItem<Item> ILLUMINATION_WAND = ITEMS.register("illumination_wand", tab(IlluminationWand::new));
 
-    public LightModule() {
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-            IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+    public LightModule(IEventBus bus, Dist dist) {
+        if (dist.isClient()) {
             ClientTools.onTextureStitch(bus, this::onTextureStitch);
-        });
+        }
     }
 
     private List<ResourceLocation> onTextureStitch() {
@@ -65,7 +61,7 @@ public class LightModule implements IModule {
     }
 
     @Override
-    public void initConfig() {
+    public void initConfig(IEventBus bus) {
     }
 
     @Override
