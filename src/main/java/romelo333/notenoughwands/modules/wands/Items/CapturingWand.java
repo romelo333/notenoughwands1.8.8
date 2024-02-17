@@ -20,7 +20,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.registries.ForgeRegistries;
 import romelo333.notenoughwands.modules.wands.WandsConfiguration;
 import romelo333.notenoughwands.varia.Tools;
 
@@ -51,7 +50,7 @@ public class CapturingWand extends GenericWand {
             if (tagCompound.contains("mob")) {
                 String type = tagCompound.getString("type");
                 if (!type.isEmpty()) {
-                    EntityType<?> entityType = ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(type));
+                    EntityType<?> entityType = mcjty.lib.varia.Tools.getEntity(new ResourceLocation(type));
                     if (entityType != null) {
                         list.add(ComponentFactory.literal(ChatFormatting.GREEN + "Captured mob: ").append(entityType.getDescription()));
                     }
@@ -90,7 +89,7 @@ public class CapturingWand extends GenericWand {
     }
 
     private LivingEntity createEntity(Player player, Level world, String type) {
-        EntityType<?> entityType = ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(type));
+        EntityType<?> entityType = mcjty.lib.varia.Tools.getEntity(new ResourceLocation(type));
         if (entityType != null) {
             return (LivingEntity) entityType.create(world);
         }
