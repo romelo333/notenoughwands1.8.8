@@ -1,53 +1,41 @@
 package romelo333.notenoughwands.network;
 
 
-import net.minecraft.resources.ResourceLocation;
+import mcjty.lib.network.IPayloadRegistrar;
+import mcjty.lib.network.Networking;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
 import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.modules.protectionwand.network.*;
 
-import static mcjty.lib.network.PlayPayloadContext.wrap;
-
 public class NEWPacketHandler {
-    private static SimpleChannel INSTANCE;
 
-    public static void registerMessages(String name) {
-        SimpleChannel net = NetworkRegistry.ChannelBuilder
-                .named(new ResourceLocation(NotEnoughWands.MODID, name))
-                .networkProtocolVersion(() -> "1.0")
-                .clientAcceptedVersions(s -> true)
-                .serverAcceptedVersions(s -> true)
-                .simpleChannel();
+    private static IPayloadRegistrar registrar;
 
-        INSTANCE = net;
+    public static void registerMessages() {
+        registrar = Networking.registrar(NotEnoughWands.MODID)
+                .versioned("1.0")
+                .optional();
 
         // Server side
-        net.registerMessage(id(), PacketToggleMode.class, PacketToggleMode::write, PacketToggleMode::create, wrap(PacketToggleMode::handle));
-        net.registerMessage(id(), PacketToggleSubMode.class, PacketToggleSubMode::write, PacketToggleSubMode::create, wrap(PacketToggleSubMode::handle));
-        net.registerMessage(id(), PacketGetProtectedBlocks.class, PacketGetProtectedBlocks::write, PacketGetProtectedBlocks::create, wrap(PacketGetProtectedBlocks::handle));
-        net.registerMessage(id(), PacketGetProtectedBlockCount.class, PacketGetProtectedBlockCount::write, PacketGetProtectedBlockCount::create, wrap(PacketGetProtectedBlockCount::handle));
-        net.registerMessage(id(), PacketGetProtectedBlocksAroundPlayer.class, PacketGetProtectedBlocksAroundPlayer::write, PacketGetProtectedBlocksAroundPlayer::create, wrap(PacketGetProtectedBlocksAroundPlayer::handle));
+        registrar.play(PacketToggleMode.class, PacketToggleMode::create, handler -> handler.server(PacketToggleMode::handle));
+        registrar.play(PacketToggleSubMode.class, PacketToggleSubMode::create, handler -> handler.server(PacketToggleSubMode::handle));
+        registrar.play(PacketGetProtectedBlocks.class, PacketGetProtectedBlocks::create, handler -> handler.server(PacketGetProtectedBlocks::handle));
+        registrar.play(PacketGetProtectedBlockCount.class, PacketGetProtectedBlockCount::create, handler -> handler.server(PacketGetProtectedBlockCount::handle));
+        registrar.play(PacketGetProtectedBlocksAroundPlayer.class, PacketGetProtectedBlocksAroundPlayer::create, handler -> handler.server(PacketGetProtectedBlocksAroundPlayer::handle));
 
         // Client side
-        net.registerMessage(id(), PacketReturnProtectedBlocks.class, PacketReturnProtectedBlocks::write, PacketReturnProtectedBlocks::create, wrap(PacketReturnProtectedBlocks::handle));
-        net.registerMessage(id(), PacketReturnProtectedBlockCount.class, PacketReturnProtectedBlockCount::write, PacketReturnProtectedBlockCount::create, wrap(PacketReturnProtectedBlockCount::handle));
-        net.registerMessage(id(), PacketReturnProtectedBlocksAroundPlayer.class, PacketReturnProtectedBlocksAroundPlayer::write, PacketReturnProtectedBlocksAroundPlayer::create, wrap(PacketReturnProtectedBlocksAroundPlayer::handle));
-    }
-
-    private static int packetId = 0;
-    private static int id() {
-        return packetId++;
+        registrar.play(PacketReturnProtectedBlocks.class, PacketReturnProtectedBlocks::create, handler -> handler.client(PacketReturnProtectedBlocks::handle));
+        registrar.play(PacketReturnProtectedBlockCount.class, PacketReturnProtectedBlockCount::create, handler -> handler.client(PacketReturnProtectedBlockCount::handle));
+        registrar.play(PacketReturnProtectedBlocksAroundPlayer.class, PacketReturnProtectedBlocksAroundPlayer::create, handler -> handler.client(PacketReturnProtectedBlocksAroundPlayer::handle));
     }
 
     public static <T> void sendToPlayer(T packet, Player player) {
-        INSTANCE.sendTo(packet, ((ServerPlayer)player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+        registrar.getChannel().sendTo(packet, ((ServerPlayer)player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
     }
 
     public static <T> void sendToServer(T packet) {
-        INSTANCE.sendToServer(packet);
+        registrar.getChannel().sendToServer(packet);
     }
 }
