@@ -7,6 +7,9 @@ displayURL="http://github.com/romelo333/notenoughwands1.8.8/"
 #credits="Thanks for this example mod goes to Java" #optional
 authors="McJty, romelo333"
 
+[[accessTransformers]]
+file="META-INF/accesstransformer.cfg"
+
 [[mods]]
 modId="notenoughwands"
 version="${file.jarVersion}"

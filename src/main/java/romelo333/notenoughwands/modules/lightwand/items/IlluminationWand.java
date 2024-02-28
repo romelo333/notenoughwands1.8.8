@@ -15,8 +15,8 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.event.ForgeEventFactory;
+import net.neoforged.neoforge.common.util.BlockSnapshot;
+import net.neoforged.neoforge.event.ForgeEventFactory;
 import romelo333.notenoughwands.modules.lightwand.LightModule;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 
