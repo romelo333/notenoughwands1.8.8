@@ -1,19 +1,19 @@
 package romelo333.notenoughwands.modules.protectionwand;
 
-import net.neoforged.neoforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class ProtectionWandConfiguration {
 
     public static String CATEGORY_PROTECTION_WAND = "protectionwand";
 
-    public static ForgeConfigSpec.BooleanValue interactionProtection;
+    public static ModConfigSpec.BooleanValue interactionProtection;
     public static int cachedClientSideProtection = -1;
-    public static ForgeConfigSpec.IntValue clientSideProtection;
+    public static ModConfigSpec.IntValue clientSideProtection;
 
-    public static ForgeConfigSpec.IntValue blockShowRadius;
-    public static ForgeConfigSpec.IntValue maximumProtectedBlocks;
+    public static ModConfigSpec.IntValue blockShowRadius;
+    public static ModConfigSpec.IntValue maximumProtectedBlocks;
 
-    public static void init(ForgeConfigSpec.Builder SERVER_BUILDER, ForgeConfigSpec.Builder CLIENT_BUILDER) {
+    public static void init(ModConfigSpec.Builder SERVER_BUILDER, ModConfigSpec.Builder CLIENT_BUILDER) {
         SERVER_BUILDER.comment("Settings for the wands").push(CATEGORY_PROTECTION_WAND);
         CLIENT_BUILDER.comment("Settings for the wands").push(CATEGORY_PROTECTION_WAND);
 

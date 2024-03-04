@@ -6,9 +6,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
-import net.neoforged.neoforge.common.MinecraftForge;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.TickEvent;
-import net.neoforged.neoforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.fml.event.lifecycle.FMLClientSetupEvent;
 import romelo333.notenoughwands.keys.KeyBindings;
 import romelo333.notenoughwands.keys.KeyInputHandler;
@@ -20,8 +20,8 @@ import romelo333.notenoughwands.network.NEWPacketHandler;
 public class ClientSetup {
 
     public static void init(FMLClientSetupEvent event) {
-        MinecraftForge.EVENT_BUS.register(new ClientSetup());
-        MinecraftForge.EVENT_BUS.register(new KeyInputHandler());
+        NeoForge.EVENT_BUS.register(new ClientSetup());
+        NeoForge.EVENT_BUS.register(new KeyInputHandler());
     }
 
     public static void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {

@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import mcjty.lib.varia.Tools;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,15 +14,15 @@ public class BuildingWandsConfiguration {
 
     public static String CATEGORY_BUILDINGWANDS = "buildingwands";
 
-    public static ForgeConfigSpec.DoubleValue maxHardness;
-    public static ForgeConfigSpec.IntValue placeDistance;
-    public static ForgeConfigSpec.DoubleValue hardnessDistance;
+    public static ModConfigSpec.DoubleValue maxHardness;
+    public static ModConfigSpec.IntValue placeDistance;
+    public static ModConfigSpec.DoubleValue hardnessDistance;
 
-    private static ForgeConfigSpec.ConfigValue<List<? extends String>> blockBlackList;
+    private static ModConfigSpec.ConfigValue<List<? extends String>> blockBlackList;
     private static boolean blacklistedBlocksLoaded = false;
     private static Map<ResourceLocation,Double> blacklistedBlocks = new HashMap<>();
 
-    public static void init(ForgeConfigSpec.Builder SERVER_BUILDER, ForgeConfigSpec.Builder CLIENT_BUILDER) {
+    public static void init(ModConfigSpec.Builder SERVER_BUILDER, ModConfigSpec.Builder CLIENT_BUILDER) {
         SERVER_BUILDER.comment("Settings for the wands").push(CATEGORY_BUILDINGWANDS);
         CLIENT_BUILDER.comment("Settings for the wands").push(CATEGORY_BUILDINGWANDS);
 

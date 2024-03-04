@@ -1,7 +1,7 @@
 package romelo333.notenoughwands.keys;
 
 import net.neoforged.neoforge.client.event.InputEvent;
-import net.neoforged.neoforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 import romelo333.notenoughwands.network.NEWPacketHandler;
 import romelo333.notenoughwands.network.PacketToggleMode;
 import romelo333.notenoughwands.network.PacketToggleSubMode;

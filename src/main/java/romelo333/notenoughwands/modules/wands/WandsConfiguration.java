@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import mcjty.lib.varia.Tools;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
-import net.neoforged.neoforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,37 +14,37 @@ public class WandsConfiguration {
 
     public static String CATEGORY_WANDS = "wandsettings";
 
-    public static ForgeConfigSpec.BooleanValue showDurabilityBarForRF;
+    public static ModConfigSpec.BooleanValue showDurabilityBarForRF;
     public static WandUsage cachedWandUsage;
-    public static ForgeConfigSpec.EnumValue<WandUsage> wandUsage;
+    public static ModConfigSpec.EnumValue<WandUsage> wandUsage;
 
-    public static ForgeConfigSpec.DoubleValue fakePlayerFactor;
-    public static ForgeConfigSpec.BooleanValue lessEffectiveForFakePlayer;
+    public static ModConfigSpec.DoubleValue fakePlayerFactor;
+    public static ModConfigSpec.BooleanValue lessEffectiveForFakePlayer;
 
-    public static ForgeConfigSpec.BooleanValue allowPassive;
-    public static ForgeConfigSpec.BooleanValue allowHostile;
-    public static ForgeConfigSpec.DoubleValue difficultyMult;
-    public static ForgeConfigSpec.DoubleValue difficultyAdd;
+    public static ModConfigSpec.BooleanValue allowPassive;
+    public static ModConfigSpec.BooleanValue allowHostile;
+    public static ModConfigSpec.DoubleValue difficultyMult;
+    public static ModConfigSpec.DoubleValue difficultyAdd;
 
-    public static ForgeConfigSpec.BooleanValue freezeAllowPassive;
-    public static ForgeConfigSpec.BooleanValue freezeAllowHostile;
-    public static ForgeConfigSpec.DoubleValue freezeDifficultyMult;
-    public static ForgeConfigSpec.DoubleValue freezeDifficultyAdd;
+    public static ModConfigSpec.BooleanValue freezeAllowPassive;
+    public static ModConfigSpec.BooleanValue freezeAllowHostile;
+    public static ModConfigSpec.DoubleValue freezeDifficultyMult;
+    public static ModConfigSpec.DoubleValue freezeDifficultyAdd;
 
-    public static ForgeConfigSpec.BooleanValue potionAllowPassive;
-    public static ForgeConfigSpec.BooleanValue potionAllowHostile;
-    public static ForgeConfigSpec.DoubleValue potionDifficultyMult;
-    public static ForgeConfigSpec.DoubleValue potionDifficultyAdd;
+    public static ModConfigSpec.BooleanValue potionAllowPassive;
+    public static ModConfigSpec.BooleanValue potionAllowHostile;
+    public static ModConfigSpec.DoubleValue potionDifficultyMult;
+    public static ModConfigSpec.DoubleValue potionDifficultyAdd;
 
-    public static ForgeConfigSpec.DoubleValue teleportVolume;
-    public static ForgeConfigSpec.IntValue maxdist;
-    public static ForgeConfigSpec.BooleanValue teleportThroughWalls;
+    public static ModConfigSpec.DoubleValue teleportVolume;
+    public static ModConfigSpec.IntValue maxdist;
+    public static ModConfigSpec.BooleanValue teleportThroughWalls;
 
-    private static ForgeConfigSpec.ConfigValue<List<? extends String>> entityBlackList;
+    private static ModConfigSpec.ConfigValue<List<? extends String>> entityBlackList;
     public static Map<ResourceLocation,Double> blacklistedEntities = new HashMap<>();
     private static boolean blacklistedEntitiesLoaded = false;
 
-    public static void init(ForgeConfigSpec.Builder SERVER_BUILDER, ForgeConfigSpec.Builder CLIENT_BUILDER) {
+    public static void init(ModConfigSpec.Builder SERVER_BUILDER, ModConfigSpec.Builder CLIENT_BUILDER) {
         SERVER_BUILDER.comment("Settings for the wands").push(CATEGORY_WANDS);
         CLIENT_BUILDER.comment("Settings for the wands").push(CATEGORY_WANDS);
 
