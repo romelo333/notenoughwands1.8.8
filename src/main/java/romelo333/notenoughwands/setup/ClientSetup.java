@@ -9,7 +9,7 @@ import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.TickEvent;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import romelo333.notenoughwands.keys.KeyBindings;
 import romelo333.notenoughwands.keys.KeyInputHandler;
 import romelo333.notenoughwands.modules.protectionwand.ProtectionWandConfiguration;
