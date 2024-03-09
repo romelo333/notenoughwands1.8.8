@@ -1,7 +1,6 @@
 package romelo333.notenoughwands.network;
 
 
-import mcjty.lib.network.IPayloadRegistrar;
 import mcjty.lib.network.Networking;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
