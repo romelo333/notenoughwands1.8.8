@@ -24,6 +24,6 @@ You can never have enough wands!
 [[dependencies.notenoughwands]]
     modId="mcjtylib"
     mandatory=false
-    versionRange="[1.20-8.0.0,)"
+    versionRange="[1.20-8.0.4,)"
     ordering="AFTER"
     side="BOTH"
