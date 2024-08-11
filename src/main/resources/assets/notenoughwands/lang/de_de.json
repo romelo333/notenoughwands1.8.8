@@ -1,0 +1,57 @@
+{
+  "item.notenoughwands.swapping_wand": "Wandtauscher",
+  "item.notenoughwands.teleportation_wand": "Teleportationsstab",
+  "item.notenoughwands.capturing_wand": "Fangstab",
+  "item.notenoughwands.building_wand": "Baustab",
+  "item.notenoughwands.illumination_wand": "Belauchtingsstab",
+  "item.notenoughwands.moving_wand": "Blockbewegungsstab",
+  "item.notenoughwands.protection_wand": "Schutzstab",
+  "item.notenoughwands.master_protection_wand": "Meister Schutzstab",
+  "item.notenoughwands.displacement_wand": "Verschiebestab",
+  "item.notenoughwands.acceleration_wand": "Beschleunigungsstab",
+  "item.notenoughwands.freezing_wand": "Froststab (In Arbeit)",
+  "item.notenoughwands.potion_wand": "Zaubertrankstab",
+  "item.notenoughwands.wand_core": "Stabkern",
+  "item.notenoughwands.advanced_wand_core": "Vortgeschrittener Stabkern",
+
+  "block.notenoughwands.light": "Beleuchtungskugel",
+
+  "message.notenoughwands.shiftmessage": "<Umschalttaste drücken>",
+
+  "message.notenoughwands.building_wand.header": "Klicken Sie mit der rechten Maustaste, um die Blöcke in diese Richtung zu erweitern.",
+  "message.notenoughwands.building_wand.gold": "[Schleichen + Rechtsklick] auf einen solchen Block, um eine der letzten beiden Operationen rückgängig zu machen.",
+  "message.notenoughwands.building_wand.undo": "Undo: ",
+  "message.notenoughwands.building_wand.mode": "Mode: ",
+  "message.notenoughwands.building_wand.submode": "Submode: ",
+
+  "message.notenoughwands.displacement_wand.header": "[Rechtsklick], um Blöcke nach vorne zu schieben.",
+  "message.notenoughwands.displacement_wand.gold": "[Schleichen + Rechtsklick] um Blöcke zu ziehen.",
+  "message.notenoughwands.displacement_wand.mode": "Mode: ",
+
+  "message.notenoughwands.moving_wand.header": "[Rechtsklick], um einen Block zu nehmen.",
+  "message.notenoughwands.moving_wand.gold": "Erneut [Rechtsklick] auf den Block, um ihn abzulegen.",
+
+  "message.notenoughwands.swapping_wand.header": "[Schleichen + Rechtsklick] um einen Block auszuwählen.",
+  "message.notenoughwands.swapping_wand.gold": "[Rechtsklick] in der leeren Luft, um den „Freihand“-Modus auszuwählen, oder [Rechtsklick] auf den Block, um ihn zu ersetzen.",
+  "message.notenoughwands.swapping_wand.mode": "Mode: ",
+
+  "message.notenoughwands.illumination_wand.header": "[Rechtsklick] auf den Block, um Licht zu erzeugen.",
+  "message.notenoughwands.illumination_wand.gold": "Erneut [Rechtsklick] auf das Licht, um es wieder zu entfernen.",
+
+  "message.notenoughwands.acceleration_wand.header": "[Rechtsklick] auf den Block, um die Ticks zu beschleunigen.",
+  "message.notenoughwands.acceleration_wand.gold": "[Schleichen + Rechtsklick] um Blöcke zu ziehen.",
+  "message.notenoughwands.acceleration_wand.mode": "Mode: ",
+
+  "message.notenoughwands.capturing_wand.header": "[Linksklick] auf die Kreatur, um sie einzufangen.",
+  "message.notenoughwands.capturing_wand.gold": "[Rechtsklick] auf den Block, um die Kreatur abzusetzen.",
+
+  "message.notenoughwands.teleportation_wand.header": "[Rechtsklick], um nach vorne zu teleportieren, bis ein Block getroffen wird oder die maximale Distanz erreicht ist.",
+  "message.notenoughwands.teleportation_wand.sneak1": "[Schleichen], um sich durch Wände zu teleportieren.",
+  "message.notenoughwands.teleportation_wand.sneak2": "[Schleichen], um über die halbe Distanz zu teleportieren.",
+
+  "key.modifier": "Modifizierungsstab",
+  
+  "key.categories.notenoughwands": "Not Enough Wands",
+
+  "itemGroup.notenoughwands": "Not Enough Wands"
+}
