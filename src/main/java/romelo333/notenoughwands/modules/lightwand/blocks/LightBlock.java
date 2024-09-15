@@ -1,15 +1,10 @@
 package romelo333.notenoughwands.modules.lightwand.blocks;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-import javax.annotation.Nullable;
-
-public class LightBlock extends Block implements EntityBlock {
+public class LightBlock extends Block {
     public LightBlock() {
         super(Properties.of()
                 .strength(0.0f, 1.0f)
@@ -22,11 +17,5 @@ public class LightBlock extends Block implements EntityBlock {
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.INVISIBLE;
-    }
-
-    @Nullable
-    @Override
-    public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-        return new LightTE(pPos, pState);
     }
 }

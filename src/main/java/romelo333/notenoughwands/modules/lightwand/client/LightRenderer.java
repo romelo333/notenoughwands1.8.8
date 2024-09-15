@@ -9,13 +9,11 @@ import mcjty.lib.client.RenderSettings;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.resources.ResourceLocation;
 import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.modules.lightwand.LightModule;
-import romelo333.notenoughwands.modules.lightwand.blocks.LightTE;
 
 public class LightRenderer implements BlockEntityRenderer<LightTE> {
 

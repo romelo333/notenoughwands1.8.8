@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[47,)"
+loaderVersion="[2,)"
 license="MIT License https://github.com/romelo333/notenoughwands1.8.8/blob/1.16/LICENCE"
 issueTrackerURL="http://github.com/romelo333/notenoughwands1.8.8/issues"
 displayURL="http://github.com/romelo333/notenoughwands1.8.8/"
@@ -19,14 +19,14 @@ description='''
 You can never have enough wands!
 '''
 [[dependencies.notenoughwands]]
-    modId="forge"
-    mandatory=true
-    versionRange="[47,)"
-    ordering="NONE"
-    side="BOTH"
+modId="neoforge"
+type="required"
+versionRange="[21.0,)"
+ordering="NONE"
+side="BOTH"
 [[dependencies.notenoughwands]]
     modId="mcjtylib"
     mandatory=false
-    versionRange="[1.20-8.0.0,)"
+    versionRange="[1.21-9.0.0,)"
     ordering="AFTER"
     side="BOTH"

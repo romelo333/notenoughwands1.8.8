@@ -11,6 +11,7 @@ import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.registries.DeferredItem;
 import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.modules.wands.Items.*;
 import romelo333.notenoughwands.setup.Config;
@@ -33,7 +34,7 @@ public class WandsModule implements IModule {
     //    public static final Supplier<Item> FREEZING_WAND = ITEMS.register("freezing_wand", FreezingWand::new);
     //    public static final Supplier<Item> POTION_WAND = ITEMS.register("potion_wand", PotionWand::new);
 
-    public static final Supplier<SoundEvent> TELEPORT_SOUND = SOUNDS.register("teleport", () -> SoundTools.createSoundEvent(new ResourceLocation(NotEnoughWands.MODID, "teleport")));
+    public static final Supplier<SoundEvent> TELEPORT_SOUND = SOUNDS.register("teleport", () -> SoundTools.createSoundEvent(ResourceLocation.fromNamespaceAndPath(NotEnoughWands.MODID, "teleport")));
 
     @Override
     public void init(FMLCommonSetupEvent event) {

@@ -8,6 +8,7 @@ import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.registries.DeferredItem;
 import romelo333.notenoughwands.modules.buildingwands.items.BuildingWand;
 import romelo333.notenoughwands.modules.buildingwands.items.DisplacementWand;
 import romelo333.notenoughwands.modules.buildingwands.items.MovingWand;

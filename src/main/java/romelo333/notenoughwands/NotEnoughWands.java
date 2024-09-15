@@ -3,12 +3,11 @@ package romelo333.notenoughwands;
 import mcjty.lib.datagen.DataGen;
 import mcjty.lib.modules.Modules;
 import net.minecraft.world.item.Item;
-import net.neoforged.neoforge.api.distmarker.Dist;
-import net.neoforged.neoforge.data.event.GatherDataEvent;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.fml.common.Mod;
-import net.neoforged.neoforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.neoforged.neoforge.fml.loading.FMLEnvironment;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsModule;
 import romelo333.notenoughwands.modules.lightwand.LightModule;
 import romelo333.notenoughwands.modules.protectionwand.ProtectionWandModule;
@@ -29,14 +28,12 @@ public class NotEnoughWands {
     private Modules modules = new Modules();
     public static NotEnoughWands instance;
 
-    public NotEnoughWands() {
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-        Dist dist = FMLEnvironment.dist;
+    public NotEnoughWands(ModContainer container, IEventBus bus, Dist dist) {
 
         instance = this;
         setupModules(bus, dist);
 
-        Config.register(bus, modules);
+        Config.register(container, bus, modules);
 
         Registration.register(bus);
 
