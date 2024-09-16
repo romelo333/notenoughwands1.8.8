@@ -28,7 +28,9 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.util.BlockSnapshot;
+import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
+import romelo333.notenoughwands.modules.buildingwands.data.BuildingWandData;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 import romelo333.notenoughwands.varia.Tools;
 
@@ -38,24 +40,12 @@ import static mcjty.lib.builder.TooltipBuilder.*;
 
 public class BuildingWand extends GenericWand {
 
-    public static final int MODE_FIRST = 0;
-    public static final int MODE_9 = 0;
-    public static final int MODE_9ROW = 1;
-    public static final int MODE_25 = 2;
-    public static final int MODE_25ROW = 3;
-    public static final int MODE_SINGLE = 4;
-    public static final int MODE_LAST = MODE_SINGLE;
-
-    public static final String[] DESCRIPTIONS = new String[] {
-            "9 blocks", "9 blocks row", "25 blocks", "25 blocks row", "single"
-    };
-
 
     private final TooltipBuilder tooltipBuilder = new TooltipBuilder()
             .info(key("message.notenoughwands.shiftmessage"))
             .infoShift(header(), gold(),
                     parameter("undo", stack -> countUndoStates(stack) > 0, stack -> Integer.toString(countUndoStates(stack))),
-                    parameter("mode", stack -> DESCRIPTIONS[getMode(stack)]),
+                    parameter("mode", stack -> getMode(stack).getDescription()),
                     parameter("submode", stack -> getSubMode(stack) == 1, stack -> getSubMode(stack) == 1 ? "Rotated" : ""));
 
     public static final int[] amount = new int[] { 9, 9, 25, 25, 1 };
@@ -102,7 +92,7 @@ public class BuildingWand extends GenericWand {
         stack.getOrCreateTag().putInt("submode", submode);
     }
 
-    private int getMode(ItemStack stack) {
+    private BuildingWandData.Mode getMode(ItemStack stack) {
         return stack.getOrCreateTag().getInt("mode");
     }
 
@@ -148,10 +138,11 @@ public class BuildingWand extends GenericWand {
                 SoundTools.playSound(world, blockState.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
                 //                IBlockState state = block.getStateFromMeta(meta);
 //                world.setBlockState(coordinate, state, 2);
-                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.create(world.dimension(), world, coordinate);
+                BlockSnapshot blocksnapshot = BlockSnapshot.create(world.dimension(), world, coordinate);
                 Tools.placeStackAt(player, consumed, world, coordinate, null);
-                if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
-                    blocksnapshot.restore(true, false);
+                if (EventHooks.onBlockPlace(player, blocksnapshot, Direction.UP)) {
+//                    blocksnapshot.restore(true, false);
+                    blocksnapshot.restore(0);   // @todo 1.21 check this
                     if (!player.isCreative()) {
                         Tools.giveItem(player, consumed);
                     }
