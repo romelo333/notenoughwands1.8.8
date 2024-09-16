@@ -25,6 +25,7 @@ import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.util.BlockSnapshot;
 import net.neoforged.neoforge.event.ForgeEventFactory;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsConfiguration;
+import romelo333.notenoughwands.modules.buildingwands.data.DisplacementWandData;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 import romelo333.notenoughwands.varia.Tools;
 
@@ -37,21 +38,10 @@ import static mcjty.lib.builder.TooltipBuilder.*;
 
 public class DisplacementWand extends GenericWand {
 
-    public static final int MODE_FIRST = 0;
-    public static final int MODE_3X3 = 0;
-    public static final int MODE_5X5 = 1;
-    public static final int MODE_7X7 = 2;
-    public static final int MODE_SINGLE = 3;
-    public static final int MODE_LAST = MODE_SINGLE;
-
-    public static final String[] DESCRIPTIONS = new String[] {
-            "3x3", "5x5", "7x7", "single"
-    };
-
     private final TooltipBuilder tooltipBuilder = new TooltipBuilder()
             .info(key("message.notenoughwands.shiftmessage"))
             .infoShift(header(), gold(),
-                    parameter("mode", stack -> DESCRIPTIONS[getMode(stack)]));
+                    parameter("mode", stack -> getMode(stack).getDescription()));
 
 
     public DisplacementWand() {
@@ -60,8 +50,8 @@ public class DisplacementWand extends GenericWand {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> list, TooltipFlag flagIn) {
-        super.appendHoverText(stack, worldIn, list, flagIn);
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> list, TooltipFlag flagIn) {
+        super.appendHoverText(stack, context, list, flagIn);
         tooltipBuilder.makeTooltip(mcjty.lib.varia.Tools.getId(this), stack, list, flagIn);
 
         showModeKeyDescription(list, "switch mode");
@@ -78,7 +68,7 @@ public class DisplacementWand extends GenericWand {
         stack.getOrCreateTag().putInt("mode", mode);
     }
 
-    private int getMode(ItemStack stack) {
+    private DisplacementWandData.Mode getMode(ItemStack stack) {
         return stack.getOrCreateTag().getInt("mode");
     }
 

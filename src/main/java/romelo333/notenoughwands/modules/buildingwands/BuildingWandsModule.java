@@ -3,12 +3,15 @@ package romelo333.notenoughwands.modules.buildingwands;
 import mcjty.lib.datagen.DataGen;
 import mcjty.lib.datagen.Dob;
 import mcjty.lib.modules.IModule;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
+import romelo333.notenoughwands.modules.buildingwands.data.BuildingWandData;
 import romelo333.notenoughwands.modules.buildingwands.items.BuildingWand;
 import romelo333.notenoughwands.modules.buildingwands.items.DisplacementWand;
 import romelo333.notenoughwands.modules.buildingwands.items.MovingWand;
@@ -19,6 +22,7 @@ import romelo333.notenoughwands.setup.Config;
 import static mcjty.lib.datagen.DataGen.has;
 import static romelo333.notenoughwands.NotEnoughWands.tab;
 import static romelo333.notenoughwands.setup.Registration.ITEMS;
+import static romelo333.notenoughwands.setup.Registration.REGISTRAR;
 
 public class BuildingWandsModule implements IModule {
 
@@ -26,6 +30,12 @@ public class BuildingWandsModule implements IModule {
     public static final DeferredItem<Item> DISPLACEMENT_WAND = ITEMS.register("displacement_wand", tab(DisplacementWand::new));
     public static final DeferredItem<Item> MOVING_WAND = ITEMS.register("moving_wand", tab(MovingWand::new));
     public static final DeferredItem<Item> SWAPPING_WAND = ITEMS.register("swapping_wand", tab(SwappingWand::new));
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<BuildingWandData>> BUILDINGWAND_DATA = REGISTRAR.registerComponentType(
+            "signsettings",
+            builder -> builder
+                    .persistent(BuildingWandData.CODEC)
+                    .networkSynchronized(BuildingWandData.STREAM_CODEC));
 
     @Override
     public void init(FMLCommonSetupEvent event) {

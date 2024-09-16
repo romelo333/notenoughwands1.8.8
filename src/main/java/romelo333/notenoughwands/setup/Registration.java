@@ -24,12 +24,14 @@ public class Registration {
     public static final DeferredBlocks BLOCKS = DeferredBlocks.create(MODID);
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(Registries.SOUND_EVENT, MODID);
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
+    public static final DeferredRegister.DataComponents REGISTRAR = DeferredRegister.createDataComponents(MODID);
 
     public static void register(IEventBus bus) {
         BLOCKS.register(bus);
         ITEMS.register(bus);
         SOUNDS.register(bus);
         TABS.register(bus);
+        REGISTRAR.register(bus);
     }
 
     public static Item.Properties createStandardProperties() {

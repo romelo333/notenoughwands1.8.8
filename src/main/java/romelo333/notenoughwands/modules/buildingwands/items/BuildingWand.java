@@ -2,17 +2,11 @@ package romelo333.notenoughwands.modules.buildingwands.items;
 
 
 import mcjty.lib.builder.TooltipBuilder;
-import mcjty.lib.varia.LevelTools;
-import mcjty.lib.varia.NBTTools;
 import mcjty.lib.varia.SoundTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -30,13 +24,18 @@ import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.util.BlockSnapshot;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
+import romelo333.notenoughwands.modules.buildingwands.BuildingWandsModule;
 import romelo333.notenoughwands.modules.buildingwands.data.BuildingWandData;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static mcjty.lib.builder.TooltipBuilder.*;
+import static romelo333.notenoughwands.modules.buildingwands.data.BuildingWandData.Mode.MODE_25ROW;
+import static romelo333.notenoughwands.modules.buildingwands.data.BuildingWandData.Mode.MODE_9ROW;
 
 public class BuildingWand extends GenericWand {
 
@@ -46,9 +45,7 @@ public class BuildingWand extends GenericWand {
             .infoShift(header(), gold(),
                     parameter("undo", stack -> countUndoStates(stack) > 0, stack -> Integer.toString(countUndoStates(stack))),
                     parameter("mode", stack -> getMode(stack).getDescription()),
-                    parameter("submode", stack -> getSubMode(stack) == 1, stack -> getSubMode(stack) == 1 ? "Rotated" : ""));
-
-    public static final int[] amount = new int[] { 9, 9, 25, 25, 1 };
+                    parameter("submode", stack -> getSubMode(stack) == BuildingWandData.OrientationMode.ROTATED, stack -> getSubMode(stack).getDescription()));
 
     public BuildingWand() {
         super();
@@ -56,48 +53,64 @@ public class BuildingWand extends GenericWand {
     }
 
     private int countUndoStates(ItemStack stack) {
-        if (stack.hasTag()) {
-            CompoundTag compound = stack.getTag();
-            return (compound.contains("undo1") ? 1 : 0) + (compound.contains("undo2") ? 1 : 0);
-        } else {
-            return 0;
-        }
+        return getOrDefault(stack, BuildingWandData::undoStates, Collections.emptyList()).size();
     }
 
+
     @Override
-    public void appendHoverText(ItemStack itemStack, Level world, List<Component> list, TooltipFlag flags) {
-        super.appendHoverText(itemStack, world, list, flags);
+    public void appendHoverText(ItemStack itemStack, TooltipContext context, List<Component> list, TooltipFlag flags) {
+        super.appendHoverText(itemStack, context, list, flags);
         tooltipBuilder.makeTooltip(mcjty.lib.varia.Tools.getId(this), itemStack, list, flags);
 
         showModeKeyDescription(list, "switch mode");
         showSubModeKeyDescription(list, "change orientation");
     }
 
+    private static BuildingWandData getOrDefault(ItemStack stack) {
+        BuildingWandData data = stack.get(BuildingWandsModule.BUILDINGWAND_DATA);
+        if (data == null) {
+            return BuildingWandData.DEFAULT;
+        }
+        return data;
+    }
+
+    private static <T> T getOrDefault(ItemStack stack, Function<BuildingWandData, T> getter, T defaultValue) {
+        BuildingWandData data = stack.get(BuildingWandsModule.BUILDINGWAND_DATA);
+        if (data == null) {
+            return defaultValue;
+        }
+        return getter.apply(data);
+    }
+
+    private static <T> void setData(ItemStack stack, BiFunction<BuildingWandData, T, BuildingWandData> setter, T value) {
+        BuildingWandData data = stack.get(BuildingWandsModule.BUILDINGWAND_DATA);
+        if (data == null) {
+            data = BuildingWandData.DEFAULT;
+        }
+        data = setter.apply(data, value);
+        stack.set(BuildingWandsModule.BUILDINGWAND_DATA, data);
+    }
+
     @Override
     public void toggleMode(Player player, ItemStack stack) {
-        int mode = getMode(stack);
-        mode++;
-        if (mode > MODE_LAST) {
-            mode = MODE_FIRST;
-        }
-        Tools.notify(player, Component.literal("Switched to " + DESCRIPTIONS[mode] + " mode"));
-        stack.getOrCreateTag().putInt("mode", mode);
+        BuildingWandData.Mode mode = getMode(stack);
+        mode = mode.next();
+        setData(stack, (data, m) -> new BuildingWandData(m, data.orientationMode(), data.undoStates()), mode);
     }
 
     @Override
     public void toggleSubMode(Player player, ItemStack stack) {
-        int submode = getSubMode(stack);
-        submode = submode == 1 ? 0 : 1;
-        Tools.notify(player, Component.literal("Switched orientation"));
-        stack.getOrCreateTag().putInt("submode", submode);
+        BuildingWandData.OrientationMode subMode = getSubMode(stack);
+        subMode = subMode.next();
+        setData(stack, (data, m) -> new BuildingWandData(data.mode(), m, data.undoStates()), subMode);
     }
 
     private BuildingWandData.Mode getMode(ItemStack stack) {
-        return stack.getOrCreateTag().getInt("mode");
+        return getOrDefault(stack, BuildingWandData::mode, BuildingWandData.Mode.MODE_9);
     }
 
-    private int getSubMode(ItemStack stack) {
-        return stack.getOrCreateTag().getInt("submode");
+    private BuildingWandData.OrientationMode getSubMode(ItemStack stack) {
+        return getOrDefault(stack, BuildingWandData::orientationMode, BuildingWandData.OrientationMode.NORMAL);
     }
 
     @Override
@@ -162,75 +175,54 @@ public class BuildingWand extends GenericWand {
     }
 
     private void registerUndo(ItemStack stack, BlockState state, Level world, Set<BlockPos> undo) {
-        CompoundTag undoTag = new CompoundTag();
-
-        undoTag.put("block", NbtUtils.writeBlockState(state));
-        undoTag.putString("dimension", world.dimension().location().toString());
-        int[] undoX = new int[undo.size()];
-        int[] undoY = new int[undo.size()];
-        int[] undoZ = new int[undo.size()];
-        int idx = 0;
-        for (BlockPos coordinate : undo) {
-            undoX[idx] = coordinate.getX();
-            undoY[idx] = coordinate.getY();
-            undoZ[idx] = coordinate.getZ();
-            idx++;
-        }
-
-        undoTag.putIntArray("x", undoX);
-        undoTag.putIntArray("y", undoY);
-        undoTag.putIntArray("z", undoZ);
-        CompoundTag wandTag = stack.getOrCreateTag();
-        if (wandTag.contains("undo1")) {
-            wandTag.put("undo2", wandTag.get("undo1"));
-        }
-        wandTag.put("undo1", undoTag);
+        BuildingWandData.UndoState undoState = new BuildingWandData.UndoState(world.dimension(), state, undo);
+        setData(stack, (data, us) -> {
+            List<BuildingWandData.UndoState> undoStates = data.undoStates();
+            // Push the new undo state in front of the list and drop the last one if we have too many (MAX_UNDO)
+            List<BuildingWandData.UndoState> newUndoStates = new ArrayList<>(undoStates);
+            newUndoStates.add(0, us);
+            if (newUndoStates.size() > BuildingWandData.MAX_UNDO) {
+                newUndoStates = newUndoStates.subList(0, BuildingWandData.MAX_UNDO);
+            }
+            return new BuildingWandData(data.mode(), data.orientationMode(), newUndoStates);
+        }, undoState);
     }
 
     private void undoPlaceBlock(ItemStack stack, Player player, Level world, BlockPos pos) {
-        CompoundTag wandTag = stack.getOrCreateTag();
-        CompoundTag undoTag1 = (CompoundTag) wandTag.get("undo1");
-        CompoundTag undoTag2 = (CompoundTag) wandTag.get("undo2");
-
-        Set<BlockPos> undo1 = checkUndo(player, world, undoTag1);
-        Set<BlockPos> undo2 = checkUndo(player, world, undoTag2);
-        if (undo1 == null && undo2 == null) {
+        // Get the first undo state from the data and remove it
+        BuildingWandData data = getOrDefault(stack);
+        if (data.undoStates().isEmpty()) {
             Tools.error(player, "Nothing to undo!");
             return;
         }
-
-        if (undo1 != null && undo1.contains(pos)) {
-            performUndo(stack, player, world, pos, undoTag1, undo1);
-            if (wandTag.contains("undo2")) {
-                wandTag.put("undo1", wandTag.get("undo2"));
-                wandTag.remove("undo2");
-            } else {
-                wandTag.remove("undo1");
-            }
+        int index = data.findUndoStateIndex(world.dimension(), pos);
+        if (index == -1) {
+            Tools.error(player, "Select at least one block of the area you want to undo!");
             return;
         }
-        if (undo2 != null && undo2.contains(pos)) {
-            performUndo(stack, player, world, pos, undoTag2, undo2);
-            wandTag.remove("undo2");
-            return;
-        }
+        // Get the undo state and remove it
+        BuildingWandData.UndoState undoState = data.undoStates().get(index);
+        List<BuildingWandData.UndoState> newUndoStates = new ArrayList<>(data.undoStates());
+        newUndoStates.remove(index);
+        setData(stack, (d, us) -> new BuildingWandData(d.mode(), d.orientationMode(), us), newUndoStates);
 
-        Tools.error(player, "Select at least one block of the area you want to undo!");
+        performUndo(player, world, pos, undoState);
     }
 
-    private void performUndo(ItemStack stack, Player player, Level world, BlockPos pos, CompoundTag undoTag, Set<BlockPos> undo) {
-        BlockState state = NBTTools.readBlockState(world, undoTag.getCompound("block"));
+    private void performUndo(Player player, Level world, BlockPos pos, BuildingWandData.UndoState undoState) {
+        BlockState state = undoState.state();
 
         int cnt = 0;
-        for (BlockPos coordinate : undo) {
+        for (BlockPos coordinate : undoState.positions()) {
             BlockState testState = world.getBlockState(coordinate);
             if (testState == state) {
                 SoundTools.playSound(world, state.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
 
-                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.create(world.dimension(), world, coordinate);
+                BlockSnapshot blocksnapshot = BlockSnapshot.create(world.dimension(), world, coordinate);
                 world.setBlockAndUpdate(coordinate, Blocks.AIR.defaultBlockState());
-                if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
-                    blocksnapshot.restore(true, false);
+                if (EventHooks.onBlockPlace(player, blocksnapshot, Direction.UP)) {
+//                    blocksnapshot.restore(true, false);
+                    blocksnapshot.restore(0);  // @todo 1.21 check this
                 } else {
                     cnt++;
                 }
@@ -245,27 +237,6 @@ public class BuildingWand extends GenericWand {
                 player.containerMenu.broadcastChanges();
             }
         }
-    }
-
-    private Set<BlockPos> checkUndo(Player player, Level world, CompoundTag undoTag) {
-        if (undoTag == null) {
-            return null;
-        }
-        String dimension = undoTag.getString("dimension");
-        ResourceKey<Level> dim = LevelTools.getId(new ResourceLocation(dimension));
-        if (!Objects.equals(dim, world.dimension())) {
-            Tools.error(player, "Select at least one block of the area you want to undo!");
-            return null;
-        }
-
-        int[] undoX = undoTag.getIntArray("x");
-        int[] undoY = undoTag.getIntArray("y");
-        int[] undoZ = undoTag.getIntArray("z");
-        Set<BlockPos> undo = new HashSet<BlockPos>();
-        for (int i = 0 ; i < undoX.length ; i++) {
-            undo.add(new BlockPos(undoX[i], undoY[i], undoZ[i]));
-        }
-        return undo;
     }
 
     // @todo 1.20 is this right event?
@@ -290,23 +261,16 @@ public class BuildingWand extends GenericWand {
                 Set<BlockPos> coordinates;
 
                 if (player.isShiftKeyDown()) {
-                    CompoundTag wandTag = wand.getOrCreateTag();
-                    CompoundTag undoTag1 = (CompoundTag) wandTag.get("undo1");
-                    CompoundTag undoTag2 = (CompoundTag) wandTag.get("undo2");
-
-                    Set<BlockPos> undo1 = checkUndo(player, world, undoTag1);
-                    Set<BlockPos> undo2 = checkUndo(player, world, undoTag2);
-                    if (undo1 == null && undo2 == null) {
+                    // Find the undostate that the player is looking at
+                    BuildingWandData data = getOrDefault(wand);
+                    if (data == null) {
                         return;
                     }
-
-                    if (undo1 != null && undo1.contains(blockPos)) {
-                        coordinates = undo1;
-                        renderOutlines(evt, player, coordinates, 240, 30, 0);
-                    } else if (undo2 != null && undo2.contains(blockPos)) {
-                        coordinates = undo2;
-                        renderOutlines(evt, player, coordinates, 240, 30, 0);
+                    int index = data.findUndoStateIndex(world.dimension(), blockPos);
+                    if (index == -1) {
+                        return;
                     }
+                    renderOutlines(evt, player, data.undoStates().get(index).positions(), 240, 30, 0);
                 } else {
                     coordinates = findSuitableBlocks(wand, world, btrace.getDirection(), blockPos, blockState);
                     renderOutlines(evt, player, coordinates, 50, 250, 180);
@@ -320,29 +284,29 @@ public class BuildingWand extends GenericWand {
         Set<BlockPos> done = new HashSet<>();
         Deque<BlockPos> todo = new ArrayDeque<>();
         todo.addLast(pos);
-        findSuitableBlocks(world, coordinates, done, todo, sideHit, state, amount[getMode(stack)],
+        findSuitableBlocks(world, coordinates, done, todo, sideHit, state, getMode(stack).getAmount(),
                 getMode(stack) == MODE_9ROW || getMode(stack) == MODE_25ROW, getSubMode(stack));
 
         return coordinates;
     }
 
     private void findSuitableBlocks(Level world, Set<BlockPos> coordinates, Set<BlockPos> done, Deque<BlockPos> todo, Direction direction,
-                                    BlockState state, int maxAmount, boolean rowMode, int rotated) {
+                                    BlockState state, int maxAmount, boolean rowMode, BuildingWandData.OrientationMode rotated) {
 
         Direction dirA = null;
         Direction dirB = null;
         if (rowMode) {
             BlockPos base = todo.getFirst();
             BlockPos offset = base.relative(direction);
-            dirA = rotated == 1 ? dir2(direction) : dir1(direction);
+            dirA = rotated == BuildingWandData.OrientationMode.ROTATED ? dir2(direction) : dir1(direction);
             dirB = dirA.getOpposite();
             if (!isSuitable(world, state, base.relative(dirA), offset.relative(dirA)) ||
                 !isSuitable(world, state, base.relative(dirB), offset.relative(dirB))) {
-                dirA = rotated == 1 ? dir3(direction) : dir2(direction);
+                dirA = rotated == BuildingWandData.OrientationMode.ROTATED ? dir3(direction) : dir2(direction);
                 dirB = dirA.getOpposite();
                 if (!isSuitable(world, state, base.relative(dirA), offset.relative(dirA)) ||
                         !isSuitable(world, state, base.relative(dirB), offset.relative(dirB))) {
-                    dirA = rotated == 1 ? dir1(direction) : dir3(direction);
+                    dirA = rotated == BuildingWandData.OrientationMode.ROTATED ? dir1(direction) : dir3(direction);
                     dirB = dirA.getOpposite();
                 }
             }
