@@ -30,8 +30,6 @@ import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import static mcjty.lib.builder.TooltipBuilder.*;
 import static romelo333.notenoughwands.modules.buildingwands.data.BuildingWandData.Mode.MODE_25ROW;
@@ -53,7 +51,7 @@ public class BuildingWand extends GenericWand {
     }
 
     private int countUndoStates(ItemStack stack) {
-        return getOrDefault(stack, BuildingWandData::undoStates, Collections.emptyList()).size();
+        return stack.getOrDefault(BuildingWandsModule.BUILDINGWAND_DATA, BuildingWandData.DEFAULT).undoStates().size();
     }
 
 
@@ -66,51 +64,24 @@ public class BuildingWand extends GenericWand {
         showSubModeKeyDescription(list, "change orientation");
     }
 
-    private static BuildingWandData getOrDefault(ItemStack stack) {
-        BuildingWandData data = stack.get(BuildingWandsModule.BUILDINGWAND_DATA);
-        if (data == null) {
-            return BuildingWandData.DEFAULT;
-        }
-        return data;
-    }
-
-    private static <T> T getOrDefault(ItemStack stack, Function<BuildingWandData, T> getter, T defaultValue) {
-        BuildingWandData data = stack.get(BuildingWandsModule.BUILDINGWAND_DATA);
-        if (data == null) {
-            return defaultValue;
-        }
-        return getter.apply(data);
-    }
-
-    private static <T> void setData(ItemStack stack, BiFunction<BuildingWandData, T, BuildingWandData> setter, T value) {
-        BuildingWandData data = stack.get(BuildingWandsModule.BUILDINGWAND_DATA);
-        if (data == null) {
-            data = BuildingWandData.DEFAULT;
-        }
-        data = setter.apply(data, value);
-        stack.set(BuildingWandsModule.BUILDINGWAND_DATA, data);
-    }
-
     @Override
     public void toggleMode(Player player, ItemStack stack) {
-        BuildingWandData.Mode mode = getMode(stack);
-        mode = mode.next();
-        setData(stack, (data, m) -> new BuildingWandData(m, data.orientationMode(), data.undoStates()), mode);
+        BuildingWandData.Mode mode = getMode(stack).next();
+        stack.update(BuildingWandsModule.BUILDINGWAND_DATA, BuildingWandData.DEFAULT, data -> data.withMode(mode));
     }
 
     @Override
     public void toggleSubMode(Player player, ItemStack stack) {
-        BuildingWandData.OrientationMode subMode = getSubMode(stack);
-        subMode = subMode.next();
-        setData(stack, (data, m) -> new BuildingWandData(data.mode(), m, data.undoStates()), subMode);
+        BuildingWandData.OrientationMode subMode = getSubMode(stack).next();
+        stack.update(BuildingWandsModule.BUILDINGWAND_DATA, BuildingWandData.DEFAULT, data -> data.withOrientationMode(subMode));
     }
 
     private BuildingWandData.Mode getMode(ItemStack stack) {
-        return getOrDefault(stack, BuildingWandData::mode, BuildingWandData.Mode.MODE_9);
+        return stack.getOrDefault(BuildingWandsModule.BUILDINGWAND_DATA, BuildingWandData.DEFAULT).mode();
     }
 
     private BuildingWandData.OrientationMode getSubMode(ItemStack stack) {
-        return getOrDefault(stack, BuildingWandData::orientationMode, BuildingWandData.OrientationMode.NORMAL);
+        return stack.getOrDefault(BuildingWandsModule.BUILDINGWAND_DATA, BuildingWandData.DEFAULT).orientationMode();
     }
 
     @Override
@@ -176,21 +147,13 @@ public class BuildingWand extends GenericWand {
 
     private void registerUndo(ItemStack stack, BlockState state, Level world, Set<BlockPos> undo) {
         BuildingWandData.UndoState undoState = new BuildingWandData.UndoState(world.dimension(), state, undo);
-        setData(stack, (data, us) -> {
-            List<BuildingWandData.UndoState> undoStates = data.undoStates();
-            // Push the new undo state in front of the list and drop the last one if we have too many (MAX_UNDO)
-            List<BuildingWandData.UndoState> newUndoStates = new ArrayList<>(undoStates);
-            newUndoStates.add(0, us);
-            if (newUndoStates.size() > BuildingWandData.MAX_UNDO) {
-                newUndoStates = newUndoStates.subList(0, BuildingWandData.MAX_UNDO);
-            }
-            return new BuildingWandData(data.mode(), data.orientationMode(), newUndoStates);
-        }, undoState);
+        // Push the new undo state in front of the list and drop the last one if we have too many (MAX_UNDO)
+        stack.update(BuildingWandsModule.BUILDINGWAND_DATA, BuildingWandData.DEFAULT, d -> d.pushUndoState(undoState));
     }
 
     private void undoPlaceBlock(ItemStack stack, Player player, Level world, BlockPos pos) {
         // Get the first undo state from the data and remove it
-        BuildingWandData data = getOrDefault(stack);
+        BuildingWandData data = stack.getOrDefault(BuildingWandsModule.BUILDINGWAND_DATA, BuildingWandData.DEFAULT);
         if (data.undoStates().isEmpty()) {
             Tools.error(player, "Nothing to undo!");
             return;
@@ -204,7 +167,7 @@ public class BuildingWand extends GenericWand {
         BuildingWandData.UndoState undoState = data.undoStates().get(index);
         List<BuildingWandData.UndoState> newUndoStates = new ArrayList<>(data.undoStates());
         newUndoStates.remove(index);
-        setData(stack, (d, us) -> new BuildingWandData(d.mode(), d.orientationMode(), us), newUndoStates);
+        stack.update(BuildingWandsModule.BUILDINGWAND_DATA, BuildingWandData.DEFAULT, d -> new BuildingWandData(d.mode(), d.orientationMode(), newUndoStates));
 
         performUndo(player, world, pos, undoState);
     }
@@ -262,7 +225,7 @@ public class BuildingWand extends GenericWand {
 
                 if (player.isShiftKeyDown()) {
                     // Find the undostate that the player is looking at
-                    BuildingWandData data = getOrDefault(wand);
+                    BuildingWandData data = wand.getOrDefault(BuildingWandsModule.BUILDINGWAND_DATA, BuildingWandData.DEFAULT);
                     if (data == null) {
                         return;
                     }

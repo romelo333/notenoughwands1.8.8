@@ -92,6 +92,22 @@ public record BuildingWandData(Mode mode, OrientationMode orientationMode, List<
         return -1;
     }
 
+    public BuildingWandData pushUndoState(UndoState undoState) {
+        List<UndoState> newUndoStates = new ArrayList<>(undoStates);
+        newUndoStates.addFirst(undoState);
+        if (newUndoStates.size() > MAX_UNDO) {
+            newUndoStates = newUndoStates.subList(0, MAX_UNDO);
+        }
+        return new BuildingWandData(mode, orientationMode, newUndoStates);
+    }
+
+    public BuildingWandData withMode(Mode mode) {
+        return new BuildingWandData(mode, orientationMode, undoStates);
+    }
+
+    public BuildingWandData withOrientationMode(OrientationMode orientationMode) {
+        return new BuildingWandData(mode, orientationMode, undoStates);
+    }
 
     public static final BuildingWandData DEFAULT = new BuildingWandData(Mode.MODE_9, OrientationMode.NORMAL, new ArrayList<>());
 

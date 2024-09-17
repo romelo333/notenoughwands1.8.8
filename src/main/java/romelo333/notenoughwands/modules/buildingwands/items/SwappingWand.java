@@ -3,14 +3,11 @@ package romelo333.notenoughwands.modules.buildingwands.items;
 
 import mcjty.lib.builder.TooltipBuilder;
 import mcjty.lib.varia.ComponentFactory;
-import mcjty.lib.varia.NBTTools;
 import mcjty.lib.varia.SoundTools;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -29,14 +26,15 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.util.BlockSnapshot;
-import net.neoforged.neoforge.event.ForgeEventFactory;
+import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsConfiguration;
+import romelo333.notenoughwands.modules.buildingwands.BuildingWandsModule;
+import romelo333.notenoughwands.modules.buildingwands.data.SwappingWandData;
 import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 import romelo333.notenoughwands.varia.Tools;
 
-import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -45,21 +43,10 @@ import static mcjty.lib.builder.TooltipBuilder.*;
 
 public class SwappingWand extends GenericWand {
 
-    public static final int MODE_FIRST = 0;
-    public static final int MODE_3X3 = 0;
-    public static final int MODE_5X5 = 1;
-    public static final int MODE_7X7 = 2;
-    public static final int MODE_SINGLE = 3;
-    public static final int MODE_LAST = MODE_SINGLE;
-
-    public static final String[] DESCRIPTIONS = new String[] {
-        "3x3", "5x5", "7x7", "single"
-    };
-
     private final TooltipBuilder tooltipBuilder = new TooltipBuilder()
             .info(key("message.notenoughwands.shiftmessage"))
             .infoShift(header(), gold(),
-                parameter("mode", stack -> DESCRIPTIONS[getMode(stack)]));
+                parameter("mode", stack -> getMode(stack).getDescription()));
 
 
     public SwappingWand() {
@@ -69,18 +56,14 @@ public class SwappingWand extends GenericWand {
 
     @Override
     public void toggleMode(Player player, ItemStack stack) {
-        int mode = getMode(stack);
-        mode++;
-        if (mode > MODE_LAST) {
-            mode = MODE_FIRST;
-        }
-        Tools.notify(player, ComponentFactory.literal("Switched to " + DESCRIPTIONS[mode] + " mode"));
-        stack.getOrCreateTag().putInt("mode", mode);
+        SwappingWandData.Mode mode = getMode(stack).next();
+        Tools.notify(player, ComponentFactory.literal("Switched to " + mode.getDescription() + " mode"));
+        stack.update(BuildingWandsModule.SWAPPINGWAND_DATA, SwappingWandData.DEFAULT, data -> data.withMode(mode));
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> list, TooltipFlag flagIn) {
-        super.appendHoverText(stack, world, list, flagIn);
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> list, TooltipFlag flagIn) {
+        super.appendHoverText(stack, context, list, flagIn);
         tooltipBuilder.makeTooltip(mcjty.lib.varia.Tools.getId(this), stack, list, flagIn);
         list.add(getBlockDescription(stack));
 
@@ -88,14 +71,14 @@ public class SwappingWand extends GenericWand {
     }
 
     private Component getBlockDescription(ItemStack stack) {
-        CompoundTag compound = stack.getTag();
-        if (compound == null) {
+        SwappingWandData data = stack.getOrDefault(BuildingWandsModule.SWAPPINGWAND_DATA, SwappingWandData.DEFAULT);
+        if (data.state().isAir()) {
             return ComponentFactory.literal("No selected block").withStyle(ChatFormatting.RED);
         } else {
             if (isSwappingWithOffHand(stack)) {
                 return ComponentFactory.literal("Will swap with block in offhand").withStyle(ChatFormatting.GREEN);
             } else {
-                BlockState state = NBTTools.readBlockState(compound.getCompound("block"));
+                BlockState state = data.state();
                 Component name = Tools.getBlockName(state.getBlock());
                 return ComponentFactory.literal("Block: ").append(name).withStyle(ChatFormatting.GREEN);
             }
@@ -103,24 +86,15 @@ public class SwappingWand extends GenericWand {
     }
 
     private static boolean isSwappingWithOffHand(ItemStack stack) {
-        CompoundTag compound = stack.getTag();
-        if (compound == null) {
-            return false;
-        }
-        return compound.contains("offhand");
+        return stack.getOrDefault(BuildingWandsModule.SWAPPINGWAND_DATA, SwappingWandData.DEFAULT).offhand();
     }
 
     private static void enableSwappingWithOffHand(ItemStack stack) {
-        CompoundTag compound = stack.getOrCreateTag();
-        compound.putBoolean("offhand", true);
+        stack.update(BuildingWandsModule.SWAPPINGWAND_DATA, SwappingWandData.DEFAULT, data -> data.withOffhand(true));
     }
 
     private static void disableSwappingWithOffHand(ItemStack stack) {
-        CompoundTag compound = stack.getTag();
-        if (compound == null) {
-            return;
-        }
-        compound.remove("offhand");
+        stack.update(BuildingWandsModule.SWAPPINGWAND_DATA, SwappingWandData.DEFAULT, data -> data.withOffhand(false));
     }
 
     @Override
@@ -165,8 +139,8 @@ public class SwappingWand extends GenericWand {
             return;
         }
 
-        CompoundTag tagCompound = stack.getTag();
-        if (tagCompound == null) {
+        SwappingWandData data = stack.getOrDefault(BuildingWandsModule.SWAPPINGWAND_DATA, SwappingWandData.DEFAULT);
+        if (data.state().isAir()) {
             Tools.error(player, "First select a block by sneaking");
             return;
         }
@@ -187,8 +161,8 @@ public class SwappingWand extends GenericWand {
             blockState = itemBlock.getBlock().defaultBlockState();    // @todo 1.15 is this right?
             hardness = blockState.getDestroySpeed(world, pos);
         } else {
-            blockState = NBTTools.readBlockState(world, tagCompound.getCompound("block"));
-            hardness = tagCompound.getFloat("hardness");
+            blockState = data.state();
+            hardness = data.hardness();
         }
 
         BlockState oldState = world.getBlockState(pos);
@@ -238,12 +212,13 @@ public class SwappingWand extends GenericWand {
                     ItemHandlerHelper.giveItemToPlayer(player, oldblockItem);
                 }
                 SoundTools.playSound(world, blockState.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
-                BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.create(world.dimension(), world, coordinate);
+                BlockSnapshot blocksnapshot = BlockSnapshot.create(world.dimension(), world, coordinate);
                 world.setBlockAndUpdate(coordinate, Blocks.AIR.defaultBlockState());
                 Tools.placeStackAt(player, consumed, world, coordinate, null);
 
-                if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
-                    blocksnapshot.restore(true, false);
+                if (EventHooks.onBlockPlace(player, blocksnapshot, Direction.UP)) {
+//                    blocksnapshot.restore(true, false);   // @todo 1.21 check
+                    blocksnapshot.restore(0);
                     if (!player.isCreative()) {
                         ItemHandlerHelper.giveItemToPlayer(player, consumed);
                     }
@@ -263,8 +238,7 @@ public class SwappingWand extends GenericWand {
     private void selectBlock(ItemStack stack, Player player, Level world, BlockPos pos) {
         BlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
-        ItemStack item = block.getCloneItemStack(state, null, world, pos, player);   // @todo 1.15 check?
-        CompoundTag tagCompound = stack.getOrCreateTag();
+//        ItemStack item = block.getCloneItemStack(state, null, world, pos, player);   // @todo 1.15 check?
         Component name = Tools.getBlockName(block);
         if (name == null) {
             Tools.error(player, "You cannot select this block!");
@@ -275,9 +249,8 @@ public class SwappingWand extends GenericWand {
                 return;
             }
 
-            tagCompound.put("block", NbtUtils.writeBlockState(state));
             float hardness = state.getDestroySpeed(world, pos);
-            tagCompound.putFloat("hardness", hardness);
+            stack.set(BuildingWandsModule.SWAPPINGWAND_DATA, new SwappingWandData(getMode(stack), state, false, hardness));
             Tools.notify(player, ComponentFactory.literal("Selected block: ").append(name));
         }
     }
@@ -292,11 +265,7 @@ public class SwappingWand extends GenericWand {
             Level world = player.getCommandSenderWorld();
             BlockPos blockPos = br.getBlockPos();
             BlockState state = world.getBlockState(blockPos);
-            if (!state.isAir() && wand.hasTag()) {
-                BlockState wandState = NBTTools.readBlockState(world, wand.getTag().getCompound("block"));
-                if (wandState == state) {
-                    return;
-                }
+            if (!state.isAir() && wand.getOrDefault(BuildingWandsModule.SWAPPINGWAND_DATA, SwappingWandData.DEFAULT).state() == state) {
                 Set<BlockPos> coordinates = findSuitableBlocks(wand, world, br.getDirection(), blockPos, state);
                 renderOutlines(evt, player, coordinates, 200, 230, 180);
             }
@@ -305,7 +274,7 @@ public class SwappingWand extends GenericWand {
 
     private Set<BlockPos> findSuitableBlocks(ItemStack stack, Level world, Direction sideHit, BlockPos pos, BlockState centerState) {
         Set<BlockPos> coordinates = new HashSet<BlockPos>();
-        int mode = getMode(stack);
+        SwappingWandData.Mode mode = getMode(stack);
         int dim = 0;
         switch (mode) {
             case MODE_SINGLE -> {
@@ -357,7 +326,7 @@ public class SwappingWand extends GenericWand {
         }
     }
 
-    private int getMode(ItemStack stack) {
-        return stack.getOrCreateTag().getInt("mode");
+    private SwappingWandData.Mode getMode(ItemStack stack) {
+        return stack.getOrDefault(BuildingWandsModule.SWAPPINGWAND_DATA, SwappingWandData.DEFAULT).mode();
     }
 }

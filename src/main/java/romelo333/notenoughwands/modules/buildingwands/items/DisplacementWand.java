@@ -23,13 +23,13 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.util.BlockSnapshot;
-import net.neoforged.neoforge.event.ForgeEventFactory;
+import net.neoforged.neoforge.event.EventHooks;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsConfiguration;
+import romelo333.notenoughwands.modules.buildingwands.BuildingWandsModule;
 import romelo333.notenoughwands.modules.buildingwands.data.DisplacementWandData;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 import romelo333.notenoughwands.varia.Tools;
 
-import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -59,17 +59,13 @@ public class DisplacementWand extends GenericWand {
 
     @Override
     public void toggleMode(Player player, ItemStack stack) {
-        int mode = getMode(stack);
-        mode++;
-        if (mode > MODE_LAST) {
-            mode = MODE_FIRST;
-        }
-        Tools.notify(player, ComponentFactory.literal("Switched to " + DESCRIPTIONS[mode] + " mode"));
-        stack.getOrCreateTag().putInt("mode", mode);
+        DisplacementWandData.Mode mode = stack.getOrDefault(BuildingWandsModule.DISPLACEMENTWAND_DATA, DisplacementWandData.DEFAULT).mode().next();
+        Tools.notify(player, ComponentFactory.literal("Switched to " + mode.getDescription() + " mode"));
+        stack.update(BuildingWandsModule.DISPLACEMENTWAND_DATA, DisplacementWandData.DEFAULT, data -> data.withMode(mode));
     }
 
     private DisplacementWandData.Mode getMode(ItemStack stack) {
-        return stack.getOrCreateTag().getInt("mode");
+        return stack.getOrDefault(BuildingWandsModule.DISPLACEMENTWAND_DATA, DisplacementWandData.DEFAULT).mode();
     }
 
     @Override
@@ -122,22 +118,23 @@ public class DisplacementWand extends GenericWand {
                 double cost = GenericWand.checkPickup(player, world, otherC, state, BuildingWandsConfiguration.maxHardness.get());
                 if (cost >= 0.0) {
                     cnt++;
-                    SoundTools.playSound(world, block.getSoundType(state).getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
+                    SoundTools.playSound(world, block.getSoundType(state, world, coordinate, player).getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
                     BlockEntity tileEntity = world.getBlockEntity(coordinate);
                     CompoundTag tc = null;
                     if (tileEntity != null) {
-                        tc = tileEntity.saveWithoutMetadata();
+                        tc = tileEntity.saveWithoutMetadata(world.registryAccess());
                         world.removeBlockEntity(coordinate);
                     }
 
                     world.setBlock(coordinate, Blocks.AIR.defaultBlockState(), 0);
 
-                    BlockSnapshot blocksnapshot = net.minecraftforge.common.util.BlockSnapshot.create(world.dimension(), world, otherC);
-                    BlockState blockState = block.defaultBlockState();    // @todo 1.15 blockstate
-                    world.setBlock(otherC, blockState, 3);
-                    if (ForgeEventFactory.onBlockPlace(player, blocksnapshot, Direction.UP)) {
-                        blocksnapshot.restore(true, false);
-                        world.setBlock(coordinate, blockState, 3);
+                    BlockSnapshot blocksnapshot = BlockSnapshot.create(world.dimension(), world, otherC);
+                    BlockState blockState = block.defaultBlockState();
+                    world.setBlock(otherC, blockState, Block.UPDATE_ALL);
+                    if (EventHooks.onBlockPlace(player, blocksnapshot, Direction.UP)) {
+//                        blocksnapshot.restore(true, false);   // @todo 1.21 check
+                        blocksnapshot.restore(0);
+                        world.setBlock(coordinate, blockState, Block.UPDATE_ALL);
                         // Make sure we restore the tileentity at the original spot
                         otherC = coordinate;
                     }
@@ -146,9 +143,9 @@ public class DisplacementWand extends GenericWand {
                         //TODO otherC moved from setBlockEntity to loadStatic
                         tileEntity = world.getBlockEntity(otherC);
                         if (tileEntity != null) {
-                            tileEntity.load(tc);
+                            tileEntity.loadWithComponents(tc, world.registryAccess());
                             tileEntity.setChanged();
-                            world.sendBlockUpdated(otherC, blockState, blockState, 3); // @todo 1.15 constants
+                            world.sendBlockUpdated(otherC, blockState, blockState, Block.UPDATE_ALL);
                         }
                     }
                 }
@@ -176,7 +173,7 @@ public class DisplacementWand extends GenericWand {
 
     private Set<BlockPos> findSuitableBlocks(ItemStack stack, Level world, Direction sideHit, BlockPos pos) {
         Set<BlockPos> coordinates = new HashSet<>();
-        int mode = getMode(stack);
+        DisplacementWandData.Mode mode = getMode(stack);
         int dim = 0;
         switch (mode) {
             case MODE_SINGLE -> {

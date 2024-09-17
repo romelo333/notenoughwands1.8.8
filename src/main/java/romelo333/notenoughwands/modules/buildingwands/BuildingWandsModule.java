@@ -12,6 +12,9 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import romelo333.notenoughwands.modules.buildingwands.data.BuildingWandData;
+import romelo333.notenoughwands.modules.buildingwands.data.DisplacementWandData;
+import romelo333.notenoughwands.modules.buildingwands.data.MovingWandData;
+import romelo333.notenoughwands.modules.buildingwands.data.SwappingWandData;
 import romelo333.notenoughwands.modules.buildingwands.items.BuildingWand;
 import romelo333.notenoughwands.modules.buildingwands.items.DisplacementWand;
 import romelo333.notenoughwands.modules.buildingwands.items.MovingWand;
@@ -36,6 +39,21 @@ public class BuildingWandsModule implements IModule {
             builder -> builder
                     .persistent(BuildingWandData.CODEC)
                     .networkSynchronized(BuildingWandData.STREAM_CODEC));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<DisplacementWandData>> DISPLACEMENTWAND_DATA = REGISTRAR.registerComponentType(
+            "displacementwandsettings",
+            builder -> builder
+                    .persistent(DisplacementWandData.CODEC)
+                    .networkSynchronized(DisplacementWandData.STREAM_CODEC));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<MovingWandData>> MOVINGWAND_DATA = REGISTRAR.registerComponentType(
+            "movingwandsettings",
+            builder -> builder
+                    .persistent(MovingWandData.CODEC)
+                    .networkSynchronized(MovingWandData.STREAM_CODEC));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<SwappingWandData>> SWAPPINGWAND_DATA = REGISTRAR.registerComponentType(
+            "swappingwandsettings",
+            builder -> builder
+                    .persistent(SwappingWandData.CODEC)
+                    .networkSynchronized(SwappingWandData.STREAM_CODEC));
 
     @Override
     public void init(FMLCommonSetupEvent event) {
