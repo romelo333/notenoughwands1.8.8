@@ -7,10 +7,15 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
+import net.neoforged.neoforge.energy.ComponentEnergyStorage;
+import romelo333.notenoughwands.data.EnergyItem;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsModule;
 import romelo333.notenoughwands.modules.lightwand.LightModule;
 import romelo333.notenoughwands.modules.protectionwand.ProtectionWandModule;
+import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 import romelo333.notenoughwands.modules.wands.WandsModule;
 import romelo333.notenoughwands.network.NEWPacketHandler;
 import romelo333.notenoughwands.setup.ClientSetup;
@@ -66,5 +71,17 @@ public class NotEnoughWands {
         modules.register(new WandsModule());
         modules.register(new ProtectionWandModule());
         modules.register(new BuildingWandsModule());
+    }
+
+    // @todo 1.21 for McJtyLib?
+    private void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
+        Registration.ITEMS.getRegister().getEntries().forEach(entry -> {
+            Item item = entry.get();
+            if (item instanceof GenericWand) {
+                event.registerItem(Capabilities.EnergyStorage.ITEM,
+                        (stack, context) -> new ComponentEnergyStorage(stack, EnergyItem.ENERGY_COMPONENT.get(), 0),
+                        item);
+            }
+        });
     }
 }
