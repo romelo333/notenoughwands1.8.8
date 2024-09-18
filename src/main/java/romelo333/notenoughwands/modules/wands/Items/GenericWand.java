@@ -6,15 +6,14 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.ICapabilityProvider;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import romelo333.notenoughwands.keys.KeyBindings;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsConfiguration;
@@ -24,10 +23,8 @@ import romelo333.notenoughwands.modules.wands.WandsConfiguration;
 import romelo333.notenoughwands.setup.Registration;
 import romelo333.notenoughwands.varia.ClientTools;
 import romelo333.notenoughwands.varia.IEnergyItem;
-import romelo333.notenoughwands.varia.ItemCapabilityProvider;
 import romelo333.notenoughwands.varia.Tools;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Set;
 
@@ -139,10 +136,11 @@ public class GenericWand extends Item implements IEnergyItem {
         return true;
     }
 
-    @Override
-    public boolean canBeDepleted() {
-        return needsDamage();
-    }
+    // @todo 1.21 Neoforge
+//    @Override
+//    public boolean canBeDepleted() {
+//        return needsDamage();
+//    }
 
     @Override
     public int getMaxDamage(ItemStack stack) {
@@ -157,7 +155,7 @@ public class GenericWand extends Item implements IEnergyItem {
             Tools.addPlayerXP(player, -(int) (calculateXP() * difficultyScale));
         }
         if (needsDamage()) {
-            stack.hurtAndBreak(1, player, playerEntity -> {});
+            stack.hurtAndBreak(1, (ServerLevel) player.level(), player, playerEntity -> {});
         }
         if (needsPower()) {
             extractEnergy(stack, (int) (calculatePower() * difficultyScale), false);

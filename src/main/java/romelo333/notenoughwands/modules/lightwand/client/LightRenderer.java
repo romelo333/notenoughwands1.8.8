@@ -14,10 +14,11 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.resources.ResourceLocation;
 import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.modules.lightwand.LightModule;
+import romelo333.notenoughwands.modules.lightwand.blocks.LightTE;
 
 public class LightRenderer implements BlockEntityRenderer<LightTE> {
 
-    public static final ResourceLocation LIGHT = new ResourceLocation(NotEnoughWands.MODID, "block/light");
+    public static final ResourceLocation LIGHT = ResourceLocation.fromNamespaceAndPath(NotEnoughWands.MODID, "block/light");
 
     public LightRenderer(BlockEntityRendererProvider.Context context) {
         super();

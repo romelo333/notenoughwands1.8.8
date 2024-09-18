@@ -1,12 +1,13 @@
 package romelo333.notenoughwands;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.neoforged.bus.api.ICancellableEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.ExplosionEvent;
-import net.neoforged.bus.api.SubscribeEvent;
 import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
 import romelo333.notenoughwands.modules.protectionwand.ProtectionWandConfiguration;
 
@@ -65,29 +66,34 @@ public class ForgeEventHandlers {
 //    }
 
     @SubscribeEvent
-    public void onPlayerInteractEvent(PlayerInteractEvent event) {
-        if (!event.isCancelable()) {
-            return;
-        }
+    public void onPlayerInteractEvent(PlayerInteractEvent.LeftClickBlock event) {
+        protect(event, event);
+    }
 
+    @SubscribeEvent
+    public void onPlayerInteractEvent(PlayerInteractEvent.RightClickBlock event) {
+        protect(event, event);
+    }
+
+    private static void protect(PlayerInteractEvent event, ICancellableEvent cancellable) {
         Level world = event.getLevel();
         BlockPos pos = event.getPos();
 
         if (world.isClientSide) {
             // Client side.
             if (ProtectedBlocks.isProtectedClientSide(world, pos)) {
-                event.setCanceled(true);
+                cancellable.setCanceled(true);
             }
         } else {
             // Server side
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
             if (protectedBlocks != null && protectedBlocks.isProtected(world, pos)) {
                 if (ProtectionWandConfiguration.interactionProtection.get()) {
-                    event.setCanceled(true);
+                    cancellable.setCanceled(true);
                 } else {
                     // We still allow right click interaction.
                     if (event instanceof PlayerInteractEvent.LeftClickBlock) {
-                        event.setCanceled(true);
+                        cancellable.setCanceled(true);
                     }
                 }
                 return;

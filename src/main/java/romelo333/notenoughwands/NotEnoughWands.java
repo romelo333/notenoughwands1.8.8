@@ -12,6 +12,7 @@ import romelo333.notenoughwands.modules.buildingwands.BuildingWandsModule;
 import romelo333.notenoughwands.modules.lightwand.LightModule;
 import romelo333.notenoughwands.modules.protectionwand.ProtectionWandModule;
 import romelo333.notenoughwands.modules.wands.WandsModule;
+import romelo333.notenoughwands.network.NEWPacketHandler;
 import romelo333.notenoughwands.setup.ClientSetup;
 import romelo333.notenoughwands.setup.Config;
 import romelo333.notenoughwands.setup.ModSetup;
@@ -41,6 +42,7 @@ public class NotEnoughWands {
         bus.addListener(modules::init);
         bus.addListener(Config::onLoad);
         bus.addListener(this::onDataGen);
+        bus.addListener(NEWPacketHandler::registerMessages);
 
         if (dist.isClient()) {
             bus.addListener(modules::initClient);

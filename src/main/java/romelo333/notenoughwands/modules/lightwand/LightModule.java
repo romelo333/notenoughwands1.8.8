@@ -16,6 +16,7 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
 import romelo333.notenoughwands.modules.lightwand.blocks.LightBlock;
+import romelo333.notenoughwands.modules.lightwand.blocks.LightTE;
 import romelo333.notenoughwands.modules.lightwand.client.LightRenderer;
 import romelo333.notenoughwands.modules.lightwand.items.IlluminationWand;
 import romelo333.notenoughwands.modules.wands.WandsModule;
@@ -29,11 +30,13 @@ import static mcjty.lib.datagen.DataGen.has;
 import static net.neoforged.neoforge.client.model.generators.ModelProvider.BLOCK_FOLDER;
 import static romelo333.notenoughwands.NotEnoughWands.tab;
 import static romelo333.notenoughwands.setup.Registration.*;
+import static romelo333.notenoughwands.setup.Registration.TILES;
 
 public class LightModule implements IModule {
 
     public static final DeferredBlock<Block> LIGHT = BLOCKS.register("light", LightBlock::new);
     public static final DeferredItem<Item> LIGHT_ITEM = ITEMS.register("light", tab(() -> new BlockItem(LIGHT.get(), Registration.createStandardProperties())));
+    public static final Supplier<BlockEntityType<LightTE>> TYPE_LIGHT = TILES.register("light", () -> BlockEntityType.Builder.of(LightTE::new, LIGHT.get()).build(null));
 
     public static final DeferredItem<Item> ILLUMINATION_WAND = ITEMS.register("illumination_wand", tab(IlluminationWand::new));
 

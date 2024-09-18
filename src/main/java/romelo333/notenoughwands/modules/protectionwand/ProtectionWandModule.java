@@ -7,6 +7,7 @@ import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.registries.DeferredItem;
 import romelo333.notenoughwands.modules.protectionwand.items.ProtectionWand;
 import romelo333.notenoughwands.modules.wands.WandsModule;
 import romelo333.notenoughwands.setup.Config;
