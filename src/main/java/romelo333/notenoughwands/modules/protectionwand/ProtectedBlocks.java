@@ -2,15 +2,16 @@ package romelo333.notenoughwands.modules.protectionwand;
 
 import mcjty.lib.varia.LevelTools;
 import mcjty.lib.worlddata.AbstractWorldData;
-import net.minecraft.nbt.Tag;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.core.GlobalPos;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.tuple.Pair;
 import romelo333.notenoughwands.varia.Tools;
@@ -50,7 +51,7 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
         for (int i = 0; i<list.size();i++){
             CompoundTag tc = list.getCompound(i);
             String dim = tc.getString("dim");
-            GlobalPos block = GlobalPos.of(LevelTools.getId(new ResourceLocation(dim)), new BlockPos(tc.getInt("x"),tc.getInt("y"),tc.getInt("z")));
+            GlobalPos block = GlobalPos.of(LevelTools.getId(ResourceLocation.parse(dim)), new BlockPos(tc.getInt("x"),tc.getInt("y"),tc.getInt("z")));
             int id = tc.getInt("id");
             blocks.put(block, id);
             incrementProtection(id);
@@ -243,8 +244,9 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
     //TODO load doesn't exist in McjtyLib
     //@Override
 
+
     @Override
-    public CompoundTag save(CompoundTag tagCompound) {
+    public CompoundTag save(CompoundTag tagCompound, HolderLookup.Provider provider) {
         tagCompound.putInt("lastId", lastId);
         ListTag list = new ListTag();
         for (Map.Entry<GlobalPos, Integer> entry : blocks.entrySet()) {

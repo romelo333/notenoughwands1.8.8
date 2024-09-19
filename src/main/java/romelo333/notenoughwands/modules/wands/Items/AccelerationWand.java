@@ -23,34 +23,20 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import romelo333.notenoughwands.modules.wands.WandsConfiguration;
+import romelo333.notenoughwands.modules.wands.WandsModule;
+import romelo333.notenoughwands.modules.wands.data.AccelerationWandData;
 import romelo333.notenoughwands.varia.Tools;
 
-import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Random;
 
 import static mcjty.lib.builder.TooltipBuilder.*;
 
 public class AccelerationWand extends GenericWand {
 
-    public static final int MODE_FIRST = 0;
-    public static final int MODE_20 = 0;
-    public static final int MODE_50 = 1;
-    public static final int MODE_100 = 2;
-    public static final int MODE_LAST = MODE_100;
-
-    public static final String[] DESCRIPTIONS = new String[] {
-            "fast", "faster", "fastest"
-    };
-
     private final TooltipBuilder tooltipBuilder = new TooltipBuilder()
             .info(key("message.notenoughwands.shiftmessage"))
             .infoShift(header(), gold(),
-                    parameter("mode", stack -> DESCRIPTIONS[getMode(stack)]));
-
-
-    public static final int[] amount = new int[] { 20, 50, 100};
-    public static final float[] cost = new float[] { 1.0f, 2.0f, 5.0f};
+                    parameter("mode", stack -> getMode(stack).getDescription()));
 
     public AccelerationWand() {
         this.usageFactor(3.0f);
@@ -59,8 +45,8 @@ public class AccelerationWand extends GenericWand {
     private final RandomSource random = RandomSource.create();
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> list, TooltipFlag flagIn) {
-        super.appendHoverText(stack, world, list, flagIn);
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> list, TooltipFlag flagIn) {
+        super.appendHoverText(stack, context, list, flagIn);
         tooltipBuilder.makeTooltip(mcjty.lib.varia.Tools.getId(this), stack, list, flagIn);
 
         showModeKeyDescription(list, "change speed");
@@ -87,10 +73,10 @@ public class AccelerationWand extends GenericWand {
         if (!world.isClientSide) {
             BlockState state = world.getBlockState(pos);
             Block block = state.getBlock();
-            int mode = getMode(stack);
+            AccelerationWandData.Mode mode = getMode(stack);
 
-            float cost = AccelerationWand.cost[mode];
-            int amount = AccelerationWand.amount[mode];
+            float cost = mode.getCost();
+            int amount = mode.getAmount();
 
             if (player instanceof FakePlayer) {
                 if (WandsConfiguration.fakePlayerFactor.get() < 0) {
@@ -109,8 +95,8 @@ public class AccelerationWand extends GenericWand {
             }
             BlockEntity tileEntity = world.getBlockEntity(pos);
             for (int i = 0; i < amount /(tileEntity == null ? 5 : 1); i ++){
-                if (tileEntity == null){
-                    block.tick(state, (ServerLevel) world, pos, random);
+                if (tileEntity == null) {
+                    state.tick((ServerLevel) world, pos, random);
                 } else if (state.getBlock() instanceof EntityBlock entityBlock) {
                     BlockEntityTicker<BlockEntity> ticker = entityBlock.getTicker(world, state, (BlockEntityType<BlockEntity>) tileEntity.getType());
                     if (ticker != null) {
@@ -127,16 +113,12 @@ public class AccelerationWand extends GenericWand {
 
     @Override
     public void toggleMode(Player player, ItemStack stack) {
-        int mode = getMode(stack);
-        mode++;
-        if (mode > MODE_LAST) {
-            mode = MODE_FIRST;
-        }
-        Tools.notify(player, ComponentFactory.literal("Switched to " + DESCRIPTIONS[mode] + " mode"));
-        stack.getOrCreateTag().putInt("mode", mode);
+        AccelerationWandData.Mode mode = getMode(stack).next();
+        Tools.notify(player, ComponentFactory.literal("Switched to " + mode.getDescription() + " mode"));
+        stack.update(WandsModule.ACCELERATIONWAND_DATA, AccelerationWandData.DEFAULT, data -> data.withMode(mode));
     }
 
-    private int getMode(ItemStack stack) {
-        return stack.getOrCreateTag().getInt("mode");
+    private AccelerationWandData.Mode getMode(ItemStack stack) {
+        return stack.getOrDefault(WandsModule.ACCELERATIONWAND_DATA, AccelerationWandData.DEFAULT).mode();
     }
 }

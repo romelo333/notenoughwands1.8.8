@@ -14,7 +14,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.energy.IEnergyStorage;
+import romelo333.notenoughwands.data.EnergyItem;
 import romelo333.notenoughwands.keys.KeyBindings;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsConfiguration;
 import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
@@ -22,13 +25,12 @@ import romelo333.notenoughwands.modules.wands.WandUsage;
 import romelo333.notenoughwands.modules.wands.WandsConfiguration;
 import romelo333.notenoughwands.setup.Registration;
 import romelo333.notenoughwands.varia.ClientTools;
-import romelo333.notenoughwands.varia.IEnergyItem;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.List;
 import java.util.Set;
 
-public class GenericWand extends Item implements IEnergyItem {
+public class GenericWand extends Item {
 
     protected float usageFactor = 1.0f;
 
@@ -192,61 +194,26 @@ public class GenericWand extends Item implements IEnergyItem {
 
     //------------------------------------------------------------------------------
 
-    @Override
-    public int extractEnergy(ItemStack container, int maxExtract, boolean simulate) {
-        if (!needsPower()) {
-            return 0;
-        }
-
-        if (container.getTag() == null || !container.getTag().contains("Energy")) {
-            return 0;
-        }
-        int energy = container.getTag().getInt("Energy");
-        int energyExtracted = Math.min(energy, Math.min(calculatePower(), maxExtract));
-
-        if (!simulate) {
-            energy -= energyExtracted;
-            container.getTag().putInt("Energy", energy);
-        }
-        return energyExtracted;
-    }
-
-    @Override
-    public int receiveEnergy(ItemStack container, int maxReceive, boolean simulate) {
-        if (!needsPower()) {
-            return 0;
-        }
-
-        container.getOrCreateTag();
-        int energy = container.getTag().getInt("Energy");
-        int maxrf = calculateMaxPower();
-        int energyReceived = Math.min(maxrf - energy, Math.min(maxrf, maxReceive));
-
-        if (!simulate) {
-            energy += energyReceived;
-            container.getTag().putInt("Energy", energy);
-        }
-        return energyReceived;
-    }
-
-    @Override
     public int getEnergyStored(ItemStack container) {
-        if (container.getTag() == null || !container.getTag().contains("Energy")) {
-            return 0;
-        }
-        return container.getTag().getInt("Energy");
+        return container.get(EnergyItem.ENERGY_COMPONENT);
     }
 
-    @Override
     public int getMaxEnergyStored(ItemStack container) {
         return calculateMaxPower();
+    }
+
+    private void extractEnergy(ItemStack stack, int amount, boolean simulate) {
+        IEnergyStorage capability = stack.getCapability(Capabilities.EnergyStorage.ITEM, null);
+        if (capability != null) {
+            capability.extractEnergy(amount, simulate);
+        }
     }
 
     private int calculatePower() {
         return (int) (500 * usageFactor);       // @todo 1.15 balance
     }
 
-    private int calculateMaxPower() {
+    public int calculateMaxPower() {
         return (int) (100000 * usageFactor);       // @todo 1.15 balance
     }
 

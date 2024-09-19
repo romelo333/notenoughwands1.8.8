@@ -4,6 +4,7 @@ import mcjty.lib.datagen.DataGen;
 import mcjty.lib.datagen.Dob;
 import mcjty.lib.modules.IModule;
 import mcjty.lib.varia.SoundTools;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.Item;
@@ -11,17 +12,19 @@ import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.modules.wands.Items.*;
+import romelo333.notenoughwands.modules.wands.data.AccelerationWandData;
+import romelo333.notenoughwands.modules.wands.data.CapturingWandData;
 import romelo333.notenoughwands.setup.Config;
 
 import java.util.function.Supplier;
 
 import static mcjty.lib.datagen.DataGen.has;
 import static romelo333.notenoughwands.NotEnoughWands.tab;
-import static romelo333.notenoughwands.setup.Registration.ITEMS;
-import static romelo333.notenoughwands.setup.Registration.SOUNDS;
+import static romelo333.notenoughwands.setup.Registration.*;
 
 public class WandsModule implements IModule {
 
@@ -35,6 +38,17 @@ public class WandsModule implements IModule {
     //    public static final Supplier<Item> POTION_WAND = ITEMS.register("potion_wand", PotionWand::new);
 
     public static final Supplier<SoundEvent> TELEPORT_SOUND = SOUNDS.register("teleport", () -> SoundTools.createSoundEvent(ResourceLocation.fromNamespaceAndPath(NotEnoughWands.MODID, "teleport")));
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<CapturingWandData>> CAPTURINGWAND_DATA = COMPONENTS.registerComponentType(
+            "capturingwand",
+            builder -> builder
+                    .persistent(CapturingWandData.CODEC)
+                    .networkSynchronized(CapturingWandData.STREAM_CODEC));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<AccelerationWandData>> ACCELERATIONWAND_DATA = COMPONENTS.registerComponentType(
+            "accelerationwandwand",
+            builder -> builder
+                    .persistent(AccelerationWandData.CODEC)
+                    .networkSynchronized(AccelerationWandData.STREAM_CODEC));
 
     @Override
     public void init(FMLCommonSetupEvent event) {

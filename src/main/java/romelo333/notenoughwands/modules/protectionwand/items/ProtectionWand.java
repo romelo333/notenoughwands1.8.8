@@ -14,6 +14,8 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
+import romelo333.notenoughwands.modules.protectionwand.ProtectionWandModule;
+import romelo333.notenoughwands.modules.protectionwand.data.ProtectionWandData;
 import romelo333.notenoughwands.modules.protectionwand.network.PacketGetProtectedBlockCount;
 import romelo333.notenoughwands.modules.protectionwand.network.PacketGetProtectedBlocks;
 import romelo333.notenoughwands.modules.protectionwand.network.ReturnProtectedBlockCountHelper;
@@ -22,23 +24,14 @@ import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 import romelo333.notenoughwands.network.NEWPacketHandler;
 import romelo333.notenoughwands.varia.Tools;
 
-import javax.annotation.Nullable;
 import java.util.List;
+
+import static romelo333.notenoughwands.modules.protectionwand.data.ProtectionWandData.Mode.MODE_PROTECT;
+import static romelo333.notenoughwands.modules.protectionwand.data.ProtectionWandData.Mode.MODE_UNPROTECT;
 
 public class ProtectionWand extends GenericWand {
 
-    public static final int MODE_FIRST = 0;
-    public static final int MODE_PROTECT = 0;
-    public static final int MODE_UNPROTECT = 1;
-    public static final int MODE_CLEAR = 2;
-    public static final int MODE_LAST = MODE_CLEAR;
-
     private final boolean master;
-
-
-    public static final String[] descriptions = new String[] {
-            "protect", "unprotect", "clear all"
-    };
 
     public ProtectionWand(boolean master) {
         super();
@@ -53,10 +46,11 @@ public class ProtectionWand extends GenericWand {
     private static long tooltipLastTime = 0;
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> list, TooltipFlag flagIn) {
-        super.appendHoverText(stack, world, list, flagIn);
-        boolean hasid = stack.getTag() != null && stack.getTag().contains("id");
-        int mode = getMode(stack);
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> list, TooltipFlag flagIn) {
+        super.appendHoverText(stack, context, list, flagIn);
+        ProtectionWandData data = stack.getOrDefault(ProtectionWandModule.PROTECTIONWAND_DATA, ProtectionWandData.DEFAULT);
+        boolean hasid = data.id() != 0;
+        ProtectionWandData.Mode mode = data.mode();
         int id = getId(stack);
         if (hasid && id != 0) {
             if ((System.currentTimeMillis() - tooltipLastTime) > 250) {
@@ -65,7 +59,7 @@ public class ProtectionWand extends GenericWand {
             }
         }
         // @todo 1.15 better tooltips
-        list.add(ComponentFactory.literal(ChatFormatting.GREEN + "Mode: " + descriptions[mode]));
+        list.add(ComponentFactory.literal(ChatFormatting.GREEN + "Mode: " + mode.getDescription()));
         if (master) {
             list.add(ComponentFactory.literal(ChatFormatting.YELLOW + "Master wand"));
         } else {
@@ -82,24 +76,20 @@ public class ProtectionWand extends GenericWand {
 
     @Override
     public void toggleMode(Player player, ItemStack stack) {
-        int mode = getMode(stack);
-        mode++;
-        if (mode > MODE_LAST) {
-            mode = MODE_FIRST;
-        }
-        Tools.notify(player, ComponentFactory.literal("Switched to " + descriptions[mode] + " mode"));
-        stack.getOrCreateTag().putInt("mode", mode);
+        ProtectionWandData.Mode mode = getMode(stack).next();
+        Tools.notify(player, ComponentFactory.literal("Switched to " + mode.getDescription() + " mode"));
+        stack.update(ProtectionWandModule.PROTECTIONWAND_DATA, ProtectionWandData.DEFAULT, data -> data.withMode(mode));
     }
 
-    private int getMode(ItemStack stack) {
-        return stack.getOrCreateTag().getInt("mode");
+    private ProtectionWandData.Mode getMode(ItemStack stack) {
+        return stack.getOrDefault(ProtectionWandModule.PROTECTIONWAND_DATA, ProtectionWandData.DEFAULT).mode();
     }
 
     public int getId(ItemStack stack) {
         if (master) {
             return -1;
         }
-        return stack.getOrCreateTag().getInt("id");
+        return stack.getOrDefault(ProtectionWandModule.PROTECTIONWAND_DATA, ProtectionWandData.DEFAULT).id();
     }
 
     private static long lastTime = 0;
@@ -127,7 +117,7 @@ public class ProtectionWand extends GenericWand {
         if (!world.isClientSide) {
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
             int id = getOrCreateId(stack, world, protectedBlocks);
-            int mode = getMode(stack);
+            ProtectionWandData.Mode mode = getMode(stack);
             if (mode == MODE_PROTECT) {
                 if (!checkUsage(stack, player, 1.0f)) {
                     return InteractionResult.FAIL;
@@ -152,7 +142,8 @@ public class ProtectionWand extends GenericWand {
         int id = getId(stack);
         if (id == 0) {
             id = protectedBlocks.getNewId();
-            stack.getOrCreateTag().putInt("id", id);
+            int finalId = id;
+            stack.update(ProtectionWandModule.PROTECTIONWAND_DATA, ProtectionWandData.DEFAULT, data -> data.withId(finalId));
         }
         return id;
     }
@@ -172,9 +163,9 @@ public class ProtectionWand extends GenericWand {
 
     @Override
     public ItemStack getCraftingRemainingItem(ItemStack stack) {
-        if (hasCraftingRemainingItem(stack) && stack.hasTag()) {
+        if (hasCraftingRemainingItem(stack)) {
             ItemStack container = new ItemStack(getCraftingRemainingItem());
-            container.setTag(stack.getTag().copy());
+            container.set(ProtectionWandModule.PROTECTIONWAND_DATA, stack.get(ProtectionWandModule.PROTECTIONWAND_DATA));
             return container;
         }
         return ItemStack.EMPTY;

@@ -35,22 +35,22 @@ public class BuildingWandsModule implements IModule {
     public static final DeferredItem<Item> SWAPPING_WAND = ITEMS.register("swapping_wand", tab(SwappingWand::new));
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<BuildingWandData>> BUILDINGWAND_DATA = COMPONENTS.registerComponentType(
-            "signsettings",
+            "buildingwand",
             builder -> builder
                     .persistent(BuildingWandData.CODEC)
                     .networkSynchronized(BuildingWandData.STREAM_CODEC));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<DisplacementWandData>> DISPLACEMENTWAND_DATA = COMPONENTS.registerComponentType(
-            "displacementwandsettings",
+            "displacementwand",
             builder -> builder
                     .persistent(DisplacementWandData.CODEC)
                     .networkSynchronized(DisplacementWandData.STREAM_CODEC));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<MovingWandData>> MOVINGWAND_DATA = COMPONENTS.registerComponentType(
-            "movingwandsettings",
+            "movingwand",
             builder -> builder
                     .persistent(MovingWandData.CODEC)
                     .networkSynchronized(MovingWandData.STREAM_CODEC));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<SwappingWandData>> SWAPPINGWAND_DATA = COMPONENTS.registerComponentType(
-            "swappingwandsettings",
+            "swappingwand",
             builder -> builder
                     .persistent(SwappingWandData.CODEC)
                     .networkSynchronized(SwappingWandData.STREAM_CODEC));

@@ -64,7 +64,7 @@ public class BuildingWandsConfiguration {
             if (split.length > 1) {
                 cost = Double.parseDouble(split[1]);
             }
-            blacklistedBlocks.put(new ResourceLocation(split[0]), cost);
+            blacklistedBlocks.put(ResourceLocation.parse(split[0]), cost);
         }
         blacklistedBlocksLoaded = true;
     }

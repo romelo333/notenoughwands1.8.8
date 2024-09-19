@@ -142,7 +142,7 @@ public class WandsConfiguration {
             if (split.length > 1) {
                 cost = Double.parseDouble(split[1]);
             }
-            blacklistedEntities.put(new ResourceLocation(split[0]), cost);
+            blacklistedEntities.put(ResourceLocation.parse(split[0]), cost);
         }
 
     }

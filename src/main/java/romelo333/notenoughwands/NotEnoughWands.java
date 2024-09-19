@@ -77,9 +77,9 @@ public class NotEnoughWands {
     private void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
         Registration.ITEMS.getRegister().getEntries().forEach(entry -> {
             Item item = entry.get();
-            if (item instanceof GenericWand) {
+            if (item instanceof GenericWand wand) {
                 event.registerItem(Capabilities.EnergyStorage.ITEM,
-                        (stack, context) -> new ComponentEnergyStorage(stack, EnergyItem.ENERGY_COMPONENT.get(), 0),
+                        (stack, context) -> new ComponentEnergyStorage(stack, EnergyItem.ENERGY_COMPONENT.get(), wand.calculateMaxPower()),
                         item);
             }
         });

@@ -37,7 +37,6 @@ import static romelo333.notenoughwands.modules.buildingwands.data.BuildingWandDa
 
 public class BuildingWand extends GenericWand {
 
-
     private final TooltipBuilder tooltipBuilder = new TooltipBuilder()
             .info(key("message.notenoughwands.shiftmessage"))
             .infoShift(header(), gold(),

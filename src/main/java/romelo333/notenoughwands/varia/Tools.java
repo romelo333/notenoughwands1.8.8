@@ -96,7 +96,7 @@ public class Tools {
     public static int finditem(ItemStack item, Inventory inv) {
         for (int i = 0; i < 36; ++i) {
             ItemStack stack = inv.getItem(i);
-            if (!stack.isEmpty() && ItemHandlerHelper.canItemStacksStack(item, stack)) {
+            if (!stack.isEmpty() && ItemStack.isSameItemSameComponents(item, stack)) {
                 return i;
             }
         }

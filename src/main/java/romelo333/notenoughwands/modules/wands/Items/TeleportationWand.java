@@ -40,8 +40,8 @@ public class TeleportationWand extends GenericWand {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> list, TooltipFlag flagIn) {
-        super.appendHoverText(stack, worldIn, list, flagIn);
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> list, TooltipFlag flagIn) {
+        super.appendHoverText(stack, context, list, flagIn);
         tooltipBuilder.makeTooltip(mcjty.lib.varia.Tools.getId(this), stack, list, flagIn);
 
         if (WandsConfiguration.teleportThroughWalls.get()) {

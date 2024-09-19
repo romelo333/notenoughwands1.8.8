@@ -21,9 +21,10 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import romelo333.notenoughwands.modules.wands.WandsConfiguration;
+import romelo333.notenoughwands.modules.wands.WandsModule;
+import romelo333.notenoughwands.modules.wands.data.CapturingWandData;
 import romelo333.notenoughwands.varia.Tools;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 import static mcjty.lib.builder.TooltipBuilder.*;
@@ -41,20 +42,15 @@ public class CapturingWand extends GenericWand {
 
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> list, TooltipFlag flagIn) {
-        super.appendHoverText(stack, worldIn, list, flagIn);
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> list, TooltipFlag flagIn) {
+        super.appendHoverText(stack, context, list, flagIn);
         tooltipBuilder.makeTooltip(mcjty.lib.varia.Tools.getId(this), stack, list, flagIn);
 
-        CompoundTag tagCompound = stack.getTag();
-        if (tagCompound != null) {
-            if (tagCompound.contains("mob")) {
-                String type = tagCompound.getString("type");
-                if (!type.isEmpty()) {
-                    EntityType<?> entityType = mcjty.lib.varia.Tools.getEntity(new ResourceLocation(type));
-                    if (entityType != null) {
-                        list.add(ComponentFactory.literal(ChatFormatting.GREEN + "Captured mob: ").append(entityType.getDescription()));
-                    }
-                }
+        CapturingWandData data = stack.getOrDefault(WandsModule.CAPTURINGWAND_DATA, CapturingWandData.DEFAULT);
+        if (data.type() != null) {
+            EntityType<?> entityType = mcjty.lib.varia.Tools.getEntity(data.type());
+            if (entityType != null) {
+                list.add(ComponentFactory.literal(ChatFormatting.GREEN + "Captured mob: ").append(entityType.getDescription()));
             }
         }
     }
@@ -67,10 +63,10 @@ public class CapturingWand extends GenericWand {
         ItemStack stack = player.getItemInHand(hand);
         BlockPos pos = context.getClickedPos();
         if (!world.isClientSide) {
-            CompoundTag tagCompound = stack.getOrCreateTag();
-            if (tagCompound.contains("mob")) {
-                Tag mobCompound = tagCompound.get("mob");
-                String type = tagCompound.getString("type");
+            CapturingWandData data = stack.getOrDefault(WandsModule.CAPTURINGWAND_DATA, CapturingWandData.DEFAULT);
+            if (data.type() != null) {
+                Tag mobCompound = data.tag();
+                ResourceLocation type = data.type();
                 LivingEntity entityLivingBase = createEntity(player, world, type);
                 if (entityLivingBase == null) {
                     Tools.error(player, "Something went wrong trying to spawn creature!");
@@ -78,8 +74,7 @@ public class CapturingWand extends GenericWand {
                 }
                 entityLivingBase.load((CompoundTag) mobCompound);
                 entityLivingBase.moveTo(pos.getX()+.5, pos.getY()+1, pos.getZ()+.5, 0, 0);
-                tagCompound.remove("mob");
-                tagCompound.remove("type");
+                stack.set(WandsModule.CAPTURINGWAND_DATA, CapturingWandData.DEFAULT);
                 world.addFreshEntity(entityLivingBase);
             } else {
                 Tools.error(player, "There is no mob captured in this wand!");
@@ -88,8 +83,8 @@ public class CapturingWand extends GenericWand {
         return InteractionResult.SUCCESS;
     }
 
-    private LivingEntity createEntity(Player player, Level world, String type) {
-        EntityType<?> entityType = mcjty.lib.varia.Tools.getEntity(new ResourceLocation(type));
+    private LivingEntity createEntity(Player player, Level world, ResourceLocation type) {
+        EntityType<?> entityType = mcjty.lib.varia.Tools.getEntity(type);
         if (entityType != null) {
             return (LivingEntity) entityType.create(world);
         }
@@ -100,7 +95,8 @@ public class CapturingWand extends GenericWand {
     public boolean onLeftClickEntity(ItemStack stack, Player player, Entity entity) {
         if (!player.getCommandSenderWorld().isClientSide) {
             if (entity instanceof LivingEntity entityLivingBase) {
-                if (stack.getOrCreateTag().contains("mob")) {
+                CapturingWandData data = stack.getOrDefault(WandsModule.CAPTURINGWAND_DATA, CapturingWandData.DEFAULT);
+                if (data.type() != null) {
                     Tools.error(player, "There is already a mob in this wand!");
                     return true;
                 }
@@ -130,8 +126,7 @@ public class CapturingWand extends GenericWand {
 
                 CompoundTag tagCompound = new CompoundTag();
                 entityLivingBase.addAdditionalSaveData(tagCompound);  // @todo 1.15 is this right?
-                stack.getOrCreateTag().put("mob", tagCompound);
-                stack.getOrCreateTag().putString("type", mcjty.lib.varia.Tools.getId(entity.getType()).toString());
+                stack.set(WandsModule.CAPTURINGWAND_DATA, new CapturingWandData(mcjty.lib.varia.Tools.getId(entity.getType()), tagCompound));
                 entity.remove(Entity.RemovalReason.DISCARDED);
 //                ((ServerLevel)player.getCommandSenderWorld()).removeEntity(entity);
 
