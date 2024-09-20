@@ -1,10 +1,6 @@
 {
   "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "Xn ",
-    "nXn",
-    " nX"
-  ],
+  "category": "misc",
   "key": {
     "X": {
       "item": "minecraft:blaze_rod"
@@ -13,7 +9,13 @@
       "item": "minecraft:gold_nugget"
     }
   },
+  "pattern": [
+    "Xn ",
+    "nXn",
+    " nX"
+  ],
   "result": {
-    "item": "notenoughwands:wand_core"
+    "count": 1,
+    "id": "notenoughwands:wand_core"
   }
 }

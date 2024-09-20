@@ -1,32 +1,32 @@
 {
   "parent": "minecraft:recipes/root",
-  "rewards": {
-    "recipes": [
-      "notenoughwands:acceleration_wand"
-    ]
-  },
   "criteria": {
     "core": {
-      "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "item": "notenoughwands:wand_core"
+            "items": "notenoughwands:wand_core"
           }
         ]
-      }
+      },
+      "trigger": "minecraft:inventory_changed"
     },
     "has_the_recipe": {
-      "trigger": "minecraft:recipe_unlocked",
       "conditions": {
         "recipe": "notenoughwands:acceleration_wand"
-      }
+      },
+      "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
-      "core",
-      "has_the_recipe"
+      "has_the_recipe",
+      "core"
     ]
-  ]
+  ],
+  "rewards": {
+    "recipes": [
+      "notenoughwands:acceleration_wand"
+    ]
+  }
 }

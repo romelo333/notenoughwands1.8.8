@@ -2,6 +2,7 @@ package romelo333.notenoughwands.modules.buildingwands.items;
 
 
 import mcjty.lib.builder.TooltipBuilder;
+import mcjty.lib.varia.ComponentFactory;
 import mcjty.lib.varia.SoundTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -66,6 +67,7 @@ public class BuildingWand extends GenericWand {
     @Override
     public void toggleMode(Player player, ItemStack stack) {
         BuildingWandData.Mode mode = getMode(stack).next();
+        Tools.notify(player, ComponentFactory.literal("Switched to " + mode.getDescription() + " mode"));
         stack.update(BuildingWandsModule.BUILDINGWAND_DATA, BuildingWandData.DEFAULT, data -> data.withMode(mode));
     }
 

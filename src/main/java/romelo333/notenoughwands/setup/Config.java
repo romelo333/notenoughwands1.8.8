@@ -1,14 +1,11 @@
 package romelo333.notenoughwands.setup;
 
 import mcjty.lib.modules.Modules;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.bus.api.SubscribeEvent;
-import romelo333.notenoughwands.modules.buildingwands.BuildingWandsConfiguration;
 import romelo333.notenoughwands.modules.protectionwand.ProtectionWandConfiguration;
 import romelo333.notenoughwands.modules.wands.WandsConfiguration;
 
@@ -38,7 +35,7 @@ public class Config {
         container.registerConfig(ModConfig.Type.SERVER, SERVER_CONFIG);
     }
 
-    public static void onLoad(final ModConfigEvent configEvent) {
+    public static void onLoad(final ModConfigEvent.Reloading configEvent) {
         if (configEvent.getConfig().getSpec() == SERVER_CONFIG) {
             ProtectionWandConfiguration.cachedClientSideProtection = ProtectionWandConfiguration.clientSideProtection.get();
             WandsConfiguration.cachedWandUsage = WandsConfiguration.wandUsage.get();

@@ -11,7 +11,6 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.energy.ComponentEnergyStorage;
-import romelo333.notenoughwands.data.EnergyItem;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsModule;
 import romelo333.notenoughwands.modules.lightwand.LightModule;
 import romelo333.notenoughwands.modules.protectionwand.ProtectionWandModule;
@@ -79,7 +78,7 @@ public class NotEnoughWands {
             Item item = entry.get();
             if (item instanceof GenericWand wand) {
                 event.registerItem(Capabilities.EnergyStorage.ITEM,
-                        (stack, context) -> new ComponentEnergyStorage(stack, EnergyItem.ENERGY_COMPONENT.get(), wand.calculateMaxPower()),
+                        (stack, context) -> new ComponentEnergyStorage(stack, Registration.ENERGY_COMPONENT.get(), wand.calculateMaxPower()),
                         item);
             }
         });

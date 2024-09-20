@@ -40,6 +40,12 @@ public class Registration {
         COMPONENTS.register(bus);
     }
 
+    public static final Supplier<DataComponentType<Integer>> ENERGY_COMPONENT = COMPONENTS.register("energy", () -> DataComponentType.<Integer>builder()
+            .persistent(Codec.INT)
+            .networkSynchronized(ByteBufCodecs.INT)
+            .build());
+
+
     public static Item.Properties createStandardProperties() {
         return NotEnoughWands.setup.defaultProperties();
     }

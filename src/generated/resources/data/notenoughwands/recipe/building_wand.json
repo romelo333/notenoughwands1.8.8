@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "w": {
+      "item": "notenoughwands:wand_core"
+    },
+    "x": {
+      "item": "minecraft:brick"
+    }
+  },
+  "pattern": [
+    "xx ",
+    "xw ",
+    "  w"
+  ],
+  "result": {
+    "count": 1,
+    "id": "notenoughwands:building_wand"
+  }
+}

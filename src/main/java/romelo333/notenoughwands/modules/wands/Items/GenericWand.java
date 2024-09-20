@@ -17,7 +17,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.energy.IEnergyStorage;
-import romelo333.notenoughwands.data.EnergyItem;
 import romelo333.notenoughwands.keys.KeyBindings;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsConfiguration;
 import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
@@ -183,19 +182,17 @@ public class GenericWand extends Item {
     }
 
     protected void showModeKeyDescription(List<Component> list, String suffix) {
-        String keyDescription = KeyBindings.wandModifier != null ? KeyBindings.wandModifier.getName() : "unknown";
-        list.add(ComponentFactory.literal("Mode key (" + keyDescription + ") to " + suffix).withStyle(ChatFormatting.YELLOW));
+        list.add(ComponentFactory.literal("Mode key (").append(KeyBindings.wandModifier.getTranslatedKeyMessage()).append(") to ").append(suffix).withStyle(ChatFormatting.YELLOW));
     }
 
     protected void showSubModeKeyDescription(List<Component> list, String suffix) {
-        String keyDescription = KeyBindings.wandSubMode != null ? KeyBindings.wandSubMode.getName() : "unknown";
-        list.add(ComponentFactory.literal("Sub-mode key (" + keyDescription + ") to " + suffix).withStyle(ChatFormatting.YELLOW));
+        list.add(ComponentFactory.literal("Sub-mode key (").append(KeyBindings.wandSubMode.getTranslatedKeyMessage()).append(") to ").append(suffix).withStyle(ChatFormatting.YELLOW));
     }
 
     //------------------------------------------------------------------------------
 
     public int getEnergyStored(ItemStack container) {
-        return container.get(EnergyItem.ENERGY_COMPONENT);
+        return container.getOrDefault(Registration.ENERGY_COMPONENT, 0);
     }
 
     public int getMaxEnergyStored(ItemStack container) {

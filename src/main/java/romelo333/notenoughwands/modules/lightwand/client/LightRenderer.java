@@ -26,13 +26,13 @@ public class LightRenderer implements BlockEntityRenderer<LightTE> {
 
     @Override
     public void render(LightTE tileEntity, float partialTicks, PoseStack matrixStack, MultiBufferSource buffer, int combinedLightIn, int combinedOverlayIn) {
-        DelayedRenderer.addRender(RenderType.translucent(), tileEntity.getBlockPos(), (poseStack, vertexConsumer) -> {
-            RenderHelper.renderBillboardQuadBright(poseStack, vertexConsumer, 0.5f, LIGHT, RenderSettings.builder()
+//        DelayedRenderer.addRender(RenderType.translucent(), tileEntity.getBlockPos(), (poseStack, vertexConsumer) -> {
+            RenderHelper.renderBillboardQuadBright(matrixStack, buffer, 0.5f, LIGHT, RenderSettings.builder()
                     .color(255, 255, 255)
-                    .renderType(CustomRenderTypes.translucent())
+                    .renderType(RenderType.translucent())
                     .alpha(128)
                     .build());
-        });
+//        });
     }
 
     public static void register() {

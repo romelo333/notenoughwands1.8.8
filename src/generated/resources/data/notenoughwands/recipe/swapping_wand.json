@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "R": {
+      "item": "minecraft:redstone_block"
+    },
+    "w": {
+      "item": "notenoughwands:wand_core"
+    },
+    "x": {
+      "item": "minecraft:glowstone"
+    }
+  },
+  "pattern": [
+    "Rx ",
+    "xw ",
+    "  w"
+  ],
+  "result": {
+    "count": 1,
+    "id": "notenoughwands:swapping_wand"
+  }
+}

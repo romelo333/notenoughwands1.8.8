@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "o": {
+      "tag": "c:ender_pearls"
+    },
+    "r": {
+      "item": "minecraft:redstone"
+    },
+    "w": {
+      "item": "notenoughwands:wand_core"
+    }
+  },
+  "pattern": [
+    "ro ",
+    "ow ",
+    "  w"
+  ],
+  "result": {
+    "count": 1,
+    "id": "notenoughwands:moving_wand"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "d": {
+      "item": "minecraft:diamond"
+    },
+    "t": {
+      "item": "minecraft:ghast_tear"
+    },
+    "w": {
+      "item": "notenoughwands:wand_core"
+    },
+    "x": {
+      "item": "minecraft:nether_star"
+    }
+  },
+  "pattern": [
+    " x ",
+    "twt",
+    " d "
+  ],
+  "result": {
+    "count": 1,
+    "id": "notenoughwands:advanced_wand_core"
+  }
+}

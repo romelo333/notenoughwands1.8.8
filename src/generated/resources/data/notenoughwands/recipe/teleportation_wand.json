@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "o": {
+      "tag": "c:ender_pearls"
+    },
+    "w": {
+      "item": "notenoughwands:wand_core"
+    }
+  },
+  "pattern": [
+    "oo ",
+    "ow ",
+    "  w"
+  ],
+  "result": {
+    "count": 1,
+    "id": "notenoughwands:teleportation_wand"
+  }
+}

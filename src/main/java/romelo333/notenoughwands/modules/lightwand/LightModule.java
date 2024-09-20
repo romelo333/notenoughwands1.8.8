@@ -65,7 +65,7 @@ public class LightModule implements IModule {
     public void initDatagen(DataGen dataGen) {
         dataGen.add(
                 Dob.blockBuilder(LIGHT)
-                        .generatedItem("block/light")
+                        .parentedItem("block/light")
                         .blockState(p -> p.singleTextureBlock(LIGHT.get(), BLOCK_FOLDER + "/light", "block/empty")),
                 Dob.itemBuilder(ILLUMINATION_WAND)
                         .handheldItem("item/illumination_wand")
