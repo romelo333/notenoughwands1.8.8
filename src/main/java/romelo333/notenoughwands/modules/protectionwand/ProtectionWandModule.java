@@ -3,6 +3,7 @@ package romelo333.notenoughwands.modules.protectionwand;
 import mcjty.lib.datagen.DataGen;
 import mcjty.lib.datagen.Dob;
 import mcjty.lib.modules.IModule;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.IEventBus;
@@ -13,7 +14,6 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import romelo333.notenoughwands.modules.protectionwand.data.ProtectionWandData;
 import romelo333.notenoughwands.modules.protectionwand.items.ProtectionWand;
 import romelo333.notenoughwands.modules.wands.WandsModule;
-import romelo333.notenoughwands.modules.wands.data.CapturingWandData;
 import romelo333.notenoughwands.setup.Config;
 
 import static mcjty.lib.datagen.DataGen.has;
@@ -48,7 +48,7 @@ public class ProtectionWandModule implements IModule {
     }
 
     @Override
-    public void initDatagen(DataGen dataGen) {
+    public void initDatagen(DataGen dataGen, HolderLookup.Provider provider) {
         dataGen.add(
                 Dob.itemBuilder(PROTECTION_WAND)
                         .handheldItem("item/protection_wand")
