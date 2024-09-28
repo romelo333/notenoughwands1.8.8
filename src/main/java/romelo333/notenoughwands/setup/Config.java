@@ -38,7 +38,7 @@ public class Config {
     public static void onLoad(final ModConfigEvent.Reloading configEvent) {
         if (configEvent.getConfig().getSpec() == SERVER_CONFIG) {
             ProtectionWandConfiguration.cachedClientSideProtection = ProtectionWandConfiguration.clientSideProtection.get();
-            WandsConfiguration.cachedWandUsage = WandsConfiguration.wandUsage.get();
+            WandsConfiguration.setWandUsage(WandsConfiguration.wandUsage.get());
         }
     }
 }

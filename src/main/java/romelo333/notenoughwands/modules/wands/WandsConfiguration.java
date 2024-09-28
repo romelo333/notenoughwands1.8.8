@@ -15,7 +15,7 @@ public class WandsConfiguration {
     public static String CATEGORY_WANDS = "wandsettings";
 
     public static ModConfigSpec.BooleanValue showDurabilityBarForRF;
-    public static WandUsage cachedWandUsage;
+    private static WandUsage cachedWandUsage;
     public static ModConfigSpec.EnumValue<WandUsage> wandUsage;
 
     public static ModConfigSpec.DoubleValue fakePlayerFactor;
@@ -144,7 +144,17 @@ public class WandsConfiguration {
             }
             blacklistedEntities.put(ResourceLocation.parse(split[0]), cost);
         }
+    }
 
+    public static WandUsage getWandUsage() {
+        if (cachedWandUsage == null) {
+            cachedWandUsage = wandUsage.get();
+        }
+        return cachedWandUsage;
+    }
+
+    public static void setWandUsage(WandUsage usage) {
+        cachedWandUsage = usage;
     }
 
     public static double getEntityCost(Entity entity) {

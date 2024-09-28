@@ -223,15 +223,15 @@ public class GenericWand extends Item {
     }
 
     private boolean needsPower() {
-        return WandsConfiguration.cachedWandUsage.needsPower();
+        return WandsConfiguration.getWandUsage().needsPower();
     }
 
     private boolean needsDamage() {
-        return WandsConfiguration.cachedWandUsage == WandUsage.DURABILITY;
+        return WandsConfiguration.getWandUsage() == WandUsage.DURABILITY;
     }
 
     private boolean needsXP() {
-        return WandsConfiguration.cachedWandUsage == WandUsage.XP;
+        return WandsConfiguration.getWandUsage() == WandUsage.XP;
     }
 
 }
