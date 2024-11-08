@@ -40,14 +40,6 @@ public class GenericWand extends Item {
         );
     }
 
-    // @todo 1.21
-//    @Nullable
-//    @Override
-//    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
-//        return new ItemCapabilityProvider(stack, this);
-//    }
-
-
     // Check if a given block can be picked up.
     public static double checkPickup(Player player, Level world, BlockPos pos, BlockState state, double maxHardness) {
         float hardness = state.getDestroySpeed(world, pos);
@@ -92,15 +84,14 @@ public class GenericWand extends Item {
         return super.isBarVisible(pStack);
     }
 
-    //TODO
-    /*@Override
-    public double getDurabilityForDisplay(ItemStack stack) {
+    @Override
+    public int getBarWidth(ItemStack stack) {
         if (needsPower() && WandsConfiguration.showDurabilityBarForRF.get()) {
             int max = getMaxEnergyStored(stack);
-            return (max - getEnergyStored(stack)) / (double) max;
+            return Math.round((float)getEnergyStored(stack) * 13.0F / (float)max);
         }
-        return super.getDurabilityForDisplay(stack);
-    }*/
+        return super.getBarWidth(stack);
+    }
 
     public GenericWand usageFactor(float usageFactor) {
         this.usageFactor = usageFactor;

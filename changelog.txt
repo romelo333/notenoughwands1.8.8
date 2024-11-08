@@ -1,3 +1,7 @@
+1.21-7.0.3:
+- Wands can now be charged
+- Wands now show a correct durability bar depending on the amount of power in them
+
 1.21-7.0.2:
 - Update to latest McJtyLib
 

@@ -47,6 +47,7 @@ public class NotEnoughWands {
         bus.addListener(Config::onLoad);
         bus.addListener(this::onDataGen);
         bus.addListener(NEWPacketHandler::registerMessages);
+        bus.addListener(this::onRegisterCapabilities);
 
         if (dist.isClient()) {
             bus.addListener(modules::initClient);
@@ -72,7 +73,6 @@ public class NotEnoughWands {
         modules.register(new BuildingWandsModule());
     }
 
-    // @todo 1.21 for McJtyLib?
     private void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
         Registration.ITEMS.getRegister().getEntries().forEach(entry -> {
             Item item = entry.get();
