@@ -1,0 +1,57 @@
+{
+  "item.notenoughwands.swapping_wand": "交换魔杖",
+  "item.notenoughwands.teleportation_wand": "传送魔杖",
+  "item.notenoughwands.capturing_wand": "捕捉魔杖",
+  "item.notenoughwands.building_wand": "建筑魔杖",
+  "item.notenoughwands.illumination_wand": "照明魔杖",
+  "item.notenoughwands.moving_wand": "移动魔杖",
+  "item.notenoughwands.protection_wand": "保护魔杖",
+  "item.notenoughwands.master_protection_wand": "保护魔杖（管理员）",
+  "item.notenoughwands.displacement_wand": "移位魔杖",
+  "item.notenoughwands.acceleration_wand": "加速魔杖",
+  "item.notenoughwands.freezing_wand": "冰冻魔杖(WIP)",
+  "item.notenoughwands.potion_wand": "药水魔杖",
+  "item.notenoughwands.wand_core": "魔杖核心",
+  "item.notenoughwands.advanced_wand_core": "高级魔杖核心",
+
+  "block.notenoughwands.light": "发光宝珠",
+
+  "message.notenoughwands.shiftmessage": "<按下 Shift>",
+
+  "message.notenoughwands.building_wand.header": "右键单击可沿该方向扩展",
+  "message.notenoughwands.building_wand.gold": "潜行右键单击这样的块以撤消最后两个作之一",
+  "message.notenoughwands.building_wand.undo": "撤回操作： ",
+  "message.notenoughwands.building_wand.mode": "模式： ",
+  "message.notenoughwands.building_wand.submode": "子模式： ",
+
+  "message.notenoughwands.displacement_wand.header": "右键推动方块",
+  "message.notenoughwands.displacement_wand.gold": "潜行右键拉动方块",
+  "message.notenoughwands.displacement_wand.mode": "模式： ",
+
+  "message.notenoughwands.moving_wand.header": "右键拿起方块",
+  "message.notenoughwands.moving_wand.gold": "再次右键放下方块",
+
+  "message.notenoughwands.swapping_wand.header": "潜行右键单击以选择一个方块",
+  "message.notenoughwands.swapping_wand.gold": "在空气中右键单击以选择“副手”模式，或右键单击方块块以替换",
+  "message.notenoughwands.swapping_wand.mode": "模式： ",
+
+  "message.notenoughwands.illumination_wand.header": "右键单击方块以生成光照",
+  "message.notenoughwands.illumination_wand.gold": "右键单击方块以移除光照",
+
+  "message.notenoughwands.acceleration_wand.header": "右键单击方块以加快速度",
+  "message.notenoughwands.acceleration_wand.gold": "潜行右键拉取方块",
+  "message.notenoughwands.acceleration_wand.mode": "模式： ",
+
+  "message.notenoughwands.capturing_wand.header": "左键单击生物以捕获它",
+  "message.notenoughwands.capturing_wand.gold": "右键单击方块以重生生物",
+
+  "message.notenoughwands.teleportation_wand.header": "右键单击可向前传送，直到击中方块或达到最大距离",
+  "message.notenoughwands.teleportation_wand.sneak1": "潜行以穿过墙壁传送",
+  "message.notenoughwands.teleportation_wand.sneak2": "潜行半距离",
+
+
+  "key.modifier": "魔杖调节",
+  "key.categories.notenoughwands": "更多魔杖",
+
+  "itemGroup.notenoughwands": "更多魔杖"
+}
