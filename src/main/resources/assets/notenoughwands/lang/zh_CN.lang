@@ -1,19 +1,19 @@
-item.notenoughwands.SwappingWand.name=转换魔杖
-item.notenoughwands.TeleportationWand.name=传送魔杖
-item.notenoughwands.CapturingWand.name=捕获魔杖
-item.notenoughwands.BuildingWand.name=建造魔杖
-item.notenoughwands.IlluminationWand.name=照明魔杖
-item.notenoughwands.MovingWand.name=移动魔杖
-item.notenoughwands.ProtectionWand.name=防爆魔杖
-item.notenoughwands.MasterProtectionWand.name=大师防爆魔杖
-item.notenoughwands.DisplacementWand.name=位移魔杖
-item.notenoughwands.AccelerationWand.name=时光加速魔杖
+item.notenoughwands.swapping_wand.name=转换魔杖
+item.notenoughwands.teleportation_wand.name=传送魔杖
+item.notenoughwands.capturing_wand.name=捕获魔杖
+item.notenoughwands.building_wand.name=建造魔杖
+item.notenoughwands.illumination_wand.name=唤星魔杖
+item.notenoughwands.moving_wand.name=移动魔杖
+item.notenoughwands.protection_wand.name=防爆魔杖
+item.notenoughwands.master_protection_wand.name=大师防爆魔杖
+item.notenoughwands.displacement_wand.name=位移魔杖
+item.notenoughwands.acceleration_wand.name=时光加速魔杖
 item.notenoughwands.freezing_wand.name=冰冻魔杖(WIP)
 item.notenoughwands.potion_wand.name=药剂魔杖
-item.notenoughwands.WandCore.name=魔杖核心
-item.notenoughwands.AdvancedWandCore.name=闪耀的魔杖核心
+item.notenoughwands.wandcore.name=魔杖核心
+item.notenoughwands.advanced_wandcore.name=闪耀的魔杖核心
 
-tile.notenoughwands.blockLight.name=照明节点
+tile.notenoughwands.blockLight.name=照明矮星
 
 
 key.modifier=Wand Modifier
