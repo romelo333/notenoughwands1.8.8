@@ -8,7 +8,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import romelo333.notenoughwands.keys.KeyBindings;
 import romelo333.notenoughwands.keys.KeyInputHandler;
@@ -16,6 +16,7 @@ import romelo333.notenoughwands.modules.protectionwand.ProtectionWandConfigurati
 import romelo333.notenoughwands.modules.protectionwand.network.PacketGetProtectedBlocksAroundPlayer;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 import romelo333.notenoughwands.network.NEWPacketHandler;
+import romelo333.notenoughwands.varia.ClientTools.RenderContext;
 
 public class ClientSetup {
 
@@ -32,19 +33,19 @@ public class ClientSetup {
 
     // @todo 1.20 correct event?
     @SubscribeEvent
-    public void renderWorldLastEvent(RenderLevelStageEvent evt) {
-        if (evt.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) {
-            return;
-        }
+    public void submitWandOverlay(SubmitCustomGeometryEvent event) {
         Minecraft mc = Minecraft.getInstance();
         Player p = mc.player;
+        if (p == null) {
+            return;
+        }
         ItemStack heldItem = p.getItemInHand(InteractionHand.MAIN_HAND);
         if (heldItem.isEmpty()) {
             return;
         }
-        if (heldItem.getItem() instanceof GenericWand) {
-            GenericWand genericWand = (GenericWand) heldItem.getItem();
-            genericWand.renderOverlay(evt, p, heldItem);
+        if (heldItem.getItem() instanceof GenericWand wand) {
+            var context = new RenderContext(event.getPoseStack(), event.getSubmitNodeCollector(), event.getLevelRenderState().cameraRenderState.pos);
+            wand.renderOverlay(context, p, heldItem);
         }
     }
 

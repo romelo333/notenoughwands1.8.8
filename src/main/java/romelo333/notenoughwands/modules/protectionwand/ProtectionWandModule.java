@@ -23,8 +23,8 @@ import static romelo333.notenoughwands.setup.Registration.ITEMS;
 
 public class ProtectionWandModule implements IModule {
 
-    public static final DeferredItem<ProtectionWand> PROTECTION_WAND = ITEMS.register("protection_wand", tab(() -> new ProtectionWand(false)));
-    public static final DeferredItem<ProtectionWand> MASTER_PROTECTION_WAND = ITEMS.register("master_protection_wand", tab(() -> new ProtectionWand(true)));
+    public static final DeferredItem<ProtectionWand> PROTECTION_WAND = ITEMS.register("protection_wand", tab(properties -> new ProtectionWand(properties, false)));
+    public static final DeferredItem<ProtectionWand> MASTER_PROTECTION_WAND = ITEMS.register("master_protection_wand", tab(properties -> new ProtectionWand(properties, true)));
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<ProtectionWandData>> PROTECTIONWAND_DATA = COMPONENTS.registerComponentType(
             "protectionwand",

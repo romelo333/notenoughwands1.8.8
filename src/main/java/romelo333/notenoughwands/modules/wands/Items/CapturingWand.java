@@ -1,37 +1,41 @@
 package romelo333.notenoughwands.modules.wands.Items;
 
-
 import mcjty.lib.builder.TooltipBuilder;
 import mcjty.lib.varia.ComponentFactory;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
 import romelo333.notenoughwands.modules.wands.WandsConfiguration;
 import romelo333.notenoughwands.modules.wands.WandsModule;
 import romelo333.notenoughwands.modules.wands.data.CapturingWandData;
 import romelo333.notenoughwands.varia.Tools;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import static mcjty.lib.builder.TooltipBuilder.*;
 
 public class CapturingWand extends GenericWand {
 
-    public CapturingWand() {
+    public CapturingWand(Properties properties) {
+        super(properties);
         this.usageFactor(3.0f);
     }
 
@@ -42,15 +46,15 @@ public class CapturingWand extends GenericWand {
 
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> list, TooltipFlag flagIn) {
-        super.appendHoverText(stack, context, list, flagIn);
-        tooltipBuilder.makeTooltip(mcjty.lib.varia.Tools.getId(this), stack, list, flagIn);
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> list, TooltipFlag flagIn) {
+        super.appendHoverText(stack, context, display, list, flagIn);
+        Tools.appendTooltip(tooltipBuilder, mcjty.lib.varia.Tools.getId(this), stack, list, flagIn);
 
         CapturingWandData data = stack.getOrDefault(WandsModule.CAPTURINGWAND_DATA, CapturingWandData.DEFAULT);
         if (data.type() != null) {
             EntityType<?> entityType = mcjty.lib.varia.Tools.getEntity(data.type());
             if (entityType != null) {
-                list.add(ComponentFactory.literal(ChatFormatting.GREEN + "Captured mob: ").append(entityType.getDescription()));
+                list.accept(ComponentFactory.literal(ChatFormatting.GREEN + "Captured mob: ").append(entityType.getDescription()));
             }
         }
     }
@@ -62,18 +66,18 @@ public class CapturingWand extends GenericWand {
         Level world = context.getLevel();
         ItemStack stack = player.getItemInHand(hand);
         BlockPos pos = context.getClickedPos();
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             CapturingWandData data = stack.getOrDefault(WandsModule.CAPTURINGWAND_DATA, CapturingWandData.DEFAULT);
             if (data.type() != null) {
-                Tag mobCompound = data.tag();
-                ResourceLocation type = data.type();
-                LivingEntity entityLivingBase = createEntity(player, world, type);
+                CompoundTag mobCompound = data.tag();
+                Identifier type = data.type();
+                LivingEntity entityLivingBase = createEntity(world, type);
                 if (entityLivingBase == null) {
                     Tools.error(player, "Something went wrong trying to spawn creature!");
                     return InteractionResult.FAIL;
                 }
-                entityLivingBase.load((CompoundTag) mobCompound);
-                entityLivingBase.moveTo(pos.getX()+.5, pos.getY()+1, pos.getZ()+.5, 0, 0);
+                entityLivingBase.load(TagValueInput.create(ProblemReporter.DISCARDING, world.registryAccess(), mobCompound));
+                entityLivingBase.snapTo(pos.getX()+.5, pos.getY()+1, pos.getZ()+.5, 0, 0);
                 stack.set(WandsModule.CAPTURINGWAND_DATA, CapturingWandData.DEFAULT);
                 world.addFreshEntity(entityLivingBase);
             } else {
@@ -83,17 +87,17 @@ public class CapturingWand extends GenericWand {
         return InteractionResult.SUCCESS;
     }
 
-    private LivingEntity createEntity(Player player, Level world, ResourceLocation type) {
+    private LivingEntity createEntity(Level world, Identifier type) {
         EntityType<?> entityType = mcjty.lib.varia.Tools.getEntity(type);
         if (entityType != null) {
-            return (LivingEntity) entityType.create(world);
+            return entityType.create(world, EntitySpawnReason.SPAWN_ITEM_USE) instanceof LivingEntity living ? living : null;
         }
         return null;
     }
 
     @Override
     public boolean onLeftClickEntity(ItemStack stack, Player player, Entity entity) {
-        if (!player.getCommandSenderWorld().isClientSide) {
+        if (!player.level().isClientSide()) {
             if (entity instanceof LivingEntity entityLivingBase) {
                 CapturingWandData data = stack.getOrDefault(WandsModule.CAPTURINGWAND_DATA, CapturingWandData.DEFAULT);
                 if (data.type() != null) {
@@ -124,11 +128,13 @@ public class CapturingWand extends GenericWand {
                     return true;
                 }
 
-                CompoundTag tagCompound = new CompoundTag();
-                entityLivingBase.addAdditionalSaveData(tagCompound);  // @todo 1.15 is this right?
+                TagValueOutput output = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, player.registryAccess());
+                entityLivingBase.saveWithoutId(output);
+                CompoundTag tagCompound = output.buildResult();
+                tagCompound.remove("UUID");
                 stack.set(WandsModule.CAPTURINGWAND_DATA, new CapturingWandData(mcjty.lib.varia.Tools.getId(entity.getType()), tagCompound));
                 entity.remove(Entity.RemovalReason.DISCARDED);
-//                ((ServerLevel)player.getCommandSenderWorld()).removeEntity(entity);
+//                ((ServerLevel)player.level()).removeEntity(entity);
 
                 registerUsage(stack, player, difficultyScale);
             } else {

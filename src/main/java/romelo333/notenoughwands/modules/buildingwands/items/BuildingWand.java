@@ -1,6 +1,5 @@
 package romelo333.notenoughwands.modules.buildingwands.items;
 
-
 import mcjty.lib.builder.TooltipBuilder;
 import mcjty.lib.varia.ComponentFactory;
 import mcjty.lib.varia.SoundTools;
@@ -13,24 +12,24 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.util.BlockSnapshot;
 import net.neoforged.neoforge.event.EventHooks;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsModule;
 import romelo333.notenoughwands.modules.buildingwands.data.BuildingWandData;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
+import romelo333.notenoughwands.varia.ClientTools.RenderContext;
 import romelo333.notenoughwands.varia.ClientTools;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 import static mcjty.lib.builder.TooltipBuilder.*;
 import static romelo333.notenoughwands.modules.buildingwands.data.BuildingWandData.Mode.MODE_25ROW;
@@ -45,8 +44,8 @@ public class BuildingWand extends GenericWand {
                     parameter("mode", stack -> getMode(stack).getDescription()),
                     parameter("submode", stack -> getSubMode(stack) == BuildingWandData.OrientationMode.ROTATED, stack -> getSubMode(stack).getDescription()));
 
-    public BuildingWand() {
-        super();
+    public BuildingWand(Properties properties) {
+        super(properties);
         this.usageFactor(1.0f);
     }
 
@@ -56,9 +55,9 @@ public class BuildingWand extends GenericWand {
 
 
     @Override
-    public void appendHoverText(ItemStack itemStack, TooltipContext context, List<Component> list, TooltipFlag flags) {
-        super.appendHoverText(itemStack, context, list, flags);
-        tooltipBuilder.makeTooltip(mcjty.lib.varia.Tools.getId(this), itemStack, list, flags);
+    public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> list, TooltipFlag flags) {
+        super.appendHoverText(itemStack, context, display, list, flags);
+        Tools.appendTooltip(tooltipBuilder, mcjty.lib.varia.Tools.getId(this), itemStack, list, flags);
 
         showModeKeyDescription(list, "switch mode");
         showSubModeKeyDescription(list, "change orientation");
@@ -93,7 +92,7 @@ public class BuildingWand extends GenericWand {
         BlockPos pos = context.getClickedPos();
         Direction side = context.getClickedFace();
         ItemStack wandStack = player.getItemInHand(hand);
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             if (player.isShiftKeyDown()) {
                 undoPlaceBlock(wandStack, player, world, pos);
             } else {
@@ -193,17 +192,16 @@ public class BuildingWand extends GenericWand {
         }
         if (cnt > 0) {
             if (!player.isCreative()) {
-                HitResult result = new BlockHitResult(new Vec3(0, 0, 0), Direction.UP, pos, false);
-                ItemStack itemStack = state.getCloneItemStack(result, world, pos, player);
+                ItemStack itemStack = Tools.pickBlock(state, world, pos, player);
                 itemStack.setCount(cnt);
-                ItemHandlerHelper.giveItemToPlayer(player, itemStack);
+                Tools.giveItem(player, itemStack);
                 player.containerMenu.broadcastChanges();
             }
         }
     }
 
     @Override
-    public void renderOverlay(RenderLevelStageEvent evt, Player player, ItemStack wand) {
+    public void renderOverlay(RenderContext context, Player player, ItemStack wand) {
         if (!(Minecraft.getInstance().hitResult instanceof BlockHitResult hit) || hit.getType() != HitResult.Type.BLOCK) {
             return;
         }
@@ -218,7 +216,7 @@ public class BuildingWand extends GenericWand {
             BuildingWandData data = wand.getOrDefault(BuildingWandsModule.BUILDINGWAND_DATA, BuildingWandData.DEFAULT);
             int index = data.findUndoStateIndex(world.dimension(), pos);
             if (index >= 0) {
-                renderOutlines(evt, player, data.undoStates().get(index).positions(), 240, 30, 0);
+                renderOutlines(context, data.undoStates().get(index).positions(), 240, 30, 0);
             }
             return;
         }
@@ -226,9 +224,9 @@ public class BuildingWand extends GenericWand {
         Direction face = hit.getDirection();
         Direction sourceDirection = face.getOpposite();
         Set<BlockPos> coordinates = findSuitableBlocks(wand, world, face, pos, state);
-        ClientTools.renderPlacementPreview(evt.getPoseStack(), player, coordinates,
+        ClientTools.renderPlacementPreview(context, player, coordinates,
                 destination -> Tools.pickBlock(state, world, destination.relative(sourceDirection), player), false);
-        renderOutlines(evt, player, coordinates, 50, 250, 180);
+        renderOutlines(context, coordinates, 50, 250, 180);
     }
 
     private Set<BlockPos> findSuitableBlocks(ItemStack stack, Level world, Direction sideHit, BlockPos pos, BlockState state) {

@@ -25,8 +25,8 @@ import romelo333.notenoughwands.setup.Config;
 
 import static mcjty.lib.datagen.DataGen.has;
 import static romelo333.notenoughwands.NotEnoughWands.tab;
-import static romelo333.notenoughwands.setup.Registration.ITEMS;
 import static romelo333.notenoughwands.setup.Registration.COMPONENTS;
+import static romelo333.notenoughwands.setup.Registration.ITEMS;
 
 public class BuildingWandsModule implements IModule {
 

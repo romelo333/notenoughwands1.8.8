@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "notenoughwands:teleportation_wand"
+        "recipes": "notenoughwands:teleportation_wand"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

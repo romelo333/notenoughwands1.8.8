@@ -1,6 +1,5 @@
 package romelo333.notenoughwands.modules.wands.Items;
 
-
 import mcjty.lib.varia.ComponentFactory;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
@@ -11,14 +10,16 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import romelo333.notenoughwands.modules.wands.WandsConfiguration;
 import romelo333.notenoughwands.varia.Tools;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 public class PotionWand extends GenericWand {
 
-    public PotionWand() {
+    public PotionWand(Properties properties) {
+        super(properties);
         this.usageFactor(2.0f);
     }
 
@@ -35,33 +36,33 @@ public class PotionWand extends GenericWand {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> list, TooltipFlag flagIn) {
-        super.appendHoverText(stack, context, list, flagIn);
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> list, TooltipFlag flagIn) {
+        super.appendHoverText(stack, context, display, list, flagIn);
         // @todo 1.15 better tooltips
-        list.add(ComponentFactory.literal("Left click on creature to apply effect"));
+        list.accept(ComponentFactory.literal("Left click on creature to apply effect"));
         // @todo 1.21
 //        CompoundTag tagCompound = stack.getTag();
 //        if (tagCompound==null){
-//            list.add(ComponentFactory.literal(ChatFormatting.YELLOW+"No effects. Combine with potion"));
-//            list.add(ComponentFactory.literal(ChatFormatting.YELLOW+"in crafting table to add effect"));
+//            list.accept(ComponentFactory.literal(ChatFormatting.YELLOW+"No effects. Combine with potion"));
+//            list.accept(ComponentFactory.literal(ChatFormatting.YELLOW+"in crafting table to add effect"));
 //            return;
 //        }
 //        ListTag effects = (ListTag) tagCompound.get("effects");
 //        if (effects == null || effects.isEmpty()){
-//            list.add(ComponentFactory.literal(ChatFormatting.YELLOW+"No effects. Combine with potion"));
-//            list.add(ComponentFactory.literal(ChatFormatting.YELLOW+"in crafting table to add effect"));
+//            list.accept(ComponentFactory.literal(ChatFormatting.YELLOW+"No effects. Combine with potion"));
+//            list.accept(ComponentFactory.literal(ChatFormatting.YELLOW+"in crafting table to add effect"));
 //            return;
 //        }
-//        list.add(ComponentFactory.literal(ChatFormatting.YELLOW+"Combine with empty bottle"));
-//        list.add(ComponentFactory.literal(ChatFormatting.YELLOW+"to clear effects"));
+//        list.accept(ComponentFactory.literal(ChatFormatting.YELLOW+"Combine with empty bottle"));
+//        list.accept(ComponentFactory.literal(ChatFormatting.YELLOW+"to clear effects"));
 //        int mode = getMode(stack);
 //        for (int i=0;i<effects.size();i++) {
 //            CompoundTag effecttag = effects.getCompound(i);
 //            MobEffectInstance effect = MobEffectInstance.load(effecttag);
 //            if (i==mode){
-//                list.add(ComponentFactory.literal("    + " + ChatFormatting.GREEN + getEffectName(effect)));
+//                list.accept(ComponentFactory.literal("    + " + ChatFormatting.GREEN + getEffectName(effect)));
 //            } else {
-//                list.add(ComponentFactory.literal("    " + ChatFormatting.GRAY+getEffectName(effect)));
+//                list.accept(ComponentFactory.literal("    " + ChatFormatting.GRAY+getEffectName(effect)));
 //            }
 //        }
     }
@@ -114,7 +115,7 @@ public class PotionWand extends GenericWand {
 
     @Override
     public boolean onLeftClickEntity(ItemStack stack, Player player, Entity entity) {
-        if (!player.getCommandSenderWorld().isClientSide) {
+        if (!player.level().isClientSide()) {
             if (entity instanceof LivingEntity entityLivingBase) {
                 if ((!WandsConfiguration.potionAllowHostile.get()) && entityLivingBase instanceof Enemy) {
                     Tools.error(player, "It is not possible to add effects to hostile mobs with this wand!");

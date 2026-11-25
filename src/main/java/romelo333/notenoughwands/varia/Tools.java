@@ -1,34 +1,46 @@
 package romelo333.notenoughwands.varia;
 
+import mcjty.lib.builder.TooltipBuilder;
 import mcjty.lib.varia.ComponentFactory;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class Tools {
+    public static void appendTooltip(TooltipBuilder builder, Identifier id, ItemStack stack, Consumer<Component> consumer, TooltipFlag flag) {
+        List<Component> lines = new ArrayList<>();
+        builder.makeTooltip(id, stack, lines, flag);
+        lines.forEach(consumer);
+    }
+
     public static void error(Player player, String msg) {
-        player.displayClientMessage(ComponentFactory.literal(ChatFormatting.RED + msg), false);
+        player.sendSystemMessage(ComponentFactory.literal(msg).withStyle(ChatFormatting.RED));
     }
 
     public static void notify(Player player, MutableComponent msg) {
-        player.displayClientMessage(msg.withStyle(ChatFormatting.GREEN), false);
+        player.sendSystemMessage(msg.withStyle(ChatFormatting.GREEN));
     }
 
     // PlaceStackAt from a perspective of a wand
@@ -59,7 +71,7 @@ public class Tools {
     }
 
     public static ItemStack pickBlock(BlockState state, Level level, BlockPos pos, Player player) {
-        return state.getCloneItemStack(placementHit(pos), level, pos, player);
+        return state.getBlock().getCloneItemStack(level, pos, state, false, player);
     }
 
     private static BlockHitResult placementHit(BlockPos pos) {
@@ -111,11 +123,11 @@ public class Tools {
     }
 
     public static void giveItem(Player player, ItemStack stack) {
-        ItemHandlerHelper.giveItemToPlayer(player, stack);
+        player.getInventory().placeItemBackInInventory(stack, Prediction.SERVER_ONLY);
     }
 
     public static int finditem(ItemStack item, Inventory inv) {
-        for (int i = 0; i < 36; ++i) {
+        for (int i = 0; i < Inventory.INVENTORY_SIZE; ++i) {
             ItemStack stack = inv.getItem(i);
             if (matchesInventoryItem(item, stack)) {
                 return i;
@@ -127,7 +139,8 @@ public class Tools {
 
     static int countInventoryItems(ItemStack item, Inventory inventory) {
         int count = 0;
-        for (ItemStack stack : inventory.items) {
+        for (int slot = 0; slot < Inventory.INVENTORY_SIZE; slot++) {
+            ItemStack stack = inventory.getItem(slot);
             if (matchesInventoryItem(item, stack)) {
                 count += stack.getCount();
             }

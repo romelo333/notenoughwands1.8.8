@@ -1,6 +1,5 @@
 package romelo333.notenoughwands.modules.buildingwands.items;
 
-
 import mcjty.lib.builder.TooltipBuilder;
 import mcjty.lib.varia.ComponentFactory;
 import mcjty.lib.varia.SoundTools;
@@ -9,30 +8,33 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.util.BlockSnapshot;
 import net.neoforged.neoforge.event.EventHooks;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsConfiguration;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsModule;
 import romelo333.notenoughwands.modules.buildingwands.data.DisplacementWandData;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
+import romelo333.notenoughwands.varia.ClientTools.RenderContext;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import static mcjty.lib.builder.TooltipBuilder.*;
 
@@ -44,15 +46,15 @@ public class DisplacementWand extends GenericWand {
                     parameter("mode", stack -> getMode(stack).getDescription()));
 
 
-    public DisplacementWand() {
-        super();
+    public DisplacementWand(Properties properties) {
+        super(properties);
         this.usageFactor(1.0f);
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> list, TooltipFlag flagIn) {
-        super.appendHoverText(stack, context, list, flagIn);
-        tooltipBuilder.makeTooltip(mcjty.lib.varia.Tools.getId(this), stack, list, flagIn);
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> list, TooltipFlag flagIn) {
+        super.appendHoverText(stack, context, display, list, flagIn);
+        Tools.appendTooltip(tooltipBuilder, mcjty.lib.varia.Tools.getId(this), stack, list, flagIn);
 
         showModeKeyDescription(list, "switch mode");
     }
@@ -74,7 +76,7 @@ public class DisplacementWand extends GenericWand {
         Player player = context.getPlayer();
         BlockPos pos = context.getClickedPos();
         Direction side = context.getClickedFace();
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             if (player.isShiftKeyDown()) {
                 pullBlocks(stack, player, world, pos, side);
             } else {
@@ -143,7 +145,7 @@ public class DisplacementWand extends GenericWand {
                         //TODO otherC moved from setBlockEntity to loadStatic
                         tileEntity = world.getBlockEntity(otherC);
                         if (tileEntity != null) {
-                            tileEntity.loadWithComponents(tc, world.registryAccess());
+                            tileEntity.loadWithComponents(TagValueInput.create(ProblemReporter.DISCARDING, world.registryAccess(), tc));
                             tileEntity.setChanged();
                             world.sendBlockUpdated(otherC, blockState, blockState, Block.UPDATE_ALL);
                         }
@@ -156,17 +158,17 @@ public class DisplacementWand extends GenericWand {
 
     // @todo 1.20 correct event?
     @Override
-    public void renderOverlay(RenderLevelStageEvent evt, Player player, ItemStack wand) {
+    public void renderOverlay(RenderContext context, Player player, ItemStack wand) {
         HitResult mouseOver = Minecraft.getInstance().hitResult;
 
         if (mouseOver instanceof BlockHitResult br) {
 
-            Level world = player.getCommandSenderWorld();
+            Level world = player.level();
             BlockPos blockPos = br.getBlockPos();
             BlockState state = world.getBlockState(blockPos);
             if (!state.isAir()) {
                 Set<BlockPos> coordinates = findSuitableBlocks(wand, world, br.getDirection(), blockPos);
-                renderOutlines(evt, player, coordinates, 200, 230, 180);
+                renderOutlines(context, coordinates, 200, 230, 180);
             }
         }
     }

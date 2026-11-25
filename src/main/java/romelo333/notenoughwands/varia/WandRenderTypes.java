@@ -1,36 +1,65 @@
 package romelo333.notenoughwands.varia;
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import net.minecraft.client.renderer.RenderType;
+import com.mojang.renderpearl.api.pipeline.BlendFunction;
+import com.mojang.renderpearl.api.pipeline.ColorTargetState;
+import com.mojang.renderpearl.api.pipeline.CompareOp;
+import com.mojang.renderpearl.api.pipeline.DepthStencilState;
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+import net.minecraft.client.renderer.BindGroupLayouts;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.oit.OitPipelineSet;
+import net.minecraft.client.renderer.rendertype.RenderSetup;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.resources.Identifier;
+import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
+import romelo333.notenoughwands.NotEnoughWands;
 
-import java.util.OptionalDouble;
+import java.util.Optional;
 
-final class WandRenderTypes extends RenderType {
+public final class WandRenderTypes {
 
-    static final RenderType OUTLINES = create("notenoughwands_outlines", DefaultVertexFormat.POSITION_COLOR_NORMAL,
-            VertexFormat.Mode.LINES, 256, false, false, CompositeState.builder()
-                    .setShaderState(RENDERTYPE_LINES_SHADER)
-                    .setLineState(new LineStateShard(OptionalDouble.of(4.0)))
-                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-                    .setDepthTestState(NO_DEPTH_TEST)
-                    .setCullState(NO_CULL)
-                    .setWriteMaskState(COLOR_WRITE)
-                    .createCompositeState(false));
+    private static final RenderPipeline OUTLINE_PIPELINE = RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
+            .withLocation(Identifier.fromNamespaceAndPath(NotEnoughWands.MODID, "pipeline/outlines"))
+            .withColorTargetState(ColorTargetState.DEFAULT)
+            .withDepthStencilState(Optional.empty())
+            .build();
 
-    static final RenderType GHOST_BLOCKS = create("notenoughwands_ghost_blocks", DefaultVertexFormat.NEW_ENTITY,
-            VertexFormat.Mode.QUADS, 4096, false, true, CompositeState.builder()
-                    .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_CULL_SHADER)
-                    .setTextureState(BLOCK_SHEET_MIPPED)
-                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-                    .setLayeringState(POLYGON_OFFSET_LAYERING)
-                    .setLightmapState(LIGHTMAP)
-                    .setOverlayState(OVERLAY)
-                    .setWriteMaskState(COLOR_WRITE)
-                    .createCompositeState(false));
+    static final RenderType OUTLINES = RenderType.create("notenoughwands_outlines",
+            RenderSetup.builder(OUTLINE_PIPELINE).createRenderSetup());
 
-    private WandRenderTypes(String name, VertexFormat format, VertexFormat.Mode mode, int size,
-                            boolean crumbling, boolean sort, Runnable setup, Runnable clear) {
-        super(name, format, mode, size, crumbling, sort, setup, clear);
+    private static final RenderPipeline PREVIEW_PIPELINE = RenderPipeline.builder(RenderPipelines.GUI_TEXTURED_SNIPPET)
+            .withLocation(Identifier.fromNamespaceAndPath(NotEnoughWands.MODID, "pipeline/preview"))
+            .withVertexShader("core/position_tex_color")
+            .withFragmentShader("core/position_tex_color")
+            .withVertexBinding(0, DefaultVertexFormat.POSITION_TEX_COLOR)
+            .withPrimitiveTopology(PrimitiveTopology.QUADS)
+            .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
+            .withDepthStencilState(new DepthStencilState(CompareOp.GREATER_THAN_OR_EQUAL, false))
+            .build();
+
+    private static final OitPipelineSet PREVIEW_OIT = OitPipelineSet.builder(
+            Identifier.fromNamespaceAndPath(NotEnoughWands.MODID, "preview"),
+            RenderPipeline.builder()
+                    .withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS)
+                    .withBindGroupLayout(BindGroupLayouts.SAMPLER0)
+                    .withVertexShader("core/position_tex_color")
+                    .withFragmentShader(Identifier.fromNamespaceAndPath(NotEnoughWands.MODID, "preview"))
+                    .withVertexBinding(0, DefaultVertexFormat.POSITION_TEX_COLOR)
+                    .withPrimitiveTopology(PrimitiveTopology.QUADS)).build();
+
+    public static final RenderType GHOST_BLOCKS = RenderType.create("notenoughwands_ghost_blocks",
+            RenderSetup.builder(PREVIEW_PIPELINE).withTexture("Sampler0", TextureAtlas.LOCATION_BLOCKS)
+                    .setOitPipelines(PREVIEW_OIT).sortOnUpload().createRenderSetup());
+
+    private WandRenderTypes() {
+    }
+
+    public static void registerPipelines(RegisterRenderPipelinesEvent event) {
+        event.registerPipeline(OUTLINE_PIPELINE);
+        event.registerPipeline(PREVIEW_PIPELINE);
+        event.registerOitPipelineSet(PREVIEW_OIT);
     }
 }

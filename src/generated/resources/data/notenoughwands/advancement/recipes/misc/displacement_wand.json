@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "notenoughwands:displacement_wand"
+        "recipes": "notenoughwands:displacement_wand"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "notenoughwands:capturing_wand"
+        "recipes": "notenoughwands:capturing_wand"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

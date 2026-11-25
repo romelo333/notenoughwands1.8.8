@@ -32,10 +32,18 @@ public class Config {
         CLIENT_CONFIG = CLIENT_BUILDER.build();
 
         container.registerConfig(ModConfig.Type.CLIENT, CLIENT_CONFIG);
-        container.registerConfig(ModConfig.Type.SERVER, SERVER_CONFIG);
+        container.registerConfig(ModConfig.Type.SYNCED, SERVER_CONFIG, "notenoughwands-server.toml");
     }
 
-    public static void onLoad(final ModConfigEvent.Reloading configEvent) {
+    public static void onLoad(ModConfigEvent.Loading configEvent) {
+        refresh(configEvent);
+    }
+
+    public static void onReload(ModConfigEvent.Reloading configEvent) {
+        refresh(configEvent);
+    }
+
+    private static void refresh(ModConfigEvent configEvent) {
         if (configEvent.getConfig().getSpec() == SERVER_CONFIG) {
             ProtectionWandConfiguration.cachedClientSideProtection = ProtectionWandConfiguration.clientSideProtection.get();
             WandsConfiguration.setWandUsage(WandsConfiguration.wandUsage.get());

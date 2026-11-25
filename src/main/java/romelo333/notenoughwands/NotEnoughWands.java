@@ -10,7 +10,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
-import net.neoforged.neoforge.energy.ComponentEnergyStorage;
+import net.neoforged.neoforge.transfer.energy.ItemAccessEnergyHandler;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsModule;
 import romelo333.notenoughwands.modules.lightwand.LightModule;
 import romelo333.notenoughwands.modules.protectionwand.ProtectionWandModule;
@@ -21,8 +21,9 @@ import romelo333.notenoughwands.setup.ClientSetup;
 import romelo333.notenoughwands.setup.Config;
 import romelo333.notenoughwands.setup.ModSetup;
 import romelo333.notenoughwands.setup.Registration;
+import romelo333.notenoughwands.varia.WandRenderTypes;
 
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 @Mod(NotEnoughWands.MODID)
 public class NotEnoughWands {
@@ -45,6 +46,7 @@ public class NotEnoughWands {
         bus.addListener(setup::init);
         bus.addListener(modules::init);
         bus.addListener(Config::onLoad);
+        bus.addListener(Config::onReload);
         bus.addListener(this::onDataGen);
         bus.addListener(NEWPacketHandler::registerMessages);
         bus.addListener(this::onRegisterCapabilities);
@@ -53,16 +55,21 @@ public class NotEnoughWands {
             bus.addListener(modules::initClient);
             bus.addListener(ClientSetup::init);
             bus.addListener(ClientSetup::onRegisterKeyMappings);
+            bus.addListener(WandRenderTypes::registerPipelines);
         }
     }
 
-    public static <T extends Item> Supplier<T> tab(Supplier<T> supplier) {
-        return instance.setup.tab(supplier);
+    public static <T extends Item> Function<Item.Properties, T> tab(Function<Item.Properties, T> factory) {
+        return properties -> {
+            T item = factory.apply(properties);
+            setup.addTabItem(item::getDefaultInstance);
+            return item;
+        };
     }
 
-    private void onDataGen(GatherDataEvent event) {
+    private void onDataGen(GatherDataEvent.Client event) {
         DataGen datagen = new DataGen(MODID, event);
-        modules.datagen(datagen, event.getLookupProvider());
+        modules.datagen(datagen, event.getWorldLookupProvider());
         datagen.generate();
     }
 
@@ -77,8 +84,8 @@ public class NotEnoughWands {
         Registration.ITEMS.getRegister().getEntries().forEach(entry -> {
             Item item = entry.get();
             if (item instanceof GenericWand wand) {
-                event.registerItem(Capabilities.EnergyStorage.ITEM,
-                        (stack, context) -> new ComponentEnergyStorage(stack, Registration.ENERGY_COMPONENT.get(), wand.calculateMaxPower()),
+                event.registerItem(Capabilities.Energy.ITEM,
+                        (stack, access) -> new ItemAccessEnergyHandler(access, Registration.ENERGY_COMPONENT.get(), wand.calculateMaxPower()),
                         item);
             }
         });

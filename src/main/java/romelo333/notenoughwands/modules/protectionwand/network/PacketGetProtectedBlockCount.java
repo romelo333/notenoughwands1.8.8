@@ -4,7 +4,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -15,7 +15,7 @@ import romelo333.notenoughwands.network.NEWPacketHandler;
 
 public record PacketGetProtectedBlockCount(Integer protectionId) implements CustomPacketPayload {
 
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(NotEnoughWands.MODID, "getprotectedblockcount");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(NotEnoughWands.MODID, "getprotectedblockcount");
     public static final CustomPacketPayload.Type<PacketGetProtectedBlockCount> TYPE = new Type<>(ID);
 
     public static final StreamCodec<FriendlyByteBuf, PacketGetProtectedBlockCount> CODEC = StreamCodec.composite(
@@ -34,7 +34,7 @@ public record PacketGetProtectedBlockCount(Integer protectionId) implements Cust
     public void handle(IPayloadContext ctx) {
         ctx.enqueueWork(() -> {
             Player player = ctx.player();
-            Level world = player.getCommandSenderWorld();
+            Level world = player.level();
 
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
             PacketReturnProtectedBlockCount msg = new PacketReturnProtectedBlockCount(protectedBlocks.getProtectedBlockCount(protectionId));

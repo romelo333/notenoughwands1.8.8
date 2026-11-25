@@ -9,12 +9,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 public class LightBlock extends Block implements EntityBlock {
-    public LightBlock() {
-        super(Properties.of()
+    public LightBlock(Properties properties) {
+        super(properties
                 .strength(0.0f, 1.0f)
                 .noOcclusion()
                 .noLootTable()
-                .noCollission()
+                .noCollision()
                 .lightLevel(state -> 15));
     }
 
@@ -25,6 +25,6 @@ public class LightBlock extends Block implements EntityBlock {
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+        return RenderShape.INVISIBLE;
     }
 }
