@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "d": {
-      "item": "minecraft:diamond"
-    },
-    "w": {
-      "item": "notenoughwands:advanced_wand_core"
-    },
-    "x": {
-      "item": "minecraft:rotten_flesh"
-    }
+    "d": "minecraft:diamond",
+    "w": "notenoughwands:advanced_wand_core",
+    "x": "minecraft:rotten_flesh"
   },
   "pattern": [
     "dx ",
@@ -18,7 +12,6 @@
     "  w"
   ],
   "result": {
-    "count": 1,
     "id": "notenoughwands:capturing_wand"
   }
 }

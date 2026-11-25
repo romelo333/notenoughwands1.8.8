@@ -1,36 +1,39 @@
 package romelo333.notenoughwands.varia;
 
+import com.mojang.blaze3d.pipeline.BlendFunction;
+import com.mojang.blaze3d.pipeline.ColorTargetState;
+import com.mojang.blaze3d.pipeline.DepthStencilState;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.platform.CompareOp;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.rendertype.RenderSetup;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.resources.Identifier;
+import romelo333.notenoughwands.NotEnoughWands;
 
-import java.util.OptionalDouble;
+public final class WandRenderTypes {
 
-final class WandRenderTypes extends RenderType {
+    private static final RenderPipeline PREVIEW_PIPELINE = RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET)
+            .withLocation(Identifier.fromNamespaceAndPath(NotEnoughWands.MODID, "pipeline/preview"))
+            .withVertexShader("core/position_tex_color")
+            .withFragmentShader("core/position_tex_color")
+            .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS)
+            .withSampler("Sampler0")
+            .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
+            .withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false))
+            .build();
 
-    static final RenderType OUTLINES = create("notenoughwands_outlines", DefaultVertexFormat.POSITION_COLOR_NORMAL,
-            VertexFormat.Mode.LINES, 256, false, false, CompositeState.builder()
-                    .setShaderState(RENDERTYPE_LINES_SHADER)
-                    .setLineState(new LineStateShard(OptionalDouble.of(4.0)))
-                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-                    .setDepthTestState(NO_DEPTH_TEST)
-                    .setCullState(NO_CULL)
-                    .setWriteMaskState(COLOR_WRITE)
-                    .createCompositeState(false));
+    public static final RenderType GHOST_BLOCKS = RenderType.create("notenoughwands_ghost_blocks",
+            RenderSetup.builder(PREVIEW_PIPELINE).withTexture("Sampler0", TextureAtlas.LOCATION_BLOCKS)
+                    .sortOnUpload().createRenderSetup());
 
-    static final RenderType GHOST_BLOCKS = create("notenoughwands_ghost_blocks", DefaultVertexFormat.NEW_ENTITY,
-            VertexFormat.Mode.QUADS, 4096, false, true, CompositeState.builder()
-                    .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_CULL_SHADER)
-                    .setTextureState(BLOCK_SHEET_MIPPED)
-                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-                    .setLayeringState(POLYGON_OFFSET_LAYERING)
-                    .setLightmapState(LIGHTMAP)
-                    .setOverlayState(OVERLAY)
-                    .setWriteMaskState(COLOR_WRITE)
-                    .createCompositeState(false));
+    private WandRenderTypes() {
+    }
 
-    private WandRenderTypes(String name, VertexFormat format, VertexFormat.Mode mode, int size,
-                            boolean crumbling, boolean sort, Runnable setup, Runnable clear) {
-        super(name, format, mode, size, crumbling, sort, setup, clear);
+    public static void registerPipelines() {
+        RenderPipelines.register(PREVIEW_PIPELINE);
     }
 }

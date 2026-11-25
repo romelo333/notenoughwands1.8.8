@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "o": {
-      "tag": "c:ender_pearls"
-    },
-    "w": {
-      "item": "notenoughwands:wand_core"
-    },
-    "x": {
-      "item": "minecraft:brick"
-    }
+    "o": "#c:ender_pearls",
+    "w": "notenoughwands:wand_core",
+    "x": "minecraft:brick"
   },
   "pattern": [
     "ox ",
@@ -18,7 +12,6 @@
     "  w"
   ],
   "result": {
-    "count": 1,
     "id": "notenoughwands:displacement_wand"
   }
 }

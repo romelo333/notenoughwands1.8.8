@@ -19,7 +19,7 @@ public class ProtectionWandConfiguration {
 
         clientSideProtection = SERVER_BUILDER
                 .comment("If this is >= 1 then the protection data will be synced to the client with this frequency (in ticks). This makes protection cleaner at the cost of network traffic")
-                .defineInRange("clientSideProtection", -1, 0, Integer.MAX_VALUE);
+                .defineInRange("clientSideProtection", -1, -1, Integer.MAX_VALUE);
         interactionProtection = SERVER_BUILDER
                 .comment("If this is true then the protection wand will prevent ALL kind of interaction with protected blocks. If this is false then only block breaking is prevented")
                 .define("interactionProtection", false);

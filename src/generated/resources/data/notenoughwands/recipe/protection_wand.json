@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "o": {
-      "tag": "c:ender_pearls"
-    },
-    "w": {
-      "item": "notenoughwands:advanced_wand_core"
-    },
-    "x": {
-      "item": "minecraft:comparator"
-    }
+    "o": "#c:ender_pearls",
+    "w": "notenoughwands:advanced_wand_core",
+    "x": "minecraft:comparator"
   },
   "pattern": [
     "xo ",
@@ -18,7 +12,6 @@
     "  w"
   ],
   "result": {
-    "count": 1,
     "id": "notenoughwands:protection_wand"
   }
 }

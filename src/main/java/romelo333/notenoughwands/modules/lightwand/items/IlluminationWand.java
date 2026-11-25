@@ -1,8 +1,6 @@
 package romelo333.notenoughwands.modules.lightwand.items;
 
-
 import mcjty.lib.builder.TooltipBuilder;
-import mcjty.lib.varia.Tools;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -11,23 +9,24 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.common.util.BlockSnapshot;
-import net.neoforged.neoforge.event.EventHooks;
 import romelo333.notenoughwands.modules.lightwand.LightModule;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
+import romelo333.notenoughwands.varia.BlockSnapshot;
+import romelo333.notenoughwands.varia.Tools;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import static mcjty.lib.builder.TooltipBuilder.*;
 
 public class IlluminationWand extends GenericWand {
 
-    public IlluminationWand() {
-        super();
+    public IlluminationWand(Properties properties) {
+        super(properties);
         this.usageFactor(1);
     }
 
@@ -37,9 +36,9 @@ public class IlluminationWand extends GenericWand {
 
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> list, TooltipFlag flagIn) {
-        super.appendHoverText(stack, context, list, flagIn);
-        tooltipBuilder.makeTooltip(Tools.getId(this), stack, list, flagIn);
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> list, TooltipFlag flagIn) {
+        super.appendHoverText(stack, context, display, list, flagIn);
+        Tools.appendTooltip(tooltipBuilder, mcjty.lib.varia.Tools.getId(this), stack, list, flagIn);
     }
 
     @Override
@@ -50,13 +49,12 @@ public class IlluminationWand extends GenericWand {
         BlockPos pos = context.getClickedPos();
         Direction side = context.getClickedFace();
         ItemStack stack = player.getItemInHand(hand);
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             Block block = world.getBlockState(pos).getBlock();
             if (block == LightModule.LIGHT.get()) {
-                BlockSnapshot blocksnapshot = BlockSnapshot.create(world.dimension(), world, pos);
+                BlockSnapshot blocksnapshot = BlockSnapshot.create(world, pos);
                 world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-                if (EventHooks.onBlockPlace(player, blocksnapshot, Direction.UP)) {
-//                    blocksnapshot.restore(true, false);   // @todo check 1.21
+                if (!blocksnapshot.canEdit(player)) {
                     blocksnapshot.restore(0);
                 }
                 return InteractionResult.SUCCESS;
@@ -71,10 +69,9 @@ public class IlluminationWand extends GenericWand {
                 return InteractionResult.SUCCESS;
             }
 
-            BlockSnapshot blocksnapshot = BlockSnapshot.create(world.dimension(), world, offset);
+            BlockSnapshot blocksnapshot = BlockSnapshot.create(world, offset);
             world.setBlock(offset, LightModule.LIGHT.get().defaultBlockState(), 3);
-            if (EventHooks.onBlockPlace(player, blocksnapshot, Direction.UP)) {
-//                blocksnapshot.restore(true, false);   // @todo check 1.21
+            if (!blocksnapshot.canEdit(player)) {
                 blocksnapshot.restore(0);
             } else {
                 registerUsage(stack, player, 1.0f);

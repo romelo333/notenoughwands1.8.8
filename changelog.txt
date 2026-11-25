@@ -1,3 +1,6 @@
+26.1.2-8.0.0-fabric:
+- Port to Minecraft 26.1.2 on Fabric.
+
 1.21-7.0.4:
 - The wand sub-mode control has a readable name in Controls.
 - Fixed the Building Wand selecting short rows when a longer row was available.

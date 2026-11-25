@@ -1,6 +1,5 @@
 package romelo333.notenoughwands.modules.buildingwands.items;
 
-
 import mcjty.lib.builder.TooltipBuilder;
 import mcjty.lib.varia.ComponentFactory;
 import net.minecraft.ChatFormatting;
@@ -8,12 +7,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -21,24 +21,24 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.util.BlockSnapshot;
-import net.neoforged.neoforge.event.EventHooks;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsConfiguration;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsModule;
 import romelo333.notenoughwands.modules.buildingwands.data.MovingWandData;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
+import romelo333.notenoughwands.varia.BlockSnapshot;
 import romelo333.notenoughwands.varia.Tools;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import static mcjty.lib.builder.TooltipBuilder.*;
 
 public class MovingWand extends GenericWand {
 
-    public MovingWand() {
-        super();
+    public MovingWand(Properties properties) {
+        super(properties);
         this.usageFactor(1.5f);
     }
 
@@ -47,31 +47,31 @@ public class MovingWand extends GenericWand {
             .infoShift(header(), gold());
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> list, TooltipFlag flagIn) {
-        super.appendHoverText(stack, context, list, flagIn);
-        tooltipBuilder.makeTooltip(mcjty.lib.varia.Tools.getId(this), stack, list, flagIn);
-        list.add(getBlockDescription(stack));
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> list, TooltipFlag flagIn) {
+        super.appendHoverText(stack, context, display, list, flagIn);
+        Tools.appendTooltip(tooltipBuilder, mcjty.lib.varia.Tools.getId(this), stack, list, flagIn);
+        list.accept(getBlockDescription(stack));
     }
 
     private Component getBlockDescription(ItemStack stack) {
         if (!hasBlock(stack)) {
             return ComponentFactory.literal("Wand is empty").withStyle(ChatFormatting.RED);
         } else {
-            BlockState state = stack.getOrDefault(BuildingWandsModule.MOVINGWAND_DATA, MovingWandData.DEFAULT).state();
+            BlockState state = stack.getOrDefault(BuildingWandsModule.MOVINGWAND_DATA.get(), MovingWandData.DEFAULT).state();
             Component name = Tools.getBlockName(state.getBlock());
             return ComponentFactory.literal("Block: ").append(name).withStyle(ChatFormatting.GREEN);
         }
     }
 
     private boolean hasBlock(ItemStack stack) {
-        return !stack.getOrDefault(BuildingWandsModule.MOVINGWAND_DATA, MovingWandData.DEFAULT).state().isAir();
+        return !stack.getOrDefault(BuildingWandsModule.MOVINGWAND_DATA.get(), MovingWandData.DEFAULT).state().isAir();
     }
 
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+    public InteractionResult use(Level world, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             if (hasBlock(stack)) {
                 Vec3 lookVec = player.getLookAngle();
                 Vec3 start = new Vec3(player.getX(), player.getY() + player.getEyeHeight(), player.getZ());
@@ -84,17 +84,16 @@ public class MovingWand extends GenericWand {
                 }
             }
         }
-        return InteractionResultHolder.success(stack);
+        return InteractionResult.SUCCESS;
     }
 
-    @Override
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
         Player player = context.getPlayer();
         InteractionHand hand = context.getHand();
         Level world = context.getLevel();
         BlockPos pos = context.getClickedPos();
         Direction side = context.getClickedFace();
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             if (hasBlock(stack)) {
                 place(stack, world, pos, side, player);
             } else {
@@ -122,15 +121,14 @@ public class MovingWand extends GenericWand {
             return;
         }
 
-        MovingWandData data = stack.getOrDefault(BuildingWandsModule.MOVINGWAND_DATA, MovingWandData.DEFAULT);
+        MovingWandData data = stack.getOrDefault(BuildingWandsModule.MOVINGWAND_DATA.get(), MovingWandData.DEFAULT);
         BlockState blockState = data.state();
 
-        BlockSnapshot blocksnapshot = BlockSnapshot.create(world.dimension(), world, pp);
+        BlockSnapshot blocksnapshot = BlockSnapshot.create(world, pp);
 
         world.setBlock(pp, blockState, 0);
         // Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
-        if (EventHooks.onBlockPlace(player, blocksnapshot, Direction.UP)) {
-//            blocksnapshot.restore(true, false);   // @todo 1.21 check
+        if (!blocksnapshot.canEdit(player)) {
             blocksnapshot.restore(0);
             return;
         }
@@ -142,14 +140,14 @@ public class MovingWand extends GenericWand {
 //            BlockEntity tileEntity = BlockEntity.loadStatic(pp, blockState, tc);
             BlockEntity tileEntity = world.getBlockEntity(pp);
             if (tileEntity != null) {
-                tileEntity.loadWithComponents(tc, world.registryAccess());
+                tileEntity.loadWithComponents(TagValueInput.create(ProblemReporter.DISCARDING, world.registryAccess(), tc));
 //                world.getChunk(pp).setBlockEntity(tileEntity);
                 tileEntity.setChanged();
                 world.sendBlockUpdated(pp, blockState, blockState, Block.UPDATE_ALL);
             }
         }
 
-        stack.set(BuildingWandsModule.MOVINGWAND_DATA, MovingWandData.DEFAULT);
+        stack.set(BuildingWandsModule.MOVINGWAND_DATA.get(), MovingWandData.DEFAULT);
     }
 
     private void pickup(ItemStack stack, Player player, Level world, BlockPos pos) {
@@ -163,7 +161,7 @@ public class MovingWand extends GenericWand {
             return;
         }
 
-        ItemStack s = state.getBlock().getCloneItemStack(world, pos, state);
+        ItemStack s = Tools.pickBlock(state, world, pos, player);
         Component name;
         if (s.isEmpty()) {
             name = Tools.getBlockName(state.getBlock());
@@ -177,9 +175,9 @@ public class MovingWand extends GenericWand {
             if (tileEntity != null) {
                 CompoundTag tc = tileEntity.saveWithoutMetadata(world.registryAccess());
                 world.removeBlockEntity(pos);
-                stack.set(BuildingWandsModule.MOVINGWAND_DATA, new MovingWandData(state, tc));
+                stack.set(BuildingWandsModule.MOVINGWAND_DATA.get(), new MovingWandData(state, tc));
             } else {
-                stack.set(BuildingWandsModule.MOVINGWAND_DATA, new MovingWandData(state, new CompoundTag()));
+                stack.set(BuildingWandsModule.MOVINGWAND_DATA.get(), new MovingWandData(state, new CompoundTag()));
             }
             world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 

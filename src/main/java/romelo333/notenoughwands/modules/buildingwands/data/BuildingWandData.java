@@ -2,6 +2,7 @@ package romelo333.notenoughwands.modules.buildingwands.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import mcjty.lib.network.StreamCodecs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
@@ -11,7 +12,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -130,8 +130,8 @@ public record BuildingWandData(Mode mode, OrientationMode orientationMode, List<
     ).apply(instance, BuildingWandData::new));
 
     public static final StreamCodec<FriendlyByteBuf, BuildingWandData> STREAM_CODEC = StreamCodec.composite(
-            NeoForgeStreamCodecs.enumCodec(Mode.class), BuildingWandData::mode,
-            NeoForgeStreamCodecs.enumCodec(OrientationMode.class), BuildingWandData::orientationMode,
+            StreamCodecs.enumCodec(Mode.class), BuildingWandData::mode,
+            StreamCodecs.enumCodec(OrientationMode.class), BuildingWandData::orientationMode,
             UNDO_STATE_STREAM_CODEC.apply(ByteBufCodecs.list()), BuildingWandData::undoStates,
             BuildingWandData::new);
 }
