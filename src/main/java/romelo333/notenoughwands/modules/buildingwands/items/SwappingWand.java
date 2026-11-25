@@ -23,7 +23,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.util.BlockSnapshot;
 import net.neoforged.neoforge.event.EventHooks;
@@ -33,9 +32,11 @@ import romelo333.notenoughwands.modules.buildingwands.BuildingWandsModule;
 import romelo333.notenoughwands.modules.buildingwands.data.SwappingWandData;
 import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
+import romelo333.notenoughwands.varia.ClientTools;
 import romelo333.notenoughwands.varia.Tools;
 
-import java.util.HashSet;
+import javax.annotation.Nullable;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -71,18 +72,15 @@ public class SwappingWand extends GenericWand {
     }
 
     private Component getBlockDescription(ItemStack stack) {
-        SwappingWandData data = stack.getOrDefault(BuildingWandsModule.SWAPPINGWAND_DATA, SwappingWandData.DEFAULT);
-        if (data.state().isAir()) {
-            return ComponentFactory.literal("No selected block").withStyle(ChatFormatting.RED);
-        } else {
-            if (isSwappingWithOffHand(stack)) {
-                return ComponentFactory.literal("Will swap with block in offhand").withStyle(ChatFormatting.GREEN);
-            } else {
-                BlockState state = data.state();
-                Component name = Tools.getBlockName(state.getBlock());
-                return ComponentFactory.literal("Block: ").append(name).withStyle(ChatFormatting.GREEN);
-            }
+        if (isSwappingWithOffHand(stack)) {
+            return ComponentFactory.literal("Will swap with block in offhand").withStyle(ChatFormatting.GREEN);
         }
+        SwappingWandData data = stack.getOrDefault(BuildingWandsModule.SWAPPINGWAND_DATA, SwappingWandData.DEFAULT);
+        BlockState state = data.state();
+        if (state.isAir()) {
+            return ComponentFactory.literal("No selected block").withStyle(ChatFormatting.RED);
+        }
+        return ComponentFactory.literal("Block: ").append(Tools.getBlockName(state.getBlock())).withStyle(ChatFormatting.GREEN);
     }
 
     private static boolean isSwappingWithOffHand(ItemStack stack) {
@@ -139,55 +137,25 @@ public class SwappingWand extends GenericWand {
             return;
         }
 
-        SwappingWandData data = stack.getOrDefault(BuildingWandsModule.SWAPPINGWAND_DATA, SwappingWandData.DEFAULT);
-        if (data.state().isAir()) {
-            Tools.error(player, "First select a block by sneaking");
-            return;
-        }
-
-        BlockState blockState;
-        float hardness;
-
-        if (isSwappingWithOffHand(stack)) {
-            ItemStack off = player.getOffhandItem();
-            if (off.isEmpty()) {
+        BlockState blockState = getReplacementState(stack, player, world);
+        if (blockState.isAir()) {
+            if (!isSwappingWithOffHand(stack)) {
+                Tools.error(player, "First select a block by sneaking");
+            } else if (player.getOffhandItem().isEmpty()) {
                 Tools.error(player, "You need to hold a block in your offhand!");
-                return;
-            }
-            if (!(off.getItem() instanceof BlockItem itemBlock)) {
+            } else {
                 Tools.error(player, "The item in your offhand cannot be placed!");
-                return;
             }
-            blockState = itemBlock.getBlock().defaultBlockState();    // @todo 1.15 is this right?
-            hardness = blockState.getDestroySpeed(world, pos);
-        } else {
-            blockState = data.state();
-            hardness = data.hardness();
+            return;
         }
 
         BlockState oldState = world.getBlockState(pos);
-        Block oldblock = oldState.getBlock();
-
-        double cost = BuildingWandsConfiguration.getBlockCost(oldState);
-        if (cost <= 0.001f) {
-            Tools.error(player, "It is illegal to swap this block");
-            return;
-        }
-
-        float blockHardness = oldState.getDestroySpeed(world, pos);
-
         if (blockState == oldState) {
-            // The same, nothing happens.
             return;
         }
-
-        if (blockHardness < -0.1f) {
-            Tools.error(player, "This block cannot be swapped!");
-            return;
-        }
-
-        if ((!player.isCreative()) && Math.abs(hardness-blockHardness) >= BuildingWandsConfiguration.hardnessDistance.get()) {
-            Tools.error(player, "The hardness of this blocks differs too much to swap!");
+        String error = getSwapError(stack, player, world, pos, oldState, blockState);
+        if (error != null) {
+            Tools.error(player, error);
             return;
         }
 
@@ -197,14 +165,14 @@ public class SwappingWand extends GenericWand {
             return;
         }
 
+        Block oldblock = oldState.getBlock();
         Set<BlockPos> coordinates = findSuitableBlocks(stack, world, side, pos, oldState);
         boolean notenough = false;
         for (BlockPos coordinate : coordinates) {
             if (!checkUsage(stack, player, 1.0f)) {
                 return;
             }
-            HitResult result = new BlockHitResult(new Vec3(0, 0, 0), Direction.UP, coordinate, false);
-            ItemStack pickBlock = blockState.getCloneItemStack(result, world, coordinate, player);
+            ItemStack pickBlock = Tools.pickBlock(blockState, world, coordinate, player);
             ItemStack consumed = Tools.consumeInventoryItem(pickBlock, player.getInventory(), player);
             if (!consumed.isEmpty()) {
                 if (!player.isCreative()) {
@@ -255,25 +223,56 @@ public class SwappingWand extends GenericWand {
         }
     }
 
-    // @todo 1.20 correct event?
-    @Override
-    public void renderOverlay(RenderLevelStageEvent evt, Player player, ItemStack wand) {
-        HitResult mouseOver = Minecraft.getInstance().hitResult;
+    private BlockState getReplacementState(ItemStack stack, Player player, Level world) {
+        if (isSwappingWithOffHand(stack)) {
+            ItemStack offhand = player.getOffhandItem();
+            return offhand.getItem() instanceof BlockItem item ? item.getBlock().defaultBlockState() : Blocks.AIR.defaultBlockState();
+        }
+        return stack.getOrDefault(BuildingWandsModule.SWAPPINGWAND_DATA, SwappingWandData.DEFAULT).state();
+    }
 
-        if (mouseOver instanceof BlockHitResult br) {
-
-            Level world = player.getCommandSenderWorld();
-            BlockPos blockPos = br.getBlockPos();
-            BlockState state = world.getBlockState(blockPos);
-            if (!state.isAir() && wand.getOrDefault(BuildingWandsModule.SWAPPINGWAND_DATA, SwappingWandData.DEFAULT).state() == state) {
-                Set<BlockPos> coordinates = findSuitableBlocks(wand, world, br.getDirection(), blockPos, state);
-                renderOutlines(evt, player, coordinates, 200, 230, 180);
+    @Nullable
+    private String getSwapError(ItemStack stack, Player player, Level world, BlockPos pos, BlockState oldState, BlockState replacement) {
+        if (BuildingWandsConfiguration.getBlockCost(oldState) <= 0.001f) {
+            return "It is illegal to swap this block";
+        }
+        float oldHardness = oldState.getDestroySpeed(world, pos);
+        if (oldHardness < -0.1f) {
+            return "This block cannot be swapped!";
+        }
+        if (!player.isCreative()) {
+            float hardness = isSwappingWithOffHand(stack) ? replacement.getDestroySpeed(world, pos) : stack.getOrDefault(BuildingWandsModule.SWAPPINGWAND_DATA, SwappingWandData.DEFAULT).hardness();
+            if (Math.abs(hardness - oldHardness) >= BuildingWandsConfiguration.hardnessDistance.get()) {
+                return "The hardness of this blocks differs too much to swap!";
             }
         }
+        return null;
+    }
+
+    @Override
+    public void renderOverlay(RenderLevelStageEvent evt, Player player, ItemStack wand) {
+        if (player.isShiftKeyDown() || !(Minecraft.getInstance().hitResult instanceof BlockHitResult hit)
+                || hit.getType() != HitResult.Type.BLOCK) {
+            return;
+        }
+
+        Level world = player.level();
+        BlockPos pos = hit.getBlockPos();
+        BlockState state = world.getBlockState(pos);
+        BlockState replacement = getReplacementState(wand, player, world);
+        if (state.isAir() || replacement.isAir() || state == replacement
+                || getSwapError(wand, player, world, pos, state, replacement) != null
+                || ProtectedBlocks.isProtectedClientSide(world, pos)) {
+            return;
+        }
+        Set<BlockPos> coordinates = findSuitableBlocks(wand, world, hit.getDirection(), pos, state);
+        ClientTools.renderPlacementPreview(evt.getPoseStack(), player, coordinates,
+                destination -> Tools.pickBlock(replacement, world, destination, player), true);
+        renderOutlines(evt, player, coordinates, 200, 230, 180);
     }
 
     private Set<BlockPos> findSuitableBlocks(ItemStack stack, Level world, Direction sideHit, BlockPos pos, BlockState centerState) {
-        Set<BlockPos> coordinates = new HashSet<BlockPos>();
+        Set<BlockPos> coordinates = new LinkedHashSet<>();
         SwappingWandData.Mode mode = getMode(stack);
         int dim = 0;
         switch (mode) {

@@ -173,11 +173,17 @@ public class GenericWand extends Item {
     }
 
     protected void showModeKeyDescription(List<Component> list, String suffix) {
-        list.add(ComponentFactory.literal("Mode key (").append(KeyBindings.wandModifier.getTranslatedKeyMessage()).append(") to ").append(suffix).withStyle(ChatFormatting.YELLOW));
+        Component shortcut = KeyBindings.wandModifier == null
+                ? Component.translatable("key.keyboard.unknown")
+                : KeyBindings.wandModifier.getTranslatedKeyMessage();
+        list.add(ComponentFactory.literal("Mode key (").append(shortcut).append(") to ").append(suffix).withStyle(ChatFormatting.YELLOW));
     }
 
     protected void showSubModeKeyDescription(List<Component> list, String suffix) {
-        list.add(ComponentFactory.literal("Sub-mode key (").append(KeyBindings.wandSubMode.getTranslatedKeyMessage()).append(") to ").append(suffix).withStyle(ChatFormatting.YELLOW));
+        Component shortcut = KeyBindings.wandSubMode == null
+                ? Component.translatable("key.keyboard.unknown")
+                : KeyBindings.wandSubMode.getTranslatedKeyMessage();
+        list.add(ComponentFactory.literal("Sub-mode key (").append(shortcut).append(") to ").append(suffix).withStyle(ChatFormatting.YELLOW));
     }
 
     //------------------------------------------------------------------------------
