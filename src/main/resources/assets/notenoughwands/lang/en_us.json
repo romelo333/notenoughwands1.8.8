@@ -52,7 +52,7 @@
 
   "key.modifier": "Wand Modifier",
   "key.submode": "Wand Sub-mode",
-  "key.categories.notenoughwands": "Not Enough Wands",
+  "key.category.notenoughwands.keys": "Not Enough Wands",
 
   "itemGroup.notenoughwands": "Not Enough Wands"
 }

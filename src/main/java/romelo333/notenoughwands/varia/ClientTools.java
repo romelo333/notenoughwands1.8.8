@@ -3,25 +3,25 @@ package romelo333.notenoughwands.varia;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.model.geom.builders.UVPair;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.minecraft.world.phys.shapes.Shapes;
+import org.joml.Vector3f;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,43 +31,47 @@ import java.util.function.Function;
 public final class ClientTools {
 
     private static final Direction[] DIRECTIONS = Direction.values();
-    private static final float PREVIEW_ALPHA = 0.30f;
-    private static final float[] QUAD_BRIGHTNESS = { 1.0f, 1.0f, 1.0f, 1.0f };
-    private static final int[] QUAD_LIGHT = {
-            LightTexture.FULL_BRIGHT, LightTexture.FULL_BRIGHT, LightTexture.FULL_BRIGHT, LightTexture.FULL_BRIGHT
-    };
+    private static final int PREVIEW_ALPHA = 77;
 
     private ClientTools() {
     }
 
-    public static void renderOutlines(PoseStack poseStack, MultiBufferSource.BufferSource buffer, Set<BlockPos> positions, int r, int g, int b) {
+    public record RenderContext(PoseStack poses, SubmitNodeCollector collector, Vec3 camera) {
+    }
+
+    public static void renderOutlines(RenderContext context, Set<BlockPos> positions, int r, int g, int b) {
         if (positions.isEmpty()) {
             return;
         }
-        VertexConsumer vertices = buffer.getBuffer(WandRenderTypes.OUTLINES);
-        Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
-        for (BlockPos pos : positions) {
-            double x = pos.getX() - camera.x;
-            double y = pos.getY() - camera.y;
-            double z = pos.getZ() - camera.z;
-            LevelRenderer.renderLineBox(poseStack, vertices, x, y, z, x + 1, y + 1, z + 1,
-                    r / 255.0f, g / 255.0f, b / 255.0f, 1.0f);
-        }
-        buffer.endBatch(WandRenderTypes.OUTLINES);
+        List<BlockPos> targets = List.copyOf(positions);
+        Vec3 camera = context.camera();
+        int color = ARGB.color(255, r, g, b);
+        context.collector().submitCustomGeometry(context.poses(), WandRenderTypes.OUTLINES, (pose, vertices) -> {
+            for (BlockPos pos : targets) {
+                double x = pos.getX() - camera.x;
+                double y = pos.getY() - camera.y;
+                double z = pos.getZ() - camera.z;
+                Shapes.block().forAllEdges((x1, y1, z1, x2, y2, z2) -> {
+                    Vector3f normal = new Vector3f((float) (x2 - x1), (float) (y2 - y1), (float) (z2 - z1)).normalize();
+                    vertices.addVertex(pose, (float) (x + x1), (float) (y + y1), (float) (z + z1))
+                            .setColor(color).setNormal(pose, normal).setLineWidth(4.0f);
+                    vertices.addVertex(pose, (float) (x + x2), (float) (y + y2), (float) (z + z2))
+                            .setColor(color).setNormal(pose, normal).setLineWidth(4.0f);
+                });
+            }
+        });
     }
 
-    public static void renderPlacementPreview(PoseStack poseStack, Player player, Set<BlockPos> positions,
+    public static void renderPlacementPreview(RenderContext context, Player player, Set<BlockPos> positions,
                                               Function<BlockPos, ItemStack> material, boolean replacing) {
         if (positions.isEmpty()) {
             return;
         }
 
         Minecraft minecraft = Minecraft.getInstance();
-        Vec3 camera = minecraft.gameRenderer.getMainCamera().getPosition();
-        MultiBufferSource.BufferSource buffer = minecraft.renderBuffers().bufferSource();
-        VertexConsumer vertices = buffer.getBuffer(WandRenderTypes.GHOST_BLOCKS);
+        Vec3 camera = context.camera();
+        PoseStack poseStack = context.poses();
         RandomSource random = RandomSource.create();
-        Level level = player.level();
         Inventory inventory = player.getInventory();
         Map<Integer, Integer> remainingItems = new HashMap<>();
         for (BlockPos pos : positions) {
@@ -98,38 +102,58 @@ public final class ClientTools {
 
             poseStack.pushPose();
             poseStack.translate(pos.getX() - camera.x, pos.getY() - camera.y, pos.getZ() - camera.z);
-            Vec3 modelOffset = state.getOffset(level, pos);
+            Vec3 modelOffset = state.getOffset(pos);
             poseStack.translate(modelOffset.x, modelOffset.y, modelOffset.z);
-            renderBlockModel(minecraft, poseStack.last(), vertices, level, pos, state, random);
+            var parts = getModelParts(minecraft, state, pos, random);
+            context.collector().submitCustomGeometry(poseStack, WandRenderTypes.GHOST_BLOCKS,
+                    (pose, vertices) -> renderBlockModel(minecraft, pose, vertices, pos, state, parts, replacing));
             poseStack.popPose();
         }
-        buffer.endBatch(WandRenderTypes.GHOST_BLOCKS);
+    }
+
+    private static List<BlockStateModelPart> getModelParts(Minecraft minecraft, BlockState state, BlockPos pos, RandomSource random) {
+        BlockStateModel model = minecraft.getModelManager().getBlockStateModelSet().get(state);
+        List<BlockStateModelPart> parts = new ArrayList<>();
+        random.setSeed(state.getSeed(pos));
+        model.collectParts(random, parts);
+        return parts;
     }
 
     private static void renderBlockModel(Minecraft minecraft, PoseStack.Pose pose, VertexConsumer vertices,
-                                         Level level, BlockPos pos, BlockState state, RandomSource random) {
-        BakedModel model = minecraft.getBlockRenderer().getBlockModel(state);
-        long seed = state.getSeed(pos);
-        random.setSeed(seed);
-        for (RenderType layer : model.getRenderTypes(state, random, ModelData.EMPTY)) {
+                                         BlockPos pos, BlockState state, List<BlockStateModelPart> parts, boolean replacing) {
+        for (BlockStateModelPart part : parts) {
             for (Direction side : DIRECTIONS) {
-                random.setSeed(seed);
-                renderQuads(minecraft, pose, vertices, level, pos, state, model.getQuads(state, side, random, ModelData.EMPTY, layer));
+                renderQuads(minecraft, pose, vertices, pos, state, part.getQuads(side), replacing);
             }
-            random.setSeed(seed);
-            renderQuads(minecraft, pose, vertices, level, pos, state, model.getQuads(state, null, random, ModelData.EMPTY, layer));
+            renderQuads(minecraft, pose, vertices, pos, state, part.getQuads(null), replacing);
         }
     }
 
     private static void renderQuads(Minecraft minecraft, PoseStack.Pose pose, VertexConsumer vertices,
-                                    Level level, BlockPos pos, BlockState state, List<BakedQuad> quads) {
+                                    BlockPos pos, BlockState state, List<BakedQuad> quads, boolean replacing) {
         for (BakedQuad quad : quads) {
-            int color = quad.isTinted() ? minecraft.getBlockColors().getColor(state, level, pos, quad.getTintIndex()) : 0xFFFFFF;
-            float shade = level.getShade(quad.getDirection(), quad.isShade());
-            float red = ((color >> 16) & 0xFF) / 255.0f * shade;
-            float green = ((color >> 8) & 0xFF) / 255.0f * shade;
-            float blue = (color & 0xFF) / 255.0f * shade;
-            vertices.putBulkData(pose, quad, QUAD_BRIGHTNESS, red, green, blue, PREVIEW_ALPHA, QUAD_LIGHT, OverlayTexture.NO_OVERLAY, true);
+            var material = quad.materialInfo();
+            var tintSource = material.isTinted() ? minecraft.getBlockColors().getTintSource(state, material.tintIndex()) : null;
+            int tint = tintSource == null ? 0xFFFFFFFF : tintSource.colorInWorld(state, minecraft.level, pos);
+            Direction side = quad.direction();
+            Direction shadedSide = material.shadeDirectionOverride() == null ? side : material.shadeDirectionOverride();
+            float shade = switch (shadedSide) {
+                case UP -> 1.0f;
+                case DOWN -> 0.55f;
+                case NORTH, SOUTH -> 0.8f;
+                case EAST, WEST -> 0.65f;
+            };
+            // Move coplanar replacement faces just ahead of the old block.
+            float offset = replacing ? 0.002f : 0.0f;
+            for (int vertex = 0; vertex < 4; vertex++) {
+                var point = quad.position(vertex);
+                long uv = quad.packedUV(vertex);
+                int color = tint;
+                vertices.addVertex(pose, point.x() + side.getStepX() * offset, point.y() + side.getStepY() * offset, point.z() + side.getStepZ() * offset)
+                        .setUv(UVPair.unpackU(uv), UVPair.unpackV(uv))
+                        .setColor((int) (ARGB.red(color) * shade), (int) (ARGB.green(color) * shade),
+                                (int) (ARGB.blue(color) * shade), PREVIEW_ALPHA);
+            }
         }
     }
 }

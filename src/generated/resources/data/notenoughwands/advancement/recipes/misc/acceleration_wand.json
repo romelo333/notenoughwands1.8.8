@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "notenoughwands:acceleration_wand"
+        "recipes": "notenoughwands:acceleration_wand"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

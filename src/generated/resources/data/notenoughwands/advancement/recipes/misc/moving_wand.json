@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "notenoughwands:moving_wand"
+        "recipes": "notenoughwands:moving_wand"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

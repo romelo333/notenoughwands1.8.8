@@ -2,10 +2,10 @@ package romelo333.notenoughwands.modules.protectionwand.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import mcjty.lib.network.StreamCodecs;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
 
 public record ProtectionWandData(Mode mode, Integer id) {
 
@@ -49,7 +49,7 @@ public record ProtectionWandData(Mode mode, Integer id) {
     ).apply(instance, ProtectionWandData::new));
 
     public static final StreamCodec<FriendlyByteBuf, ProtectionWandData> STREAM_CODEC = StreamCodec.composite(
-            NeoForgeStreamCodecs.enumCodec(ProtectionWandData.Mode.class), ProtectionWandData::mode,
+            StreamCodecs.enumCodec(ProtectionWandData.Mode.class), ProtectionWandData::mode,
             ByteBufCodecs.INT, ProtectionWandData::id,
             ProtectionWandData::new);
 }

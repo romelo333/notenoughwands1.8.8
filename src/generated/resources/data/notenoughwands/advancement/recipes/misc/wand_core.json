@@ -3,7 +3,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "notenoughwands:wand_core"
+        "recipes": "notenoughwands:wand_core"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

@@ -3,15 +3,12 @@ package romelo333.notenoughwands.modules.buildingwands;
 import mcjty.lib.datagen.DataGen;
 import mcjty.lib.datagen.Dob;
 import mcjty.lib.modules.IModule;
+import mcjty.lib.setup.DeferredHolder;
+import mcjty.lib.setup.DeferredItem;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredItem;
 import romelo333.notenoughwands.modules.buildingwands.data.BuildingWandData;
 import romelo333.notenoughwands.modules.buildingwands.data.DisplacementWandData;
 import romelo333.notenoughwands.modules.buildingwands.data.MovingWandData;
@@ -25,8 +22,8 @@ import romelo333.notenoughwands.setup.Config;
 
 import static mcjty.lib.datagen.DataGen.has;
 import static romelo333.notenoughwands.NotEnoughWands.tab;
-import static romelo333.notenoughwands.setup.Registration.ITEMS;
 import static romelo333.notenoughwands.setup.Registration.COMPONENTS;
+import static romelo333.notenoughwands.setup.Registration.ITEMS;
 
 public class BuildingWandsModule implements IModule {
 
@@ -57,17 +54,17 @@ public class BuildingWandsModule implements IModule {
                     .networkSynchronized(SwappingWandData.STREAM_CODEC));
 
     @Override
-    public void init(FMLCommonSetupEvent event) {
+    public void init() {
 
     }
 
     @Override
-    public void initClient(FMLClientSetupEvent event) {
+    public void initClient() {
 
     }
 
     @Override
-    public void initConfig(IEventBus bus) {
+    public void initConfig() {
         BuildingWandsConfiguration.init(Config.SERVER_BUILDER, Config.CLIENT_BUILDER);
     }
 

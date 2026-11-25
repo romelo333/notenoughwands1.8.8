@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "notenoughwands:building_wand"
+        "recipes": "notenoughwands:building_wand"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "romelo333.notenoughwands.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "ServerExplosionMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

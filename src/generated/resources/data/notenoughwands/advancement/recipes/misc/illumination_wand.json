@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "notenoughwands:illumination_wand"
+        "recipes": "notenoughwands:illumination_wand"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

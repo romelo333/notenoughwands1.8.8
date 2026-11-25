@@ -1,37 +1,49 @@
 package romelo333.notenoughwands.network;
 
-
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.PacketDistributor;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.registration.PayloadRegistrar;
-import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.modules.protectionwand.network.*;
 
-public class NEWPacketHandler {
+public final class NEWPacketHandler {
 
-    public static void registerMessages(RegisterPayloadHandlersEvent event) {
-        final PayloadRegistrar registrar = event.registrar(NotEnoughWands.MODID)
-                .versioned("1.0")
-                .optional();
-
-        registrar.playToClient(PacketReturnProtectedBlocks.TYPE, PacketReturnProtectedBlocks.CODEC, PacketReturnProtectedBlocks::handle);
-        registrar.playToClient(PacketReturnProtectedBlocksAroundPlayer.TYPE, PacketReturnProtectedBlocksAroundPlayer.CODEC, PacketReturnProtectedBlocksAroundPlayer::handle);
-        registrar.playToClient(PacketReturnProtectedBlockCount.TYPE, PacketReturnProtectedBlockCount.CODEC, PacketReturnProtectedBlockCount::handle);
-
-        registrar.playToServer(PacketGetProtectedBlockCount.TYPE, PacketGetProtectedBlockCount.CODEC, PacketGetProtectedBlockCount::handle);
-        registrar.playToServer(PacketGetProtectedBlocks.TYPE, PacketGetProtectedBlocks.CODEC, PacketGetProtectedBlocks::handle);
-        registrar.playToServer(PacketGetProtectedBlocksAroundPlayer.TYPE, PacketGetProtectedBlocksAroundPlayer.CODEC, PacketGetProtectedBlocksAroundPlayer::handle);
-        registrar.playToServer(PacketToggleSubMode.TYPE, PacketToggleSubMode.CODEC, PacketToggleSubMode::handle);
-        registrar.playToServer(PacketToggleMode.TYPE, PacketToggleMode.CODEC, PacketToggleMode::handle);
+    private NEWPacketHandler() {
     }
 
-    public static <T extends CustomPacketPayload> void sendToPlayer(T packet, ServerPlayer player) {
-        PacketDistributor.sendToPlayer(player, packet);
+    public static void registerMessages() {
+        PayloadTypeRegistry.clientboundPlay().register(PacketReturnProtectedBlocks.TYPE, PacketReturnProtectedBlocks.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(PacketReturnProtectedBlocksAroundPlayer.TYPE, PacketReturnProtectedBlocksAroundPlayer.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(PacketReturnProtectedBlockCount.TYPE, PacketReturnProtectedBlockCount.CODEC);
+
+        PayloadTypeRegistry.serverboundPlay().register(PacketGetProtectedBlockCount.TYPE, PacketGetProtectedBlockCount.CODEC);
+        ServerPlayNetworking.registerGlobalReceiver(PacketGetProtectedBlockCount.TYPE, (payload, context) -> payload.handle(context.player()));
+        PayloadTypeRegistry.serverboundPlay().register(PacketGetProtectedBlocks.TYPE, PacketGetProtectedBlocks.CODEC);
+        ServerPlayNetworking.registerGlobalReceiver(PacketGetProtectedBlocks.TYPE, (payload, context) -> payload.handle(context.player()));
+        PayloadTypeRegistry.serverboundPlay().register(PacketGetProtectedBlocksAroundPlayer.TYPE, PacketGetProtectedBlocksAroundPlayer.CODEC);
+        ServerPlayNetworking.registerGlobalReceiver(PacketGetProtectedBlocksAroundPlayer.TYPE, (payload, context) -> payload.handle(context.player()));
+        PayloadTypeRegistry.serverboundPlay().register(PacketToggleSubMode.TYPE, PacketToggleSubMode.CODEC);
+        ServerPlayNetworking.registerGlobalReceiver(PacketToggleSubMode.TYPE, (payload, context) -> payload.handle(context.player()));
+        PayloadTypeRegistry.serverboundPlay().register(PacketToggleMode.TYPE, PacketToggleMode.CODEC);
+        ServerPlayNetworking.registerGlobalReceiver(PacketToggleMode.TYPE, (payload, context) -> payload.handle(context.player()));
     }
 
-    public static <T extends CustomPacketPayload> void sendToServer(T packet) {
-        PacketDistributor.sendToServer(packet);
+    public static void registerClientMessages() {
+        ClientPlayNetworking.registerGlobalReceiver(PacketReturnProtectedBlocks.TYPE, (payload, context) -> payload.handle());
+        ClientPlayNetworking.registerGlobalReceiver(PacketReturnProtectedBlocksAroundPlayer.TYPE, (payload, context) -> payload.handle());
+        ClientPlayNetworking.registerGlobalReceiver(PacketReturnProtectedBlockCount.TYPE, (payload, context) -> payload.handle());
+    }
+
+    public static void sendToPlayer(CustomPacketPayload packet, ServerPlayer player) {
+        if (ServerPlayNetworking.canSend(player, packet.type())) {
+            ServerPlayNetworking.send(player, packet);
+        }
+    }
+
+    public static void sendToServer(CustomPacketPayload packet) {
+        if (ClientPlayNetworking.canSend(packet.type())) {
+            ClientPlayNetworking.send(packet);
+        }
     }
 }

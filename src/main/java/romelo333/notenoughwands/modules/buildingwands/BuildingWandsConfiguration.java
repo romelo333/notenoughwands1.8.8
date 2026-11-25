@@ -2,7 +2,7 @@ package romelo333.notenoughwands.modules.buildingwands;
 
 import com.google.common.collect.Lists;
 import mcjty.lib.varia.Tools;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
@@ -20,7 +20,7 @@ public class BuildingWandsConfiguration {
 
     private static ModConfigSpec.ConfigValue<List<? extends String>> blockBlackList;
     private static boolean blacklistedBlocksLoaded = false;
-    private static Map<ResourceLocation,Double> blacklistedBlocks = new HashMap<>();
+    private static Map<Identifier,Double> blacklistedBlocks = new HashMap<>();
 
     public static void init(ModConfigSpec.Builder SERVER_BUILDER, ModConfigSpec.Builder CLIENT_BUILDER) {
         SERVER_BUILDER.comment("Settings for the wands").push(CATEGORY_BUILDINGWANDS);
@@ -64,14 +64,14 @@ public class BuildingWandsConfiguration {
             if (split.length > 1) {
                 cost = Double.parseDouble(split[1]);
             }
-            blacklistedBlocks.put(ResourceLocation.parse(split[0]), cost);
+            blacklistedBlocks.put(Identifier.parse(split[0]), cost);
         }
         blacklistedBlocksLoaded = true;
     }
 
     public static double getBlockCost(BlockState state) {
         reloadConfig();
-        ResourceLocation registryName = Tools.getId(state.getBlock());
+        Identifier registryName = Tools.getId(state.getBlock());
         return blacklistedBlocks.getOrDefault(registryName, 1.0);
     }
 }
