@@ -5,8 +5,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraft.resources.Identifier;
 import romelo333.notenoughwands.NotEnoughWands;
 
 import java.util.HashSet;
@@ -14,7 +13,7 @@ import java.util.Set;
 
 public record PacketReturnProtectedBlocks(Set<BlockPos> blocks, Set<BlockPos> childBlocks) implements CustomPacketPayload {
 
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(NotEnoughWands.MODID, "returnprotectedblocks");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(NotEnoughWands.MODID, "returnprotectedblocks");
     public static final CustomPacketPayload.Type<PacketReturnProtectedBlocks> TYPE = new Type<>(ID);
 
     public static final StreamCodec<FriendlyByteBuf, PacketReturnProtectedBlocks> CODEC = StreamCodec.composite(
@@ -39,9 +38,7 @@ public record PacketReturnProtectedBlocks(Set<BlockPos> blocks, Set<BlockPos> ch
         return childBlocks;
     }
 
-    public void handle(IPayloadContext ctx) {
-        ctx.enqueueWork(() -> {
-            ReturnProtectedBlocksHelper.setProtectedBlocks(this);
-        });
+    public void handle() {
+        ReturnProtectedBlocksHelper.setProtectedBlocks(this);
     }
 }

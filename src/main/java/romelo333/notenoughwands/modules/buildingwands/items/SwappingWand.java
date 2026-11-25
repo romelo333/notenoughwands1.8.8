@@ -1,6 +1,5 @@
 package romelo333.notenoughwands.modules.buildingwands.items;
 
-
 import mcjty.lib.builder.TooltipBuilder;
 import mcjty.lib.varia.ComponentFactory;
 import mcjty.lib.varia.SoundTools;
@@ -11,11 +10,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -23,22 +22,20 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
-import net.neoforged.neoforge.common.util.BlockSnapshot;
-import net.neoforged.neoforge.event.EventHooks;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsConfiguration;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsModule;
 import romelo333.notenoughwands.modules.buildingwands.data.SwappingWandData;
 import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
+import romelo333.notenoughwands.varia.BlockSnapshot;
+import romelo333.notenoughwands.varia.ClientTools.RenderContext;
 import romelo333.notenoughwands.varia.ClientTools;
 import romelo333.notenoughwands.varia.Tools;
 
-import javax.annotation.Nullable;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
+import javax.annotation.Nullable;
 
 import static mcjty.lib.builder.TooltipBuilder.*;
 
@@ -50,8 +47,8 @@ public class SwappingWand extends GenericWand {
                 parameter("mode", stack -> getMode(stack).getDescription()));
 
 
-    public SwappingWand() {
-        super();
+    public SwappingWand(Properties properties) {
+        super(properties);
         this.usageFactor(1.0f);
     }
 
@@ -59,14 +56,14 @@ public class SwappingWand extends GenericWand {
     public void toggleMode(Player player, ItemStack stack) {
         SwappingWandData.Mode mode = getMode(stack).next();
         Tools.notify(player, ComponentFactory.literal("Switched to " + mode.getDescription() + " mode"));
-        stack.update(BuildingWandsModule.SWAPPINGWAND_DATA, SwappingWandData.DEFAULT, data -> data.withMode(mode));
+        stack.update(BuildingWandsModule.SWAPPINGWAND_DATA.get(), SwappingWandData.DEFAULT, data -> data.withMode(mode));
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> list, TooltipFlag flagIn) {
-        super.appendHoverText(stack, context, list, flagIn);
-        tooltipBuilder.makeTooltip(mcjty.lib.varia.Tools.getId(this), stack, list, flagIn);
-        list.add(getBlockDescription(stack));
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> list, TooltipFlag flagIn) {
+        super.appendHoverText(stack, context, display, list, flagIn);
+        Tools.appendTooltip(tooltipBuilder, mcjty.lib.varia.Tools.getId(this), stack, list, flagIn);
+        list.accept(getBlockDescription(stack));
 
         showModeKeyDescription(list, "switch mode");
     }
@@ -75,7 +72,7 @@ public class SwappingWand extends GenericWand {
         if (isSwappingWithOffHand(stack)) {
             return ComponentFactory.literal("Will swap with block in offhand").withStyle(ChatFormatting.GREEN);
         }
-        SwappingWandData data = stack.getOrDefault(BuildingWandsModule.SWAPPINGWAND_DATA, SwappingWandData.DEFAULT);
+        SwappingWandData data = stack.getOrDefault(BuildingWandsModule.SWAPPINGWAND_DATA.get(), SwappingWandData.DEFAULT);
         BlockState state = data.state();
         if (state.isAir()) {
             return ComponentFactory.literal("No selected block").withStyle(ChatFormatting.RED);
@@ -84,29 +81,29 @@ public class SwappingWand extends GenericWand {
     }
 
     private static boolean isSwappingWithOffHand(ItemStack stack) {
-        return stack.getOrDefault(BuildingWandsModule.SWAPPINGWAND_DATA, SwappingWandData.DEFAULT).offhand();
+        return stack.getOrDefault(BuildingWandsModule.SWAPPINGWAND_DATA.get(), SwappingWandData.DEFAULT).offhand();
     }
 
     private static void enableSwappingWithOffHand(ItemStack stack) {
-        stack.update(BuildingWandsModule.SWAPPINGWAND_DATA, SwappingWandData.DEFAULT, data -> data.withOffhand(true));
+        stack.update(BuildingWandsModule.SWAPPINGWAND_DATA.get(), SwappingWandData.DEFAULT, data -> data.withOffhand(true));
     }
 
     private static void disableSwappingWithOffHand(ItemStack stack) {
-        stack.update(BuildingWandsModule.SWAPPINGWAND_DATA, SwappingWandData.DEFAULT, data -> data.withOffhand(false));
+        stack.update(BuildingWandsModule.SWAPPINGWAND_DATA.get(), SwappingWandData.DEFAULT, data -> data.withOffhand(false));
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+    public InteractionResult use(Level world, Player player, InteractionHand hand) {
         ItemStack heldItem = player.getItemInHand(hand);
         if (!heldItem.isEmpty()) {
             if (isSwappingWithOffHand(heldItem)) {
                 disableSwappingWithOffHand(heldItem);
-                if (world.isClientSide) {
+                if (world.isClientSide()) {
                     Tools.notify(player, ComponentFactory.literal("Switched to swapping with selected block"));
                 }
             } else {
                 enableSwappingWithOffHand(heldItem);
-                if (world.isClientSide) {
+                if (world.isClientSide()) {
                     Tools.notify(player, ComponentFactory.literal("Switched to swapping with block in offhand"));
                 }
             }
@@ -122,7 +119,7 @@ public class SwappingWand extends GenericWand {
         BlockPos pos = context.getClickedPos();
         Direction side = context.getClickedFace();
         ItemStack stack = player.getItemInHand(hand);
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             if (player.isShiftKeyDown()) {
                 selectBlock(stack, player, world, pos);
             } else {
@@ -165,32 +162,34 @@ public class SwappingWand extends GenericWand {
             return;
         }
 
-        Block oldblock = oldState.getBlock();
         Set<BlockPos> coordinates = findSuitableBlocks(stack, world, side, pos, oldState);
         boolean notenough = false;
         for (BlockPos coordinate : coordinates) {
+            if (protectedBlocks.isProtected(world, coordinate)) {
+                continue;
+            }
             if (!checkUsage(stack, player, 1.0f)) {
                 return;
             }
             ItemStack pickBlock = Tools.pickBlock(blockState, world, coordinate, player);
             ItemStack consumed = Tools.consumeInventoryItem(pickBlock, player.getInventory(), player);
             if (!consumed.isEmpty()) {
-                if (!player.isCreative()) {
-                    ItemStack oldblockItem = oldblock.getCloneItemStack(oldState, null, world, pos, player);
-                    ItemHandlerHelper.giveItemToPlayer(player, oldblockItem);
-                }
+                ItemStack replaced = player.isCreative() ? ItemStack.EMPTY : Tools.pickBlock(oldState, world, coordinate, player);
+                ItemStack refund = consumed.copy();
                 SoundTools.playSound(world, blockState.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
-                BlockSnapshot blocksnapshot = BlockSnapshot.create(world.dimension(), world, coordinate);
+                BlockSnapshot blocksnapshot = BlockSnapshot.create(world, coordinate);
                 world.setBlockAndUpdate(coordinate, Blocks.AIR.defaultBlockState());
                 Tools.placeStackAt(player, consumed, world, coordinate, null);
 
-                if (EventHooks.onBlockPlace(player, blocksnapshot, Direction.UP)) {
-//                    blocksnapshot.restore(true, false);   // @todo 1.21 check
+                if (!blocksnapshot.canEdit(player)) {
                     blocksnapshot.restore(0);
                     if (!player.isCreative()) {
-                        ItemHandlerHelper.giveItemToPlayer(player, consumed);
+                        Tools.giveItem(player, refund);
                     }
+                    continue;
                 }
+
+                Tools.giveItem(player, replaced);
 
                 player.containerMenu.broadcastChanges();
                 registerUsage(stack, player, 1.0f);
@@ -218,7 +217,7 @@ public class SwappingWand extends GenericWand {
             }
 
             float hardness = state.getDestroySpeed(world, pos);
-            stack.set(BuildingWandsModule.SWAPPINGWAND_DATA, new SwappingWandData(getMode(stack), state, false, hardness));
+            stack.set(BuildingWandsModule.SWAPPINGWAND_DATA.get(), new SwappingWandData(getMode(stack), state, false, hardness));
             Tools.notify(player, ComponentFactory.literal("Selected block: ").append(name));
         }
     }
@@ -228,7 +227,7 @@ public class SwappingWand extends GenericWand {
             ItemStack offhand = player.getOffhandItem();
             return offhand.getItem() instanceof BlockItem item ? item.getBlock().defaultBlockState() : Blocks.AIR.defaultBlockState();
         }
-        return stack.getOrDefault(BuildingWandsModule.SWAPPINGWAND_DATA, SwappingWandData.DEFAULT).state();
+        return stack.getOrDefault(BuildingWandsModule.SWAPPINGWAND_DATA.get(), SwappingWandData.DEFAULT).state();
     }
 
     @Nullable
@@ -241,7 +240,7 @@ public class SwappingWand extends GenericWand {
             return "This block cannot be swapped!";
         }
         if (!player.isCreative()) {
-            float hardness = isSwappingWithOffHand(stack) ? replacement.getDestroySpeed(world, pos) : stack.getOrDefault(BuildingWandsModule.SWAPPINGWAND_DATA, SwappingWandData.DEFAULT).hardness();
+            float hardness = isSwappingWithOffHand(stack) ? replacement.getDestroySpeed(world, pos) : stack.getOrDefault(BuildingWandsModule.SWAPPINGWAND_DATA.get(), SwappingWandData.DEFAULT).hardness();
             if (Math.abs(hardness - oldHardness) >= BuildingWandsConfiguration.hardnessDistance.get()) {
                 return "The hardness of this blocks differs too much to swap!";
             }
@@ -250,7 +249,7 @@ public class SwappingWand extends GenericWand {
     }
 
     @Override
-    public void renderOverlay(RenderLevelStageEvent evt, Player player, ItemStack wand) {
+    public void renderOverlay(RenderContext context, Player player, ItemStack wand) {
         if (player.isShiftKeyDown() || !(Minecraft.getInstance().hitResult instanceof BlockHitResult hit)
                 || hit.getType() != HitResult.Type.BLOCK) {
             return;
@@ -266,9 +265,9 @@ public class SwappingWand extends GenericWand {
             return;
         }
         Set<BlockPos> coordinates = findSuitableBlocks(wand, world, hit.getDirection(), pos, state);
-        ClientTools.renderPlacementPreview(evt.getPoseStack(), player, coordinates,
+        ClientTools.renderPlacementPreview(context, player, coordinates,
                 destination -> Tools.pickBlock(replacement, world, destination, player), true);
-        renderOutlines(evt, player, coordinates, 200, 230, 180);
+        renderOutlines(context, coordinates, 200, 230, 180);
     }
 
     private Set<BlockPos> findSuitableBlocks(ItemStack stack, Level world, Direction sideHit, BlockPos pos, BlockState centerState) {
@@ -326,6 +325,6 @@ public class SwappingWand extends GenericWand {
     }
 
     private SwappingWandData.Mode getMode(ItemStack stack) {
-        return stack.getOrDefault(BuildingWandsModule.SWAPPINGWAND_DATA, SwappingWandData.DEFAULT).mode();
+        return stack.getOrDefault(BuildingWandsModule.SWAPPINGWAND_DATA.get(), SwappingWandData.DEFAULT).mode();
     }
 }

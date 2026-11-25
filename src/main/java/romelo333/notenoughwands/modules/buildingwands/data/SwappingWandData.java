@@ -2,13 +2,13 @@ package romelo333.notenoughwands.modules.buildingwands.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import mcjty.lib.network.StreamCodecs;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
 
 public record SwappingWandData(Mode mode, BlockState state, Boolean offhand, Float hardness) {
 
@@ -60,7 +60,7 @@ public record SwappingWandData(Mode mode, BlockState state, Boolean offhand, Flo
     ).apply(instance, SwappingWandData::new));
 
     public static final StreamCodec<FriendlyByteBuf, SwappingWandData> STREAM_CODEC = StreamCodec.composite(
-            NeoForgeStreamCodecs.enumCodec(Mode.class), SwappingWandData::mode,
+            StreamCodecs.enumCodec(Mode.class), SwappingWandData::mode,
             ByteBufCodecs.idMapper(Block.BLOCK_STATE_REGISTRY), SwappingWandData::state,
             ByteBufCodecs.BOOL, SwappingWandData::offhand,
             ByteBufCodecs.FLOAT, SwappingWandData::hardness,

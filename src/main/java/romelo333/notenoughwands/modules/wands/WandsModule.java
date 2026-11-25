@@ -3,18 +3,15 @@ package romelo333.notenoughwands.modules.wands;
 import mcjty.lib.datagen.DataGen;
 import mcjty.lib.datagen.Dob;
 import mcjty.lib.modules.IModule;
+import mcjty.lib.setup.DeferredHolder;
+import mcjty.lib.setup.DeferredItem;
 import mcjty.lib.varia.SoundTools;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredItem;
 import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.modules.wands.Items.*;
 import romelo333.notenoughwands.modules.wands.data.AccelerationWandData;
@@ -38,7 +35,7 @@ public class WandsModule implements IModule {
     //    public static final Supplier<Item> FREEZING_WAND = ITEMS.register("freezing_wand", FreezingWand::new);
     //    public static final Supplier<Item> POTION_WAND = ITEMS.register("potion_wand", PotionWand::new);
 
-    public static final Supplier<SoundEvent> TELEPORT_SOUND = SOUNDS.register("teleport", () -> SoundTools.createSoundEvent(ResourceLocation.fromNamespaceAndPath(NotEnoughWands.MODID, "teleport")));
+    public static final Supplier<SoundEvent> TELEPORT_SOUND = SOUNDS.register("teleport", () -> SoundTools.createSoundEvent(Identifier.fromNamespaceAndPath(NotEnoughWands.MODID, "teleport")));
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<CapturingWandData>> CAPTURINGWAND_DATA = COMPONENTS.registerComponentType(
             "capturingwand",
@@ -52,17 +49,17 @@ public class WandsModule implements IModule {
                     .networkSynchronized(AccelerationWandData.STREAM_CODEC));
 
     @Override
-    public void init(FMLCommonSetupEvent event) {
+    public void init() {
 
     }
 
     @Override
-    public void initClient(FMLClientSetupEvent event) {
+    public void initClient() {
 
     }
 
     @Override
-    public void initConfig(IEventBus bus) {
+    public void initConfig() {
         WandsConfiguration.init(Config.SERVER_BUILDER, Config.CLIENT_BUILDER);
     }
 

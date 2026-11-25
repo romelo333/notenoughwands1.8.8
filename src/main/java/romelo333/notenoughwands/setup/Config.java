@@ -1,11 +1,11 @@
 package romelo333.notenoughwands.setup;
 
+import fuzs.forgeconfigapiport.fabric.api.v5.ConfigRegistry;
+import fuzs.forgeconfigapiport.fabric.api.v5.ModConfigEvents;
 import mcjty.lib.modules.Modules;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
+import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.modules.protectionwand.ProtectionWandConfiguration;
 import romelo333.notenoughwands.modules.wands.WandsConfiguration;
 
@@ -19,11 +19,11 @@ public class Config {
     public static ModConfigSpec SERVER_CONFIG;
     public static ModConfigSpec CLIENT_CONFIG;
 
-    public static void register(ModContainer container, IEventBus bus, Modules modules) {
+    public static void register(Modules modules) {
         SERVER_BUILDER.comment("General settings").push(CATEGORY_GENERAL);
         CLIENT_BUILDER.comment("General settings").push(CATEGORY_GENERAL);
 
-        modules.initConfig(bus);
+        modules.initConfig();
 
         SERVER_BUILDER.pop();
         CLIENT_BUILDER.pop();
@@ -31,12 +31,14 @@ public class Config {
         SERVER_CONFIG = SERVER_BUILDER.build();
         CLIENT_CONFIG = CLIENT_BUILDER.build();
 
-        container.registerConfig(ModConfig.Type.CLIENT, CLIENT_CONFIG);
-        container.registerConfig(ModConfig.Type.SERVER, SERVER_CONFIG);
+        ModConfigEvents.loading(NotEnoughWands.MODID).register(Config::refresh);
+        ModConfigEvents.reloading(NotEnoughWands.MODID).register(Config::refresh);
+        ConfigRegistry.INSTANCE.register(NotEnoughWands.MODID, ModConfig.Type.CLIENT, CLIENT_CONFIG);
+        ConfigRegistry.INSTANCE.register(NotEnoughWands.MODID, ModConfig.Type.SERVER, SERVER_CONFIG);
     }
 
-    public static void onLoad(final ModConfigEvent.Reloading configEvent) {
-        if (configEvent.getConfig().getSpec() == SERVER_CONFIG) {
+    private static void refresh(ModConfig config) {
+        if (config.getSpec() == SERVER_CONFIG) {
             ProtectionWandConfiguration.cachedClientSideProtection = ProtectionWandConfiguration.clientSideProtection.get();
             WandsConfiguration.setWandUsage(WandsConfiguration.wandUsage.get());
         }

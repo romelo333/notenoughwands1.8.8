@@ -1,43 +1,39 @@
 package romelo333.notenoughwands.modules.wands.Items;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.varia.ComponentFactory;
+import mcjty.lib.varia.IEnergyItem;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
-import net.neoforged.neoforge.energy.IEnergyStorage;
 import romelo333.notenoughwands.keys.KeyBindings;
 import romelo333.notenoughwands.modules.buildingwands.BuildingWandsConfiguration;
 import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
 import romelo333.notenoughwands.modules.wands.WandUsage;
 import romelo333.notenoughwands.modules.wands.WandsConfiguration;
 import romelo333.notenoughwands.setup.Registration;
+import romelo333.notenoughwands.varia.ClientTools.RenderContext;
 import romelo333.notenoughwands.varia.ClientTools;
 import romelo333.notenoughwands.varia.Tools;
 
-import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
-public class GenericWand extends Item {
+public class GenericWand extends Item implements IEnergyItem {
 
     protected float usageFactor = 1.0f;
 
-    public GenericWand() {
-        super(Registration.createStandardProperties()
-                .setNoRepair()
-                .stacksTo(1)
-        );
+    public GenericWand(Properties properties) {
+        super(properties.stacksTo(1));
     }
 
     // Check if a given block can be picked up.
@@ -47,7 +43,7 @@ public class GenericWand extends Item {
             Tools.error(player, "This block is to hard to take!");
             return -1.0f;
         }
-        if (!state.canEntityDestroy(world, pos, player)){
+        if (!world.mayInteract(player, pos)){
             Tools.error(player, "You are not allowed to take this block!");
             return -1.0f;
         }
@@ -68,10 +64,10 @@ public class GenericWand extends Item {
 
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
-        super.appendHoverText(stack, context, tooltip, flagIn);
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flagIn) {
+        super.appendHoverText(stack, context, display, tooltip, flagIn);
         if (needsPower()) {
-            tooltip.add(ComponentFactory.literal("Energy: " + getEnergyStored(stack) + " / " + getMaxEnergyStored(stack)).withStyle(ChatFormatting.GREEN));
+            tooltip.accept(ComponentFactory.literal("Energy: " + getEnergyStored(stack) + " / " + getMaxEnergyStored(stack)).withStyle(ChatFormatting.GREEN));
         }
     }
 
@@ -113,7 +109,7 @@ public class GenericWand extends Item {
             }
         }
         if (needsDamage()) {
-            if (wandStack.getDamageValue() >= wandStack.getMaxDamage()) {
+            if (wandStack.getDamageValue() >= calculateMaxDamage()) {
                 Tools.error(player, "This wand can no longer be used!");
                 return false;
             }
@@ -134,11 +130,6 @@ public class GenericWand extends Item {
 //        return needsDamage();
 //    }
 
-    @Override
-    public int getMaxDamage(ItemStack stack) {
-        return calculateMaxDamage();
-    }
-
     protected void registerUsage(ItemStack stack, Player player, float difficultyScale) {
         if (player.isCreative()) {
             return;
@@ -147,10 +138,12 @@ public class GenericWand extends Item {
             Tools.addPlayerXP(player, -(int) (calculateXP() * difficultyScale));
         }
         if (needsDamage()) {
-            stack.hurtAndBreak(1, (ServerLevel) player.level(), player, playerEntity -> {});
+            stack.set(DataComponents.MAX_DAMAGE, calculateMaxDamage());
+            stack.hurtAndBreak(1, (ServerLevel) player.level(), (ServerPlayer) player, item -> {});
         }
         if (needsPower()) {
-            extractEnergy(stack, (int) (calculatePower() * difficultyScale), false);
+            int used = (int) (calculatePower() * difficultyScale);
+            stack.set(Registration.ENERGY_COMPONENT.get(), Math.max(0, getEnergyStored(stack) - used));
         }
     }
 
@@ -162,45 +155,64 @@ public class GenericWand extends Item {
 
     //------------------------------------------------------------------------------
 
-    public void renderOverlay(RenderLevelStageEvent evt, Player player, ItemStack wand) {
+    public void renderOverlay(RenderContext context, Player player, ItemStack wand) {
 
     }
 
-    protected static void renderOutlines(RenderLevelStageEvent evt, Player p, Set<BlockPos> coordinates, int r, int g, int b) {
-        PoseStack matrixStack = evt.getPoseStack();
-        MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
-        ClientTools.renderOutlines(matrixStack, buffer, coordinates, r, g, b);
+    protected static void renderOutlines(RenderContext context, Set<BlockPos> coordinates, int r, int g, int b) {
+        ClientTools.renderOutlines(context, coordinates, r, g, b);
     }
 
-    protected void showModeKeyDescription(List<Component> list, String suffix) {
+    protected void showModeKeyDescription(Consumer<Component> list, String suffix) {
         Component shortcut = KeyBindings.wandModifier == null
                 ? Component.translatable("key.keyboard.unknown")
                 : KeyBindings.wandModifier.getTranslatedKeyMessage();
-        list.add(ComponentFactory.literal("Mode key (").append(shortcut).append(") to ").append(suffix).withStyle(ChatFormatting.YELLOW));
+        list.accept(ComponentFactory.literal("Mode key (").append(shortcut).append(") to ").append(suffix).withStyle(ChatFormatting.YELLOW));
     }
 
-    protected void showSubModeKeyDescription(List<Component> list, String suffix) {
+    protected void showSubModeKeyDescription(Consumer<Component> list, String suffix) {
         Component shortcut = KeyBindings.wandSubMode == null
                 ? Component.translatable("key.keyboard.unknown")
                 : KeyBindings.wandSubMode.getTranslatedKeyMessage();
-        list.add(ComponentFactory.literal("Sub-mode key (").append(shortcut).append(") to ").append(suffix).withStyle(ChatFormatting.YELLOW));
+        list.accept(ComponentFactory.literal("Sub-mode key (").append(shortcut).append(") to ").append(suffix).withStyle(ChatFormatting.YELLOW));
     }
 
     //------------------------------------------------------------------------------
 
     public int getEnergyStored(ItemStack container) {
-        return container.getOrDefault(Registration.ENERGY_COMPONENT, 0);
+        return container.getOrDefault(Registration.ENERGY_COMPONENT.get(), 0);
     }
 
     public int getMaxEnergyStored(ItemStack container) {
         return calculateMaxPower();
     }
 
-    private void extractEnergy(ItemStack stack, int amount, boolean simulate) {
-        IEnergyStorage capability = stack.getCapability(Capabilities.EnergyStorage.ITEM, null);
-        if (capability != null) {
-            capability.extractEnergy(amount, simulate);
+    @Override
+    public long receiveEnergyL(ItemStack stack, long amount, boolean simulate) {
+        long moved = Math.min(amount, Math.max(0, calculateMaxPower() - getEnergyStored(stack)));
+        if (moved > 0 && !simulate) {
+            stack.set(Registration.ENERGY_COMPONENT.get(), getEnergyStored(stack) + (int) moved);
         }
+        return moved;
+    }
+
+    @Override
+    public long extractEnergyL(ItemStack stack, long amount, boolean simulate) {
+        long moved = Math.min(amount, getEnergyStored(stack));
+        if (moved > 0 && !simulate) {
+            stack.set(Registration.ENERGY_COMPONENT.get(), getEnergyStored(stack) - (int) moved);
+        }
+        return moved;
+    }
+
+    @Override
+    public long getEnergyStoredL(ItemStack stack) {
+        return getEnergyStored(stack);
+    }
+
+    @Override
+    public long getMaxEnergyStoredL(ItemStack stack) {
+        return calculateMaxPower();
     }
 
     private int calculatePower() {

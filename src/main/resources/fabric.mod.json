@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "notenoughwands",
+  "version": "${version}",
+  "name": "Not Enough Wands",
+  "description": "You can never have enough wands!",
+  "authors": [
+    "McJty",
+    "romelo333"
+  ],
+  "license": "MIT",
+  "environment": "*",
+  "mixins": ["notenoughwands.mixins.json"],
+  "contact": {
+    "sources": "https://github.com/romelo333/notenoughwands1.8.8",
+    "issues": "https://github.com/romelo333/notenoughwands1.8.8/issues"
+  },
+  "entrypoints": {
+    "main": [
+      "romelo333.notenoughwands.NotEnoughWands"
+    ],
+    "client": [
+      "romelo333.notenoughwands.setup.ClientSetup"
+    ],
+    "fabric-datagen": [
+      "romelo333.notenoughwands.datagen.FabricDataGen"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.3",
+    "minecraft": "~26.2",
+    "java": ">=25",
+    "fabric-api": ">=0.155.2+26.2",
+    "forgeconfigapiport": ">=26.2.1",
+    "mcjtylib": ">=26.2-10.0.3-fabric"
+  },
+  "suggests": {
+    "theoneprobe": "*",
+    "jei": "*"
+  }
+}

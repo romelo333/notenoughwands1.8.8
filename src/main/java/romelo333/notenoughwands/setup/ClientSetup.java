@@ -1,67 +1,49 @@
 package romelo333.notenoughwands.setup;
 
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
-import net.neoforged.neoforge.common.NeoForge;
+import romelo333.notenoughwands.NotEnoughWands;
 import romelo333.notenoughwands.keys.KeyBindings;
 import romelo333.notenoughwands.keys.KeyInputHandler;
 import romelo333.notenoughwands.modules.protectionwand.ProtectionWandConfiguration;
 import romelo333.notenoughwands.modules.protectionwand.network.PacketGetProtectedBlocksAroundPlayer;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 import romelo333.notenoughwands.network.NEWPacketHandler;
+import romelo333.notenoughwands.varia.ClientTools.RenderContext;
+import romelo333.notenoughwands.varia.WandRenderTypes;
 
-public class ClientSetup {
+public class ClientSetup implements ClientModInitializer {
+    private int timer;
 
-    public static void init(FMLClientSetupEvent event) {
-        NeoForge.EVENT_BUS.register(new ClientSetup());
-        NeoForge.EVENT_BUS.register(new KeyInputHandler());
-    }
-
-    public static void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
+    @Override
+    public void onInitializeClient() {
+        NotEnoughWands.MODULES.initClient();
         KeyBindings.init();
-        event.register(KeyBindings.wandModifier);
-        event.register(KeyBindings.wandSubMode);
+        NEWPacketHandler.registerClientMessages();
+        WandRenderTypes.registerPipelines();
+        ClientTickEvents.END_CLIENT_TICK.register(this::onClientTick);
+        LevelRenderEvents.COLLECT_SUBMITS.register(this::submitWandOverlay);
     }
 
-    // @todo 1.20 correct event?
-    @SubscribeEvent
-    public void renderWorldLastEvent(RenderLevelStageEvent evt) {
-        if (evt.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) {
-            return;
-        }
-        Minecraft mc = Minecraft.getInstance();
-        Player p = mc.player;
-        ItemStack heldItem = p.getItemInHand(InteractionHand.MAIN_HAND);
-        if (heldItem.isEmpty()) {
-            return;
-        }
-        if (heldItem.getItem() instanceof GenericWand) {
-            GenericWand genericWand = (GenericWand) heldItem.getItem();
-            genericWand.renderOverlay(evt, p, heldItem);
+    private void submitWandOverlay(LevelRenderContext event) {
+        var player = Minecraft.getInstance().player;
+        if (player != null && player.getMainHandItem().getItem() instanceof GenericWand wand) {
+            var context = new RenderContext(event.poseStack(), event.submitNodeCollector(), event.levelState().cameraRenderState.pos);
+            wand.renderOverlay(context, player, player.getMainHandItem());
         }
     }
 
-    public static int timer = 0;
-
-    @SubscribeEvent
-    public void onClientTick(ClientTickEvent.Post event) {
-        if (ProtectionWandConfiguration.cachedClientSideProtection < 0) {
+    private void onClientTick(Minecraft minecraft) {
+        if (minecraft.player == null) {
             return;
         }
-
-        timer--;
-        if (timer > 0) {
-            return;
-        }
-        timer = ProtectionWandConfiguration.cachedClientSideProtection;
-        if (Minecraft.getInstance().player != null) {
+        KeyInputHandler.onClientTick();
+        int interval = ProtectionWandConfiguration.cachedClientSideProtection;
+        if (interval >= 0 && --timer <= 0) {
+            timer = interval;
             NEWPacketHandler.sendToServer(new PacketGetProtectedBlocksAroundPlayer());
         }
     }

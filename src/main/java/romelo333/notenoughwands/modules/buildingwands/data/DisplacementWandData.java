@@ -2,9 +2,9 @@ package romelo333.notenoughwands.modules.buildingwands.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import mcjty.lib.network.StreamCodecs;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
 
 public record DisplacementWandData(Mode mode) {
 
@@ -46,6 +46,6 @@ public record DisplacementWandData(Mode mode) {
     ).apply(instance, DisplacementWandData::new));
 
     public static final StreamCodec<FriendlyByteBuf, DisplacementWandData> STREAM_CODEC = StreamCodec.composite(
-            NeoForgeStreamCodecs.enumCodec(Mode.class), DisplacementWandData::mode,
+            StreamCodecs.enumCodec(Mode.class), DisplacementWandData::mode,
             DisplacementWandData::new);
 }
