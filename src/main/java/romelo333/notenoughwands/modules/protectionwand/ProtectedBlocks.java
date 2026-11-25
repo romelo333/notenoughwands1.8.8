@@ -7,15 +7,22 @@ import net.minecraft.core.GlobalPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtAccounter;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.LevelResource;
 import org.apache.commons.lang3.tuple.Pair;
 import romelo333.notenoughwands.varia.Tools;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -23,7 +30,7 @@ import java.util.Set;
 
 public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
 
-    private static final String NAME = "NEWProtectedBlocks";
+    private static final String NAME = "notenoughwands:protected_blocks";
 
     // Persisted data
     private Map<GlobalPos, Integer> blocks = new HashMap<>();       // Map from coordinate -> ID
@@ -43,16 +50,16 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
     }
 
     public ProtectedBlocks(CompoundTag tag) {
-        lastId = tag.getInt("lastId");
+        lastId = tag.getIntOr("lastId", 1);
         blocks.clear();
-        perDimPerChunkCache.clear();;
+        perDimPerChunkCache.clear();
         counter.clear();
-        ListTag list = tag.getList("blocks", Tag.TAG_COMPOUND);
+        ListTag list = tag.getListOrEmpty("blocks");
         for (int i = 0; i<list.size();i++){
-            CompoundTag tc = list.getCompound(i);
-            String dim = tc.getString("dim");
-            GlobalPos block = GlobalPos.of(LevelTools.getId(ResourceLocation.parse(dim)), new BlockPos(tc.getInt("x"),tc.getInt("y"),tc.getInt("z")));
-            int id = tc.getInt("id");
+            CompoundTag tc = list.getCompoundOrEmpty(i);
+            String dim = tc.getStringOr("dim", "minecraft:overworld");
+            GlobalPos block = GlobalPos.of(LevelTools.getId(Identifier.parse(dim)), new BlockPos(tc.getIntOr("x", 0),tc.getIntOr("y", 0),tc.getIntOr("z", 0)));
+            int id = tc.getIntOr("id", 0);
             blocks.put(block, id);
             incrementProtection(id);
         }
@@ -67,12 +74,29 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
 //        lastId = -1;
 //    }
 
-    public static ProtectedBlocks getProtectedBlocks(Level world){
-        return getData(world, ProtectedBlocks::new, ProtectedBlocks::new, NAME);
+    public static ProtectedBlocks getProtectedBlocks(Level world) {
+        return getData(world, ProtectedBlocks::new, () -> loadLegacy((ServerLevel) world), NAME);
+    }
+
+    private static ProtectedBlocks loadLegacy(ServerLevel level) {
+        Path oldFile = level.getServer().getWorldPath(LevelResource.ROOT).resolve("data/NEWProtectedBlocks.dat");
+        if (!Files.exists(oldFile)) {
+            return new ProtectedBlocks();
+        }
+
+        // Older worlds used the literal saved-data filename before IDs became namespaced.
+        try {
+            CompoundTag root = NbtIo.readCompressed(oldFile, NbtAccounter.unlimitedHeap());
+            ProtectedBlocks data = new ProtectedBlocks(root.getCompoundOrEmpty("data"));
+            data.save();
+            return data;
+        } catch (IOException e) {
+            throw new UncheckedIOException("Could not read protection data from " + oldFile, e);
+        }
     }
 
     public static boolean isProtectedClientSide(Level world, BlockPos pos){
-        ChunkPos chunkPos = new ChunkPos(pos);
+        ChunkPos chunkPos = ChunkPos.containing(pos);
         if (!clientSideProtectedBlocks.containsKey(chunkPos)) {
             return false;
         }
@@ -198,23 +222,23 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
     }
 
     private void clearCache(GlobalPos pos) {
-        ChunkPos chunkpos = new ChunkPos(pos.pos());
+        ChunkPos chunkpos = ChunkPos.containing(pos.pos());
         perDimPerChunkCache.remove(Pair.of(pos.dimension(), chunkpos));
     }
 
     public Map<ChunkPos,Set<BlockPos>> fetchProtectedBlocks(Level world, BlockPos pos) {
         Map<ChunkPos,Set<BlockPos>> result = new HashMap<>();
-        ChunkPos chunkpos = new ChunkPos(pos);
+        ChunkPos chunkpos = ChunkPos.containing(pos);
 
-        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x-1, chunkpos.z-1));
-        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x  , chunkpos.z-1));
-        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x+1, chunkpos.z-1));
-        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x-1, chunkpos.z  ));
-        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x  , chunkpos.z  ));
-        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x+1, chunkpos.z  ));
-        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x-1, chunkpos.z+1));
-        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x  , chunkpos.z+1));
-        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x+1, chunkpos.z+1));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x()-1, chunkpos.z()-1));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x()  , chunkpos.z()-1));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x()+1, chunkpos.z()-1));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x()-1, chunkpos.z()  ));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x()  , chunkpos.z()  ));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x()+1, chunkpos.z()  ));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x()-1, chunkpos.z()+1));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x()  , chunkpos.z()+1));
+        fetchProtectedBlocks(result, world, new ChunkPos(chunkpos.x()+1, chunkpos.z()+1));
 
         return result;
     }
@@ -231,7 +255,7 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
         for (Map.Entry<GlobalPos, Integer> entry : blocks.entrySet()) {
             GlobalPos block = entry.getKey();
             if (block.dimension().equals(world.dimension())) {
-                ChunkPos bc = new ChunkPos(block.pos());
+                ChunkPos bc = ChunkPos.containing(block.pos());
                 if (bc.equals(chunkpos)) {
                     result.add(block.pos());
                 }
@@ -255,7 +279,7 @@ public class ProtectedBlocks extends AbstractWorldData<ProtectedBlocks> {
             tc.putInt("x", block.pos().getX());
             tc.putInt("y", block.pos().getY());
             tc.putInt("z", block.pos().getZ());
-            tc.putString("dim", block.dimension().location().toString());
+            tc.putString("dim", block.dimension().identifier().toString());
             tc.putInt("id", entry.getValue());
             list.add(tc);
         }

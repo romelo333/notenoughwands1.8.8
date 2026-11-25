@@ -2,7 +2,7 @@ package romelo333.notenoughwands.modules.wands;
 
 import com.google.common.collect.Lists;
 import mcjty.lib.varia.Tools;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
@@ -41,7 +41,7 @@ public class WandsConfiguration {
     public static ModConfigSpec.BooleanValue teleportThroughWalls;
 
     private static ModConfigSpec.ConfigValue<List<? extends String>> entityBlackList;
-    public static Map<ResourceLocation,Double> blacklistedEntities = new HashMap<>();
+    public static Map<Identifier,Double> blacklistedEntities = new HashMap<>();
     private static boolean blacklistedEntitiesLoaded = false;
 
     public static void init(ModConfigSpec.Builder SERVER_BUILDER, ModConfigSpec.Builder CLIENT_BUILDER) {
@@ -142,7 +142,7 @@ public class WandsConfiguration {
             if (split.length > 1) {
                 cost = Double.parseDouble(split[1]);
             }
-            blacklistedEntities.put(ResourceLocation.parse(split[0]), cost);
+            blacklistedEntities.put(Identifier.parse(split[0]), cost);
         }
     }
 
@@ -159,7 +159,7 @@ public class WandsConfiguration {
 
     public static double getEntityCost(Entity entity) {
         reloadConfig();
-        ResourceLocation registryName = Tools.getId(entity.getType());
+        Identifier registryName = Tools.getId(entity.getType());
         return blacklistedEntities.getOrDefault(registryName, 1.0);
     }
 }

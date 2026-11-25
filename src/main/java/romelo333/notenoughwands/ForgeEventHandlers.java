@@ -6,8 +6,8 @@ import net.minecraft.world.level.LevelAccessor;
 import net.neoforged.bus.api.ICancellableEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.ExplosionEvent;
+import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
 import romelo333.notenoughwands.modules.protectionwand.ProtectionWandConfiguration;
 
@@ -16,7 +16,7 @@ import java.util.List;
 public class ForgeEventHandlers {
 
     @SubscribeEvent
-    public void onBlockBreakEvent (BlockEvent.BreakEvent event){
+    public void onBlockBreakEvent(BreakBlockEvent event) {
         LevelAccessor world = event.getLevel();
         if (world.isClientSide()) {
             return;
@@ -31,7 +31,7 @@ public class ForgeEventHandlers {
     @SubscribeEvent
     public void onDetonate(ExplosionEvent.Detonate event) {
         Level world = event.getLevel();
-        if (world.isClientSide) {
+        if (world.isClientSide()) {
             return;
         }
         ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
@@ -79,7 +79,7 @@ public class ForgeEventHandlers {
         Level world = event.getLevel();
         BlockPos pos = event.getPos();
 
-        if (world.isClientSide) {
+        if (world.isClientSide()) {
             // Client side.
             if (ProtectedBlocks.isProtectedClientSide(world, pos)) {
                 cancellable.setCanceled(true);

@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "r": {
-      "item": "minecraft:redstone"
-    },
-    "w": {
-      "item": "notenoughwands:advanced_wand_core"
-    },
-    "x": {
-      "item": "minecraft:clock"
-    }
+    "r": "minecraft:redstone",
+    "w": "notenoughwands:advanced_wand_core",
+    "x": "minecraft:clock"
   },
   "pattern": [
     "xr ",
@@ -18,7 +12,6 @@
     "  w"
   ],
   "result": {
-    "count": 1,
     "id": "notenoughwands:acceleration_wand"
   }
 }

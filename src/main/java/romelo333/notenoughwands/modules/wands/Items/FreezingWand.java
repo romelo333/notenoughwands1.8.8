@@ -1,37 +1,37 @@
 package romelo333.notenoughwands.modules.wands.Items;
 
-
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import romelo333.notenoughwands.modules.wands.WandsConfiguration;
 import romelo333.notenoughwands.varia.Tools;
 
-import javax.annotation.Nullable;
-import java.util.List;
+import java.util.function.Consumer;
 
 public class FreezingWand extends GenericWand {
-    public FreezingWand() {
+    public FreezingWand(Properties properties) {
+        super(properties);
         this.usageFactor(2.0f);
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> list, TooltipFlag flagIn) {
-        super.appendHoverText(stack, context, list, flagIn);
-        list.add(Component.literal("Right click on creature to freeze creature."));
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> list, TooltipFlag flagIn) {
+        super.appendHoverText(stack, context, display, list, flagIn);
+        list.accept(Component.literal("Right click on creature to freeze creature."));
     }
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
         Level world = context.getLevel();
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
 
         }
         return InteractionResult.FAIL;
@@ -43,7 +43,7 @@ public class FreezingWand extends GenericWand {
 
     @Override
     public boolean onLeftClickEntity(ItemStack stack, Player player, Entity entity) {
-        if (!player.getCommandSenderWorld().isClientSide) {
+        if (!player.level().isClientSide()) {
             if (entity instanceof LivingEntity) {
                 LivingEntity entityLivingBase = (LivingEntity) entity;
                 if (entityLivingBase instanceof Player) {

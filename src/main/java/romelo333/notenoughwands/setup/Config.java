@@ -35,7 +35,15 @@ public class Config {
         container.registerConfig(ModConfig.Type.SERVER, SERVER_CONFIG);
     }
 
-    public static void onLoad(final ModConfigEvent.Reloading configEvent) {
+    public static void onLoad(ModConfigEvent.Loading configEvent) {
+        refresh(configEvent);
+    }
+
+    public static void onReload(ModConfigEvent.Reloading configEvent) {
+        refresh(configEvent);
+    }
+
+    private static void refresh(ModConfigEvent configEvent) {
         if (configEvent.getConfig().getSpec() == SERVER_CONFIG) {
             ProtectionWandConfiguration.cachedClientSideProtection = ProtectionWandConfiguration.clientSideProtection.get();
             WandsConfiguration.setWandUsage(WandsConfiguration.wandUsage.get());

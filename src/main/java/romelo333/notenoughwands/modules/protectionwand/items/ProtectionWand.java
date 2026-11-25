@@ -1,6 +1,5 @@
 package romelo333.notenoughwands.modules.protectionwand.items;
 
-
 import mcjty.lib.varia.ComponentFactory;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -8,11 +7,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemInstance;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import org.jspecify.annotations.Nullable;
 import romelo333.notenoughwands.modules.protectionwand.ProtectedBlocks;
 import romelo333.notenoughwands.modules.protectionwand.ProtectionWandModule;
 import romelo333.notenoughwands.modules.protectionwand.data.ProtectionWandData;
@@ -22,9 +24,10 @@ import romelo333.notenoughwands.modules.protectionwand.network.ReturnProtectedBl
 import romelo333.notenoughwands.modules.protectionwand.network.ReturnProtectedBlocksHelper;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
 import romelo333.notenoughwands.network.NEWPacketHandler;
+import romelo333.notenoughwands.varia.ClientTools.RenderContext;
 import romelo333.notenoughwands.varia.Tools;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import static romelo333.notenoughwands.modules.protectionwand.data.ProtectionWandData.Mode.MODE_PROTECT;
 import static romelo333.notenoughwands.modules.protectionwand.data.ProtectionWandData.Mode.MODE_UNPROTECT;
@@ -33,8 +36,8 @@ public class ProtectionWand extends GenericWand {
 
     private final boolean master;
 
-    public ProtectionWand(boolean master) {
-        super();
+    public ProtectionWand(Properties properties, boolean master) {
+        super(properties);
         if (master) {
             this.usageFactor(3.0f);
         } else {
@@ -46,8 +49,8 @@ public class ProtectionWand extends GenericWand {
     private static long tooltipLastTime = 0;
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> list, TooltipFlag flagIn) {
-        super.appendHoverText(stack, context, list, flagIn);
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> list, TooltipFlag flagIn) {
+        super.appendHoverText(stack, context, display, list, flagIn);
         ProtectionWandData data = stack.getOrDefault(ProtectionWandModule.PROTECTIONWAND_DATA, ProtectionWandData.DEFAULT);
         boolean hasid = data.id() != 0;
         ProtectionWandData.Mode mode = data.mode();
@@ -59,18 +62,18 @@ public class ProtectionWand extends GenericWand {
             }
         }
         // @todo 1.15 better tooltips
-        list.add(ComponentFactory.literal(ChatFormatting.GREEN + "Mode: " + mode.getDescription()));
+        list.accept(ComponentFactory.literal(ChatFormatting.GREEN + "Mode: " + mode.getDescription()));
         if (master) {
-            list.add(ComponentFactory.literal(ChatFormatting.YELLOW + "Master wand"));
+            list.accept(ComponentFactory.literal(ChatFormatting.YELLOW + "Master wand"));
         } else {
             if (id != 0) {
-                list.add(ComponentFactory.literal(ChatFormatting.GREEN + "Id: " + id));
+                list.accept(ComponentFactory.literal(ChatFormatting.GREEN + "Id: " + id));
             }
         }
         if (hasid) {
-            list.add(ComponentFactory.literal(ChatFormatting.GREEN + "Number of protected blocks: " + ReturnProtectedBlockCountHelper.count));
+            list.accept(ComponentFactory.literal(ChatFormatting.GREEN + "Number of protected blocks: " + ReturnProtectedBlockCountHelper.count));
         }
-        list.add(ComponentFactory.literal("Right click to protect or unprotect a block."));
+        list.accept(ComponentFactory.literal("Right click to protect or unprotect a block."));
         showModeKeyDescription(list, "switch mode");
     }
 
@@ -96,15 +99,15 @@ public class ProtectionWand extends GenericWand {
 
     // @todo 1.20 correct event?
     @Override
-    public void renderOverlay(RenderLevelStageEvent evt, Player player, ItemStack wand) {
+    public void renderOverlay(RenderContext context, Player player, ItemStack wand) {
         if ((System.currentTimeMillis() - lastTime) > 250) {
             lastTime = System.currentTimeMillis();
             NEWPacketHandler.sendToServer(new PacketGetProtectedBlocks());
         }
         if (master) {
-            renderOutlines(evt, player, ReturnProtectedBlocksHelper.childBlocks, 30, 30, 200);
+            renderOutlines(context, ReturnProtectedBlocksHelper.childBlocks, 30, 30, 200);
         }
-        renderOutlines(evt, player, ReturnProtectedBlocksHelper.blocks, 210, 60, 40);
+        renderOutlines(context, ReturnProtectedBlocksHelper.blocks, 210, 60, 40);
     }
 
     @Override
@@ -114,7 +117,7 @@ public class ProtectionWand extends GenericWand {
         Level world = context.getLevel();
         BlockPos pos = context.getClickedPos();
         ItemStack stack = player.getItemInHand(hand);
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             ProtectedBlocks protectedBlocks = ProtectedBlocks.getProtectedBlocks(world);
             int id = getOrCreateId(stack, world, protectedBlocks);
             ProtectionWandData.Mode mode = getMode(stack);
@@ -149,26 +152,12 @@ public class ProtectionWand extends GenericWand {
     }
 
     @Override
-    public boolean hasCraftingRemainingItem() {
-        return !master;
-    }
-
-
-// @todo 1.15
-//    @Override
-//    public Item getContainerItem() {
-//        return this;
-//    }
-
-
-    @Override
-    public ItemStack getCraftingRemainingItem(ItemStack stack) {
-        if (hasCraftingRemainingItem(stack)) {
-            ItemStack container = new ItemStack(getCraftingRemainingItem());
-            container.set(ProtectionWandModule.PROTECTIONWAND_DATA, stack.get(ProtectionWandModule.PROTECTIONWAND_DATA));
-            return container;
+    public @Nullable ItemStackTemplate getCraftingRemainder(ItemInstance instance) {
+        if (master) {
+            return null;
         }
-        return ItemStack.EMPTY;
+        ItemStack remainder = getDefaultInstance();
+        remainder.set(ProtectionWandModule.PROTECTIONWAND_DATA, instance.get(ProtectionWandModule.PROTECTIONWAND_DATA));
+        return ItemStackTemplate.fromNonEmptyStack(remainder);
     }
-
 }
