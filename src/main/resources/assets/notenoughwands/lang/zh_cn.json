@@ -50,8 +50,9 @@
   "message.notenoughwands.teleportation_wand.sneak2": "潜行半距离",
 
 
+  "key.submode": "魔杖子模式",
   "key.modifier": "魔杖调节",
-  "key.categories.notenoughwands": "更多魔杖",
+  "key.category.notenoughwands.keys": "更多魔杖",
 
   "itemGroup.notenoughwands": "更多魔杖"
 }

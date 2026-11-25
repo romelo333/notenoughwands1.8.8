@@ -5,7 +5,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
@@ -19,7 +19,7 @@ import java.util.Set;
 
 public record PacketReturnProtectedBlocksAroundPlayer(Map<ChunkPos, Set<BlockPos>> blocks) implements CustomPacketPayload {
 
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(NotEnoughWands.MODID, "returnprotectedblocksaroundplayer");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(NotEnoughWands.MODID, "returnprotectedblocksaroundplayer");
     public static final CustomPacketPayload.Type<PacketReturnProtectedBlocksAroundPlayer> TYPE = new Type<>(ID);
 
     public static final StreamCodec<FriendlyByteBuf, PacketReturnProtectedBlocksAroundPlayer> CODEC = StreamCodec.composite(

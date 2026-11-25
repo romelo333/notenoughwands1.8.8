@@ -6,7 +6,7 @@ import mcjty.lib.modules.IModule;
 import mcjty.lib.varia.SoundTools;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -38,7 +38,7 @@ public class WandsModule implements IModule {
     //    public static final Supplier<Item> FREEZING_WAND = ITEMS.register("freezing_wand", FreezingWand::new);
     //    public static final Supplier<Item> POTION_WAND = ITEMS.register("potion_wand", PotionWand::new);
 
-    public static final Supplier<SoundEvent> TELEPORT_SOUND = SOUNDS.register("teleport", () -> SoundTools.createSoundEvent(ResourceLocation.fromNamespaceAndPath(NotEnoughWands.MODID, "teleport")));
+    public static final Supplier<SoundEvent> TELEPORT_SOUND = SOUNDS.register("teleport", () -> SoundTools.createSoundEvent(Identifier.fromNamespaceAndPath(NotEnoughWands.MODID, "teleport")));
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<CapturingWandData>> CAPTURINGWAND_DATA = COMPONENTS.registerComponentType(
             "capturingwand",

@@ -1,6 +1,5 @@
 package romelo333.notenoughwands.modules.wands.Items;
 
-
 import mcjty.lib.builder.TooltipBuilder;
 import mcjty.lib.varia.ComponentFactory;
 import net.minecraft.ChatFormatting;
@@ -13,6 +12,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -27,7 +27,7 @@ import romelo333.notenoughwands.modules.wands.WandsModule;
 import romelo333.notenoughwands.modules.wands.data.AccelerationWandData;
 import romelo333.notenoughwands.varia.Tools;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import static mcjty.lib.builder.TooltipBuilder.*;
 
@@ -38,28 +38,29 @@ public class AccelerationWand extends GenericWand {
             .infoShift(header(), gold(),
                     parameter("mode", stack -> getMode(stack).getDescription()));
 
-    public AccelerationWand() {
+    public AccelerationWand(Properties properties) {
+        super(properties);
         this.usageFactor(3.0f);
     }
 
     private final RandomSource random = RandomSource.create();
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> list, TooltipFlag flagIn) {
-        super.appendHoverText(stack, context, list, flagIn);
-        tooltipBuilder.makeTooltip(mcjty.lib.varia.Tools.getId(this), stack, list, flagIn);
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> list, TooltipFlag flagIn) {
+        super.appendHoverText(stack, context, display, list, flagIn);
+        Tools.appendTooltip(tooltipBuilder, mcjty.lib.varia.Tools.getId(this), stack, list, flagIn);
 
         showModeKeyDescription(list, "change speed");
 
         if (Math.abs(WandsConfiguration.fakePlayerFactor.get() -1.0f) >= 0.01) {
             if (WandsConfiguration.fakePlayerFactor.get() < 0) {
-                list.add(ComponentFactory.literal(ChatFormatting.RED + "Usage in a machine has been disabled in config!"));
+                list.accept(ComponentFactory.literal(ChatFormatting.RED + "Usage in a machine has been disabled in config!"));
             } else if (WandsConfiguration.fakePlayerFactor.get() > 1) {
-                list.add(ComponentFactory.literal(ChatFormatting.YELLOW + "Usage in a machine will cost more!"));
+                list.accept(ComponentFactory.literal(ChatFormatting.YELLOW + "Usage in a machine will cost more!"));
             }
         }
         if (WandsConfiguration.fakePlayerFactor.get() >= 0.0 && WandsConfiguration.lessEffectiveForFakePlayer.get()) {
-            list.add(ComponentFactory.literal(ChatFormatting.YELLOW + "Usage in a machine will be less effective!"));
+            list.accept(ComponentFactory.literal(ChatFormatting.YELLOW + "Usage in a machine will be less effective!"));
         }
     }
 
@@ -70,7 +71,7 @@ public class AccelerationWand extends GenericWand {
         Level world = context.getLevel();
         BlockPos pos = context.getClickedPos();
         ItemStack stack = player.getItemInHand(hand);
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             BlockState state = world.getBlockState(pos);
             Block block = state.getBlock();
             AccelerationWandData.Mode mode = getMode(stack);
