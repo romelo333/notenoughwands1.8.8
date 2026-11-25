@@ -12,7 +12,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -38,29 +37,51 @@ public class Tools {
         ItemStack old = player.getItemInHand(InteractionHand.MAIN_HAND);
         player.setItemInHand(InteractionHand.MAIN_HAND, blockStack);
 
-        BlockHitResult trace = new BlockHitResult(new Vec3(0, 0, 0), Direction.UP, pos, false);
-        BlockPlaceContext context = new BlockPlaceContext(new UseOnContext(player, InteractionHand.MAIN_HAND, trace));
-        if (blockStack.getItem() instanceof BlockItem itemBlock) {
-            if (origState == null) {
-                origState = itemBlock.getBlock().getStateForPlacement(context);
+        try {
+            BlockPlaceContext context = new BlockPlaceContext(player, InteractionHand.MAIN_HAND, blockStack, placementHit(pos));
+            if (blockStack.getItem() instanceof BlockItem blockItem) {
                 if (origState == null) {
-                    // Cannot place!
-                    return null;
+                    origState = blockItem.getBlock().getStateForPlacement(context);
+                    if (origState == null) {
+                        return null;
+                    }
                 }
+                blockItem.place(context);
+                return origState;
             }
-            if (itemBlock.place(context).consumesAction()) {
-//                blockStack.shrink(1);
-            }
-            player.setItemInHand(InteractionHand.MAIN_HAND, old);
-            return origState;
-        } else {
-            player.setPos(pos.getX()+.5, pos.getY()+1.5, pos.getZ()+.5);
+
+            player.setPos(pos.getX() + 0.5, pos.getY() + 1.5, pos.getZ() + 0.5);
             blockStack.getItem().useOn(context);
-            player.setItemInHand(InteractionHand.MAIN_HAND, old);
             return world.getBlockState(pos);
+        } finally {
+            player.setItemInHand(InteractionHand.MAIN_HAND, old);
         }
     }
 
+    public static ItemStack pickBlock(BlockState state, Level level, BlockPos pos, Player player) {
+        return state.getCloneItemStack(placementHit(pos), level, pos, player);
+    }
+
+    private static BlockHitResult placementHit(BlockPos pos) {
+        return new BlockHitResult(Vec3.ZERO, Direction.UP, pos, false);
+    }
+
+    @Nullable
+    static BlockState getPlacementPreview(Player player, ItemStack stack, BlockPos pos, boolean replacing) {
+        if (!(stack.getItem() instanceof BlockItem blockItem)) {
+            return null;
+        }
+        BlockPlaceContext context = new BlockPlaceContext(player, InteractionHand.MAIN_HAND, stack, placementHit(pos)) {
+            {
+                // Swapping clears the target before placing the new block.
+                replaceClicked |= replacing;
+            }
+        };
+        if (!context.getClickedPos().equals(pos)) {
+            return null;
+        }
+        return blockItem.getBlock().getStateForPlacement(context);
+    }
 
     @Nonnull
     public static ItemStack consumeInventoryItem(ItemStack item, Inventory inv, Player player) {
@@ -96,12 +117,26 @@ public class Tools {
     public static int finditem(ItemStack item, Inventory inv) {
         for (int i = 0; i < 36; ++i) {
             ItemStack stack = inv.getItem(i);
-            if (!stack.isEmpty() && ItemHandlerHelper.canItemStacksStack(item, stack)) {
+            if (matchesInventoryItem(item, stack)) {
                 return i;
             }
         }
 
         return -1;
+    }
+
+    static int countInventoryItems(ItemStack item, Inventory inventory) {
+        int count = 0;
+        for (ItemStack stack : inventory.items) {
+            if (matchesInventoryItem(item, stack)) {
+                count += stack.getCount();
+            }
+        }
+        return count;
+    }
+
+    private static boolean matchesInventoryItem(ItemStack item, ItemStack stack) {
+        return !stack.isEmpty() && ItemHandlerHelper.canItemStacksStack(item, stack);
     }
 
     public static Component getBlockName(Block block) {

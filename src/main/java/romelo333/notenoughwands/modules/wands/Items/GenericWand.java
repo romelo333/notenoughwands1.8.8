@@ -181,13 +181,17 @@ public class GenericWand extends Item implements IEnergyItem {
     }
 
     protected void showModeKeyDescription(List<Component> list, String suffix) {
-        String keyDescription = KeyBindings.wandModifier != null ? KeyBindings.wandModifier.getName() : "unknown";
-        list.add(ComponentFactory.literal("Mode key (" + keyDescription + ") to " + suffix).withStyle(ChatFormatting.YELLOW));
+        Component shortcut = KeyBindings.wandModifier == null
+                ? Component.translatable("key.keyboard.unknown")
+                : KeyBindings.wandModifier.getTranslatedKeyMessage();
+        list.add(ComponentFactory.literal("Mode key (").append(shortcut).append(") to ").append(suffix).withStyle(ChatFormatting.YELLOW));
     }
 
     protected void showSubModeKeyDescription(List<Component> list, String suffix) {
-        String keyDescription = KeyBindings.wandSubMode != null ? KeyBindings.wandSubMode.getName() : "unknown";
-        list.add(ComponentFactory.literal("Sub-mode key (" + keyDescription + ") to " + suffix).withStyle(ChatFormatting.YELLOW));
+        Component shortcut = KeyBindings.wandSubMode == null
+                ? Component.translatable("key.keyboard.unknown")
+                : KeyBindings.wandSubMode.getTranslatedKeyMessage();
+        list.add(ComponentFactory.literal("Sub-mode key (").append(shortcut).append(") to ").append(suffix).withStyle(ChatFormatting.YELLOW));
     }
 
     //------------------------------------------------------------------------------

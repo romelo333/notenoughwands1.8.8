@@ -1,3 +1,9 @@
+1.20-6.0.3:
+- Wand tooltips show the current mode and sub-mode shortcuts. The sub-mode control has a readable name in Controls.
+- Fixed the Building Wand selecting short rows when a longer row was available.
+- Wand selection outlines are twice as thick.
+- The Building and Swapping Wands show faint previews of the blocks they will place.
+
 1.20-6.0.2:
 - Update to latest McJtyLib
 

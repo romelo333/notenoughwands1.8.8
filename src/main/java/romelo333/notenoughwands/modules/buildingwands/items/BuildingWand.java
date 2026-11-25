@@ -20,7 +20,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -31,6 +30,7 @@ import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.items.ItemHandlerHelper;
 import romelo333.notenoughwands.modules.wands.Items.GenericWand;
+import romelo333.notenoughwands.varia.ClientTools;
 import romelo333.notenoughwands.varia.Tools;
 
 import java.util.*;
@@ -104,11 +104,11 @@ public class BuildingWand extends GenericWand {
     }
 
     private int getMode(ItemStack stack) {
-        return stack.getOrCreateTag().getInt("mode");
+        return stack.hasTag() ? stack.getTag().getInt("mode") : MODE_FIRST;
     }
 
     private int getSubMode(ItemStack stack) {
-        return stack.getOrCreateTag().getInt("submode");
+        return stack.hasTag() ? stack.getTag().getInt("submode") : 0;
     }
 
     @Override
@@ -142,8 +142,7 @@ public class BuildingWand extends GenericWand {
             if (!checkUsage(wandStack, player, 1.0f)) {
                 break;
             }
-            HitResult result = new BlockHitResult(new Vec3(0, 0, 0), Direction.UP, coordinate, false);
-            ItemStack pickBlock = blockState.getCloneItemStack(result, world, coordinate, player);
+            ItemStack pickBlock = Tools.pickBlock(blockState, world, coordinate.relative(side.getOpposite()), player);
             ItemStack consumed = Tools.consumeInventoryItem(pickBlock, player.getInventory(), player);
             if (!consumed.isEmpty()) {
                 SoundTools.playSound(world, blockState.getSoundType().getStepSound(), coordinate.getX(), coordinate.getY(), coordinate.getZ(), 1.0f, 1.0f);
@@ -278,109 +277,115 @@ public class BuildingWand extends GenericWand {
         return undo;
     }
 
-    // @todo 1.20 is this right event?
     @Override
     public void renderOverlay(RenderLevelStageEvent evt, Player player, ItemStack wand) {
-        HitResult mouseOver = Minecraft.getInstance().hitResult;
-        if (!(mouseOver instanceof BlockHitResult)) {
+        if (!(Minecraft.getInstance().hitResult instanceof BlockHitResult hit) || hit.getType() != HitResult.Type.BLOCK) {
             return;
         }
 
-        BlockHitResult btrace = (BlockHitResult) mouseOver;
-
-        if (btrace.getDirection() != null && btrace.getBlockPos() != null) {
-            Level world = player.getCommandSenderWorld();
-            BlockPos blockPos = btrace.getBlockPos();
-            if (blockPos == null) {
+        Level world = player.level();
+        BlockPos pos = hit.getBlockPos();
+        BlockState state = world.getBlockState(pos);
+        if (state.isAir()) {
+            return;
+        }
+        if (player.isShiftKeyDown()) {
+            CompoundTag tag = wand.getTag();
+            if (tag == null) {
                 return;
             }
-            BlockState blockState = world.getBlockState(blockPos);
-            Block block = blockState.getBlock();
-            if (block != null && !blockState.isAir()) {
-                Set<BlockPos> coordinates;
-
-                if (player.isShiftKeyDown()) {
-                    CompoundTag wandTag = wand.getOrCreateTag();
-                    CompoundTag undoTag1 = (CompoundTag) wandTag.get("undo1");
-                    CompoundTag undoTag2 = (CompoundTag) wandTag.get("undo2");
-
-                    Set<BlockPos> undo1 = checkUndo(player, world, undoTag1);
-                    Set<BlockPos> undo2 = checkUndo(player, world, undoTag2);
-                    if (undo1 == null && undo2 == null) {
-                        return;
-                    }
-
-                    if (undo1 != null && undo1.contains(blockPos)) {
-                        coordinates = undo1;
-                        renderOutlines(evt, player, coordinates, 240, 30, 0);
-                    } else if (undo2 != null && undo2.contains(blockPos)) {
-                        coordinates = undo2;
-                        renderOutlines(evt, player, coordinates, 240, 30, 0);
-                    }
-                } else {
-                    coordinates = findSuitableBlocks(wand, world, btrace.getDirection(), blockPos, blockState);
-                    renderOutlines(evt, player, coordinates, 50, 250, 180);
-                }
+            Set<BlockPos> undo1 = checkUndo(player, world, (CompoundTag) tag.get("undo1"));
+            Set<BlockPos> undo2 = checkUndo(player, world, (CompoundTag) tag.get("undo2"));
+            if (undo1 != null && undo1.contains(pos)) {
+                renderOutlines(evt, player, undo1, 240, 30, 0);
+            } else if (undo2 != null && undo2.contains(pos)) {
+                renderOutlines(evt, player, undo2, 240, 30, 0);
             }
+            return;
         }
+
+        Direction face = hit.getDirection();
+        Direction sourceDirection = face.getOpposite();
+        Set<BlockPos> coordinates = findSuitableBlocks(wand, world, face, pos, state);
+        ClientTools.renderPlacementPreview(evt.getPoseStack(), player, coordinates,
+                destination -> Tools.pickBlock(state, world, destination.relative(sourceDirection), player), false);
+        renderOutlines(evt, player, coordinates, 50, 250, 180);
     }
 
     private Set<BlockPos> findSuitableBlocks(ItemStack stack, Level world, Direction sideHit, BlockPos pos, BlockState state) {
-        Set<BlockPos> coordinates = new HashSet<>();
-        Set<BlockPos> done = new HashSet<>();
-        Deque<BlockPos> todo = new ArrayDeque<>();
-        todo.addLast(pos);
-        findSuitableBlocks(world, coordinates, done, todo, sideHit, state, amount[getMode(stack)],
-                getMode(stack) == MODE_9ROW || getMode(stack) == MODE_25ROW, getSubMode(stack));
+        int mode = getMode(stack);
+        int maxAmount = amount[mode];
+        boolean rowMode = mode == MODE_9ROW || mode == MODE_25ROW;
+        boolean rotated = getSubMode(stack) == 1;
+        Direction firstAxis = getFirstAxis(sideHit);
+        Direction secondAxis = getSecondAxis(sideHit);
+        if (rowMode) {
+            Direction preferred = rotated ? secondAxis : firstAxis;
+            Direction alternate = rotated ? firstAxis : secondAxis;
+            Set<BlockPos> row = findRow(world, pos, sideHit, state, maxAmount, preferred);
+            if (row.size() == maxAmount) {
+                return row;
+            }
+            Set<BlockPos> otherRow = findRow(world, pos, sideHit, state, maxAmount, alternate);
+            return otherRow.size() > row.size() ? otherRow : row;
+        }
 
+        Set<BlockPos> coordinates = new LinkedHashSet<>();
+        Set<BlockPos> visited = new HashSet<>();
+        Deque<BlockPos> pending = new ArrayDeque<>();
+        pending.addLast(pos);
+        Direction oppositeFirst = firstAxis.getOpposite();
+        Direction oppositeSecond = secondAxis.getOpposite();
+        while (!pending.isEmpty() && coordinates.size() < maxAmount) {
+            BlockPos base = pending.removeFirst();
+            BlockPos destination = base.relative(sideHit);
+            if (visited.add(base) && isSuitable(world, state, base, destination)) {
+                coordinates.add(destination);
+                pending.addLast(base.relative(firstAxis));
+                pending.addLast(base.relative(oppositeFirst));
+                pending.addLast(base.relative(secondAxis));
+                pending.addLast(base.relative(oppositeSecond));
+                pending.addLast(base.relative(firstAxis).relative(secondAxis));
+                pending.addLast(base.relative(firstAxis).relative(oppositeSecond));
+                pending.addLast(base.relative(oppositeFirst).relative(secondAxis));
+                pending.addLast(base.relative(oppositeFirst).relative(oppositeSecond));
+            }
+        }
         return coordinates;
     }
 
-    private void findSuitableBlocks(Level world, Set<BlockPos> coordinates, Set<BlockPos> done, Deque<BlockPos> todo, Direction direction,
-                                    BlockState state, int maxAmount, boolean rowMode, int rotated) {
+    private Set<BlockPos> findRow(Level world, BlockPos pos, Direction face, BlockState state, int maxAmount, Direction axis) {
+        Set<BlockPos> row = new LinkedHashSet<>();
+        BlockPos destination = pos.relative(face);
+        if (!isSuitable(world, state, pos, destination)) {
+            return row;
+        }
+        row.add(destination);
 
-        Direction dirA = null;
-        Direction dirB = null;
-        if (rowMode) {
-            BlockPos base = todo.getFirst();
-            BlockPos offset = base.relative(direction);
-            dirA = rotated == 1 ? dir2(direction) : dir1(direction);
-            dirB = dirA.getOpposite();
-            if (!isSuitable(world, state, base.relative(dirA), offset.relative(dirA)) ||
-                !isSuitable(world, state, base.relative(dirB), offset.relative(dirB))) {
-                dirA = rotated == 1 ? dir3(direction) : dir2(direction);
-                dirB = dirA.getOpposite();
-                if (!isSuitable(world, state, base.relative(dirA), offset.relative(dirA)) ||
-                        !isSuitable(world, state, base.relative(dirB), offset.relative(dirB))) {
-                    dirA = rotated == 1 ? dir1(direction) : dir3(direction);
-                    dirB = dirA.getOpposite();
-                }
+        Direction opposite = axis.getOpposite();
+        int forward = countRow(world, pos, face, state, maxAmount - 1, axis);
+        int backward = countRow(world, pos, face, state, maxAmount - 1, opposite);
+        for (int distance = 1; row.size() < maxAmount && distance <= Math.max(forward, backward); distance++) {
+            if (distance <= forward) {
+                row.add(destination.relative(axis, distance));
+            }
+            if (distance <= backward && row.size() < maxAmount) {
+                row.add(destination.relative(opposite, distance));
             }
         }
+        return row;
+    }
 
-        while (!todo.isEmpty() && coordinates.size() < maxAmount) {
-            BlockPos base = todo.pollFirst();
-            if (!done.contains(base)) {
-                done.add(base);
-                BlockPos offset = base.relative(direction);
-                if (isSuitable(world, state, base, offset)) {
-                    coordinates.add(offset);
-                    if (rowMode) {
-                        todo.addLast(base.relative(dirA));
-                        todo.addLast(base.relative(dirB));
-                    } else {
-                        todo.addLast(base.relative(dir1(direction)));
-                        todo.addLast(base.relative(dir1(direction).getOpposite()));
-                        todo.addLast(base.relative(dir2(direction)));
-                        todo.addLast(base.relative(dir2(direction).getOpposite()));
-                        todo.addLast(base.relative(dir1(direction)).relative(dir2(direction)));
-                        todo.addLast(base.relative(dir1(direction)).relative(dir2(direction).getOpposite()));
-                        todo.addLast(base.relative(dir1(direction).getOpposite()).relative(dir2(direction)));
-                        todo.addLast(base.relative(dir1(direction).getOpposite()).relative(dir2(direction).getOpposite()));
-                    }
-                }
+    private int countRow(Level world, BlockPos pos, Direction face, BlockState state, int limit, Direction axis) {
+        int count = 0;
+        while (count < limit) {
+            pos = pos.relative(axis);
+            if (!isSuitable(world, state, pos, pos.relative(face))) {
+                break;
             }
+            count++;
         }
+        return count;
     }
 
     private boolean isSuitable(Level world, BlockState state, BlockPos base, BlockPos offset) {
@@ -389,7 +394,7 @@ public class BuildingWand extends GenericWand {
         return baseState == state && destState.canBeReplaced();
     }
 
-    private Direction dir1(Direction direction) {
+    private Direction getFirstAxis(Direction direction) {
         return switch (direction) {
             case DOWN, UP -> Direction.EAST;
             case NORTH, SOUTH -> Direction.EAST;
@@ -397,18 +402,10 @@ public class BuildingWand extends GenericWand {
         };
     }
 
-    private Direction dir2(Direction direction) {
+    private Direction getSecondAxis(Direction direction) {
         return switch (direction) {
             case DOWN, UP -> Direction.SOUTH;
             case NORTH, SOUTH -> Direction.DOWN;
-            case WEST, EAST -> Direction.SOUTH;
-        };
-    }
-
-    private Direction dir3(Direction direction) {
-        return switch (direction) {
-            case DOWN, UP -> Direction.SOUTH;
-            case NORTH, SOUTH -> Direction.WEST;
             case WEST, EAST -> Direction.SOUTH;
         };
     }

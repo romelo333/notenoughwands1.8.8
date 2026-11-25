@@ -51,6 +51,7 @@
 
 
   "key.modifier": "Wand Modifier",
+  "key.submode": "Wand Sub-mode",
   "key.categories.notenoughwands": "Not Enough Wands",
 
   "itemGroup.NotEnoughWands": "Not Enough Wands"
